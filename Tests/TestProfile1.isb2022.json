@@ -1,0 +1,36 @@
+{
+    "hotkeys":[
+        {
+            "name":"Follow Me",
+            "keyCombo":"Alt+F"
+        }
+    ],
+    "gameKeyBindings":[
+        {
+            "name":"Follow Slot 1",
+            "keyCombo":"Shift+F11"
+        },
+        {
+            "name":"Follow Slot 2",
+            "keyCombo":"Ctrl+F11"
+        }
+    ],
+    "keyLayouts":[
+        {
+            "name":"Base Hotkeys",
+            "mappedKeys":[
+                {
+                    "name":"Follow Me",
+                    "hotkey":"Follow Me",
+                    "actions":[
+                        {
+                            "type":"Variable Keystroke",
+                            "gameKeyBinding":"Follow Slot {SLOT}",
+                            "target":"all other"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

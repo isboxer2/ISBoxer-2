@@ -1,22 +1,24 @@
-/* isb2022definitions: 
+/* isb2022_definitions: 
     A set of definitions for ISBoxer 2022. Essentially a "profile" (like an ISBoxer Toolkit Profile) but preferably more generic.
 */
-objectdef isb2022definitions
+objectdef isb2022_definitions
 {
     variable jsonvalue Hotkeys={}
     variable jsonvalue GameKeyBindings={}
-    variable jsonvalue Actions={}
     variable jsonvalue GUI={}    
     variable jsonvalue KeyLayouts={}
 
     member:jsonvalueref AsJSON()
     {
-        variable jsonvalue jo={}
-        jo:Set[hotkeys,"${Hotkeys~}"]
-        jo:Set[gameKeyBindings,"${GameKeyBindings~}"]
-        jo:Set[actions,"${Actions~}"]
-        jo:Set[gui,"${GUI~}"]
-        jo:Set[keyLayouts,"${KeyLayouts~}"]
+        variable jsonvalue jo
+        jo:SetValue["$$>
+        {
+            "hotkeys":${Hotkeys.AsJSON~},
+            "gameKeyBindings":${GameKeyBindings.AsJSON~},
+            "gui":${GUI.AsJSON~},
+            "keyLayouts":${KeyLayouts.AsJSON~}
+        }
+        <$$"]
         return jo
     }
 }
@@ -44,10 +46,13 @@ objectdef isb2022_actiontype
 
     member:jsonvalueref AsJSON()
     {
-        variable jsonvalue jo={}
-        jo:Set[name,"${Name~}"]
-        jo:Set[fields,"${Fields~}"]
-        return jo
+        variable jsonvalue jo
+        jo:SetValue["$$>
+        {
+            "name":${Name.AsJSON~},
+            "fields":${Fields.AsJSON~}
+        }
+        <$$"]
     }
 }
 
@@ -79,10 +84,55 @@ objectdef isb2022_mappedkey
 
     member:jsonvalueref AsJSON()
     {
-        variable jsonvalue jo={}
-        jo:Set[name,"${Name~}"]
-        jo:Set[hotkey,"${HotkeyName~}"]
-        jo:Set[actions,"${Actions~}"]
+        variable jsonvalue jo
+        jo:SetValue["$$>
+        {
+            "name":${Name.AsJSON~},
+            "hotkey":${HotkeyName.AsJSON~},
+            "actions":${Actions.AsJSON~}
+        }
+        <$$"]
+        return jo
+    }
+}
+
+/* isb2022_keylayout:
+    A "Key Layout" is a collection of Mapped Keys
+    
+    Example:
+    {
+        "name":"My Key Layout"
+        "mappedKeys":[
+            {
+                "name":"Follow Me",
+                "actions":[
+                    {
+                        "type":"Keystroke",
+                        "keyCombination":"Shift+F11",
+                        "target":"self"
+                    }
+                ]
+            }
+        ]
+    }
+*/
+objectdef isb2022_keylayout
+{
+    ; Name of the Key Layout
+    variable string Name
+
+    ; Mapped Keys
+    variable collection:isb2022_mappedkey MappedKeys
+
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo
+        jo:SetValue["$$>
+        {
+            "name":${Name.AsJSON~},
+            "mappedKeys":${MappedKeys.AsJSON[array]~}
+        }
+        <$$"]
         return jo
     }
 }

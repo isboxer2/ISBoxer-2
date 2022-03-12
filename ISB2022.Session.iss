@@ -1,9 +1,9 @@
 #include "ISB2022.Common.iss"
 
-objectdef isb2022
+objectdef isb2022session
 {
-    variable isb2022_definitions Definitions
-
+    variable isb2022definitions Definitions
+    
     method Initialize()
     {
 
@@ -15,7 +15,7 @@ objectdef isb2022
     }
 }
 
-variable(global) isb2022 ISB2022
+variable(global) isb2022session ISB2022
 
 function main()
 {

@@ -1,4 +1,5 @@
 {
+    "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
     "name":"Variable Follow Me",
     "hotkeys":[
         {

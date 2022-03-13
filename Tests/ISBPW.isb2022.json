@@ -1,4 +1,17 @@
 {
+    "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
+    "triggers":[
+        {
+            "triggerName":"profile.Loaded",
+            "actions":[
+                {
+                    "type":"Layout State",
+                    "name":"Always On",
+                    "value":true
+                }
+            ]
+        }
+    ],
     "keyLayouts":[
         {
             "name":"Always On",

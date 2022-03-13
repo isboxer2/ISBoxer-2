@@ -1,0 +1,37 @@
+{
+    "name":"Team 1",
+    "characters":[
+        {
+            "name":"Character One",
+            "gameLaunchInfo":{
+                "path":"d:/games/wow/_classic_",
+                "executable":"wow.exe"
+            }
+        },
+        {
+            "name":"Character Two",
+            "gameLaunchInfo":{
+                "path":"d:/games/wow/_classic_",
+                "executable":"wow.exe"
+            }
+        }
+    ],
+    "teams":[
+        {
+            "name":"Team 1",
+            "slots":[
+                {
+                    "character":"Character One"
+                },
+                {
+                    "character":"Character Two"
+                }
+            ],
+            "profiles":[
+                "Variable Follow Me",
+                "World of Warcraft Base Profile"
+            ],
+            "windowLayout":"My Window Layout"
+        }
+    ]
+}

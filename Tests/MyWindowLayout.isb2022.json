@@ -1,0 +1,50 @@
+{
+    "name":"My Window Layout",
+    "windowLayouts":[
+        {
+            "name":"My Window Layout",
+            "screenLayout":{
+                "screens":[
+                    {
+                        "bounds":[0,0,1920,1080],
+                        "workingArea":[0,0,1920,1080],
+                        "primary":true,
+                        "deviceName":"\\\\.\\DISPLAY1",
+                        "dpiScale":100
+                    }
+                ]
+            },
+            "regions":[
+                {
+                    "bounds":[0,0,1920,900]
+                },
+                {
+                    "bounds":[0,900,384,180],
+                    "slot":1
+                },
+                {
+                    "bounds":[384,900,384,180],
+                    "slot":2
+                },
+                {
+                    "bounds":[768,900,384,180],
+                    "slot":3
+                },
+                {
+                    "bounds":[1152,900,384,180],
+                    "slot":4
+                },
+                {
+                    "bounds":[1536,900,384,180],
+                    "slot":5
+                }
+            ],
+            "swapGroups":[
+                {
+                    "reset":0,
+                    "active":0
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,173 @@
+{
+    "name":"World of Warcraft Base Profile",
+    "virtualFiles":[
+        {
+            "pattern":"*/Config.WTF",
+            "replacement":"{1}/Config-{CHARACTER}.WTF"
+        },
+        {
+            "pattern":"Software/Blizzard Entertainment/World of Warcraft/Client/*",
+            "replacement":"Software/Blizzard Entertainment/World of Warcraft/Client-ISBoxer/{CHARACTER}/{1}"
+        },
+        {
+            "pattern":"*/Battle.net.config",
+            "replacement":"{1}/Battle.net-{CHARACTER}.config"
+        },
+        {
+            "pattern":"Software/Blizzard Entertainment/Battle.net/*",
+            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/CHARACTER}/{1}"
+        }
+    ],
+    "keyLayouts":[
+        {
+            "name":"World of Warcraft",
+            "mappedKeys":[
+                {
+                    "name":"Click to Move Off",
+                    "description":"This turns Click to Move off",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"WoW Macro",
+                                    "macroName":"Click-to-Move OFF"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"Click to Move On",
+                    "description":"This turns Click to Move on.",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"WoW Macro",
+                                    "macroName":"Click-to-Move ON"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"JambaMaster",
+                    "description":"This tells the Jamba Addon to tell the other characters the current one is master.\n\nThe Quick Setup Wizard uses this and similar mappings for whatever character switching (e.g. follow upon character switch) options were selected on the last page. A different Mapped Key can be selected later if desired, by selecting it per Slot in your Character Set (in a drop-down box on the right side). Or just run the wizard again...",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"WoW Macro",
+                                    "macroName":"JambaMaster"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"JambaStrobe Off",
+                    "description":"This tells the Jamba Addon to turn off follow strobing.",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"WoW Macro",
+                                    "macroName":"JambaStrobe OFF"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"JambaStrobe On",
+                    "description":"This tells the Jamba Addon to turn on follow strobing.",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"WoW Macro",
+                                    "macroName":"JambaStrobe ON"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"Follow/JambaMaster",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"Mapped Key",
+                                    "keyLayout":"World of Warcraft",
+                                    "mappedKey":"Follow Me"
+                                },
+                                {
+                                    "type":"Mapped Key",
+                                    "keyLayout":"World of Warcraft",
+                                    "mappedKey":"JambaMaster"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"Follow/JambaStrobe",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"Mapped Key",
+                                    "keyLayout":"World of Warcraft",
+                                    "mappedKey":"Follow Me"
+                                },
+                                {
+                                    "type":"Mapped Key",
+                                    "keyLayout":"World of Warcraft",
+                                    "mappedKey":"JambaStrobe ON"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"Follow/JambaStrobe/JambaMaster",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"Mapped Key",
+                                    "keyLayout":"World of Warcraft",
+                                    "mappedKey":"Follow Me"
+                                },
+                                {
+                                    "type":"Mapped Key",
+                                    "keyLayout":"World of Warcraft",
+                                    "mappedKey":"JambaMaster"
+                                },
+                                {
+                                    "type":"Mapped Key",
+                                    "keyLayout":"World of Warcraft",
+                                    "mappedKey":"JambaStrobe ON"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"Invite Team",
+                    "steps":[
+                        {
+                            "actions":[
+                                {
+                                    "type":"WoW Macro",
+                                    "macroName":"/invite team"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

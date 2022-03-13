@@ -1,0 +1,151 @@
+{
+    "keyLayouts":[
+        {
+            "name":"Always On",
+            "mappedKeys":[
+                {
+                    "name":"Activate Maps"
+                },
+                {
+                    "name":"Next Window"
+                },
+                {
+                    "name":"Previous Window"
+                },
+                {
+                    "name":"Close All Windows"
+                }
+            ]
+        },
+        {
+            "name":"Base Hotkeys",
+            "mappedKeys":[
+                {
+                    "name":"Follow Master"
+                },
+                {
+                    "name":"Assist Master"
+                },
+                {
+                    "name":"Interact with Target"
+                },
+                {
+                    "name":"Face Toward Target"
+                },
+                {
+                    "name":"Invite Team"
+                },
+                {
+                    "name":"Set Master"
+                }
+            ]
+        },
+        {
+            "name":"Toggles",
+            "mappedKeys":[
+                {
+                    "name":"Activate Maps (all windows)"
+                }
+            ]
+        },
+        {
+            "name":"Party",
+            "mappedKeys":[
+                {
+                    "name":"Assist Master"
+                },
+                {
+                    "name":"Auto-Assist Master"
+                },
+                {
+                    "name":"Follow Master"
+                },
+                {
+                    "name":"Target Master"
+                },
+                {
+                    "name":"Interact with Target"
+                },
+                {
+                    "name":"Auto-Interact with Target"
+                },
+                {
+                    "name":"Face Target"
+                },
+                {
+                    "name":"Invite Team"
+                }
+            ]
+        },
+        {
+            "name":"Master Switching",
+            "mappedKeys":[
+                {
+                    "name":"Set Master Slot 1"
+                },
+                {
+                    "name":"Set Master Slot 2"
+                },
+                {
+                    "name":"Set Master Slot 3"
+                },
+                {
+                    "name":"Set Master Slot 4"
+                },
+                {
+                    "name":"Set Master Slot 5"
+                },
+                {
+                    "name":"Set Master Slot 6"
+                },
+                {
+                    "name":"Set Master Slot 7"
+                }
+            ]
+        },
+        {
+            "name":"Combat Hotkeys",
+            "mappedKeys":[
+                {
+                    "name":"1"
+                },
+                {
+                    "name":"2"
+                },
+                {
+                    "name":"3"
+                },
+                {
+                    "name":"4"
+                },
+                {
+                    "name":"5"
+                },
+                {
+                    "name":"6"
+                },
+                {
+                    "name":"7"
+                },
+                {
+                    "name":"8"
+                },
+                {
+                    "name":"9"
+                },
+                {
+                    "name":"0"
+                },
+                {
+                    "name":"-"
+                },
+                {
+                    "name":"="
+                },
+                {
+                    "name":"DPS Rotation"
+                }
+            ]
+        }
+    ]
+}

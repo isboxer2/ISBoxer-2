@@ -12,8 +12,8 @@
         {
             "name":"Character Two",
             "gameLaunchInfo":{
-                "path":"d:/games/wow/_classic_",
-                "executable":"wow.exe"
+                "game": "WoW Classic",
+                "gameProfile": "WoW Classic Default Profile"
             }
         }
     ],

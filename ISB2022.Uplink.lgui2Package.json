@@ -1,0 +1,52 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
+    "includes": ["ISB2022.Skin.lgui2Package.json"],
+    "skin":"ISBoxer 2022",
+    "templates": {
+
+    },
+    "elements": [
+        {
+            "type": "panel",
+            "visibility": "hidden",
+            "name": "isb2022.events"
+        },
+        {
+            "type":"window",
+            "name":"isb2022.MainWindow",
+            "hideOnClose":true,
+            "title":"ISBoxer 2022",
+            "width":750,
+            "height":400,
+            "minSize":[600,300],
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "visibility": "visible",
+            "content":{
+                "type":"dockpanel",
+                "horizontalAlignment": "stretch",
+                "verticalAlignment": "stretch",
+                "children":[
+                    {
+                        "type":"dockpanel",
+                        "_dock":"bottom",
+                        "horizontalAlignment": "stretch",
+                        "children":[
+                            {
+                                "type":"button",
+                                "content":"Reload Agent",
+                                "_dock": "right",
+                                "eventHandlers": {
+                                    "onPress":{
+                                        "type":"code",
+                                        "code":"InnerSpace.Agent[ISBoxer 2022]:Stop:Start"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

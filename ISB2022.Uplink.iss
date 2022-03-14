@@ -6,12 +6,12 @@ objectdef isb2022 inherits isb2022_profilecollection
 
     method Initialize()
     {
-
+        LGUI2:LoadPackageFile[ISB2022.Uplink.lgui2Package.json]
     }
 
     method Shutdown()
     {
-
+        LGUI2:UnloadPackageFile[ISB2022.Uplink.lgui2Package.json]
     }
 
     method LoadTests()

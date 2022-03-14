@@ -1,0 +1,6 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
+    "skin": {
+        "name": "ISBoxer 2022"
+    }
+}

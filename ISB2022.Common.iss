@@ -1,21 +1,86 @@
-/* isb2022_definitions: 
-    A set of definitions for ISBoxer 2022. Essentially a "profile" (like an ISBoxer Toolkit Profile) but preferably more generic.
+/* isb2022_profile: 
+    A set of definitions for ISBoxer 2022. Like an ISBoxer Toolkit Profile, but preferably more generic.
 */
-objectdef isb2022_definitions
+objectdef isb2022_profile
 {
-    variable jsonvalue Hotkeys={}
-    variable jsonvalue GameKeyBindings={}
-    variable jsonvalue GUI={}    
-    variable jsonvalue KeyLayouts={}
+    variable string LocalFilename
+
+    variable string Name
+    variable string Description
+    variable string Version
+    variable uint MinimumBuild
+    variable jsonvalue Metadata
+
+    variable jsonvalue Profiles=[]
+    variable jsonvalue Teams=[]
+    variable jsonvalue Characters=[]
+    variable jsonvalue WindowLayouts=[]
+    variable jsonvalue VirtualFiles=[]
+    variable jsonvalue Triggers=[]
+    variable jsonvalue Hotkeys=[]
+    variable jsonvalue GameKeyBindings=[]
+    variable jsonvalue KeyLayouts=[]
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+        if ${jo.Has[description]}
+            Name:Set["${jo.Get[description]~}"]
+        if ${jo.Has[version]}
+            Name:Set["${jo.Get[version]~}"]
+        if ${jo.Has[minimumBuild]}
+            Name:Set["${jo.Get[minimumBuild]~}"]
+
+        if ${jo.Has[metadata]}
+            Metadata:SetValue["${jo.Get[metadata]~}"]
+        if ${jo.Has[profiles]}
+            Profiles:SetValue["${jo.Get[profiles]~}"]
+        if ${jo.Has[teams]}
+            Teams:SetValue["${jo.Get[teams]~}"] 
+        if ${jo.Has[characters]}
+            Characters:SetValue["${jo.Get[characters]~}"]
+        if ${jo.Has[windowLayouts]}
+            WindowLayouts:SetValue["${jo.Get[windowLayouts]~}"]
+        if ${jo.Has[virtualFiles]}
+            VirtualFiles:SetValue["${jo.Get[virtualFiles]~}"]
+        if ${jo.Has[triggers]}
+            Triggers:SetValue["${jo.Get[triggers]~}"]
+        if ${jo.Has[hotkeys]}
+            Hotkeys:SetValue["${jo.Get[hotkeys]~}"]
+        if ${jo.Has[gameKeyBindings]}
+            GameKeyBindings:SetValue["${jo.Get[gameKeyBindings]~}"]
+        if ${jo.Has[keyLayouts]}
+            KeyLayouts:SetValue["${jo.Get[kayLayouts]~}"]
+    }
 
     member:jsonvalueref AsJSON()
     {
         variable jsonvalue jo
         jo:SetValue["$$>
         {
+            "$schema":"http://www.lavishsoft.com/schema/isb2022.json",
+            "name":${Name.AsJSON~},
+            "description":${Description.AsJSON~},
+            "version":${Version.AsJSON~},
+            "minimumBuild":${MinimumBuild.AsJSON~},
+            "metadata":${Metadata.AsJSON~},
+            "profiles":${Profiles.AsJSON~},
+            "teams":${Teams.AsJSON~},
+            "characters":${Characters.AsJSON~},
+            "windowLayouts":${WindowLayouts.AsJSON~},
+            "virtualFiles":${VirtualFiles.AsJSON~},
+            "triggers":${Triggers.AsJSON~},
             "hotkeys":${Hotkeys.AsJSON~},
             "gameKeyBindings":${GameKeyBindings.AsJSON~},
-            "gui":${GUI.AsJSON~},
             "keyLayouts":${KeyLayouts.AsJSON~}
         }
         <$$"]
@@ -23,116 +88,46 @@ objectdef isb2022_definitions
     }
 }
 
-/* isb2022_actiontype:
-    An "Action Type" implements a type of Action, such as "Keystroke", which would typically press and release a key or key combination.
-
-    Example:
-        {
-            "name":"Keystroke",
-            "fields":{                                      note: probably actually JSON schema, but simplifying for now
-                "keyCombination":"string",
-                "target":"string"
-            }
-        }
-
+/* isb2022_profilecollection: 
+    A collection of ISBoxer 2022 profiles
 */
-objectdef isb2022_actiontype
+objectdef isb2022_profilecollection
 {
-    ; Name of the Action Type, such as "Keystroke"
-    variable string Name
+    ; The variable that contains the actual list
+    variable collection:isb2022_profile Profiles
 
-    ; A list of fields that the Action Type can use (e.g. "Key Combination" and "Target")
-    variable jsonvalue Fields={}
-
-    member:jsonvalueref AsJSON()
+    ; Loads a profile from a given file
+    method LoadFile(filepath fileName)
     {
-        variable jsonvalue jo
-        jo:SetValue["$$>
+        ; given a path like "Tests/WoW.isb2022.json" this turns it into like "C:/blah blah/Tests/isb2022.json"
+        fileName:MakeAbsolute
+        
+        ; parse the file into, hopefully, a json object
+        variable jsonvalue jo        
+        if !${jo:ParseFile["${fileName~}"](exists)}
+            return FALSE
+
+        ; if we got something else, forget it
+        if !${jo.Type.Equal[object]}
         {
-            "name":${Name.AsJSON~},
-            "fields":${Fields.AsJSON~}
+            echo "isb2022_profilecollection:LoadFile[${fileName~}]: expected JSON object, got ${jo.Type~}"
+            return FALSE
         }
-        <$$"]
-    }
-}
 
-/* isb2022_mappedkey:
-    A "Mapped Key" executes when a Hotkey is pressed/released.
-    
-    Example:
+        ; a profile is required to have a name, so we can more easily work with multiple profiles!
+        if !${jo.Has[name]}
         {
-            "name":"Follow Me",
-            "actions":[
-                {
-                    "type":"Keystroke",
-                    "keyCombination":"Shift+F11",
-                    "target":"self"
-                }
-            ]
+            echo "isb2022_profilecollection:LoadFile[${fileName~}]: 'name' field required"
+            return FALSE
         }
-*/
-objectdef isb2022_mappedkey
-{
-    ; Name of the Mapped Key
-    variable string Name
 
-    ; Name of assigned Hotkey
-    variable string HotkeyName
+        ; temporarily store the name since we'll need it a few times
+        variable string name
+        name:Set["${jo.Get[name]~}"]
 
-    ; Array of Actions to perform
-    variable jsonvalue Actions="[]"
-
-    member:jsonvalueref AsJSON()
-    {
-        variable jsonvalue jo
-        jo:SetValue["$$>
-        {
-            "name":${Name.AsJSON~},
-            "hotkey":${HotkeyName.AsJSON~},
-            "actions":${Actions.AsJSON~}
-        }
-        <$$"]
-        return jo
-    }
-}
-
-/* isb2022_keylayout:
-    A "Key Layout" is a collection of Mapped Keys
-    
-    Example:
-    {
-        "name":"My Key Layout"
-        "mappedKeys":[
-            {
-                "name":"Follow Me",
-                "actions":[
-                    {
-                        "type":"Keystroke",
-                        "keyCombination":"Shift+F11",
-                        "target":"self"
-                    }
-                ]
-            }
-        ]
-    }
-*/
-objectdef isb2022_keylayout
-{
-    ; Name of the Key Layout
-    variable string Name
-
-    ; Mapped Keys
-    variable collection:isb2022_mappedkey MappedKeys
-
-    member:jsonvalueref AsJSON()
-    {
-        variable jsonvalue jo
-        jo:SetValue["$$>
-        {
-            "name":${Name.AsJSON~},
-            "mappedKeys":${MappedKeys.AsJSON[array]~}
-        }
-        <$$"]
-        return jo
+        ; Assign the Profile
+        Profiles:Set["${name~}","jo"]
+        Profiles["${name~}"].LocalFilename:Set["${fileName~}"]
+        echo "Profile added: ${name~}"
     }
 }

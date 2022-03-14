@@ -1,8 +1,8 @@
 #include "ISB2022.Common.iss"
 
-objectdef isb2022
+objectdef isb2022 inherits isb2022_profilecollection
 {
-    variable isb2022_definitions Definitions
+    
 
     method Initialize()
     {
@@ -12,6 +12,15 @@ objectdef isb2022
     method Shutdown()
     {
 
+    }
+
+    method LoadTests()
+    {
+        This:LoadFile["Tests/ISBPW.isb2022.json"]
+        This:LoadFile["Tests/MyWindowLayout.isb2022.json"]
+        This:LoadFile["Tests/Team1.isb2022.json"]
+        This:LoadFile["Tests/VariableFollowMe.isb2022.json"]
+        This:LoadFile["Tests/WoW.isb2022.json"]
     }
 }
 

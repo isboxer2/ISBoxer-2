@@ -2,7 +2,6 @@
 
 objectdef isb2022session
 {
-    variable isb2022definitions Definitions
     
     method Initialize()
     {

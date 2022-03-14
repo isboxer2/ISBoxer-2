@@ -1,5 +1,6 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
+    "name": "ISBoxer Per-Window",
     "triggers":[
         {
             "triggerName":"profile.Loaded",

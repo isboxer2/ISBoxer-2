@@ -65,6 +65,8 @@ objectdef isb2022_profile
     member:jsonvalueref AsJSON()
     {
         variable jsonvalue jo
+        /*
+        ; this version produces a larger footprint than necessary, but this is basically what gets generated
         jo:SetValue["$$>
         {
             "$schema":"http://www.lavishsoft.com/schema/isb2022.json",
@@ -84,6 +86,41 @@ objectdef isb2022_profile
             "keyLayouts":${KeyLayouts.AsJSON~}
         }
         <$$"]
+        */
+
+        jo:SetValue["$$>
+        {
+            "$schema":"http://www.lavishsoft.com/schema/isb2022.json",
+            "name":${Name.AsJSON~}
+        }
+        <$$"]
+
+        if ${Description.NotNULLOrEmpty}
+            jo:Set["description","${Description.AsJSON~}"]
+        if ${Version.NotNULLOrEmpty}
+            jo:Set["version","${Version.AsJSON~}"]
+        if ${MinimumBuild}
+            jo:Set["description","${Description.AsJSON~}"]
+        if ${Metadata.Type.Equal[object]}
+            jo:Set["metadata","${Metadata.AsJSON~}"]
+        if ${Profiles.Used}
+            jo:Set["profiles","${Profiles.AsJSON~}"]
+        if ${Teams.Used}
+            jo:Set["teams","${Teams.AsJSON~}"]
+        if ${Characters.Used}
+            jo:Set["characters","${Characters.AsJSON~}"]
+        if ${WindowLayouts.Used}
+            jo:Set["windowLayouts","${WindowLayouts.AsJSON~}"]
+        if ${VirtualFiles.Used}
+            jo:Set["virtualFiles","${VirtualFiles.AsJSON~}"]
+        if ${Triggers.Used}
+            jo:Set["triggers","${Triggers.AsJSON~}"]
+        if ${Hotkeys.Used}
+            jo:Set["hotkeys","${Hotkeys.AsJSON~}"]
+        if ${GameKeyBindings.Used}
+            jo:Set["gameKeyBindings","${GameKeyBindings.AsJSON~}"]
+        if ${KeyLayouts.Used}
+            jo:Set["keyLayouts","${KeyLayouts.AsJSON~}"]
         return jo
     }
 }

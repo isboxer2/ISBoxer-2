@@ -123,6 +123,16 @@ objectdef isb2022_profile
             jo:Set["keyLayouts","${KeyLayouts.AsJSON~}"]
         return jo
     }
+
+    method Store()
+    {
+        if ${LocalFilename.NotNULLOrEmpty}
+        {
+            This.AsJSON:WriteFile["${LocalFilename~}",multiline]
+            return TRUE
+        }
+        return FALSE
+    }
 }
 
 /* isb2022_profilecollection: 
@@ -164,7 +174,20 @@ objectdef isb2022_profilecollection
 
         ; Assign the Profile
         Profiles:Set["${name~}","jo"]
-        Profiles["${name~}"].LocalFilename:Set["${fileName~}"]
+
+        ; the isb2022_profile object is now created, assign its LocalFilename
+        Profiles.Get["${name~}"].LocalFilename:Set["${fileName~}"]
         echo "Profile added: ${name~}"
+
+        ; fire an event for the GUI to refresh its Profiles if needed
+        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated] 
+    }
+
+    method RemoveProfile(string name)
+    {
+        Profiles:Erase["${name~}"]
+
+        ; fire an event for the GUI to refresh its Profiles if needed
+        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated] 
     }
 }

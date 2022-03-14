@@ -2,7 +2,8 @@
 
 objectdef isb2022 inherits isb2022_profilecollection
 {
-    
+    ; Reference to the currently selected Profile in the main window
+    variable weakref SelectedProfile
 
     method Initialize()
     {
@@ -21,6 +22,12 @@ objectdef isb2022 inherits isb2022_profilecollection
         This:LoadFile["Tests/Team1.isb2022.json"]
         This:LoadFile["Tests/VariableFollowMe.isb2022.json"]
         This:LoadFile["Tests/WoW.isb2022.json"]
+    }
+
+    method SelectProfile(string name)
+    {
+        SelectedProfile:SetReference["Profiles.Get[\"${name~}\"]"]
+        LGUI2.Element[weq2022.events]:FireEventHandler[onSelectedProfileChanged]
     }
 }
 

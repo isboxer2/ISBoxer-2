@@ -3,7 +3,17 @@
     "includes": ["ISB2022.Skin.lgui2Package.json"],
     "skin":"ISBoxer 2022",
     "templates": {
-
+        "isb2022.profileView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        }
     },
     "elements": [
         {
@@ -42,7 +52,71 @@
                                         "code":"InnerSpace.Agent[ISBoxer 2022]:Stop:Start"
                                     }
                                 }
+                            },
+                            {
+                                "type":"button",
+                                "content":"Load Tests",
+                                "_dock": "right",
+                                "margin":[0,0,5,0],
+                                "eventHandlers": {
+                                    "onPress":{
+                                        "type":"code",
+                                        "code":"ISB2022:LoadTests"
+                                    }
+                                }
                             }
+                        ]
+                    },
+                    {
+                        "type":"tabcontrol",
+                        "_dock":"top",
+                        "horizontalAlignment":"stretch",
+                        "tabs":[
+                            {
+                                "type":"tab",
+                                "header":"Launcher",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch"                    
+                                }                                
+                            },
+                            {
+                                "type":"tab",
+                                "header":"Profiles",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "children":[
+                                        {
+                                            "type":"listbox",
+                                            "_dock":"top",
+                                            "horizontalAlignment": "stretch",
+                                            "verticalAlignment": "stretch",
+                                            "itemsBinding":{
+                                                "pullFormat": "${ISB2022.Profiles.AsJSON[array]}",
+                                                "pullHook": {
+                                                    "elementName": "isb2022.events",
+                                                    "flags": "global",
+                                                    "event": "onProfilesUpdated"
+                                                }
+                                            },
+                                            "selectedItemBinding":{
+                                                "pullFormat":"${ISB2022.SelectedProfile.Name}",
+                                                "pushFormat":["ISB2022:SelectProfile[\"","\"]"]
+                                            },
+                                            "selectedItemBindingProperty":"name",
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                  "type":"template",
+                                                  "template":"isb2022.profileView"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }                                
+                            }                                                        
                         ]
                     }
                 ]

@@ -59,7 +59,7 @@ objectdef isb2022_profile
         if ${jo.Has[gameKeyBindings]}
             GameKeyBindings:SetValue["${jo.Get[gameKeyBindings]~}"]
         if ${jo.Has[keyLayouts]}
-            KeyLayouts:SetValue["${jo.Get[kayLayouts]~}"]
+            KeyLayouts:SetValue["${jo.Get[keyLayouts]~}"]
     }
 
     member:jsonvalueref AsJSON()

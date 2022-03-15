@@ -13,6 +13,15 @@
                     "pullReplaceNull":""
                 }
             }
+        },
+        "isb2022.profileEditor":{
+            "type":"window",
+            "jsonTemplate":"window",
+            "title":"${This.Context.Editing.Name}",
+            "visibility":"visible",
+            "width":750,
+            "height":400,
+            "minSize":[600,300]
         }
     },
     "elements": [

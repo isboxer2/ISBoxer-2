@@ -143,6 +143,16 @@ objectdef isb2022_profilecollection
     ; The variable that contains the actual list
     variable collection:isb2022_profile Profiles
 
+    variable collection:isb2022_profileeditor Editors
+
+    method OpenEditor(string profileName)
+    {
+        if ${Editors.Get["${profileName~}"](exists)}
+            return
+        
+        Editors:Set["${profileName~}","Profiles.Get[\"${profileName~}\"]"]
+    }
+
     ; Loads a profile from a given file
     method LoadFile(filepath fileName)
     {
@@ -189,5 +199,22 @@ objectdef isb2022_profilecollection
 
         ; fire an event for the GUI to refresh its Profiles if needed
         LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated] 
+    }
+}
+
+objectdef isb2022_profileeditor
+{
+    variable weakref Editing
+    variable lgui2elementref Window
+
+    method Initialize(weakref _profile)
+    {
+        Editing:SetReference[_profile]
+        Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2022.profileEditor]",This].ID}"]
+    }
+
+    method Shutdown()
+    {
+
     }
 }

@@ -16,7 +16,7 @@
         },
         {
             "pattern":"Software/Blizzard Entertainment/Battle.net/*",
-            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/CHARACTER}/{1}"
+            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/{CHARACTER}/{1}"
         }
     ],
     "keyLayouts":[

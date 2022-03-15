@@ -205,6 +205,7 @@ objectdef isb2022_profilecollection
 objectdef isb2022_profileeditor
 {
     variable weakref Editing
+    variable weakref EditingItem
     variable lgui2elementref Window
 
     method Initialize(weakref _profile)
@@ -216,5 +217,18 @@ objectdef isb2022_profileeditor
     method Shutdown()
     {
 
+    }
+
+    method OnVirtualFileSelected()
+    {
+;        echo "OnVirtualFileSelected Context(type)=${Context(type)} Source(type)=${Context.Source(type)} Args=${Context.Args~}"
+;        echo "SelectedItem.Index=${Context.Source.SelectedItem.Index} SelectedItem.Data=${Context.Source.SelectedItem.Data~}"
+
+        EditingItem:SetReference["Editing.VirtualFiles.Get[${Context.Source.SelectedItem.Index}]"]
+
+;        echo "OnVirtualFileSelected. EditingItem = ${EditingItem~}"
+
+        Window.Locate["profile.editorContainer"]:SetChild["${LGUI2.Template[isb2022.virtualFileEditor]~}","EditingItem"]
+        
     }
 }

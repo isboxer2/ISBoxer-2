@@ -389,8 +389,27 @@
                                     "verticalAlignment": "stretch",
                                     "children":[
                                         {
+                                            "type":"dockpanel",
+                                            "_dock":"right",
+                                            "verticalAlignment":"stretch",
+                                            "margin":[5,0,0,0],
+                                            "children":[
+                                                {
+                                                    "type":"button",
+                                                    "_dock":"top",
+                                                    "content":"Edit",
+                                                    "eventHandlers":{
+                                                        "onPress":{
+                                                            "type":"code",
+                                                            "code":"ISB2022:OpenEditor[\"${ISB2022.SelectedProfile.Name~}\"]"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
                                             "type":"listbox",
-                                            "_dock":"top",
+                                            "_dock":"left",
                                             "horizontalAlignment": "stretch",
                                             "verticalAlignment": "stretch",
                                             "itemsBinding":{

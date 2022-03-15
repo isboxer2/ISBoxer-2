@@ -149,7 +149,10 @@ objectdef isb2022_profilecollection
     {
         if ${Editors.Get["${profileName~}"](exists)}
             return
-        
+
+        if !${Profiles.Get["${profileName~}"](exists)}
+            return
+
         Editors:Set["${profileName~}","Profiles.Get[\"${profileName~}\"]"]
     }
 

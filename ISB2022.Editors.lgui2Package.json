@@ -2,6 +2,219 @@
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
     "skin":"ISBoxer 2022",
     "templates": {
+        "isb2022.draggerWidths":{
+            "default":200,
+            "isb2022.characterEditor":200,
+            "isb2022.teamEditor":200,
+            "isb2022.keyLayoutEditor":200
+        },
+        "isb2022.leftPane":{
+            "_dock":"left",
+            "_pane":"default",
+            "type":"dragger",
+            "width":200,
+            "allowMove":false,
+            "allowResize":true,
+            "borderThickness":[0,0,5,0],
+            "borderBrush":{"color":[0.5,0.5,0.5]},
+            "eventHandlers":{
+                "onVisualAttached":{
+                    "type":"code",
+                    "code":"This:SetSize[${LGUI2.Template[isb2022.draggerWidths].Get[${This.Metadata.Get[pane]}]},-1]"
+                },
+                "lostMouseCapture":{
+                    "type":"code",
+                    "code":"LGUI2.Skin[default].Template[isb2022.draggerWidths]:Set[${This.Metadata.Get[pane]},${This.Width}]"
+                }
+            }
+        },
+        "isb2022.characterEditor":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "jsonTemplate":"isb2022.leftPane",
+                    "_pane":"isb2022.characterEditor",
+                    "content":{
+                        "type":"treepanel",
+                        "verticalAlignment":"stretch",
+                        "horizontalAlignment":"stretch"
+                    }        
+                },
+                {
+                    "_dock":"top",
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context}",
+                      "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Actual Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[actualName]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[actualName,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                }
+            ]
+        },
+        "isb2022.teamEditor":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "jsonTemplate":"isb2022.leftPane",
+                    "_pane":"isb2022.teamEditor",
+                    "content":{
+                        "type":"treepanel",
+                        "verticalAlignment":"stretch",
+                        "horizontalAlignment":"stretch"
+                    }        
+                },
+                {
+                    "_dock":"top",
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context}",
+                      "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                }
+            ]
+        },
+        "isb2022.keyLayoutEditor":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "jsonTemplate":"isb2022.leftPane",
+                    "_pane":"isb2022.keyLayoutEditor",
+                    "content":{
+                        "type":"treepanel",
+                        "verticalAlignment":"stretch",
+                        "horizontalAlignment":"stretch"
+                    }        
+                },
+                {
+                    "_dock":"top",
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context}",
+                      "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                }
+            ]
+        },
+        "isb2022.hotkeyEditor":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context}",
+                      "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Key Combo",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[keyCombo]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.inputCombo"                            
+                        }
+                    ]
+                }
+            ]
+        },
+        "isb2022.gameKeyBindingEditor":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context}",
+                      "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Key Combo",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[keyCombo]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.inputCombo"                            
+                        }
+                    ]
+                }
+            ]
+        },
         "isb2022.virtualFileEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
@@ -20,7 +233,7 @@
                             "dataBinding":{
                               "pullFormat":"${This.Object.Get[pattern]}",
                               "pullReplaceNull":"",
-                              "pushFormat":["This.Object:Set[-lazy,pattern,\"","\"]"]
+                              "pushFormat":["This.Object:SetString[pattern,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
                         },
@@ -29,7 +242,7 @@
                             "dataBinding":{
                               "pullFormat":"${This.Object.Get[replacement]}",
                               "pullReplaceNull":"",
-                              "pushFormat":["This.Object:Set[-lazy,replacement,\"","\"]"]
+                              "pushFormat":["This.Object:SetString[replacement,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
                         }
@@ -72,6 +285,7 @@
                                         },
                                         {
                                             "type":"listbox",
+                                            "name":"profile.characters",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.Characters}"
                                             },
@@ -79,6 +293,13 @@
                                                 "default":{
                                                     "type":"template",
                                                     "template":"isb2022.characterView"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onItemSelected":{
+                                                    "type":"method",
+                                                    "object":"This.Context",
+                                                    "method":"OnCharacterSelected"
                                                 }
                                             }
                                         }        
@@ -95,6 +316,7 @@
                                         },
                                         {
                                             "type":"listbox",
+                                            "name":"profile.teams",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.Teams}"
                                             },
@@ -102,6 +324,13 @@
                                                 "default":{
                                                     "type":"template",
                                                     "template":"isb2022.teamView"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onItemSelected":{
+                                                    "type":"method",
+                                                    "object":"This.Context",
+                                                    "method":"OnTeamSelected"
                                                 }
                                             }
                                         }
@@ -118,6 +347,7 @@
                                         },
                                         {
                                             "type":"listbox",
+                                            "name":"profile.keyLayouts",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.KeyLayouts}"
                                             },
@@ -125,6 +355,13 @@
                                                 "default":{
                                                     "type":"template",
                                                     "template":"isb2022.keyLayoutView"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onItemSelected":{
+                                                    "type":"method",
+                                                    "object":"This.Context",
+                                                    "method":"OnKeyLayoutSelected"
                                                 }
                                             }
                                         }
@@ -141,6 +378,7 @@
                                         },
                                         {
                                             "type":"listbox",
+                                            "name":"profile.gameKeyBindings",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.GameKeyBindings}"
                                             },
@@ -149,13 +387,20 @@
                                                     "type":"template",
                                                     "template":"isb2022.gameKeyBindingView"
                                                 }
+                                            },
+                                            "eventHandlers":{
+                                                "onItemSelected":{
+                                                    "type":"method",
+                                                    "object":"This.Context",
+                                                    "method":"OnGameKeyBindingSelected"
+                                                }
                                             }
                                         }
                                     ]
                                 },
                                 {
                                     "type":"stackpanel",
-                                    "orientation":"vertical",
+                                    "orientation":"vertical",                                    
                                     "margin":[0,0,5,0],
                                     "children":[
                                         {
@@ -164,6 +409,7 @@
                                         },
                                         {
                                             "type":"listbox",
+                                            "name":"profile.windowLayouts",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.WindowLayouts}"
                                             },
@@ -171,6 +417,13 @@
                                                 "default":{
                                                     "type":"template",
                                                     "template":"isb2022.windowLayoutView"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onItemSelected":{
+                                                    "type":"method",
+                                                    "object":"This.Context",
+                                                    "method":"OnWindowLayoutSelected"
                                                 }
                                             }
                                         }
@@ -187,6 +440,7 @@
                                         },
                                         {
                                             "type":"listbox",
+                                            "name":"profile.virtualFiles",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.VirtualFiles}"
                                             },
@@ -197,7 +451,7 @@
                                                 }
                                             },
                                             "eventHandlers":{
-                                                "onSelectionChanged":{
+                                                "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
                                                     "method":"OnVirtualFileSelected"

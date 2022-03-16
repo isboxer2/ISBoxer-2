@@ -214,7 +214,9 @@ objectdef isb2022_profileeditor
     method Initialize(weakref _profile)
     {
         Editing:SetReference[_profile]
+        LGUI2:PushSkin["ISBoxer 2022"]
         Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2022.profileEditor]",This].ID}"]
+        LGUI2:PopSkin["ISBoxer 2022"]
     }
 
     method Shutdown()

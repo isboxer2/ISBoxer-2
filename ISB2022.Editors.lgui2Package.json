@@ -68,6 +68,42 @@
                               "pushFormat":["This.Object:SetString[actualName,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Account Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[accountName]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[accountName,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Email",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[email]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[email,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Server",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[serverName]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[serverName,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Game",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[game]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[game,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
                         }
                     ]
                 }

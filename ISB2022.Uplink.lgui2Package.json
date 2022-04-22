@@ -2,7 +2,7 @@
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
     "includes": [
         "ISB2022.Skin.lgui2Package.json",
-        "ISB2022.Editors.lgui2Package.json"
+        "ISB2022.Editors.lgui2Package.json",
         "ISB2022.Viewers.lgui2Package.json"
     ],
     "skin":"ISBoxer 2022",
@@ -43,7 +43,7 @@
                                 "eventHandlers": {
                                     "onPress":{
                                         "type":"code",
-                                        "code":"InnerSpace.Agent[ISBoxer 2022]:Stop:Start"
+                                        "code":"InnerSpace.Agent[ISBoxer 2022]:Stop:Reload:Start"
                                     }
                                 }
                             },

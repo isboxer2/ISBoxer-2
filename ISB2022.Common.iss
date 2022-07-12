@@ -4,6 +4,7 @@
 objectdef isb2022_profile
 {
     variable string LocalFilename
+    variable uint Priority
 
     variable string Name
     variable string Description
@@ -21,9 +22,12 @@ objectdef isb2022_profile
     variable jsonvalue GameKeyBindings=[]
     variable jsonvalue KeyLayouts=[]
 
-    method Initialize(jsonvalueref jo)
+    method Initialize(jsonvalueref jo, uint priority, string localFilename)
     {
         This:FromJSON[jo]
+        Priority:Set[${priority}]
+        if !${localFilename.IsNULLOrEmpty}
+            LocalFilename:Set["${localFilename~}"]
     }
 
     method FromJSON(jsonvalueref jo)
@@ -133,7 +137,28 @@ objectdef isb2022_profile
         }
         return FALSE
     }
+
+    member:jsonvalueref FindOne(string arrayName,string objectName)
+    {
+        variable jsoniterator Iterator
+        noop ${This.${arrayName}:GetIterator[Iterator]}
+
+        if !${Iterator:First(exists)}
+            return NULL
+
+        do
+        {
+            if ${objectName.Equal["${Iterator.Value.Get[name]~}"]}
+            {
+                return Iterator.Value
+            }
+        }
+        while ${Iterator:Next(exists)}
+
+        return NULL
+    }
 }
+
 
 /* isb2022_profilecollection: 
     A collection of ISBoxer 2022 profiles
@@ -142,8 +167,11 @@ objectdef isb2022_profilecollection
 {
     ; The variable that contains the actual list
     variable collection:isb2022_profile Profiles
+    variable collection:isb2022_profile ActiveProfiles
 
     variable collection:isb2022_profileeditor Editors
+
+    variable uint LoadCount
 
     method OpenEditor(string profileName)
     {
@@ -185,8 +213,9 @@ objectdef isb2022_profilecollection
         variable string name
         name:Set["${jo.Get[name]~}"]
 
+        LoadCount:Inc
         ; Assign the Profile
-        Profiles:Set["${name~}","jo"]
+        Profiles:Set["${name~}","jo",${LoadCount},"${fileName~}"]
 
         ; the isb2022_profile object is now created, assign its LocalFilename
         Profiles.Get["${name~}"].LocalFilename:Set["${fileName~}"]
@@ -202,6 +231,36 @@ objectdef isb2022_profilecollection
 
         ; fire an event for the GUI to refresh its Profiles if needed
         LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated] 
+    }
+
+    member:jsonvalueref FindOne(string arrayName,string objectName)
+    {
+        variable uint foundPriority=0
+        variable jsonvalueref foundObject
+
+        variable jsonvalueref checkObject
+
+        variable iterator Iterator
+        Profiles:GetIterator[Iterator]
+
+        if !${Iterator:First(exists)}
+            return NULL
+
+        do
+        {
+            if ${Iterator.Value.Priority} > ${foundPriority}
+            {
+                checkObject:SetReference["Iterator.Value.FindOne[\"${arrayName~}\",\"${objectName~}\"]"]
+                if ${checkObject.Type.Equal[object]}
+                {
+                    foundObject:Set[checkObject]
+                    foundPriority:Set[${Iterator.Value.Priorioty}]
+                }
+            }
+        }
+        while ${Iterator:Next(exists)}
+
+        return foundObject
     }
 }
 
@@ -281,5 +340,148 @@ objectdef isb2022_profileeditor
         This:ResetSelections[VirtualFile]
         This:SetEditingItem[VirtualFile,${Context.Source.SelectedItem.Index}]
 ;        echo "OnVirtualFileSelected. EditingItem = ${EditingItem~}"        
+    }
+}
+
+/* isb2022_actiontypemanager: 
+    Maps Action Types to the appropriate handler method
+*/
+objectdef isb2022_actiontypemanager
+{
+    variable string ActionObject="ISB2022"
+    variable collection:string ActionMethods
+
+    method InstallActionType(string name, string methodName)
+    {
+        ; echo "InstallActionType[${name~},${methodName~}]"
+        ActionMethods:Set["${name~}","${methodName~}"]
+    }
+
+    method ExecuteAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        variable string actionType = "${joAction.Get[type]~}"
+        variable string actionMethod = "${ActionMethods.Get["${actionType~}"]~}"
+   
+        ; echo "ExecuteAction[${actionType~}]=${actionMethod~}"
+        if ${actionMethod.NotNULLOrEmpty} && ${ActionObject.NotNULLOrEmpty}
+        {
+            execute "${ActionObject~}:${actionMethod~}[joState,joAction,${activate}]"
+        }
+    }
+
+    method InstantExecuteAction(jsonvalueref joState, jsonvalueref joAction)
+    {
+        This:ExecuteAction[joState,joAction,1]
+        This:ExecuteAction[joState,joAction,0]
+    }
+}
+
+/* isb2022_hotkeysheet: 
+    
+*/
+objectdef isb2022_hotkeysheet
+{
+    variable string Name
+
+    variable jsonvalue Hotkeys="{}"
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method Shutdown()
+    {
+        This:Disable
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        jo.Get[hotkeys]:ForEach["This:Add[ForEach.Value]"]
+
+        if ${jo.GetBool[enable]}
+        {
+            This:Enable
+        }
+    }
+
+    method Add(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+        Hotkeys:SetByRef["${jo.Get[name]~}",jo]
+    }
+
+    method Enable()
+    {
+        Hotkeys:ForEach["This:EnableHotkey[ForEach.Value]"]
+    }
+
+    method Disable()
+    {
+        Hotkeys:ForEach["This:DisableHotkey[ForEach.Value]"]
+    }
+
+    method EnableHotkey(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if !${jo.Has[name]}
+            return
+
+        ; install binding
+        ISB2022:InstallHotkey["${Name~}","${jo.Get[name]~}",jo]
+
+        jo:SetBool["enabled",1]
+    }
+
+    method DisableHotkey(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if !${jo.Has[name]}
+            return
+        
+        ISB2022:UninstallHotkey["${Name~}","${jo.Get[name]~}"]
+
+        jo:SetBool["enabled",0]
+    }
+}
+
+objectdef isb2022_mappablesheet
+{
+    variable string Name
+
+    variable jsonvalue Mappables="{}"
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        jo.Get[mappables]:ForEach["This:Add[ForEach.Value]"]
+    }
+
+    method Add(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+        Mappables:SetByRef["${jo.Get[name]~}",jo]
     }
 }

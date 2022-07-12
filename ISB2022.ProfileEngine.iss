@@ -12,6 +12,7 @@ objectdef isb2022_profileengine
     variable collection:isb2022_hotkeysheet HotkeySheets
     variable collection:isb2022_mappablesheet MappableSheets
     variable jsonvalue InputMappings="{}"
+    variable jsonvalue GameKeyBindings="{}"
 
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
 
@@ -394,16 +395,289 @@ objectdef isb2022_profileengine
 
     method ExecuteMappable(jsonvalueref joMappable, bool newState)
     {
-        ; get current step, then call This:ExecuteRotatorStep
         echo "ExecuteMappable[${newState}] ${joMappable~}"
-        ; for now, just assume the first step
-        This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,1]",${newState}]
+        ; get current step, then call This:ExecuteRotatorStep
+
+        variable int numStep=1
+        This:Rotator_PreExecute[joMappable,${newState}]
+
+        numStep:Set[${This.Rotator_GetCurrentStep[joMappable]}]
+        if ${numStep}>0
+        {
+            This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]",${newState}]
+            This:Rotator_PostExecute[joMappable,${newState},${numStep}]
+        }
+    }
+
+    member:int Rotator_GetCurrentStep(jsonvalueref joRotator)
+    {
+        variable int numStep
+        numStep:Set[${joRotator.GetInteger[step]}]
+        if !${numStep}
+            return 1
+        return ${numStep}
+    }    
+
+    member:bool Rotator_IsStepEnabled(jsonvalueref joRotator, int numStep)
+    {
+        switch ${joRotator.GetBool[steps,${numStep},enable]}
+        {
+        case NULL
+        case TRUE
+            return TRUE
+        case FALSE
+            return FALSE
+        default
+            echo "Rotator_IsStepEnabled unexpected value ${joRotator.GetBool[steps,${numStep},enable]}"
+            break
+        }
+        return FALSE
+    }
+
+    member:int Rotator_GetNextStep(jsonvalueref joRotator, int fromStep)
+    {
+        variable int totalSteps = ${joRotator.Get[steps].Used}
+        variable int nextStep=${fromStep.Inc}
+        if ${totalSteps}<=1
+            return 1
+
+        while 1
+        {
+            if ${nextStep} > ${totalSteps}
+                nextStep:Set[1]
+
+            if ${nextStep} == ${fromStep}
+                return ${fromStep}
+
+            switch ${joRotator.GetBool[steps,${nextStep},enable]}
+            {
+            case NULL
+            case TRUE
+                return ${nextStep}
+            case FALSE
+                break
+            default
+                echo "Rotator_GetNextStep unexpected value ${joRotator.GetBool[steps,${nextStep},enable]}"
+                break
+            }
+
+            nextStep:Inc
+        }
+    }
+
+    method Rotator_IncrementStepCounter(jsonvalueref joRotator,int numStep)
+    {
+        variable int stepCounter
+        stepCounter:Set["${joRotator.GetInteger[steps,${numStep},counter]}"]
+        stepCounter:Inc
+        noop ${joRotator.Get[steps,${numStep}]:SetInteger[${stepCounter}]}
+    }
+
+    method Rotator_Advance(jsonvalueref joRotator,bool newState)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
+        variable int fromStep
+        variable int stepCounter
+
+        echo Rotator_Advance ${newState}
+
+        fromStep:Set[${numStep}]
+
+        if ${numStep}==1
+            joRotator:SetInteger[firstAdvance,${Script.RunningTime}]
+
+        ; increment step counter
+        This:Rotator_IncrementStepCounter[joRotator,${numStep}]
+        
+		numStep:Inc
+		while 1
+		{
+			if ${numStep}>${joRotator.Get[steps].Used}
+			{
+				numStep:Set[1]
+
+				if ${newState}
+				{
+                    joRotator:SetInteger[firstPress,${Script.RunningTime}]
+				}
+				else
+				{
+                    joRotator:SetInteger[firstPress,0]
+				}
+			}
+
+            ; stop rotating in 3 possible ways...
+            ; 1. we went through ALL the other steps and arrived back at this one
+            ; 2. this is a release and not a press
+            ; 3. the step we land on is actually enabled
+
+			if ${numStep}==${fromStep}
+				break
+
+			if !${newState} || ${This.Rotator_IsStepEnabled[joRotator,${numStep}]}
+			{
+				break
+			}
+
+			numStep:Inc
+		}
+
+        joRotator:SetInteger[step,${numStep}]
+
+        joRotator:SetInteger["stepTriggered",0]
+
+		if ${newState}
+		{
+            joRotator:SetInteger[stepTimestamp,${Script.RunningTime}]
+		}
+		else
+		{
+            joRotator:SetInteger[stepTimestamp,0]
+		}
+    }
+
+    method Rotator_PreExecute(jsonvalueref joRotator,bool newState)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
+        variable int timeNow=${Script.RunningTime}
+        variable float stickyTime
+
+        if ${newState}
+        {
+            stickyTime:Set[${joRotator.GetNumber[step,${numStep},stickyTime]}]
+            if ${stickyTime}
+            {
+                if !${joRotator.GetInteger[stepTimestamp]}
+                    joRotator:SetInteger[stepTimestamp,${timeNow}]
+                /* Pre-press advance check */
+                if ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${jo.GetInteger[stepTimestamp]}
+                {
+                    This:Rotator_Advance[joRotator,1]
+                }
+            }
+
+            if !${joRotator.GetInteger[firstPress]}
+            {
+                joRotator:SetInteger[firstPress,${timeNow}]
+                joRotator:SetInteger[stepTimestamp,${timeNow}]
+            }
+            if ${numStep}>1
+            {                
+                /* Pre-press reset check */
+                switch ${joRotator.Get[resetType]~}
+                {
+                case firstPress
+                    if ${timeNow}>=(${joRotator.GetNumber[resetTimer]}*1000)+${joRotator.GetInteger[firstPress]}
+                    {
+    ;						echo \agFromFirstPress ${timeNow}>=${ResetTimer}+${FirstPress}
+                        This:Rotator_Reset[joRotator]
+                    }
+    ;					else
+    ;						echo \ayFromFirstPress ${timeNow}<${ResetTimer}+${FirstPress}
+                    break
+                case firstAdvance
+    ;					echo FromFirstAdvance checking ${timeNow}>=${ResetTimer}+${FirstAdvance}
+    ;					if ${timeNow}>=${ResetTimer}+${CurrentStepTimestamp}
+                    if ${timeNow}>=(${joRotator.GetNumber[resetTimer]}*1000)+${joRotator.GetInteger[firstAdvance]}
+                        This:Rotator_Reset[joRotator]
+                    break
+                case lastPress
+                    if ${timeNow}>=(${joRotator.GetNumber[resetTimer]}*1000)+${joRotator.GetInteger[lastPress]}
+                        This:Rotator_Reset[joRotator]
+                    break
+                }
+
+            }		
+            
+            joRotator:SetInteger[lastPress,${timeNow}]
+        }
+
+        if !${This.Rotator_IsStepEnabled[joRotator,${numStep}]}
+		{
+;            echo Rotator_PreExecute calling Rotator_Advance[0] due to step ${numStep} disabled
+			This:Rotator_Advance[joRotator,${newState}]
+            if !${This.Rotator_IsStepEnabled[joRotator,${numStep}]}
+			{
+				return FALSE
+			}
+		}
+
+        return TRUE
+    }
+
+    method Rotator_PostExecute(jsonvalueref joRotator,bool newState, int executedStep)
+    {
+
+; call advance if ALL of these conditions are met....
+; 1. newState == FALSE
+; 2. has not already advanced (current step == executed step)
+; 3. current step is NOT sticky
+
+        if ${newState}
+            return
+        
+        variable int numStep
+        numStep:Set[${This.Rotator_GetCurrentStep[joRotator]}]
+
+        if ${numStep}!=${executedStep}
+            return
+
+        ; is step sticky?
+        if ${joRotator.GetNumber[steps,${numStep},stickyTime]}>0
+            return
+
+;        echo Rotator_PostExecute calling Rotator_Advance
+        This:Rotator_Advance[joRotator,0]
+    }
+
+    method Rotator_Reset(jsonvalueref joRotator)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
+        variable int timeNow=${Script.RunningTime}
+
+        This:Rotator_IncrementStepCounter[joRotator,${numStep}]
+        joRotator:SetInteger[firstPress,${timeNew}]
+        joRotator:SetInteger[step,1]
+        joRotator:SetInteger[stepTriggered,0]
+		joRotator:SetInteger[stepTimestamp,${timeNew}]
     }
 
     method ExecuteRotatorStep(jsonvalueref joRotator, jsonvalueref joStep, bool newState)
     {
         echo "ExecuteRotatorStep[${newState}] ${joStep~}"
-        This:ExecuteActionList[joStep,"joStep.Get[actions]",${newState}]
+
+        ; if the step is disabled, don't execute it.
+        if ${joStep.GetBool[enable].Equal[FALSE]}
+            return
+
+        if ${newState}
+        {
+            if ${jo.GetInteger[stepTriggered]}<1
+            {
+                ; safe to execute, but mark as triggered
+                joRotator:SetInteger["stepTriggered",1]    
+            }
+            else
+            {
+                if ${joStep.GetBool[triggerOnce]}
+                    return
+            }
+        }
+        else
+        {
+            if ${jo.GetInteger[stepTriggered]}<2
+            {
+                ; safe to execute, but mark as triggered
+                joRotator:SetInteger["stepTriggered",2]    
+            }
+            else
+            {
+                if ${joStep.GetBool[triggerOnce]}
+                    return
+            }
+        }
+        
+        This:ExecuteActionList[joStep,"joStep.Get[actions]",${newState}]        
     }
 
     method ExecuteActionList(jsonvalueref joState, jsonvalueref jaList, bool newState)

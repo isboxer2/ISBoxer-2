@@ -343,9 +343,40 @@ objectdef isb2022_profileeditor
     }
 }
 
+objectdef isb2022_triggerchain
+{
+    variable string Name
+    variable jsonvalue Handlers="{}"
+
+    method Initialize(string name)
+    {
+        Name:Set["${name~}"]
+    }
+
+    method AddHandler(jsonvalueref joTrigger)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        Handlers:SetByRef["${joTrigger.Get[name]~}",joTrigger]
+        return TRUE
+    }
+
+    method RemoveHandler(string name)
+    {
+        Handlers:Erase["${name~}"]
+    }
+
+    method Execute(weakref obj, bool newState)
+    {
+        Handlers:ForEach["obj:ExecuteTrigger[ForEach.Value,${newState}]"]
+    }
+}
+
 /* isb2022_actiontypemanager: 
     Maps Action Types to the appropriate handler method
 */
+/*
 objectdef isb2022_actiontypemanager
 {
     variable string ActionObject="ISB2022"
@@ -375,6 +406,7 @@ objectdef isb2022_actiontypemanager
         This:ExecuteAction[joState,joAction,0]
     }
 }
+*/
 
 /* isb2022_hotkeysheet: 
     
@@ -382,6 +414,7 @@ objectdef isb2022_actiontypemanager
 objectdef isb2022_hotkeysheet
 {
     variable string Name
+    variable bool Enabled
 
     variable jsonvalue Hotkeys="{}"
 
@@ -420,12 +453,22 @@ objectdef isb2022_hotkeysheet
 
     method Enable()
     {
+        Enabled:Set[1]
         Hotkeys:ForEach["This:EnableHotkey[ForEach.Value]"]
     }
 
     method Disable()
     {
+        Enabled:Set[0]
         Hotkeys:ForEach["This:DisableHotkey[ForEach.Value]"]
+    }
+
+    method Toggle()
+    {
+        if ${Enabled}
+            This:Disable
+        else
+            This:Enable
     }
 
     method EnableHotkey(jsonvalueref jo)

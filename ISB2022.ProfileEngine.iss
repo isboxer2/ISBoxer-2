@@ -3,16 +3,20 @@
 */
 objectdef isb2022_profileengine
 {
-    variable isb2022_actiontypemanager Actions
-
     variable set Profiles
 
     variable set Hotkeys
 
     variable collection:isb2022_hotkeysheet HotkeySheets
     variable collection:isb2022_mappablesheet MappableSheets
+    variable collection:isb2022_triggerchain TriggerChains
+
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
+    variable jsonvalue ActionTypes="{}"
+
+    variable jsonvalueref LastHotkey
+    variable jsonvalueref LastMappable
 
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
 
@@ -26,10 +30,65 @@ objectdef isb2022_profileengine
         TaskManager:Destroy
     }
 
-    method InstallActionTypes(string actionObject)
+    method InstallDefaultActionTypes()
     {
-        Actions.ActionObject:Set["${actionObject~}"]
-        Actions:InstallActionType["Keystroke","Action_Keystroke"]
+;        Actions.ActionObject:Set["${actionObject~}"]
+;        Actions:InstallActionType["Keystroke","Action_Keystroke"]
+
+        variable jsonvalue ja
+        ja:SetValue["$$>[
+            {
+                "name":"keystroke",
+                "handler":"Action_Keystroke"
+            },
+            {
+                "name":"hotkey sheet state",
+                "handler":"Action_HotkeySheetState"
+            },
+            {
+                "name":"window focus",
+                "handler":"Action_WindowFocus"
+            },
+            {
+                "name":"window close",
+                "handler":"Action_WindowClose"
+            },
+            {
+                "name":"input mapping",
+                "handler":"Action_InputMapping"
+            },
+            {
+                "name":"set input mapping",
+                "handler":"Action_SetInputMapping"
+            },
+            {
+                "name":"mappable state",
+                "handler":"Action_MappableState"
+            },
+            {
+                "name":"add trigger",
+                "handler":"Action_AddTrigger"
+            },
+            {
+                "name":"remove trigger",
+                "handler":"Action_RemoveTrigger"
+            }
+        ]<$$"]
+
+;        echo "InstallDefaultActionTypes ${ja~}"
+        This:InstallActionTypes[ja]
+    }
+
+    method InstallActionTypes(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallActionType[ForEach.Value]"]
+    }
+
+    method InstallActionType(jsonvalueref jo)
+    {
+        ; echo InstallActionType: ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo] 
+        ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo]
     }
 
     method InstallVirtualFile(jsonvalueref jo)
@@ -63,6 +122,22 @@ objectdef isb2022_profileengine
     {
         if !${jo.Type.Equal[object]}
             return FALSE
+    }
+
+    method InstallTrigger(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        variable string name
+        name:Set["${jo.Get[name]~}"]
+
+        if !${TriggerChains.Get["${name~}"](exists)}
+        {
+            TriggerChains:Set["${name~}","${name~}"]
+        }
+
+        TriggerChains.Get["${name~}"]:AddHandler[jo]
     }
 
     method InstallTriggers(jsonvalueref ja)
@@ -234,9 +309,79 @@ objectdef isb2022_profileengine
         }
     }
 
+    method Action_HotkeySheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_HotkeySheetState[${activate}] ${joAction~}"
+
+        variable string name
+        if !${activate}
+            return
+
+        name:Set["${This.ProcessVariables["${joAction.Get[name]~}"]~}"]
+
+        switch ${joAction.GetBool[state]}
+        {
+            case TRUE
+                HotkeySheets.Get["${name~}"]:Enable
+                break
+            case FALSE
+                HotkeySheets.Get["${name~}"]:Disable
+                break
+            case NULL
+                HotkeySheets.Get["${name~}"]:Toggle
+                break
+        }
+    }
+
+    method Action_WindowFocus(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_WindowFocus[${activate}] ${joAction~}"
+        if !${activate}
+            return
+    }
+
+    method Action_WindowClose(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_WindowClose[${activate}] ${joAction~}"
+        if !${activate}
+            return
+    }
+
+    method Action_InputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_InputMapping[${activate}] ${joAction~}"
+
+        variable string name
+        if !${activate}
+            return
+
+        This:ExecuteInputMappingByName["${joAction.Get[name]~}",${activate}]
+    }
+
+    method Action_SetInputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_SetInputMapping[${activate}] ${joAction~}"
+        if !${activate}
+            return
+
+                variable string name
+        if !${activate}
+            return
+
+        This:InstallInputMapping["${name~}",""]
+    }
+
+    method Action_MappableState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_MappableState[${activate}] ${joAction~}"
+        if !${activate}
+            return
+    }
 
     method InstallInputMapping(string name,jsonvalueref joMapping)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
         echo "InstallInputMapping ${name~}: ${joMapping}"
         InputMappings:SetByRef["${name~}",joMapping]
     }
@@ -248,6 +393,9 @@ objectdef isb2022_profileengine
 
     method InstallHotkey(string sheet, string name, jsonvalueref joHotkey)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
+
         echo "InstallHotkey[${sheet~},${name~}] ${joHotkey~}"
         variable jsonvalue joBinding
         ; initialize a LGUI2 input binding object with JSON
@@ -282,6 +430,8 @@ objectdef isb2022_profileengine
     ; Installs a Hotkey, given a name, a key combination, and LavishScript code to execute on PRESS
     method InstallHotkeyEx(string name, string keyCombo, string onPress, string onRelease)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
         echo "InstallHotkeyEx ${name~}: ${keyCombo~}"
 
         if !${onPress.NotNULLOrEmpty} && !${onRelease.NotNULLOrEmpty}
@@ -352,6 +502,8 @@ objectdef isb2022_profileengine
 
     method ExecuteInputMappingByName(string name, bool newState)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
         variable jsonvalueref joMapping
         joMapping:SetReference["This.InputMappings.Get[\"${name~}\"]"]
 
@@ -364,14 +516,30 @@ objectdef isb2022_profileengine
 
     method ExecuteHotkeyByName(string sheet, string name, bool newState)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
+
         variable jsonvalueref joHotkey
         joHotkey:SetReference["HotkeySheets.Get[${sheet.AsJSON~}].Hotkeys.Get[${name.AsJSON~}]"]
-        
+
+        This:ExecuteHotkey[joHotkey,${newState}]
+    }
+
+    method ExecuteHotkey(jsonvalueref joHotkey, bool newState)
+    {
+        if !${newState}
+        {
+            This:IncrementCounter[joHotkey]
+        }
+
         This:ExecuteInputMapping["joHotkey.Get[inputMapping]",${newState}]
     }
 
     method ExecuteMappableByName(string sheet, string name, bool newState)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
+
         variable jsonvalueref joMappable
         joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
         
@@ -380,23 +548,56 @@ objectdef isb2022_profileengine
 
     method ExecuteGameKeyBindingByName(string name, bool newState)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
 
+        variable jsonvalueref joGameKeyBinding
+        joGameKeyBinding:SetReference["GameKeyBindings.Get[${name.AsJSON~}]"]
+        
+        This:ExecuteGameKeyBinding["joGameKeyBinding",${newState}]
+    }
+
+    method ExecuteGameKeyBinding(jsonvalueref joGameKeyBinding, bool newState)
+    {
+        if !${joGameKeyBinding.Type.Equal[object]}
+            return
+
+        variable string keystroke
+        keystroke:Set["${joGameKeyBinding.Get[key]~}"]
+        if !${keystroke.NotNULLOrEmpty}
+            return
+
+        if ${newState}
+        {
+            echo press -hold "${keystroke}"
+            press -hold "${keystroke}"
+        }
+        else
+        {
+            echo press -release "${keystroke}"
+            press -release "${keystroke}"
+        }
     }
 
     method ExecuteTriggerByName(string name, bool newState)
     {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
 
+        TriggerChains.Get["${name}"].Handlers:ForEach["This:ExecuteTrigger[ForEach.Value,${newState}]"]
     }
 
     method ExecuteTrigger(jsonvalueref joTrigger, bool newState)
     {
-        This:ExecuteActionList[joTrigger,"joTrigger.Get[actions]",${newState}]
+        This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
     }
 
     method ExecuteMappable(jsonvalueref joMappable, bool newState)
     {
         echo "ExecuteMappable[${newState}] ${joMappable~}"
         ; get current step, then call This:ExecuteRotatorStep
+        if !${newState}
+        {
+            This:IncrementCounter[joMappable]
+        }
 
         variable int numStep=1
         This:Rotator_PreExecute[joMappable,${newState}]
@@ -407,6 +608,8 @@ objectdef isb2022_profileengine
             This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]",${newState}]
             This:Rotator_PostExecute[joMappable,${newState},${numStep}]
         }
+
+        LastMappable:SetReference[joMappable]
     }
 
     member:int Rotator_GetCurrentStep(jsonvalueref joRotator)
@@ -465,12 +668,17 @@ objectdef isb2022_profileengine
         }
     }
 
+    method IncrementCounter(jsonvalueref joCountable)
+    {
+        variable int counter=${joCountable.GetInteger[counter]}
+        counter:Inc
+        joCountable:SetInteger[counter,${counter}]
+        joCountable:SetInteger[counterTime,${Script.RunningTime}]
+    }
+
     method Rotator_IncrementStepCounter(jsonvalueref joRotator,int numStep)
     {
-        variable int stepCounter
-        stepCounter:Set["${joRotator.GetInteger[steps,${numStep},counter]}"]
-        stepCounter:Inc
-        noop ${joRotator.Get[steps,${numStep}]:SetInteger[${stepCounter}]}
+        This:IncrementCounter["joRotator.Get[steps,${numStep}]"]
     }
 
     method Rotator_Advance(jsonvalueref joRotator,bool newState)
@@ -528,11 +736,11 @@ objectdef isb2022_profileengine
 
 		if ${newState}
 		{
-            joRotator:SetInteger[stepTimestamp,${Script.RunningTime}]
+            joRotator:SetInteger[stepTime,${Script.RunningTime}]
 		}
 		else
 		{
-            joRotator:SetInteger[stepTimestamp,0]
+            joRotator:SetInteger[stepTime,0]
 		}
     }
 
@@ -547,10 +755,10 @@ objectdef isb2022_profileengine
             stickyTime:Set[${joRotator.GetNumber[step,${numStep},stickyTime]}]
             if ${stickyTime}
             {
-                if !${joRotator.GetInteger[stepTimestamp]}
-                    joRotator:SetInteger[stepTimestamp,${timeNow}]
+                if !${joRotator.GetInteger[stepTime]}
+                    joRotator:SetInteger[stepTime,${timeNow}]
                 /* Pre-press advance check */
-                if ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${jo.GetInteger[stepTimestamp]}
+                if ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${jo.GetInteger[stepTime]}
                 {
                     This:Rotator_Advance[joRotator,1]
                 }
@@ -559,7 +767,7 @@ objectdef isb2022_profileengine
             if !${joRotator.GetInteger[firstPress]}
             {
                 joRotator:SetInteger[firstPress,${timeNow}]
-                joRotator:SetInteger[stepTimestamp,${timeNow}]
+                joRotator:SetInteger[stepTime,${timeNow}]
             }
             if ${numStep}>1
             {                
@@ -639,7 +847,7 @@ objectdef isb2022_profileengine
         joRotator:SetInteger[firstPress,${timeNew}]
         joRotator:SetInteger[step,1]
         joRotator:SetInteger[stepTriggered,0]
-		joRotator:SetInteger[stepTimestamp,${timeNew}]
+		joRotator:SetInteger[stepTime,${timeNew}]
     }
 
     method ExecuteRotatorStep(jsonvalueref joRotator, jsonvalueref joStep, bool newState)
@@ -683,7 +891,19 @@ objectdef isb2022_profileengine
     method ExecuteActionList(jsonvalueref joState, jsonvalueref jaList, bool newState)
     {
         echo "ExecuteActionList[${newState}] ${jaList~}"
-        jaList:ForEach["ISB2022.Actions:ExecuteAction[joState,ForEach.Value,${newState}]"]
+        jaList:ForEach["This:ExecuteAction[joState,ForEach.Value,${newState}]"]
+    }
+
+    method ExecuteAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        variable string actionType = "${joAction.Get[type].Lower~}"
+        variable string actionMethod = "${ActionTypes.Get["${actionType~}",handler]~}"
+   
+        echo "ExecuteAction[${actionType~}]=${actionMethod~}"
+        if ${actionMethod.NotNULLOrEmpty}
+        {
+            execute "This:${actionMethod}[joState,joAction,${activate}]"
+        }
     }
 
     method ExecuteInputMapping(jsonvalueref joMapping, bool newState)

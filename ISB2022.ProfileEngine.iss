@@ -911,22 +911,38 @@ objectdef isb2022_profileengine
         echo "ExecuteInputMapping[${newState}] ${joMapping~}"
 
         variable string targetName
-        targetName:Set["${joMapping.Get[name]~}"]
-        if !${targetName.NotNULLOrEmpty}
-            return FALSE
 
         switch ${joMapping.Get[type]~}
         {
             case mappable                
+                targetName:Set["${joMapping.Get[name]~}"]
+                if !${targetName.NotNULLOrEmpty}
+                    return FALSE
                 return ${This:ExecuteMappableByName["${joMapping.Get[sheet]~}","${targetName~}",${newState}](exists)}
             case inputMapping
+                targetName:Set["${joMapping.Get[name]~}"]
+                if !${targetName.NotNULLOrEmpty}
+                    return FALSE
                 return ${This:ExecuteInputMappingByName["${targetName~}",${newState}](exists)}
             case gameKeyBinding
+                targetName:Set["${joMapping.Get[name]~}"]
+                if !${targetName.NotNULLOrEmpty}
+                    return FALSE
                 return ${This:ExecuteGameKeyBindingByName["${targetName~}",${newState}](exists)}
             case hotkey
+                targetName:Set["${joMapping.Get[name]~}"]
+                if !${targetName.NotNULLOrEmpty}
+                    return FALSE
                 return ${This:ExecuteHotkeyByName["${joMapping.Get[sheet]~}","${targetName~}",${newState}](exists)}
             case trigger
+                targetName:Set["${joMapping.Get[name]~}"]
+                if !${targetName.NotNULLOrEmpty}
+                    return FALSE
                 return ${This:ExecuteTriggerByName["${targetName~}",${newState}](exists)}
+            case action
+                return ${This:ExecuteAction[joMapping,"joMapping.Get[action]",${newState}](exists)}
+            case actions
+                return ${This:ExecuteActionList[joMapping,"joMapping.Get[actions]",${newState}](exists)}
         }
 
         return FALSE

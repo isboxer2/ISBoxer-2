@@ -343,6 +343,217 @@ objectdef isb2022_profileeditor
     }
 }
 
+objectdef isb2022_clickbar
+{
+    variable string Name
+    
+    variable jsonvalueref Data
+    variable lgui2elementref Window
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method Shutdown()
+    {
+        Window:Destroy
+    }
+
+    method GotMouseFocus()
+    {
+        echo isb2022_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+    }
+
+    method LostMouseFocus()
+    {
+        echo isb2022_clickbar:LostMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+    }
+
+    method GotMouseOver()
+    {
+        variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
+        echo isb2022_clickbar:GotMouseOver numButton=${numButton}
+
+        variable jsonvalueref joButton
+        joButton:SetReference["Data.Get[buttons,${numButton}]"]
+
+        if !${joButton.Reference(exists)}
+            return
+
+        ; get input mapping
+        if !${joButton.Has[mouseOver]}
+            return
+
+        ISB2022:ExecuteInputMapping["joButton.Get[mouseover]",1]
+    }
+
+    method LostMouseOver()
+    {
+        variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
+        echo isb2022_clickbar:LostMouseOver numButton=${numButton}
+
+        variable jsonvalueref joButton
+        joButton:SetReference["Data.Get[buttons,${numButton}]"]
+
+        if !${joButton.Reference(exists)}
+            return
+
+        ; get input mapping
+        if !${joButton.Has[mouseOver]}
+            return
+
+        ISB2022:ExecuteInputMapping["joButton.Get[mouseover]",0]
+    }
+
+    member:bool ClickMatches(jsonvalueref joClick, jsonvalueref joMatch)
+    {
+        echo ClickMatches ${joClick~} ${joMatch~}
+        if ${joClick.GetInteger[button]}!=${joMatch.GetInteger[controlID]}
+            return FALSE
+
+        echo ClickMatches \agTRUE\ax
+        return TRUE
+    }
+
+    member:jsonvalueref GetClick(jsonvalueref jaClicks, jsonvalueref joMatch)
+    {
+        echo GetClick ${jaClicks~} ${joMatch~}
+
+        variable uint i
+        for (i:Set[1] ; ${i} <= ${jaClicks.Used} ; i:Inc )
+        {
+            if ${This.ClickMatches["jaClicks.Get[${i}]",joMatch]}
+                return "jaClicks.Get[${i}]"
+        }
+
+        return NULL
+    }
+
+    method OnButtonPress(jsonvalueref joButton, jsonvalueref joData)
+    {
+        echo onButtonPress ${joButton~} ${joData~}
+        variable jsonvalueref joClick
+        joClick:SetReference["This.GetClick[\"joButton.Get[clicks]\",joData]"]
+
+        if !${joClick.Reference(exists)}
+            return
+
+        if !${joButton.Has[activeClicks]}
+            joButton:Set["activeClicks","[null,null,null,null,null]"]
+
+        joButton.Get[activeClicks]:Set[${joData.GetInteger[controlID]},"${joClick~}"]
+
+        ISB2022:ExecuteInputMapping["joClick.Get[inputMapping]",1]
+    }
+
+    method OnButtonRelease(jsonvalueref joButton, jsonvalueref joData)
+    {
+        echo onButtonRelease ${joButton~} ${joData~}
+        variable uint mouseButton=${joData.GetInteger[controlID]}
+        variable jsonvalueref joClick
+        joClick:SetReference["joButton.Get[activeClicks,${mouseButton}]"]
+
+        if !${joClick.Reference.Type.Equal[object]}
+            return
+
+        joButton.Get[activeClicks]:Set[${mouseButton},NULL]
+        ISB2022:ExecuteInputMapping["joClick.Get[inputMapping]",0]
+    }
+
+    method OnMouseButtonMove()
+    {
+        variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
+        variable bool pressed=${Context.Args.Get[position]}
+        echo isb2022_clickbar:OnMouseButtonMove numButton=${numButton} ${Context(type)} ${Context.Args} 
+
+        variable jsonvalueref joButton
+        joButton:SetReference["Data.Get[buttons,${numButton}]"]
+
+        if !${joButton.Reference(exists)}
+            return
+
+        if ${pressed}
+            This:OnButtonPress[joButton,Context.Args]
+        else
+            This:OnButtonRelease[joButton,Context.Args]
+    }
+
+    member:uint GetButtonHeight()
+    {
+        if ${Data.Has[rowHeight]}
+            return ${Data.GetInteger[rowHeight]}
+        return 32
+    }
+
+    member:uint GetButtonWidth()
+    {
+        if ${Data.Has[columnWidth]}
+            return ${Data.GetInteger[columnWidth]}
+
+        return 32
+    }
+
+    method GenerateButtonView()
+    {
+        echo isb2022_clickbar:GenerateButtonView ${Context(type)} ${Context.Args}
+        ;isb2022_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
+        ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","key":"2"}}}]}
+
+        variable jsonvalue joButton
+        joButton:SetValue["$$>
+        {
+            "jsonTemplate":"isb2022.clickbarButton",
+            "width":${This.GetButtonHeight},
+            "height":${This.GetButtonWidth},
+            "_numButton":${Context.Args.Get[numButton]}
+        }
+        <$$"]
+
+
+        Context:SetView["${joButton.AsJSON~}"]
+    }
+
+    method CreateWindow()
+    {
+        echo isb2022_clickbar:CreateWindow
+        if ${Window.Reference(exists)}
+            return
+
+        variable string useName="isb2022.cb.${Name~}"        
+
+        variable jsonvalue joWindow
+        joWindow:SetValue["$$>
+        {
+            "type":"window",
+            "jsonTemplate":"isb2022.clickbar",
+            "name":${useName.AsJSON~},
+            "title":${Name.AsJSON~},
+            "x":${Data.GetInteger[x]},
+            "y":${Data.GetInteger[y]},
+        }
+        <$$"]
+
+        LGUI2:PushSkin["ISBoxer 2022"]
+        Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
+        LGUI2:PopSkin["ISBoxer 2022"]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]                            
+
+        Data:SetReference[jo]
+
+        Data.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
+    }
+
+}
+
 objectdef isb2022_triggerchain
 {
     variable string Name
@@ -372,41 +583,6 @@ objectdef isb2022_triggerchain
         Handlers:ForEach["obj:ExecuteTrigger[ForEach.Value,${newState}]"]
     }
 }
-
-/* isb2022_actiontypemanager: 
-    Maps Action Types to the appropriate handler method
-*/
-/*
-objectdef isb2022_actiontypemanager
-{
-    variable string ActionObject="ISB2022"
-    variable collection:string ActionMethods
-
-    method InstallActionType(string name, string methodName)
-    {
-        ; echo "InstallActionType[${name~},${methodName~}]"
-        ActionMethods:Set["${name~}","${methodName~}"]
-    }
-
-    method ExecuteAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
-    {
-        variable string actionType = "${joAction.Get[type]~}"
-        variable string actionMethod = "${ActionMethods.Get["${actionType~}"]~}"
-   
-        ; echo "ExecuteAction[${actionType~}]=${actionMethod~}"
-        if ${actionMethod.NotNULLOrEmpty} && ${ActionObject.NotNULLOrEmpty}
-        {
-            execute "${ActionObject~}:${actionMethod~}[joState,joAction,${activate}]"
-        }
-    }
-
-    method InstantExecuteAction(jsonvalueref joState, jsonvalueref joAction)
-    {
-        This:ExecuteAction[joState,joAction,1]
-        This:ExecuteAction[joState,joAction,0]
-    }
-}
-*/
 
 /* isb2022_hotkeysheet: 
     

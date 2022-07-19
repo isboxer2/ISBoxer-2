@@ -1,0 +1,63 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
+    "name": "Test Stuff",
+    "keyLayouts": [
+        {
+            "name": "Test",
+            "mappedKeys": [
+                {
+                    "name": "first",
+                    "hotkeyCombo":"1",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "Keystroke",
+                                    "key":"a",
+                                    "target":"self"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "clickBars": [
+        {
+            "name": "My Click Bar",
+            "buttons": [
+                {
+                    "name":"Button 1",
+                    "clicks": [
+                        {
+                            "button": 1,
+                            "inputMapping": {
+                                "type":"action",
+                                "action": {
+                                    "type": "keystroke",
+                                    "key":"1"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name":"Button 2",
+                    "clicks": [
+                        {
+                            "button": 1,
+                            "inputMapping": {
+                                "type":"action",
+                                "action": {
+                                    "type": "keystroke",
+                                    "key":"2"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

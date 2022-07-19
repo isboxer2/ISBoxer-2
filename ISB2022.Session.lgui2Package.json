@@ -1,0 +1,273 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
+    "includes": [
+        "ISB2022.Skin.lgui2Package.json",
+        "ISB2022.Live.lgui2Package.json"
+    ],
+    "skin":"ISBoxer 2022",
+    "templates": {
+        "isb2022.clickbarButton":{
+            "type":"button",
+            "jsonTemplate":"button",
+            "eventHandlers":{
+                "gotMouseOver":{
+                    "type":"method",
+                    "object":"This.Parent.Context",
+                    "method":"GotMouseOver"
+                },
+                "lostMouseOver":{
+                    "type":"method",
+                    "object":"This.Parent.Context",
+                    "method":"LostMouseOver"
+                },
+                "onMouseButtonMove":{
+                    "type":"method",
+                    "object":"This.Parent.Context",
+                    "method":"OnMouseButtonMove"
+                }
+            }
+        },
+        "isb2022.clickbar":{
+            "type":"window",
+            "jsonTemplate":"window",
+            "content":{
+                "type":"listbox",
+                "borderThickness":0,
+                "content":{
+                    "jsonTemplate": "listbox.content",
+                    "orientation":"horizontal"
+                },
+                "itemsBinding":{
+                    "pullFormat":"${This.Context.Data.Get[buttons]}"
+                },
+                "itemViewGenerators": {
+                    "default":{
+                        "type":"method",
+                        "object":"This.Parent.Context",
+                        "method":"GenerateButtonView"
+                    }
+                }
+            }
+        },
+        "isb2022.rotatorStepView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context}"
+                    },
+                    "properties":[
+                        {
+                            "name":"Actions",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.Get[actions]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:Set[actions,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Counter",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[counter]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[counter,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Counter Time",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[counterTime]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[counterTime,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                }
+            ]
+        },
+        "isb2022.mappableView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Steps",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.Get[steps]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:Set[steps,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Counter",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[counter]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[counter,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Counter Time",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[counterTime]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[counterTime,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"First Press",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[firstPress]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[firstPress,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Last Press",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[lastPress]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[lastPress,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Step Time",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[stepTime]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[stepTime,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Step Triggered",
+                            "dataBinding":{
+                              "pullFormat":"${This.ObjectView.Context.GetInteger[stepTriggered]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.ObjectView.Context:SetInteger[stepTriggered,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "elements": [
+        {
+            "type": "panel",
+            "visibility": "hidden",
+            "name": "isb2022.events"
+        },
+        {
+            "type":"window",
+            "name":"isb2022.MainWindow",
+            "hideOnClose":true,
+            "title":"ISBoxer 2022",
+            "width":750,
+            "height":400,
+            "minSize":[600,300],
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "visibility": "visible",
+            "content":{
+                "type":"dockpanel",
+                "horizontalAlignment": "stretch",
+                "verticalAlignment": "stretch",
+                "children":[
+                    {
+                        "type":"dockpanel",
+                        "_dock":"bottom",
+                        "horizontalAlignment": "stretch",
+                        "children":[
+                            {
+                                "type":"button",
+                                "content":"Reload Agent",
+                                "_dock": "right",
+                                "eventHandlers": {
+                                    "onPress":{
+                                        "type":"code",
+                                        "code":"InnerSpace.Agent[ISBoxer 2022]:Stop:Reload:Start"
+                                    }
+                                }
+                            },
+                            {
+                                "type":"button",
+                                "content":"Load Tests",
+                                "_dock": "right",
+                                "margin":[0,0,5,0],
+                                "eventHandlers": {
+                                    "onPress":{
+                                        "type":"code",
+                                        "code":"ISB2022:BeginTest"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type":"tabcontrol",
+                        "_dock":"top",
+                        "horizontalAlignment":"stretch",
+                        "tabs":[
+                            {
+                                "type":"tab",
+                                "header":"Test",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "children":[
+                                        {
+                                            "type":"textblock",
+                                            "text":"Hotkey Sheets: ${ISB2022.HotkeySheets.Used}",
+                                            "_dock":"top"
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "text":"Mappable Sheets: ${ISB2022.MappableSheets.Used}",
+                                            "_dock":"top"
+                                        },
+                                        {
+                                            "jsonTemplate":"isb2022.mappableView",
+                                            "_dock":"top",
+                                            "name":"isb2022.viewingMappable",
+                                            "contextBinding":{
+                                                "pullFormat":"${ISB2022.LastMappable}"
+                                            }
+                                        }
+                                    ]
+                                }                                
+                            }                                            
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

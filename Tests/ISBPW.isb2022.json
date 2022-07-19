@@ -121,10 +121,53 @@
             "name":"Combat Hotkeys",
             "mappedKeys":[
                 {
-                    "name":"1"
+                    "name":"1",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"input mapping",
+                                    "inputMapping":{
+                                        "type":"mappable",
+                                        "sheet":"Party",
+                                        "name":"Auto-Assist Master"
+                                    }
+                                },
+                                {
+                                    "type":"input mapping",
+                                    "inputMapping":{
+                                        "type":"mappable",
+                                        "sheet":"Party",
+                                        "name":"Auto-Interact with Target"
+                                    }
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "key":"1"
+                                }                                
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"2"
+                    "name":"2",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"input mapping",
+                                    "inputMapping":{
+                                        "type":"trigger",
+                                        "name":"pre-combat key"
+                                    }
+                                },
+                                {
+                                    "type":"keystroke",
+                                    "key":"2"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
                     "name":"3"

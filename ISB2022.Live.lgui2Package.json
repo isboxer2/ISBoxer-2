@@ -1,0 +1,9 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
+    "skin":"ISBoxer 2022",
+    "templates": {
+    },
+    "elements":[
+        
+    ]
+}

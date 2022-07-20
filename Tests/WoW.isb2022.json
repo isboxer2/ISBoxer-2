@@ -19,10 +19,10 @@
             "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/{CHARACTER}/{1}"
         }
     ],
-    "keyLayouts":[
+    "mappableSheets":[
         {
             "name":"World of Warcraft",
-            "mappedKeys":[
+            "mappables":[
                 {
                     "name":"Click to Move Off",
                     "description":"This turns Click to Move off",

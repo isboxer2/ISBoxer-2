@@ -207,12 +207,12 @@
                         "children":[
                             {
                                 "type":"button",
-                                "content":"Reload Agent",
+                                "content":"Restart Script",
                                 "_dock": "right",
                                 "eventHandlers": {
                                     "onPress":{
                                         "type":"code",
-                                        "code":"InnerSpace.Agent[ISBoxer 2022]:Stop:Reload:Start"
+                                        "code":"ISB2022:Restart"
                                     }
                                 }
                             },

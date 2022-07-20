@@ -10,6 +10,7 @@ objectdef isb2022_profileengine
     variable collection:isb2022_hotkeysheet HotkeySheets
     variable collection:isb2022_mappablesheet MappableSheets
     variable collection:isb2022_triggerchain TriggerChains
+    variable collection:isb2022_clickbar ClickBars
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -40,6 +41,10 @@ objectdef isb2022_profileengine
             {
                 "name":"keystroke",
                 "handler":"Action_Keystroke"
+            },
+            {
+                "name":"game key binding",
+                "handler":"Action_GameKeyBinding"
             },
             {
                 "name":"hotkey sheet state",
@@ -87,6 +92,9 @@ objectdef isb2022_profileengine
 
     method InstallActionType(jsonvalueref jo)
     {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
         ; echo InstallActionType: ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo] 
         ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo]
     }
@@ -158,7 +166,25 @@ objectdef isb2022_profileengine
             ja:ForEach["This:InstallCharacter[ForEach.Value]"]
     }    
 
-    
+    method InstallClickBar(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        variable string name
+        name:Set["${jo.Get[name]~}"]
+
+        ClickBars:Erase["${name~}"]
+
+        ClickBars:Set["${name~}",jo]
+    }
+
+    method InstallClickBars(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallClickBar[ForEach.Value]"]
+    }    
+
     method InstallHotkeySheet(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -170,6 +196,12 @@ objectdef isb2022_profileengine
         HotkeySheets:Erase["${name~}"]
 
         HotkeySheets:Set["${name~}",jo]
+    }
+
+    method InstallHotkeySheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallHotkeySheet[ForEach.Value]"]
     }
 
     method InstallMappableSheet(jsonvalueref jo)
@@ -185,13 +217,20 @@ objectdef isb2022_profileengine
         MappableSheets:Set["${name~}",jo]
     }
 
-
-    method InstallHotkeySheets(jsonvalueref ja)
+    method InstallMappableSheets(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
-            ja:ForEach["This:InstallHotkeySheet[ForEach.Value]"]
+            ja:ForEach["This:InstallMappableSheet[ForEach.Value]"]
     }
 
+
+    method InstallGameKeyBinding(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        GameKeyBindings:SetByRef["${jo.Get[name].Lower~}",jo]
+    }
     method InstallGameKeyBindings(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
@@ -237,12 +276,15 @@ objectdef isb2022_profileengine
         This:InstallVirtualFiles[_profile.VirtualFiles]
         This:InstallWindowLayouts[_profile.WindowLayouts]
         This:InstallTriggers[_profile.Triggers]
-;        This:InstallHotkeys[_profile.Hotkeys]
+        This:InstallHotkeySheets[_profile.HotkeySheets]
         This:InstallGameKeyBindings[_profile.GameKeyBindings]
-        This:InstallKeyLayouts[_profile.KeyLayouts]
+        This:InstallMappableSheets[_profile.MappableSheets]
+        This:InstallClickBars[_profile.ClickBars]
 
         This:InstallCharacters[_profile.Characters]
         This:InstallTeams[_profile.Teams]
+
+        echo ActivateProfile ${_profile.Name} complete.
     }
 
     method DeactivateProfile(weakref _profile)
@@ -261,9 +303,10 @@ objectdef isb2022_profileengine
         This:UninstallVirtualFiles[_profile.VirtualFiles]
         This:UninstallWindowLayouts[_profile.WindowLayouts]
         This:UninstallTriggers[_profile.Triggers]
-;        This:UninstallHotkeys[_profile.Hotkeys]
+        This:UninstallHotkeySheets[_profile.HotkeySheets]
         This:UninstallGameKeyBindings[_profile.GameKeyBindings]
-        This:UninstallKeyLayouts[_profile.KeyLayouts]
+        This:UninstallMappableSheets[_profile.MappableSheets]
+        This:UninstallClickBars[_profile.ClickBars]
 
         This:UninstallCharacters[_profile.Characters]
         This:UninstallTeams[_profile.Teams]
@@ -271,8 +314,17 @@ objectdef isb2022_profileengine
 
     member:string ProcessVariables(string text)
     {
-        ; todo
-        return "${text~}"
+        if !${text.Find["{"]}
+            return "${text~}"        
+
+        ; todo ... handle variables!
+
+        if ${ISBoxerSlot(exists)}        
+            text:Set["${text.ReplaceSubstring["{SLOT}",${ISBoxerSlot}]}"]
+        else
+            text:Set["${text.ReplaceSubstring["{SLOT}",1]}"]
+
+        return "${text~}"        
     }
 
 
@@ -296,6 +348,43 @@ objectdef isb2022_profileengine
         keystroke:Set["${joAction.Get[key]~}"]
         if !${keystroke.NotNULLOrEmpty}
             return
+
+        if ${activate}
+        {
+            echo press -hold "${keystroke}"
+            press -hold "${keystroke}"
+        }
+        else
+        {
+            echo press -release "${keystroke}"
+            press -release "${keystroke}"
+        }
+    }
+
+    method Action_GameKeyBinding(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_GameKeyBinding[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable string name
+        name:Set["${This.ProcessVariables["${joAction.Get[name]~}"]~}"]
+
+        variable jsonvalueref gkb
+        gkb:SetReference["This.GameKeyBindings.Get[\"${name.Lower~}\"]"]
+        if !${gkb.Reference(exists)}
+        {
+            echo Game Key Binding ${name~} not found
+            return
+        }
+
+        variable string keystroke
+        keystroke:Set["${gkb.Get[keyCombo]~}"]
+        if !${keystroke.NotNULLOrEmpty}
+        {
+            echo Game Key Binding invalid keystroke
+            return
+        }
 
         if ${activate}
         {
@@ -587,11 +676,16 @@ objectdef isb2022_profileengine
 
     method ExecuteTrigger(jsonvalueref joTrigger, bool newState)
     {
+        if !${joTrigger.Type.Equal[object]}
+            return
         This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
     }
 
     method ExecuteMappable(jsonvalueref joMappable, bool newState)
     {
+        if !${joMappable.Type.Equal[object]}
+            return
+
         echo "ExecuteMappable[${newState}] ${joMappable~}"
         ; get current step, then call This:ExecuteRotatorStep
         if !${newState}
@@ -852,6 +946,11 @@ objectdef isb2022_profileengine
 
     method ExecuteRotatorStep(jsonvalueref joRotator, jsonvalueref joStep, bool newState)
     {
+        if !${joRotator.Type.Equal[object]}
+            return
+        if !${joStep.Type.Equal[object]}
+            return
+
         echo "ExecuteRotatorStep[${newState}] ${joStep~}"
 
         ; if the step is disabled, don't execute it.
@@ -890,12 +989,18 @@ objectdef isb2022_profileengine
 
     method ExecuteActionList(jsonvalueref joState, jsonvalueref jaList, bool newState)
     {
+        if !${jaList.Type.Equal[array]}
+            return
+
         echo "ExecuteActionList[${newState}] ${jaList~}"
         jaList:ForEach["This:ExecuteAction[joState,ForEach.Value,${newState}]"]
     }
 
     method ExecuteAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
+        if !${joAction.Type.Equal[object]}
+            return
+
         variable string actionType = "${joAction.Get[type].Lower~}"
         variable string actionMethod = "${ActionTypes.Get["${actionType~}",handler]~}"
    

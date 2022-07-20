@@ -18,15 +18,16 @@ objectdef isb2022_profile
     variable jsonvalue WindowLayouts=[]
     variable jsonvalue VirtualFiles=[]
     variable jsonvalue Triggers=[]
-    variable jsonvalue Hotkeys=[]
+    variable jsonvalue HotkeySheets=[]
+    variable jsonvalue MappableSheets=[]
     variable jsonvalue GameKeyBindings=[]
-    variable jsonvalue KeyLayouts=[]
+    variable jsonvalue ClickBars=[]
 
     method Initialize(jsonvalueref jo, uint priority, string localFilename)
     {
         This:FromJSON[jo]
         Priority:Set[${priority}]
-        if !${localFilename.IsNULLOrEmpty}
+        if ${localFilename.NotNULLOrEmpty}
             LocalFilename:Set["${localFilename~}"]
     }
 
@@ -58,39 +59,19 @@ objectdef isb2022_profile
             VirtualFiles:SetValue["${jo.Get[virtualFiles]~}"]
         if ${jo.Has[triggers]}
             Triggers:SetValue["${jo.Get[triggers]~}"]
-        if ${jo.Has[hotkeys]}
-            Hotkeys:SetValue["${jo.Get[hotkeys]~}"]
+        if ${jo.Has[hotkeySheets]}
+            HotkeySheets:SetValue["${jo.Get[hotkeySheets]~}"]
         if ${jo.Has[gameKeyBindings]}
             GameKeyBindings:SetValue["${jo.Get[gameKeyBindings]~}"]
-        if ${jo.Has[keyLayouts]}
-            KeyLayouts:SetValue["${jo.Get[keyLayouts]~}"]
+        if ${jo.Has[mappableSheets]}
+            MappableSheets:SetValue["${jo.Get[mappableSheets]~}"]
+        if ${jo.Has[clickBars]}
+            ClickBars:SetValue["${jo.Get[clickBars]~}"]
     }
 
     member:jsonvalueref AsJSON()
     {
         variable jsonvalue jo
-        /*
-        ; this version produces a larger footprint than necessary, but this is basically what gets generated
-        jo:SetValue["$$>
-        {
-            "$schema":"http://www.lavishsoft.com/schema/isb2022.json",
-            "name":${Name.AsJSON~},
-            "description":${Description.AsJSON~},
-            "version":${Version.AsJSON~},
-            "minimumBuild":${MinimumBuild.AsJSON~},
-            "metadata":${Metadata.AsJSON~},
-            "profiles":${Profiles.AsJSON~},
-            "teams":${Teams.AsJSON~},
-            "characters":${Characters.AsJSON~},
-            "windowLayouts":${WindowLayouts.AsJSON~},
-            "virtualFiles":${VirtualFiles.AsJSON~},
-            "triggers":${Triggers.AsJSON~},
-            "hotkeys":${Hotkeys.AsJSON~},
-            "gameKeyBindings":${GameKeyBindings.AsJSON~},
-            "keyLayouts":${KeyLayouts.AsJSON~}
-        }
-        <$$"]
-        */
 
         jo:SetValue["$$>
         {
@@ -119,12 +100,14 @@ objectdef isb2022_profile
             jo:Set["virtualFiles","${VirtualFiles.AsJSON~}"]
         if ${Triggers.Used}
             jo:Set["triggers","${Triggers.AsJSON~}"]
-        if ${Hotkeys.Used}
-            jo:Set["hotkeys","${Hotkeys.AsJSON~}"]
+        if ${HotkeySheets.Used}
+            jo:Set["hotkeySheets","${HotkeySheets.AsJSON~}"]
         if ${GameKeyBindings.Used}
             jo:Set["gameKeyBindings","${GameKeyBindings.AsJSON~}"]
-        if ${KeyLayouts.Used}
-            jo:Set["keyLayouts","${KeyLayouts.AsJSON~}"]
+        if ${MappableSheets.Used}
+            jo:Set["mappableSheets","${MappableSheets.AsJSON~}"]
+        if ${ClickBars.Used}
+            jo:Set["clickBars","${ClickBars.AsJSON~}"]
         return jo
     }
 
@@ -167,11 +150,24 @@ objectdef isb2022_profilecollection
 {
     ; The variable that contains the actual list
     variable collection:isb2022_profile Profiles
-    variable collection:isb2022_profile ActiveProfiles
 
     variable collection:isb2022_profileeditor Editors
 
     variable uint LoadCount
+
+    /*
+    member:jsonvalueref ScanFolder(filepath filePath)
+    {
+        echo ${filePath.GetFiles[*.isb2022.json]}
+        return "filePath.GetFiles[*.isb2022.json]"
+    }
+    /**/
+
+    method LoadFolder(filepath filePath)
+    {
+        echo LoadFolder ${filePath~}
+        filePath.GetFiles["*.isb2022.json"]:ForEach["This:LoadFile[\"${filePath~}/\${ForEach.Value.Get[filename]}\"]"]
+    }
 
     method OpenEditor(string profileName)
     {
@@ -292,8 +288,8 @@ objectdef isb2022_profileeditor
     {
         if ${editingType.NotEqual["Character"]}
             Window.Locate["profile.characters"]:ClearSelection
-        if ${editingType.NotEqual["KeyLayout"]}
-            Window.Locate["profile.keyLayouts"]:ClearSelection
+        if ${editingType.NotEqual["MappableSheet"]}
+            Window.Locate["profile.mappableSheets"]:ClearSelection
         if ${editingType.NotEqual["Team"]}
             Window.Locate["profile.teams"]:ClearSelection
         if ${editingType.NotEqual["GameKeyBinding"]}
@@ -314,10 +310,10 @@ objectdef isb2022_profileeditor
         This:SetEditingItem[Character,${Context.Source.SelectedItem.Index}]
     }
 
-    method OnKeyLayoutSelected()
+    method OnMappableSheetSelected()
     {
-        This:ResetSelections[KeyLayout]
-        This:SetEditingItem[KeyLayout,${Context.Source.SelectedItem.Index}]
+        This:ResetSelections[MappableSheet]
+        This:SetEditingItem[MappableSheet,${Context.Source.SelectedItem.Index}]
     }
 
     method OnTeamSelected()
@@ -362,18 +358,18 @@ objectdef isb2022_clickbar
 
     method GotMouseFocus()
     {
-        echo isb2022_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+;        echo isb2022_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
     }
 
     method LostMouseFocus()
     {
-        echo isb2022_clickbar:LostMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+;        echo isb2022_clickbar:LostMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
     }
 
     method GotMouseOver()
     {
         variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
-        echo isb2022_clickbar:GotMouseOver numButton=${numButton}
+;        echo isb2022_clickbar:GotMouseOver numButton=${numButton}
 
         variable jsonvalueref joButton
         joButton:SetReference["Data.Get[buttons,${numButton}]"]
@@ -391,7 +387,7 @@ objectdef isb2022_clickbar
     method LostMouseOver()
     {
         variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
-        echo isb2022_clickbar:LostMouseOver numButton=${numButton}
+;        echo isb2022_clickbar:LostMouseOver numButton=${numButton}
 
         variable jsonvalueref joButton
         joButton:SetReference["Data.Get[buttons,${numButton}]"]
@@ -408,17 +404,19 @@ objectdef isb2022_clickbar
 
     member:bool ClickMatches(jsonvalueref joClick, jsonvalueref joMatch)
     {
-        echo ClickMatches ${joClick~} ${joMatch~}
+;        echo ClickMatches ${joClick~} ${joMatch~}
         if ${joClick.GetInteger[button]}!=${joMatch.GetInteger[controlID]}
             return FALSE
 
-        echo ClickMatches \agTRUE\ax
+        ; TODO: compare modifiers.
+
+;        echo ClickMatches \agTRUE\ax
         return TRUE
     }
 
     member:jsonvalueref GetClick(jsonvalueref jaClicks, jsonvalueref joMatch)
     {
-        echo GetClick ${jaClicks~} ${joMatch~}
+;        echo GetClick ${jaClicks~} ${joMatch~}
 
         variable uint i
         for (i:Set[1] ; ${i} <= ${jaClicks.Used} ; i:Inc )
@@ -550,6 +548,11 @@ objectdef isb2022_clickbar
         Data:SetReference[jo]
 
         Data.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
+
+        if ${Data.GetBool[enable]}
+        {
+            This:CreateWindow
+        }
     }
 
 }

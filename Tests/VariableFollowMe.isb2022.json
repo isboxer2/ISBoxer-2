@@ -1,34 +1,48 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
-    "name":"Variable Follow Me",
-    "hotkeys":[
+    "name": "Variable Follow Me",
+    "hotkeySheets": [
         {
-            "name":"Follow Me",
-            "keyCombo":"Alt+F"
+            "name": "Base Hotkeys",
+            "enable": true,
+            "hotkeys": [
+                {
+                    "name": "Follow Me",
+                    "keyCombo": "Alt+F",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "Base Hotkeys",
+                        "name": "Follow Me"
+                    }
+                }
+            ]
         }
     ],
-    "gameKeyBindings":[
+    "gameKeyBindings": [
         {
-            "name":"Follow Slot 1",
-            "keyCombo":"Shift+F11"
+            "name": "Follow Slot 1",
+            "keyCombo": "Shift+F11"
         },
         {
-            "name":"Follow Slot 2",
-            "keyCombo":"Ctrl+F11"
+            "name": "Follow Slot 2",
+            "keyCombo": "Ctrl+F11"
         }
     ],
-    "keyLayouts":[
+    "mappableSheets": [
         {
-            "name":"Base Hotkeys",
-            "mappedKeys":[
+            "name": "Base Hotkeys",
+            "mappables": [
                 {
-                    "name":"Follow Me",
-                    "hotkey":"Follow Me",
-                    "actions":[
+                    "name": "Follow Me",
+                    "steps": [
                         {
-                            "type":"Variable Keystroke",
-                            "gameKeyBinding":"Follow Slot {SLOT}",
-                            "target":"all other"
+                            "actions": [
+                                {
+                                    "type": "Game Key Binding",
+                                    "name": "Follow Slot {SLOT}",
+                                    "target": "all other"
+                                }
+                            ]
                         }
                     ]
                 }

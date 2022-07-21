@@ -22,6 +22,7 @@ objectdef isb2022_profile
     variable jsonvalue MappableSheets=[]
     variable jsonvalue GameKeyBindings=[]
     variable jsonvalue ClickBars=[]
+    variable jsonvalue VFXSheets=[]
 
     method Initialize(jsonvalueref jo, uint priority, string localFilename)
     {
@@ -65,6 +66,8 @@ objectdef isb2022_profile
             GameKeyBindings:SetValue["${jo.Get[gameKeyBindings]~}"]
         if ${jo.Has[mappableSheets]}
             MappableSheets:SetValue["${jo.Get[mappableSheets]~}"]
+        if ${jo.Has[vfxSheets]}
+            VFXSheets:SetValue["${jo.Get[vfxSheets]~}"]
         if ${jo.Has[clickBars]}
             ClickBars:SetValue["${jo.Get[clickBars]~}"]
     }
@@ -106,6 +109,8 @@ objectdef isb2022_profile
             jo:Set["gameKeyBindings","${GameKeyBindings.AsJSON~}"]
         if ${MappableSheets.Used}
             jo:Set["mappableSheets","${MappableSheets.AsJSON~}"]
+        if ${VFXSheets.Used}
+            jo:Set["vfxSheets","${VFXSheets.AsJSON~}"]
         if ${ClickBars.Used}
             jo:Set["clickBars","${ClickBars.AsJSON~}"]
         return jo
@@ -705,5 +710,90 @@ objectdef isb2022_mappablesheet
         if !${jo.Type.Equal[object]}
             return FALSE
         Mappables:SetByRef["${jo.Get[name]~}",jo]
+    }
+}
+
+objectdef isb2022_vfxsheet
+{
+    variable string Name
+    variable bool Enabled
+
+    variable jsonvalue VFX="{}"
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        jo.Get[vfx]:ForEach["This:Add[ForEach.Value]"]
+
+
+        if ${jo.GetBool[enable]}
+        {
+            This:Enable
+        }
+
+    }
+
+    method Add(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+        VFX:SetByRef["${jo.Get[name]~}",jo]
+    }
+
+    
+    method Enable()
+    {
+        Enabled:Set[1]
+        VFX:ForEach["This:EnableVFX[ForEach.Value]"]
+    }
+
+    method Disable()
+    {
+        Enabled:Set[0]
+        VFX:ForEach["This:DisableVFX[ForEach.Value]"]
+    }
+
+    method Toggle()
+    {
+        if ${Enabled}
+            This:Disable
+        else
+            This:Enable
+    }
+
+    method EnableVFX(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if !${jo.Has[name]}
+            return
+
+        ISB2022:InstallVFX["${Name~}","${jo.Get[name]~}",jo]
+
+        jo:SetBool["enabled",1]
+    }
+
+    method DisableVFX(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if !${jo.Has[name]}
+            return
+        
+        ISB2022:UninstallVFX["${Name~}","${jo.Get[name]~}",jo]
+
+        jo:SetBool["enabled",0]
     }
 }

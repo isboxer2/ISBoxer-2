@@ -9,6 +9,7 @@ objectdef isb2022_profileengine
 
     variable collection:isb2022_hotkeysheet HotkeySheets
     variable collection:isb2022_mappablesheet MappableSheets
+    variable collection:isb2022_vfxsheet VFXSheets
     variable collection:isb2022_triggerchain TriggerChains
     variable collection:isb2022_clickbar ClickBars
 
@@ -27,6 +28,7 @@ objectdef isb2022_profileengine
 
     method Shutdown()
     {
+        This:UninstallVFX
         This:UninstallHotkeys
         TaskManager:Destroy
     }
@@ -292,6 +294,22 @@ objectdef isb2022_profileengine
             ja:ForEach["This:InstallWindowLayout[ForEach.Value]"]
     }
 
+    method InstallVFXSheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        VFXSheets:Erase["${name~}"]
+
+        VFXSheets:Set["${name~}",jo]
+    }
+
+    method InstallVFXSheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallVFXSheet[ForEach.Value]"]
+    }
+
     method ActivateProfile(weakref _profile)
     {
         if !${_profile.Reference(exists)}
@@ -311,6 +329,7 @@ objectdef isb2022_profileengine
         This:InstallGameKeyBindings[_profile.GameKeyBindings]
         This:InstallMappableSheets[_profile.MappableSheets]
         This:InstallClickBars[_profile.ClickBars]
+        This:InstallVFXSheets[_profile.VFXSheets]
 
         This:InstallCharacters[_profile.Characters]
         This:InstallTeams[_profile.Teams]
@@ -338,6 +357,7 @@ objectdef isb2022_profileengine
         This:UninstallGameKeyBindings[_profile.GameKeyBindings]
         This:UninstallMappableSheets[_profile.MappableSheets]
         This:UninstallClickBars[_profile.ClickBars]
+        This:UninstallVFXSheets[_profile.VFXSheets]
 
         This:UninstallCharacters[_profile.Characters]
         This:UninstallTeams[_profile.Teams]
@@ -539,7 +559,35 @@ objectdef isb2022_profileengine
     {
         InputMappings:Erase["${name~}"]
     }
+    
+    method InstallVFX(string sheet, string name, jsonvalueref joVFX)
+    {
+        echo "InstallVFX ${sheet~} ${name~} ${joVFX~}"
 
+        variable jsonvalue joView
+        joView:SetValue["$$>
+        {
+            "name":"isb2022.vfx.${sheet~}.${name~}",
+            "type":"videofeed",
+            "x":${joVFX.GetInteger[x]},
+            "y":${joVFX.GetInteger[y]},
+            "width":${joVFX.GetInteger[width]},
+            "height":${joVFX.GetInteger[height]},
+            "feedName":${joVFX.Get[feedName]~.AsJSON~}
+        }
+        <$$"]
+
+        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
+    }
+
+    method UninstallVFX(string sheet, string name, jsonvalueref joVFX)
+    {
+        echo "UninnstallVFX ${sheet~} ${name~} ${joVFX~}"
+        LGUI2.Element["isb2022.vfx.${sheet~}.${name~}"]:Destroy
+
+        joVFX:SetInteger["elementID",0]
+    }
+    
     method InstallHotkey(string sheet, string name, jsonvalueref joHotkey)
     {
         name:Set["${This.ProcessVariables["${name~}"]~}"]
@@ -626,6 +674,11 @@ objectdef isb2022_profileengine
         echo "UninstallHotkeyEx[${name~}]"
         LGUI2:RemoveBinding["${name~}"]
         Hotkeys:Remove["${name~}"]
+    }
+
+    method UninstallVFX()
+    {
+        VFXSheets:ForEach["ForEach.Value:Disable"]
     }
 
     method UninstallHotkeys()

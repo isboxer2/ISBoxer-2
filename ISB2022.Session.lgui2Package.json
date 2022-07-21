@@ -245,6 +245,16 @@
                                     "children":[
                                         {
                                             "type":"textblock",
+                                            "text":"Available Profiles: ${ISB2022.ProfileDB.Profiles.Used}",
+                                            "_dock":"top"
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "text":"Active Profiles: ${ISB2022.Profiles.Used}",
+                                            "_dock":"top"
+                                        },
+                                        {
+                                            "type":"textblock",
                                             "text":"Hotkey Sheets: ${ISB2022.HotkeySheets.Used}",
                                             "_dock":"top"
                                         },

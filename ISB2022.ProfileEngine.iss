@@ -3,8 +3,10 @@
 */
 objectdef isb2022_profileengine
 {
+    ; a list of active Profiles
     variable set Profiles
 
+    ; a list of active Hotkeys
     variable set Hotkeys
 
     variable collection:isb2022_hotkeysheet HotkeySheets
@@ -17,9 +19,12 @@ objectdef isb2022_profileengine
     variable jsonvalue GameKeyBindings="{}"
     variable jsonvalue ActionTypes="{}"
 
+    ; reference to the last hotkey used
     variable jsonvalueref LastHotkey
+    ; reference to the last mappable executed
     variable jsonvalueref LastMappable
 
+    ; task manager used for hotkeys and such
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
 
     method Initialize()
@@ -28,7 +33,7 @@ objectdef isb2022_profileengine
 
     method Shutdown()
     {
-        This:UninstallVFX
+        This:UninstallVFXs
         This:UninstallHotkeys
         TaskManager:Destroy
     }
@@ -676,7 +681,7 @@ objectdef isb2022_profileengine
         Hotkeys:Remove["${name~}"]
     }
 
-    method UninstallVFX()
+    method UninstallVFXs()
     {
         VFXSheets:ForEach["ForEach.Value:Disable"]
     }
@@ -1128,37 +1133,45 @@ objectdef isb2022_profileengine
 
     member:bool ShouldExecuteAction(jsonvalueref joState, jsonvalueref joActionType, jsonvalueref joAction, bool activate)
     {
+        ; action-specific activationState
         if ${joAction.Has[activationState]} && ${joAction.GetBool[activationState]}!=${activate}
             return FALSE        
 
+        ; action type-specific activationState
         if ${joActionType.Has[activationState]} && ${joActionType.GetBool[activationState]}!=${activate}
             return FALSE
 
         return TRUE
     }
-
+    
     method ExecuteAction(jsonvalueref joState, jsonvalueref _joAction, bool activate)
     {
+        ; ensure we have a valid json object representing the action
         if !${_joAction.Type.Equal[object]}
             return
 
         variable string actionType = "${_joAction.Get[type].Lower~}"
         variable jsonvalueref joActionType = "ActionTypes.Get[\"${actionType~}\"]"
 
+        ; check activationState settings to make sure we should execute the action here
         if !${This.ShouldExecuteAction[joState,joActionType,_joAction,${activate}]}
             return
 
         variable jsonvalue joAction
         joAction:SetValue["${_joAction~}"]
         
+        ; process any variableProperties
         This:ProcessActionVariables[joActionType,joAction]
 
+        ; see if the action type supports retargeting 
         if ${joActionType.GetBool[retarget]}
         {
+            ; yeah see if we should retarget the action
             if ${This:RetargetAction[joState,joAction,${activate}](exists)}
                 return
+            ; we didn't retarget the action, execute it here
         }
-
+        
         variable string actionMethod
         actionMethod:Set["${joActionType.Get[handler]~}"]
    

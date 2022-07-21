@@ -40,43 +40,74 @@ objectdef isb2022_profileengine
         ja:SetValue["$$>[
             {
                 "name":"keystroke",
-                "handler":"Action_Keystroke"
+                "handler":"Action_Keystroke",
+                "retarget":true
             },
             {
                 "name":"game key binding",
-                "handler":"Action_GameKeyBinding"
+                "handler":"Action_GameKeyBinding",
+                "retarget":true,
+                "variableProperties":["name"]
+            },
+            {
+                "name":"set game key binding",
+                "handler":"Action_SetGameKeyBinding",
+                "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
             },
             {
                 "name":"hotkey sheet state",
-                "handler":"Action_HotkeySheetState"
+                "handler":"Action_HotkeySheetState",
+                "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
             },
             {
                 "name":"window focus",
-                "handler":"Action_WindowFocus"
+                "handler":"Action_WindowFocus",
+                "activationState":true,
+                "retarget":true
             },
             {
                 "name":"window close",
-                "handler":"Action_WindowClose"
+                "handler":"Action_WindowClose",
+                "activationState":true,
+                "retarget":true
             },
             {
                 "name":"input mapping",
-                "handler":"Action_InputMapping"
+                "handler":"Action_InputMapping",
+                "variableProperties":["name","sheet"],
+                "retarget":true
             },
             {
                 "name":"set input mapping",
-                "handler":"Action_SetInputMapping"
+                "handler":"Action_SetInputMapping",
+                "variableProperties":["name","sheet"],
+                "activationState":true,
+                "retarget":true
             },
             {
                 "name":"mappable state",
-                "handler":"Action_MappableState"
+                "handler":"Action_MappableState",
+                "variableProperties":["name","sheet"],
+                "activationState":true,
+                "retarget":true
             },
             {
                 "name":"add trigger",
-                "handler":"Action_AddTrigger"
+                "handler":"Action_AddTrigger",
+                "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
             },
             {
                 "name":"remove trigger",
-                "handler":"Action_RemoveTrigger"
+                "handler":"Action_RemoveTrigger",
+                "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
             }
         ]<$$"]
 
@@ -338,6 +369,38 @@ objectdef isb2022_profileengine
         This:Action_Keystroke[NULL,joAction,FALSE]
     }
 
+
+    method RemoteAction(jsonvalue joActionState)
+    {
+        echo "RemoteAction[${joActionState~}]"
+        variable jsonvalueref joState="joActionState.Get[state]"
+        variable jsonvalueref joAction="joActionState.Get[action]"
+
+        joAction:Erase[target]
+
+        This:ExecuteAction[joState,joAction,${joActionState.GetBool[activate]}]
+    }
+
+    method RetargetAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        variable string useTarget="${joAction.Get[target]~}"
+
+        if !${useTarget.NotNULLOrEmpty}
+            return FALSE
+
+        if ${useTarget.Equal[self]}
+            return FALSE
+
+        variable jsonvalue joActionState="{}"
+        joActionState:SetByRef[action,joAction]
+        joActionState:SetByRef[state,joState]
+        joActionState:SetBool[activate,${activate}]
+
+        relay "${useTarget~}" "noop \${ISB2022:RemoteAction[\"${joActionState~}\"]}"
+;        echo relay "${useTarget~}" "noop \${ISB2022:RemoteAction[\"${joActionState~}\"]}"
+        return TRUE
+    }
+
     method Action_Keystroke(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_Keystroke[${activate}] ${joAction~}"
@@ -368,7 +431,7 @@ objectdef isb2022_profileengine
             return
 
         variable string name
-        name:Set["${This.ProcessVariables["${joAction.Get[name]~}"]~}"]
+        name:Set["${joAction.Get[name]~}"]
 
         variable jsonvalueref gkb
         gkb:SetReference["This.GameKeyBindings.Get[\"${name.Lower~}\"]"]
@@ -401,12 +464,11 @@ objectdef isb2022_profileengine
     method Action_HotkeySheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_HotkeySheetState[${activate}] ${joAction~}"
-
-        variable string name
-        if !${activate}
+        if !${joAction.Type.Equal[object]}
             return
 
-        name:Set["${This.ProcessVariables["${joAction.Get[name]~}"]~}"]
+        variable string name
+        name:Set["${joAction.Get[name]~}"]
 
         switch ${joAction.GetBool[state]}
         {
@@ -425,24 +487,26 @@ objectdef isb2022_profileengine
     method Action_WindowFocus(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_WindowFocus[${activate}] ${joAction~}"
-        if !${activate}
+        if !${joAction.Type.Equal[object]}
             return
+
     }
 
     method Action_WindowClose(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_WindowClose[${activate}] ${joAction~}"
-        if !${activate}
+        if !${joAction.Type.Equal[object]}
             return
+
     }
 
     method Action_InputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_InputMapping[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
 
         variable string name
-        if !${activate}
-            return
 
         This:ExecuteInputMappingByName["${joAction.Get[name]~}",${activate}]
     }
@@ -450,11 +514,9 @@ objectdef isb2022_profileengine
     method Action_SetInputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_SetInputMapping[${activate}] ${joAction~}"
-        if !${activate}
-            return
 
-                variable string name
-        if !${activate}
+        variable string name
+        if !${joAction.Type.Equal[object]}
             return
 
         This:InstallInputMapping["${name~}",""]
@@ -463,8 +525,6 @@ objectdef isb2022_profileengine
     method Action_MappableState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_MappableState[${activate}] ${joAction~}"
-        if !${activate}
-            return
     }
 
     method InstallInputMapping(string name,jsonvalueref joMapping)
@@ -996,13 +1056,58 @@ objectdef isb2022_profileengine
         jaList:ForEach["This:ExecuteAction[joState,ForEach.Value,${newState}]"]
     }
 
-    method ExecuteAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    method ProcessVariableProperty(jsonvalueref jo, string varName)
     {
-        if !${joAction.Type.Equal[object]}
+;        echo "ProcessVariableProperty[${varName~}] ${jo~}"
+        if !${jo.Has["${varName~}"]}
             return
 
-        variable string actionType = "${joAction.Get[type].Lower~}"
-        variable string actionMethod = "${ActionTypes.Get["${actionType~}",handler]~}"
+        jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]        
+    }
+
+    method ProcessActionVariables(jsonvalueref joActionType, jsonvalueref joAction)
+    {
+        if !${joActionType.Get[variableProperties].Type.Equal[array]}
+            return
+
+        joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Value~}\"]"]
+    }
+
+    member:bool ShouldExecuteAction(jsonvalueref joState, jsonvalueref joActionType, jsonvalueref joAction, bool activate)
+    {
+        if ${joAction.Has[activationState]} && ${joAction.GetBool[activationState]}!=${activate}
+            return FALSE        
+
+        if ${joActionType.Has[activationState]} && ${joActionType.GetBool[activationState]}!=${activate}
+            return FALSE
+
+        return TRUE
+    }
+
+    method ExecuteAction(jsonvalueref joState, jsonvalueref _joAction, bool activate)
+    {
+        if !${_joAction.Type.Equal[object]}
+            return
+
+        variable string actionType = "${_joAction.Get[type].Lower~}"
+        variable jsonvalueref joActionType = "ActionTypes.Get[\"${actionType~}\"]"
+
+        if !${This.ShouldExecuteAction[joState,joActionType,_joAction,${activate}]}
+            return
+
+        variable jsonvalue joAction
+        joAction:SetValue["${_joAction~}"]
+        
+        This:ProcessActionVariables[joActionType,joAction]
+
+        if ${joActionType.GetBool[retarget]}
+        {
+            if ${This:RetargetAction[joState,joAction,${activate}](exists)}
+                return
+        }
+
+        variable string actionMethod
+        actionMethod:Set["${joActionType.Get[handler]~}"]
    
         echo "ExecuteAction[${actionType~}]=${actionMethod~}"
         if ${actionMethod.NotNULLOrEmpty}

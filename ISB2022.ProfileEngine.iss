@@ -824,6 +824,7 @@ objectdef isb2022_profileengine
         LastMappable:SetReference[joMappable]
     }
 
+    ; for any Rotator object, gets the current `step` value (or 1 by default)
     member:int Rotator_GetCurrentStep(jsonvalueref joRotator)
     {
         variable int numStep
@@ -833,6 +834,7 @@ objectdef isb2022_profileengine
         return ${numStep}
     }    
 
+    ; for any Rotator object, determines if the given step number is enabled
     member:bool Rotator_IsStepEnabled(jsonvalueref joRotator, int numStep)
     {
         switch ${joRotator.GetBool[steps,${numStep},enable]}
@@ -849,6 +851,7 @@ objectdef isb2022_profileengine
         return FALSE
     }
 
+    ; for any Rotator object, gets the next step to advance to (from a given step number)
     member:int Rotator_GetNextStep(jsonvalueref joRotator, int fromStep)
     {
         variable int totalSteps = ${joRotator.Get[steps].Used}
@@ -880,6 +883,7 @@ objectdef isb2022_profileengine
         }
     }
 
+    ; for any object, increments `counter` and sets `counterTime` to the current script running time
     method IncrementCounter(jsonvalueref joCountable)
     {
         variable int counter=${joCountable.GetInteger[counter]}
@@ -888,11 +892,13 @@ objectdef isb2022_profileengine
         joCountable:SetInteger[counterTime,${Script.RunningTime}]
     }
 
+    ; for any Rotator object, increments the step counter for a specified step
     method Rotator_IncrementStepCounter(jsonvalueref joRotator,int numStep)
     {
         This:IncrementCounter["joRotator.Get[steps,${numStep}]"]
     }
 
+    ; for any Rotator object, attempts to advance to the next Step depending on the press/release state
     method Rotator_Advance(jsonvalueref joRotator,bool newState)
     {
         variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
@@ -956,6 +962,7 @@ objectdef isb2022_profileengine
 		}
     }
 
+    ; for any Rotator object, perform pre-execution mechanics, depending on press/release state
     method Rotator_PreExecute(jsonvalueref joRotator,bool newState)
     {
         variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
@@ -1025,6 +1032,7 @@ objectdef isb2022_profileengine
         return TRUE
     }
 
+    ; for any Rotator object, perform post-execution mechanics, depending on press/release state
     method Rotator_PostExecute(jsonvalueref joRotator,bool newState, int executedStep)
     {
 
@@ -1050,6 +1058,7 @@ objectdef isb2022_profileengine
         This:Rotator_Advance[joRotator,0]
     }
 
+    ; for any Rotator object, reset to the first step (often due to auto-reset mechanics)
     method Rotator_Reset(jsonvalueref joRotator)
     {
         variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
@@ -1062,6 +1071,7 @@ objectdef isb2022_profileengine
 		joRotator:SetInteger[stepTime,${timeNew}]
     }
 
+    ; for any Rotate object, execute a given step, depending on press/release state
     method ExecuteRotatorStep(jsonvalueref joRotator, jsonvalueref joStep, bool newState)
     {
         if !${joRotator.Type.Equal[object]}
@@ -1105,6 +1115,7 @@ objectdef isb2022_profileengine
         This:ExecuteActionList[joStep,"joStep.Get[actions]",${newState}]        
     }
 
+    ; for any Action List, execute all actions depending on press/release state
     method ExecuteActionList(jsonvalueref joState, jsonvalueref jaList, bool newState)
     {
         if !${jaList.Type.Equal[array]}
@@ -1114,6 +1125,7 @@ objectdef isb2022_profileengine
         jaList:ForEach["This:ExecuteAction[joState,ForEach.Value,${newState}]"]
     }
 
+    ; for any object, process variables within a specific property 
     method ProcessVariableProperty(jsonvalueref jo, string varName)
     {
 ;        echo "ProcessVariableProperty[${varName~}] ${jo~}"
@@ -1123,6 +1135,7 @@ objectdef isb2022_profileengine
         jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]        
     }
 
+    ; for any Action object of a given action type, process its variableProperties
     method ProcessActionVariables(jsonvalueref joActionType, jsonvalueref joAction)
     {
         if !${joActionType.Get[variableProperties].Type.Equal[array]}

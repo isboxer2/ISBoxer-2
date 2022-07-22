@@ -37,6 +37,13 @@ objectdef isb2022session inherits isb2022_profileengine
         return "${This:ActivateProfile[useProfile](exists)}"
     }
 
+    method DeactivateProfileByName(string name)
+    {
+        variable weakref useProfile="ProfileDB.Profiles.Get[\"${name~}\"]"
+        echo "DeactivateProfileByName ${name} = ${useProfile.AsJSON~}"
+        return "${This:DeactivateProfile[useProfile](exists)}"
+    }
+
     method BeginTest()
     {
         echo "ISB1=${This.DetectISBoxer1~}"

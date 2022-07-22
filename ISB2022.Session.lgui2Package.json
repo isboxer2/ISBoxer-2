@@ -2,7 +2,8 @@
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
     "includes": [
         "ISB2022.Skin.lgui2Package.json",
-        "ISB2022.Live.lgui2Package.json"
+        "ISB2022.Live.lgui2Package.json",
+        "ISB2022.Viewers.lgui2Package.json"
     ],
     "skin":"ISBoxer 2022",
     "templates": {
@@ -235,6 +236,93 @@
                         "_dock":"top",
                         "horizontalAlignment":"stretch",
                         "tabs":[
+                            {
+                                "type":"tab",
+                                "header":"Profiles",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "children":[
+                                        {
+                                            "type":"button",
+                                            "_dock":"bottom",
+                                            "horizontalAlignment":"center",
+                                            "content":"Activate",
+                                            "eventHandlers":{
+                                                "onRelease":{
+                                                    "type":"code",
+                                                    "code":"ISB2022:ActivateProfileByName[\"${LGUI2.Element[isb2022.listAvailableProfiles].SelectedItem.Data.Get[name]~}\"]"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type":"listbox",
+                                            "name":"isb2022.listAvailableProfiles",
+                                            "_dock":"bottom",
+                                            "minSize":[0,80],
+                                            "horizontalAlignment":"stretch",
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2022.ProfileDB.Profiles.AsJSON[array]}",
+                                                "pullHook": {
+                                                    "elementName": "isb2022.events",
+                                                    "flags": "global",
+                                                    "event": "onProfilesUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2022.profileView"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "_dock":"bottom",
+                                            "text":"Available Profiles"
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "_dock":"top",
+                                            "text":"Active Profiles"
+                                        },
+                                        {
+                                            "type":"listbox",
+                                            "name":"isb2022.listActiveProfiles",
+                                            "_dock":"top",
+                                            "minSize":[0,80],
+                                            "horizontalAlignment":"stretch",
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2022.Profiles.AsJSON}",
+                                                "pullHook": {
+                                                    "elementName": "isb2022.events",
+                                                    "flags": "global",
+                                                    "event": "onProfilesUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "-default":{
+                                                    "type":"template",
+                                                    "template":"isb2022.profileView"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type":"button",
+                                            "_dock":"top",
+                                            "horizontalAlignment":"center",
+                                            "content":"Deactivate",
+                                            "eventHandlers":{
+                                                "onRelease":{
+                                                    "type":"code",
+                                                    "code":"ISB2022:DeactivateProfileByName[\"${LGUI2.Element[isb2022.listActiveProfiles].SelectedItem.Data~}\"]"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
                             {
                                 "type":"tab",
                                 "header":"Test",

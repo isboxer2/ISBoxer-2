@@ -602,7 +602,12 @@ objectdef isb2022_triggerchain
         return TRUE
     }
 
-    method RemoveHandler(string name)
+    method RemoveHandler(jsonvalueref joTrigger)
+    {
+        Handlers:Erase["${joTrigger.Get[name]~}"]
+    }
+
+    method RemoveHandlerByName(string name)
     {
         Handlers:Erase["${name~}"]
     }

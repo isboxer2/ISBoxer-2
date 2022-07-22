@@ -206,16 +206,50 @@ objectdef isb2022_profileengine
             ja:ForEach["This:InstallTrigger[ForEach.Value]"]
     }    
 
+    method UninstallTrigger(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        variable string name
+        name:Set["${jo.Get[name]~}"]
+
+        if !${TriggerChains.Get["${name~}"](exists)}
+        {
+            return
+        }
+
+        TriggerChains.Get["${name~}"]:RemoveHandler[jo]
+    }
+
+    method UninstallTriggers(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallTrigger[ForEach.Value]"]
+    }    
+
     method InstallTeams(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:InstallTeam[ForEach.Value]"]
     }    
 
+    method UninstallTeams(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallTeam[ForEach.Value]"]
+    }    
+
     method InstallCharacters(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:InstallCharacter[ForEach.Value]"]
+    }    
+
+    method UninstallCharacters(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallCharacter[ForEach.Value]"]
     }    
 
     method InstallClickBar(jsonvalueref jo)
@@ -237,6 +271,24 @@ objectdef isb2022_profileengine
             ja:ForEach["This:InstallClickBar[ForEach.Value]"]
     }    
 
+    
+    method UninstallClickBar(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        variable string name
+        name:Set["${jo.Get[name]~}"]
+
+        ClickBars:Erase["${name~}"]
+    }
+
+    method UninstallClickBars(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallClickBar[ForEach.Value]"]
+    }    
+
     method InstallHotkeySheet(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -254,6 +306,23 @@ objectdef isb2022_profileengine
     {
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:InstallHotkeySheet[ForEach.Value]"]
+    }
+
+    method UninstallHotkeySheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        variable string name
+        name:Set["${jo.Get[name]~}"]
+
+        HotkeySheets:Erase["${name~}"]
+    }
+
+    method UninstallHotkeySheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallHotkeySheet[ForEach.Value]"]
     }
 
     method InstallMappableSheet(jsonvalueref jo)
@@ -275,6 +344,22 @@ objectdef isb2022_profileengine
             ja:ForEach["This:InstallMappableSheet[ForEach.Value]"]
     }
 
+    method UninstallMappableSheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        variable string name
+        name:Set["${jo.Get[name]~}"]
+
+        MappableSheets:Erase["${name~}"]
+    }
+
+    method UninstallMappableSheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallMappableSheet[ForEach.Value]"]
+    }
 
     method InstallGameKeyBinding(jsonvalueref jo)
     {
@@ -289,16 +374,41 @@ objectdef isb2022_profileengine
             ja:ForEach["This:InstallGameKeyBinding[ForEach.Value]"]
     }
 
+    method UninstallGameKeyBinding(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        GameKeyBindings:Erase["${jo.Get[name].Lower~}"]
+    }
+    method UninstallGameKeyBindings(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallGameKeyBinding[ForEach.Value]"]
+    }
+
     method InstallKeyLayouts(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:InstallKeyLayout[ForEach.Value]"]
-    }    
+    }
+
+    method UninstallKeyLayouts(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallKeyLayout[ForEach.Value]"]
+    }
 
     method InstallProfiles(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:InstallProfile[ForEach.Value]"]
+    }    
+
+    method UninstallProfiles(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallProfile[ForEach.Value]"]
     }    
 
     method InstallVirtualFiles(jsonvalueref ja)
@@ -307,10 +417,22 @@ objectdef isb2022_profileengine
             ja:ForEach["This:InstallVirtualFile[ForEach.Value]"]
     }
 
+    method UninstallVirtualFiles(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallVirtualFile[ForEach.Value]"]
+    }
+
     method InstallWindowLayouts(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:InstallWindowLayout[ForEach.Value]"]
+    }
+
+    method UninstallWindowLayouts(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallWindowLayout[ForEach.Value]"]
     }
 
     method InstallVFXSheet(jsonvalueref jo)
@@ -328,6 +450,20 @@ objectdef isb2022_profileengine
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:InstallVFXSheet[ForEach.Value]"]
     }
+
+    method UninstallVFXSheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        VFXSheets:Erase["${name~}"]
+    }
+
+    method UninstallVFXSheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallVFXSheet[ForEach.Value]"]
+    }    
 
     method ActivateProfile(weakref _profile)
     {
@@ -354,6 +490,8 @@ objectdef isb2022_profileengine
         This:InstallTeams[_profile.Teams]
 
         echo ActivateProfile ${_profile.Name} complete.
+
+        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated]
     }
 
     method DeactivateProfile(weakref _profile)
@@ -365,7 +503,7 @@ objectdef isb2022_profileengine
         if !${Profiles.Contains["${_profile.Name~}"]}
             return
 
-        Profiles:Erase["${_profile.Name~}"]
+        Profiles:Remove["${_profile.Name~}"]
 
         This:UninstallProfiles[_profile.Profiles]
 
@@ -380,6 +518,8 @@ objectdef isb2022_profileengine
 
         This:UninstallCharacters[_profile.Characters]
         This:UninstallTeams[_profile.Teams]
+
+        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated]
     }
 
     member:string ProcessVariables(string text)

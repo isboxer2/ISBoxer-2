@@ -361,6 +361,27 @@ objectdef isb2022_clickbar
         Window:Destroy
     }
 
+    method Disable()
+    {
+        Window:Destroy
+    }
+
+    method Enable()
+    {
+        if ${Window.Reference(exists)}
+            return
+
+        This:CreateWindow
+    }
+
+    method Toggle()
+    {
+        if ${Window.Reference(exists)}
+            This:Disable
+        else
+            This:CreateWindow
+    }
+
     method GotMouseFocus()
     {
 ;        echo isb2022_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}

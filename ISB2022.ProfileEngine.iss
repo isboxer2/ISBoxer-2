@@ -110,6 +110,13 @@ objectdef isb2022_profileengine
                 "retarget":true
             },
             {
+                "name":"click bar state",
+                "handler":"Action_ClickBarState",
+                "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
+            },
+            {
                 "name":"add trigger",
                 "handler":"Action_AddTrigger",
                 "variableProperties":["name"],
@@ -490,6 +497,29 @@ objectdef isb2022_profileengine
         {
             echo press -release "${keystroke}"
             press -release "${keystroke}"
+        }
+    }
+    
+    method Action_ClickBarState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_ClickBarState[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable string name
+        name:Set["${joAction.Get[name]~}"]
+
+        switch ${joAction.GetBool[state]}
+        {
+            case TRUE
+                ClickBars.Get["${name~}"]:Enable
+                break
+            case FALSE
+                ClickBars.Get["${name~}"]:Disable
+                break
+            case NULL
+                ClickBars.Get["${name~}"]:Toggle
+                break
         }
     }
 

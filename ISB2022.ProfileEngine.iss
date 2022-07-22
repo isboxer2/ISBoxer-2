@@ -499,6 +499,21 @@ objectdef isb2022_profileengine
             press -release "${keystroke}"
         }
     }
+
+    method Action_SetGameKeyBinding(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_SetGameKeyBinding[${activate}] ${joAction~}"
+
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable string name
+        name:Set["${joAction.Get[name].Lower~}"]
+        if !${name.NotNULLOrEmpty}
+            return
+
+        GameKeyBindings.Get["${name~}"]:Set["keyCombo","${joAction.Get[keyCombo].AsJSON~}"]
+    }
     
     method Action_ClickBarState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {

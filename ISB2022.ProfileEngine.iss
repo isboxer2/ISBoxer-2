@@ -71,6 +71,13 @@ objectdef isb2022_profileengine
                 "retarget":true
             },
             {
+                "name":"vfx sheet state",
+                "handler":"Action_VFXSheetState",
+                "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
+            },
+            {
                 "name":"window focus",
                 "handler":"Action_WindowFocus",
                 "activationState":true,
@@ -505,6 +512,29 @@ objectdef isb2022_profileengine
                 break
             case NULL
                 HotkeySheets.Get["${name~}"]:Toggle
+                break
+        }
+    }
+
+    method Action_VFXSheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_VFXSheetState[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable string name
+        name:Set["${joAction.Get[name]~}"]
+
+        switch ${joAction.GetBool[state]}
+        {
+            case TRUE
+                VFXSheets.Get["${name~}"]:Enable
+                break
+            case FALSE
+                VFXSheets.Get["${name~}"]:Disable
+                break
+            case NULL
+                VFXSheets.Get["${name~}"]:Toggle
                 break
         }
     }
@@ -1147,13 +1177,17 @@ objectdef isb2022_profileengine
     member:bool ShouldExecuteAction(jsonvalueref joState, jsonvalueref joActionType, jsonvalueref joAction, bool activate)
     {
         ; action-specific activationState
-        if ${joAction.Has[activationState]} && ${joAction.GetBool[activationState]}!=${activate}
-            return FALSE        
+        if ${joAction.Has[activationState]}
+        {
+            return ${activate.Equal[${joAction.GetBool[activationState]}]}
+        }
 
         ; action type-specific activationState
-        if ${joActionType.Has[activationState]} && ${joActionType.GetBool[activationState]}!=${activate}
-            return FALSE
-
+        if ${joActionType.Has[activationState]}
+        {
+            return ${activate.Equal[${joActionType.GetBool[activationState]}]}
+        }
+        
         return TRUE
     }
     

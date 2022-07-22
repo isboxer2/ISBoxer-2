@@ -92,13 +92,13 @@ objectdef isb2022_profileengine
             {
                 "name":"input mapping",
                 "handler":"Action_InputMapping",
-                "variableProperties":["name","sheet"],
+                "variableProperties":["name"],
                 "retarget":true
             },
             {
                 "name":"set input mapping",
                 "handler":"Action_SetInputMapping",
-                "variableProperties":["name","sheet"],
+                "variableProperties":["name"],
                 "activationState":true,
                 "retarget":true
             },
@@ -570,16 +570,43 @@ objectdef isb2022_profileengine
     {
         echo "Action_SetInputMapping[${activate}] ${joAction~}"
 
-        variable string name
         if !${joAction.Type.Equal[object]}
             return
+        variable string name
+        name:Set["${joAction.Get[name]~}"]
 
-        This:InstallInputMapping["${name~}",""]
+        if !${name.NotNULLOrEmpty}
+            return
+
+        variable jsonvalueref joMapping
+        joMapping:SetReference["joAction.Get[inputMapping]"]
+
+        This:InstallInputMapping["${name~}",joMapping]
     }
 
     method Action_MappableState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_MappableState[${activate}] ${joAction~}"
+
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable string sheet
+        sheet:Set["${joAction.Get[sheet]~}"]
+
+        if !${sheet.NotNULLOrEmpty}
+            return
+
+        variable string name
+        name:Set["${joAction.Get[name]~}"]
+
+        if !${name.NotNULLOrEmpty}
+            return
+
+        variable jsonvalueref joMappable
+        joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
+
+        joMappable:SetBool["${joAction.GetBool[value]}"]
     }
 
     method InstallInputMapping(string name,jsonvalueref joMapping)
@@ -835,6 +862,11 @@ objectdef isb2022_profileengine
             return
 
         echo "ExecuteMappable[${newState}] ${joMappable~}"
+
+        ; make sure it's not disabled. to be disabled requires "enable":false
+        if ${joMappable.GetBool[enable].Equal[FALSE]}
+            return
+
         ; get current step, then call This:ExecuteRotatorStep
         if !${newState}
         {

@@ -9,6 +9,9 @@ objectdef isb2022_profileengine
     ; a list of active Hotkeys
     variable set Hotkeys
 
+    ; a distributed scope which shares data with the Team
+    variable weakref TeamScope
+
     variable collection:isb2022_hotkeysheet HotkeySheets
     variable collection:isb2022_mappablesheet MappableSheets
     variable collection:isb2022_vfxsheet VFXSheets
@@ -18,6 +21,13 @@ objectdef isb2022_profileengine
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
     variable jsonvalue ActionTypes="{}"
+
+    variable jsonvalue Characters="{}"
+    variable jsonvalue Teams="{}"
+    variable jsonvalue WindowLayouts="{}"
+
+    variable jsonvalueref Character
+    variable jsonvalueref Team
 
     ; reference to the last hotkey used
     variable jsonvalueref LastHotkey
@@ -182,6 +192,8 @@ objectdef isb2022_profileengine
     {
         if !${jo.Type.Equal[object]}
             return FALSE
+
+        echo "TODO: InstallProfile"
     }
 
     method InstallTrigger(jsonvalueref jo)
@@ -228,6 +240,15 @@ objectdef isb2022_profileengine
             ja:ForEach["This:UninstallTrigger[ForEach.Value]"]
     }    
 
+    method InstallTeam(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+;        echo InstallTeam: Teams:SetByRef["${jo.Get[name]~}",jo] 
+        Teams:SetByRef["${jo.Get[name]~}",jo]
+    }
+
     method InstallTeams(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
@@ -239,6 +260,15 @@ objectdef isb2022_profileengine
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:UninstallTeam[ForEach.Value]"]
     }    
+
+    method InstallCharacter(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+;        echo InstallCharacter: Characters:SetByRef["${jo.Get[name]~}",jo] 
+        Characters:SetByRef["${jo.Get[name]~}",jo]
+    }
 
     method InstallCharacters(jsonvalueref ja)
     {
@@ -423,6 +453,15 @@ objectdef isb2022_profileengine
             ja:ForEach["This:UninstallVirtualFile[ForEach.Value]"]
     }
 
+    method InstallWindowLayout(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+;        echo InstallWindowLayout: WindowLayouts:SetByRef["${jo.Get[name]~}",jo] 
+        WindowLayouts:SetByRef["${jo.Get[name]~}",jo]
+    }
+
     method InstallWindowLayouts(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
@@ -464,6 +503,103 @@ objectdef isb2022_profileengine
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:UninstallVFXSheet[ForEach.Value]"]
     }    
+
+    method ActivateCharacterByName(string name)
+    {
+        variable weakref useCharacter="Characters.Get[\"${name~}\"]"
+        echo "ActivateCharacterByName ${name} = ${useCharacter.AsJSON~}"
+        return "${This:ActivateCharacter[useCharacter](exists)}"
+    }
+
+    method ActivateTeamByName(string name)
+    {
+        variable weakref useTeam="Teams.Get[\"${name~}\"]"
+        echo "ActivateTeamByName ${name} = ${useTeam.AsJSON~}"
+        return "${This:ActivateTeam[useTeam](exists)}"
+    }
+
+    method ActivateWindowLayoutByName(string name)
+    {
+        variable weakref useLayout="WindowLayouts.Get[\"${name~}\"]"
+        echo "ActivateWindowLayoutByName ${name} = ${useLayout.AsJSON~}"
+        return "${This:ActivateWindowLayout[useLayout](exists)}"
+    }
+
+    method ActivateWindowLayout(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return
+        
+        echo "TODO: ActivateWindowLayout ${jo~}"
+    }
+
+    method DeactivateCharacter()
+    {
+        if !${Character.Type.Equal[object]}
+            return
+
+        Character:SetReference[NULL]
+    }
+
+    method ActivateCharacter(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return
+
+        This:DeactivateCharacter
+        Character:SetReference[jo]
+
+        This:ActivateProfilesByName["Character.Get[profiles]"]
+
+        LGUI2.Element[isb2022.events]:FireEventHandler[onCharacterChanged]
+    }
+
+    method DeactivateTeam()
+    {
+        if !${Team.Type.Equal[object]}
+            return
+
+        variable string qualifiedName
+        qualifiedName:Set["isb2022team_${Team.Get[name]~}"]
+        uplink relaygroup -leave "${qualifiedName~}"
+
+        TeamScope:Remove
+
+        Team:SetReference[NULL]
+    }
+
+    method ActivateTeam(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return
+
+        This:DeactivateTeam
+        Team:SetReference[jo]
+
+        variable string qualifiedName
+        qualifiedName:Set["isb2022team_${Team.Get[name]~}"]
+        uplink relaygroup -join "${qualifiedName~}"
+
+        This:ActivateProfilesByName["Team.Get[profiles]"]
+
+        variable jsonvalue dscopeDefinition
+        dscopeDefinition:SetValue["$$>
+        {
+            "name":${qualifiedName.AsJSON},
+            "distribution":${qualifiedName.AsJSON},
+            "initialValues":{
+                "active":true
+            }
+        }
+        <$$"]
+
+        echo TeamScope:SetReference["InnerSpace.AddDistributedScope[\"${dscopeDefinition.AsJSON~}\"]"]
+        TeamScope:SetReference["InnerSpace.AddDistributedScope[\"${dscopeDefinition.AsJSON~}\"]"]
+
+        echo "ActivateTeam: TeamScope.active=${TeamScope.GetBool[active]}"
+
+        LGUI2.Element[isb2022.events]:FireEventHandler[onTeamChanged]
+    }
 
     method ActivateProfile(weakref _profile)
     {

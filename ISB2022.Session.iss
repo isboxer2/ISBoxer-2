@@ -9,12 +9,17 @@ objectdef isb2022session inherits isb2022_profileengine
 
     variable isb2022_profilecollection ProfileDB
 
-
     method Initialize()
     {
         if ${JMB(exists)} && !${JMB.Slot.Metadata.Get[launcher]~.Equal["ISBoxer 2022"]}
         {
             echo "ISBoxer 2022 inactive; Session not launched by ISBoxer 2022."
+            return
+        }
+
+        if ${InnerSpace.Build} < 6945
+        {
+            echo "ISBoxer 2022 inactive; Inner Space build 6944 or later required (currently ${InnerSpace.Build})"
             return
         }
 
@@ -28,6 +33,14 @@ objectdef isb2022session inherits isb2022_profileengine
     method Shutdown()
     {
         LGUI2:UnloadPackageFile[ISB2022.Session.lgui2Package.json]
+    }
+
+    method ActivateProfilesByName(jsonvalueref jaProfiles)
+    {
+        if !${jaProfiles.Type.Equal[array]}
+            return
+
+        jaProfiles:ForEach["This:ActivateProfileByName[\"\${ForEach.Value~}\"]"]
     }
 
     method ActivateProfileByName(string name)
@@ -49,6 +62,10 @@ objectdef isb2022session inherits isb2022_profileengine
         echo "ISB1=${This.DetectISBoxer1~}"
 
         ProfileDB:LoadFolder["${Script.CurrentDirectory~}/Tests"]
+
+        This:ActivateProfileByName["${ISBoxerCharacterSet~}"]
+        This:ActivateTeamByName["${ISBoxerCharacterSet~}"]
+        This:ActivateCharacterByName["${ISBoxerCharacter~}"]
     }
 
     member:jsonvalueref DetectISBoxer1()

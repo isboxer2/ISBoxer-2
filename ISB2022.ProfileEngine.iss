@@ -28,6 +28,8 @@ objectdef isb2022_profileengine
 
     variable jsonvalueref Character
     variable jsonvalueref Team
+    variable jsonvalueref SlotRef
+    variable uint Slot
 
     ; reference to the last hotkey used
     variable jsonvalueref LastHotkey
@@ -144,6 +146,24 @@ objectdef isb2022_profileengine
 
 ;        echo "InstallDefaultActionTypes ${ja~}"
         This:InstallActionTypes[ja]
+    }
+
+    member:uint GetCharacterSlot(string name)
+    {
+        variable jsonvalueref jaSlots="Team.Get[slots]"
+        if !${jaSlots.Type.Equal[array]}
+            return 0
+        
+        variable uint i
+        for (i:Set[1] ; ${i}<=${jaSlots.Used} ; i:Inc )
+        {
+            if ${jaSlots.Assert[${i},character,"${name.AsJSON~}"]}
+            {
+                return ${i}
+            }
+        }
+
+        return 0
     }
 
     method InstallActionTypes(jsonvalueref ja)
@@ -541,6 +561,24 @@ objectdef isb2022_profileengine
         Character:SetReference[NULL]
     }
 
+    method ActivateSlot(uint numSlot)
+    {
+        Slot:Set[${numSlot}]
+        SlotRef:SetReference["Team.Get[slots,${numSlot}]"]
+
+        if !${SlotRef.Type.Equal[object]}
+            return
+
+        echo "ActivateSlot ${numSlot} = ${SlotRef~}"
+        if ${SlotRef.Has[foregroundFPS]}
+            maxfps -fg -calculate ${SlotRef.Get[foregroundFPS]}
+
+        if ${SlotRef.Has[backgroundFPS]}
+            maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
+
+        This:ActivateProfilesByName["SlotRef.Get[profiles]"]
+    }
+
     method ActivateCharacter(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -548,7 +586,7 @@ objectdef isb2022_profileengine
 
         This:DeactivateCharacter
         Character:SetReference[jo]
-
+        This:ActivateSlot["${This.GetCharacterSlot["${Character.Get[name]~}"]}"]
         This:ActivateProfilesByName["Character.Get[profiles]"]
 
         LGUI2.Element[isb2022.events]:FireEventHandler[onCharacterChanged]

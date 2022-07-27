@@ -1,9 +1,12 @@
 #include "ISB2022.Common.iss"
+#include "ISB2022.Importer.iss"
 
 objectdef isb2022 inherits isb2022_profilecollection
 {
     ; Reference to the currently selected Profile in the main window
     variable weakref SelectedProfile
+
+    variable isb2022_importer Importer
 
     method Initialize()
     {

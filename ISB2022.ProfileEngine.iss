@@ -102,6 +102,12 @@ objectdef isb2022_profileengine
                 "retarget":true
             },
             {
+                "name":"mappable",
+                "handler":"Action_Mappable",
+                "variableProperties":["name","sheet"],
+                "retarget":true
+            },
+            {
                 "name":"input mapping",
                 "handler":"Action_InputMapping",
                 "variableProperties":["name"],
@@ -914,13 +920,20 @@ objectdef isb2022_profileengine
 
     }
 
+    method Action_Mappable(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_Mappable[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",${activate}]
+    }
+
     method Action_InputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_InputMapping[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
-
-        variable string name
 
         This:ExecuteInputMappingByName["${joAction.Get[name]~}",${activate}]
     }

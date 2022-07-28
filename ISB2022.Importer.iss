@@ -119,6 +119,13 @@ objectdef isb2022_importer
         joTransform:SetByRef["${newProperty~}",ja]
     }    
 
+    method TransformKeysToArray(jsonvalueref joTransform, string property)
+    {
+        variable jsonvalue ja="[]"
+        joTransform.Get["${property~}"]:ForEach["ja:AddString[\"\${ForEach.Key~}\"]"]
+        joTransform:SetByRef["${property~}",ja]
+    }    
+
      method TransformValuesToArray(jsonvalueref joTransform, string newProperty, string prefix, string methodName)
     {
         variable jsonvalue ja="[]"
@@ -167,8 +174,56 @@ objectdef isb2022_importer
         This:TransformObjectToArray[joGeneral,"Repeater Profiles",TransformRepeaterProfile]
         This:TransformObjectToArray[joGeneral,"Computers",TransformComputer]
 ;        This:TransformObjectToArray[joGeneral,"Relay Groups",TransformRelayGroup]
+
+        This:TransformKeysToArray[joGeneral,"Relay Groups"]
         This:TransformObjectToArray[joGeneral,"Action Timer Pools",TransformActionTimerPool]
-        This:TransformObjectToArray[joGeneral,"Variable Keystrokes",TransformVariableKeystroke]
+        This:TransformObjectToArray[joGeneral,"Variable Keystrokes",TransformVariableKeystroke]        
+    }
+
+    method TransformMenuInstances(jsonvalueref joTransform, string property)
+    {
+        variable jsonvalueref joMenuInstances
+        joMenuInstances:SetReference["joTransform.Get[\"${property~}\"]"]
+        if !${joMenuInstances.Type.Equal[object]}
+            return
+
+        variable jsonvalue ja="[]"
+        joMenuInstances:ForEach["This:AddMenuInstance[ja,\"\${ForEach.Key~}\",ForEach.Value]"]
+
+        joTransform:SetByRef["${property~}",ja]
+    }
+
+    method AddMenuInstance(jsonvalueref ja, string name, jsonvalueref joMenuInstance)
+    {
+        joMenuInstance:SetString[name,"${name~}"]
+
+        joMenuInstance:Erase["_xsi:type"]
+        joMenuInstance:Erase[value]
+
+        ja:AddByRef[joMenuInstance]
+    }
+
+    method TransformVirtualFiles(jsonvalueref joTransform, string property)
+    {
+        variable jsonvalueref joVirtualFiles
+        joVirtualFiles:SetReference["joTransform.Get[\"${property~}\"]"]
+        if !${joVirtualFiles.Type.Equal[object]}
+            return
+
+        variable jsonvalue ja="[]"
+        joVirtualFiles:ForEach["This:AddVirtualFileInstance[ja,\"\${ForEach.Key~}\",\"\${ForEach.Value~}\"]"]
+
+        joTransform:SetByRef["${property~}",ja]
+    }
+
+    method AddVirtualFileInstance(jsonvalueref ja, string pattern, string replacement)
+    {
+        ja:Add["$$>
+        {
+            "pattern":${pattern.AsJSON}
+            "replacement":${replacement.AsJSON}
+        }
+        <$$"]        
     }
 
     method TransformRepeater()
@@ -180,14 +235,20 @@ objectdef isb2022_importer
     {
         joCharacter:SetString[name,"${name~}"]
         
+        This:TransformKeysToArray[joCharacter,Relay Groups]
+        This:TransformVirtualFiles[joCharacter,Virtual Files]
     }
 
     method TransformCharacterSet(string name, jsonvalueref joCharacterSet)
     {
         joCharacterSet:SetString[name,"${name~}"]
 
+        This:TransformKeysToArray[joCharacterSet,Key Maps]
         This:TransformSubObjectsToArray[joCharacterSet,Slots,"Slot ",TransformCharacterSetSlot]
         This:TransformSubObjectsToArray[joCharacterSet,Virtual Mapped Keys,"VMK #",TransformCharacterSetVMK]
+        This:TransformVirtualFiles[joCharacterSet,Virtual Files]
+
+        This:TransformMenuInstances[joCharacterSet,Menus]
     }
 
     method TransformCharacterSetSlot(jsonvalueref jo)
@@ -206,10 +267,23 @@ objectdef isb2022_importer
         jo:SetString[name,"${name~}"]        
 
         This:TransformSubObjectsToArray[jo,"Regions","",TransformWindowLayoutRegion]
+        This:TransformSubObjectsToArray[jo,"Slots","",TransformWindowLayoutSlot]
+        This:TransformSubObjectsToArray[jo,"Swap Groups","",TransformWindowLayoutSwapGroup]
     }
 
     method TransformWindowLayoutRegion(jsonvalueref jo)
     {        
+    }    
+
+    method TransformWindowLayoutSlot(jsonvalueref jo)
+    {        
+        jo:Erase["value"]
+        jo:Erase["_xsi:type"]
+    }    
+
+    method TransformWindowLayoutSwapGroup(jsonvalueref jo)
+    {        
+
     }    
 
     method TransformRepeaterProfile(string name, jsonvalueref jo)

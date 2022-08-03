@@ -69,6 +69,16 @@ objectdef isb2022_profileengine
                 "variableProperties":["name"]
             },
             {
+                "name":"target group",
+                "handler":"Action_TargetGroup",
+                "retarget":true,
+                "variableProperties":["name"]
+            },
+            {
+                "name":"sync cursor",
+                "handler":"Action_SyncCursor"
+            },
+            {
                 "name":"set game key binding",
                 "handler":"Action_SetGameKeyBinding",
                 "variableProperties":["name"],

@@ -152,6 +152,13 @@ objectdef isb2022_profileengine
                 "retarget":true
             },
             {
+                "name":"virtualize mappable",
+                "handler":"Action_MappableSheetState",
+                "variableProperties":["fromSheet","toSheet","fromName","toName"],
+                "activationState":true,
+                "retarget":true
+            },
+            {
                 "name":"click bar state",
                 "handler":"Action_ClickBarState",
                 "variableProperties":["name"],

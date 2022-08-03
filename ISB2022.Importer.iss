@@ -264,10 +264,13 @@ objectdef isb2022_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[type,mappable]        
-        joNew:SetString[name,"${jo.Get[mappedKey]~}"]
-        joNew:SetString[sheet,"${jo.Get[keyMap]~}"]
 
+        if ${jo.Has[mappedKey]}
+            joNew:SetString[name,"${jo.Get[mappedKey]~}"]
+        if ${jo.Has[keyMap]}
+            joNew:SetString[sheet,"${jo.Get[keyMap]~}"]
 
+;        joNew:Set[originalAction,"${jo~}"]
         return joNew
     }
 
@@ -412,6 +415,82 @@ objectdef isb2022_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[type,sync cursor]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_ClickBarButtonAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,set click bar button]
+
+        if ${jo.Has[Text]}
+            joNew:SetString[text,"${jo.Get[Text]~}"]
+
+        if ${jo.Has[backgroundColor]}
+            joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
+
+;        if ${jo.Has[Image]}
+
+/*
+        [DefaultValue(null)]
+        public ARGBColor BackgroundColor { get; set; }
+        [DefaultValue(null)]
+        public ImageLooseRef Image { get; set; }
+        [DefaultValue(null)]
+        public string Text { get; set; }
+  */
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_MappedKeyRewriteAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,virtualize mappable]
+
+        if ${jo.Has[FromMappedKey,KeyMapString]}
+            joNew:SetString[fromSheet,"${jo.Get[FromMappedKey,KeyMapString]~}"]
+        if ${jo.Has[FromMappedKey,MappedKeyString]}
+            joNew:SetString[fromName,"${jo.Get[FromMappedKey,KeyMapString]~}"]
+
+        if ${jo.Has[ToMappedKey,KeyMapString]}
+            joNew:SetString[toSheet,"${jo.Get[ToMappedKey,KeyMapString]~}"]
+        if ${jo.Has[ToMappedKey,MappedKeyString]}
+            joNew:SetString[toName,"${jo.Get[ToMappedKey,KeyMapString]~}"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_SendNextClickAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,send next click]
+
+        joNew:SetBool[blockLocal,${jo.GetBool[BlockLocal]}]
+
+        if ${jo.GetBool[VideoFeed]}
+        {
+            joNew:SetBool[videoFeed,1]
+
+            if ${jo.GetInteger[VideoOutputAlpha]}>=0
+                joNew:SetInteger[videoOutputAlpha,${jo.GetInteger[VideoOutputAlpha]}]
+            if ${jo.Has[videoOutputBorder]}
+                joNew:SetString[videoOutputBorder,"${jo.Get[videoOutputBorder]~}"]
+            
+            if ${jo.Has[videoSourceSize]}
+                joNew:SetByRef[videoSourceSize,"jo.Get[videoSourceSize]"]
+            if ${jo.Has[videoOutputSize]}
+                joNew:SetByRef[videoOutputSize,"jo.Get[videoOutputSize]"]
+
+        }
+
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew

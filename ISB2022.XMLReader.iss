@@ -157,6 +157,21 @@ objectdef isb2022_isb1transformer
         }
     }
 
+    method TransformSize(jsonvalueref joTransform, string oldProperty, string newProperty)
+    {
+        variable jsonvalueref jo
+        jo:SetReference["joTransform.Get[\"${oldProperty~}\"]"]
+        if !${jo.Type.Equal[object]}
+            return
+
+        variable jsonvalue ja="[]"
+        ja:AddInteger["${jo.GetInteger[Width]}"]
+        ja:AddInteger["${jo.GetInteger[Height]}"]
+
+        joTransform:SetByRef["${newProperty~}",ja]
+        joTransform:Erase["${oldProperty~}"]
+    }
+
     method TransformColor(jsonvalueref joTransform, string oldProperty, string newProperty)
     {
         variable jsonvalueref jo
@@ -674,6 +689,10 @@ objectdef isb2022_isb1transformer
         This:TransformInteger[joTransform,FadeDurationMS,fadeDurationMS]
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
+
+        This:TransformSize[joTransform,VideoSourceSize,videoSourceSize]
+        This:TransformSize[joTransform,VideoOutputSize,videoOutputSize]
+        This:TransformColor[joTransform,VideoOutputBorder,videoOutputBorder]
 
         if ${joTransform.Has[Red]} || ${joTransform.Has[Green]} || ${joTransform.Has[Blue]}
         {

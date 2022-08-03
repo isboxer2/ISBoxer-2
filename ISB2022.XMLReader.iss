@@ -672,6 +672,7 @@ objectdef isb2022_isb1transformer
     method AutoTransform_Actions(jsonvalueref joTransform)
     {
 ;        echo "AutoTransform_Actions ${joTransform~}"
+        This:TransformSingleToArray[joTransform,"WhiteOrBlackList"]
 
         This:TransformBool[joTransform,"RoundRobin","roundRobin"]
         This:TransformBool[joTransform,"UseFTLModifiers","useFTLModifiers"]
@@ -866,7 +867,7 @@ objectdef isb2022_xmlreader
         if ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
-            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]}
+            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]}
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"
         }
         /**/

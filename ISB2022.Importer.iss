@@ -753,4 +753,39 @@ objectdef isb2022_importer
         return joNew
     }
 
+    member:jsonvalueref ConvertISKey(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[Key,"${jo.Get[Key]~}"]
+
+        if ${jo.GetInteger[Code]}
+            joNew:SetInteger[code,${jo.GetInteger[Code]}]    
+        return joNew
+    }
+
+    method AddConvertedISKey(jsonvalueref ja, jsonvalueref jo)
+    {
+        ja:AddByRef["This.ConvertISKey[jo]"]
+    }
+
+    member:jsonvalueref ConvertAction_RepeaterListAction(jsonvalueref jo)
+    {
+;        echo "ConvertAction_RepeaterListAction ${jo~}"
+
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,broadcasting list]        
+        joNew:SetString[listType,"${jo.Get[WhiteOrBlackListType]~}"]
+
+        variable jsonvalue ja="[]"
+
+        jo.Get[WhiteOrBlackList]:ForEach["This:AddConvertedISKey[ja,ForEach.Value]"]
+
+        joNew:SetByRef[list,ja]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
 }

@@ -216,6 +216,12 @@ objectdef isb2022_profileengine
                 "variableProperties":["value"],
                 "activationState":true,
                 "retarget":true
+            },
+            {
+                "name":"broadcasting list",
+                "handler":"Action_BroadcastingList",
+                "activationState":true,
+                "retarget":true
             }
         ]<$$"]
 

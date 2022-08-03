@@ -249,6 +249,10 @@ objectdef isb2022_importer
                 joNew:SetString[target,"${jo.Get[Target]~}"]
             if ${jo.Has[RoundRobin]}
                 joNew:SetBool[roundRobin,"${jo.GetBool[RoundRobin]}"]
+
+            if ${jo.Has[ActionTimer]}
+                joNew:SetByRef[actionTimer,"This.ConvertActionTimer[\"jo.Get[ActionTimer]\"]"]
+
             return joNew
         }
 
@@ -256,6 +260,23 @@ objectdef isb2022_importer
         jo:SetString[originalActionType,"${jo.Get[type]~}"]
         jo:Erase[type]
         return jo
+    }
+
+    member:jsonvalueref ConvertActionTimer(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[pool,"${jo.Get[PoolName]~}"]
+
+        joNew:SetBool[enabled,${jo.GetBool[Enabled]}]
+
+        if ${jo.GetBool[AutoRecurring]}
+            jo:SetBool[autoRecurring,1]
+        
+        joNew:SetNumber[seconds,"${jo.GetNumber[Seconds]~}"]      
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
     }
 
     member:jsonvalueref ConvertAction_MappedKeyExecuteAction(jsonvalueref jo)
@@ -314,7 +335,10 @@ objectdef isb2022_importer
         if ${jo.Has[keyMap]}
             joNew:SetString[sheet,"${jo.Get[keyMap]~}"]
 
-        joNew:SetString[value,"${jo.Get[Value]~}"]
+        if ${jo.Has[Value]}
+            joNew:SetString[value,"${jo.Get[Value]~}"]
+        else
+            joNew:SetString[value,"On"]
 
         return joNew        
     }
@@ -328,6 +352,22 @@ objectdef isb2022_importer
 
         if ${jo.Has[combo,Combo]}
             joNew:SetString[combo,"${jo.Get[combo,Combo]~}"]
+
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_KeyStringAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_Keystroke ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,keystring]        
+
+        if ${jo.Has[Text]}
+            joNew:SetString[text,"${jo.Get[Text]~}"]
+
+        if ${jo.GetBool[FillClipboard]}
+            joNew:SetBool[FillClipboard,1]
 
         return joNew
     }
@@ -459,6 +499,53 @@ objectdef isb2022_importer
         return joNew
     }
 
+    member:jsonvalueref ConvertAction_RepeaterRegionsAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_KeyMapAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,region sheet state]        
+
+        joNew:SetString[name,"${jo.Get[Profile]~}"]
+        joNew:SetString[action,"${jo.Get[Action]~}"]
+
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_RepeaterStateAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,broadcasting state]
+
+        joNew:SetBool[blockLocal,${jo.GetBool[BlockLocal]}]
+        
+        if ${jo.GetBool[UseMouseState]}
+            joNew:SetString[MouseState,"${jo.Get[MouseState]~}"]
+        if ${jo.GetBool[UseKeyboardState]}
+            joNew:SetString[KeyboardState,"${jo.Get[KeyboardState]~}"]
+
+        if ${jo.Has[VideoFeed,Value]}
+        {
+            joNew:SetBool[videoFeed,1]
+
+            if ${jo.GetInteger[VideoOutputAlpha]}>=0
+                joNew:SetInteger[videoOutputAlpha,${jo.GetInteger[VideoOutputAlpha]}]
+            if ${jo.Has[videoOutputBorder]}
+                joNew:SetString[videoOutputBorder,"${jo.Get[videoOutputBorder]~}"]
+            
+            if ${jo.Has[videoSourceSize]}
+                joNew:SetByRef[videoSourceSize,"jo.Get[videoSourceSize]"]
+            if ${jo.Has[videoOutputSize]}
+                joNew:SetByRef[videoOutputSize,"jo.Get[videoOutputSize]"]
+
+        }
+
+
+        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
     member:jsonvalueref ConvertAction_SendNextClickAction(jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
@@ -484,7 +571,7 @@ objectdef isb2022_importer
         }
 
 
-;        joNew:Set[originalAction,"${jo~}"]
+        joNew:Set[originalAction,"${jo~}"]
         return joNew
     }
 
@@ -500,6 +587,41 @@ objectdef isb2022_importer
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew
     }
+
+    member:jsonvalueref ConvertAction_WindowStateAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,window state]
+
+        if ${jo.Has[RegionType]}
+            joNew:SetString[regionType,"${jo.Get[RegionType]~}"]
+        if ${jo.Has[Action]}
+            joNew:SetString[action,"${jo.Get[Action]~}"]
+        if ${jo.GetBool[DeactivateOthers]}
+            joNew:SetBool[deactivateOthers,1]
+
+;        joNew:SetString[targetGroup,"${jo.Get[RelayGroupString]~}"]        
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_TimerPoolAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,timer pool]
+
+        joNew:SetString[action,"${jo.Get[Action]~}"]
+        joNew:SetString[timerPool,"${jo.Get[TimerPool]~}"]        
+        if ${jo.Has[Target2]}
+            joNew:SetString[target,"${jo.Get[Target2]~}"]        
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
 
     member:jsonvalueref ConvertAction_PopupTextAction(jsonvalueref jo)
     {

@@ -14,6 +14,7 @@ objectdef isb2022_profileengine
 
     variable collection:isb2022_hotkeysheet HotkeySheets
     variable collection:isb2022_mappablesheet MappableSheets
+    variable collection:isb2022_regionsheet RegionSheets
     variable collection:isb2022_vfxsheet VFXSheets
     variable collection:isb2022_triggerchain TriggerChains
     variable collection:isb2022_clickbar ClickBars
@@ -61,6 +62,12 @@ objectdef isb2022_profileengine
                 "name":"keystroke",
                 "handler":"Action_Keystroke",
                 "retarget":true
+            },
+            {
+                "name":"keystring",
+                "handler":"Action_KeyString",
+                "retarget":true,
+                "variableProperties":["text"]
             },
             {
                 "name":"game key binding",

@@ -739,6 +739,37 @@ objectdef isb2022_mappablesheet
     }
 }
 
+objectdef isb2022_regionsheet
+{
+    variable string Name
+    variable bool Enabled
+
+    variable jsonvalue VFX="{}"
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        jo.Get[regions]:ForEach["This:Add[ForEach.Value]"]
+
+
+        if ${jo.GetBool[enable]}
+        {
+            This:Enable
+        }
+
+    }
+}
+
 objectdef isb2022_vfxsheet
 {
     variable string Name

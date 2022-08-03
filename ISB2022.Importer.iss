@@ -546,12 +546,23 @@ objectdef isb2022_importer
 
         joNew:SetString[type,broadcasting state]
 
-        joNew:SetBool[blockLocal,${jo.GetBool[BlockLocal]}]
+        if ${jo.Has[BlockLocal]}
+            joNew:SetBool[blockLocal,${jo.GetBool[BlockLocal]}]
         
         if ${jo.GetBool[UseMouseState]}
-            joNew:SetString[MouseState,"${jo.Get[MouseState]~}"]
+        {
+            if ${jo.Has[MouseState]}
+                joNew:SetString[mouseState,"${jo.Get[MouseState]~}"]
+            else
+                joNew:SetString[mouseState,"On"]
+        }
         if ${jo.GetBool[UseKeyboardState]}
-            joNew:SetString[KeyboardState,"${jo.Get[KeyboardState]~}"]
+        {
+            if ${jo.Has[keyboardState]}
+               joNew:SetString[keyboardState,"${jo.Get[KeyboardState]~}"]
+            else
+                joNew:SetString[keyboardState,"On"]
+        }
 
         if ${jo.Has[VideoFeed,Value]}
         {
@@ -635,6 +646,62 @@ objectdef isb2022_importer
         return joNew
     }
 
+    member:jsonvalueref ConvertAction_WindowFocusAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,window focus]
+
+        if ${jo.Has[FilterTarget]}
+            joNew:SetString[filtertTarget,"${jo.Get[FilterTarget]~}"]
+        if ${jo.Has[window]}
+            joNew:SetString[window,"${jo.Get[Window]~}"]
+        if ${jo.Has[Computer]}
+            joNew:SetString[computer,"${jo.Get[Computer,ComputerString]~}"]
+
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_WindowCloseAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,window close]
+
+        if ${jo.Assert[Action,"\"Terminate\""]}
+            joNew:SetBool[terminate,1]
+
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_RepeaterTargetAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,broadcasting target]
+
+        if ${jo.Has[RepeaterTarget]}
+            joNew:SetString[value,"${jo.Get[RepeaterTarget]~}"]
+
+        if ${jo.GetBool[BlockLocal]}
+            joNew:SetBool[blockLocal,1]
+
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_MenuButtonAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,set click bar button]
+
+        
+
+
+        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
     member:jsonvalueref ConvertAction_TimerPoolAction(jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
@@ -675,30 +742,13 @@ objectdef isb2022_importer
 ;       echo "ConvertAction_WoWMacroRefAction ${jo~}"     
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,keystroke]        
+        joNew:SetString[type,game macro]        
 
-;        if ${jo.Has[combo,Combo]}
-;            joNew:SetString[combo,"${jo.Get[combo,Combo]~}"]
         if ${jo.Has[useFTLModifiers]}
             joNew:SetBool[useFTLModifiers,"${jo.GetBool[useFTLModifiers]}"]    
 
-        if ${jo.Has[WoWMacro]}
-        {
-            variable string macroSet
-            variable string macroName
-            macroSet:Set["${jo.Get[WoWMacro,WoWMacroSetString]~}"]
-            macroName:Set["${jo.Get[WoWMacro,WoWMacroString]~}"]
-
-            variable jsonvalueref joMacro
-            joMacro:SetReference["This.GetWoWMacro[\"${macroSet~}\",\"${macroName~}\"]"]
-;            echo "found macro=${joMacro~}"
-            if ${joMacro.Type.Equal[object]} && ${joMacro.Has[combo,Combo]}
-            {
-                joNew:SetString[combo,"${joMacro.Get[combo,Combo]~}"]    
-            }
-            else
-                joNew:Set[WoWMacro,"${jo.Get[WoWMacro]~}"]
-        }
+        joNew:SetString[sheet,"${jo.Get[WoWMacro,WoWMacroSetString]}"]
+        joNew:SetString[name,"${jo.Get[WoWMacro,WoWMacroString].ReplaceSubstring["{FTL}","(FTL)"]}"]
 
         return joNew
     }

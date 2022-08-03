@@ -71,6 +71,12 @@ objectdef isb2022_profileengine
                 "variableProperties":["name"]
             },
             {
+                "name":"game macro",
+                "handler":"Action_GameMacro",
+                "retarget":true,
+                "variableProperties":["name","sheet"]
+            }
+            {
                 "name":"keystring",
                 "handler":"Action_KeyString",
                 "retarget":true,
@@ -114,7 +120,7 @@ objectdef isb2022_profileengine
                 "name":"window focus",
                 "handler":"Action_WindowFocus",
                 "activationState":true,
-                "retarget":true
+                "variableProperties":["window","computer","filterTarget"]
             },
             {
                 "name":"window close",
@@ -201,6 +207,13 @@ objectdef isb2022_profileengine
                 "name":"remove trigger",
                 "handler":"Action_RemoveTrigger",
                 "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
+            },
+            {
+                "name":"broadcasting target",
+                "handler":"Action_BroadcastingTarget",
+                "variableProperties":["value"],
                 "activationState":true,
                 "retarget":true
             }

@@ -15,6 +15,7 @@ objectdef isb2022_profileengine
     variable collection:isb2022_hotkeysheet HotkeySheets
     variable collection:isb2022_mappablesheet MappableSheets
     variable collection:isb2022_regionsheet RegionSheets
+    variable collection:isb2022_gamemacrosheet GameMacroSheets
     variable collection:isb2022_vfxsheet VFXSheets
     variable collection:isb2022_triggerchain TriggerChains
     variable collection:isb2022_clickbar ClickBars

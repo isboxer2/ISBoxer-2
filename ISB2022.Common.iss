@@ -739,12 +739,46 @@ objectdef isb2022_mappablesheet
     }
 }
 
+objectdef isb2022_gamemacrosheet
+{
+    variable string Name
+    variable string Game
+
+    variable jsonvalue Macros="{}"
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        if ${jo.Has[game]}
+            Game:Set["${jo.Get[game]~}"]
+
+        jo.Get[macros]:ForEach["This:Add[ForEach.Value]"]
+    }
+
+    method Add(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+        Macros:SetByRef["${jo.Get[name]~}",jo]
+    }
+}
+
 objectdef isb2022_regionsheet
 {
     variable string Name
     variable bool Enabled
 
-    variable jsonvalue VFX="{}"
+    variable jsonvalue Regions="{}"
 
     method Initialize(jsonvalueref jo)
     {
@@ -766,7 +800,13 @@ objectdef isb2022_regionsheet
         {
             This:Enable
         }
+    }
 
+    method Add(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+        Regions:SetByRef["${jo.Get[name]~}",jo]
     }
 }
 

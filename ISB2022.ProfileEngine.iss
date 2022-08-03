@@ -64,26 +64,29 @@ objectdef isb2022_profileengine
                 "retarget":true
             },
             {
-                "name":"keystring",
-                "handler":"Action_KeyString",
-                "retarget":true,
-                "variableProperties":["text"]
-            },
-            {
                 "name":"game key binding",
                 "handler":"Action_GameKeyBinding",
                 "retarget":true,
                 "variableProperties":["name"]
             },
             {
+                "name":"keystring",
+                "handler":"Action_KeyString",
+                "retarget":true,
+                "activationState":true
+                "variableProperties":["text"]
+            },
+            {
                 "name":"target group",
                 "handler":"Action_TargetGroup",
                 "retarget":true,
+                "activationState":true
                 "variableProperties":["name"]
             },
             {
                 "name":"sync cursor",
-                "handler":"Action_SyncCursor"
+                "handler":"Action_SyncCursor",
+                "activationState":true
             },
             {
                 "name":"set game key binding",
@@ -145,6 +148,13 @@ objectdef isb2022_profileengine
                 "retarget":true
             },
             {
+                "name":"mappable step state",
+                "handler":"Action_MappableStepState",
+                "variableProperties":["name","sheet"],
+                "activationState":true,
+                "retarget":true
+            },
+            {
                 "name":"mappable state",
                 "handler":"Action_MappableState",
                 "variableProperties":["name","sheet"],
@@ -168,6 +178,13 @@ objectdef isb2022_profileengine
             {
                 "name":"click bar state",
                 "handler":"Action_ClickBarState",
+                "variableProperties":["name"],
+                "activationState":true,
+                "retarget":true
+            },
+            {
+                "name":"set click bar button",
+                "handler":"Action_SetClickBarButton",
                 "variableProperties":["name"],
                 "activationState":true,
                 "retarget":true
@@ -1022,13 +1039,13 @@ objectdef isb2022_profileengine
             default
             case Set
                 This:Rotator_SetStep[joMappable,${joAction.GetInteger[value]}]
-                break;
+                break
             case Inc
                 This:Rotator_IncStep[joMappable,${joAction.GetInteger[value]}]
-                break;
+                break
             case Dec
                 This:Rotator_DecStep[joMappable,${joAction.GetInteger[value]}]
-                break;
+                break
         }
 
 

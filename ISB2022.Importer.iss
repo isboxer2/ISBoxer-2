@@ -311,6 +311,34 @@ objectdef isb2022_importer
         return joNew        
     }
 
+    member:jsonvalueref ConvertAction_MappedKeyStepStateAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_MappedKeyStepStateAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,mappable step state]        
+
+        joNew:SetString[name,"${jo.Get[MappedKey,MappedKeyString]~}"]
+        joNew:SetString[sheet,"${jo.Get[MappedKey,KeyMapString]~}"]
+
+        joNew:SetInteger[step,"${jo.GetInteger[Step]}"]
+
+        if ${jo.GetInteger[Enable]}>=0
+            joNew:SetBool[enable,"${jo.GetInteger[Enable]}"]
+
+        if ${jo.GetInteger[TriggerOnce]}>=0
+            joNew:SetInteger[triggerOnce,"${jo.GetInteger[TriggerOnce]}"]
+
+        joNew:SetInteger[stickyTime,"${jo.GetInteger[StickyTime]}"]
+
+
+
+;        joNew:SetInteger[value,"${jo.GetInteger[Value]}"]
+;        joNew:SetString[action,"${jo.Get[Action]~}"]
+
+        return joNew        
+    }
+
     member:jsonvalueref ConvertAction_KeyMapAction(jsonvalueref jo)
     {
 ;       echo "ConvertAction_KeyMapAction ${jo~}"     

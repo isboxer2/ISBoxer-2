@@ -432,16 +432,8 @@ objectdef isb2022_importer
         if ${jo.Has[backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
 
-;        if ${jo.Has[Image]}
-
-/*
-        [DefaultValue(null)]
-        public ARGBColor BackgroundColor { get; set; }
-        [DefaultValue(null)]
-        public ImageLooseRef Image { get; set; }
-        [DefaultValue(null)]
-        public string Text { get; set; }
-  */
+        if ${jo.Has[Image,ImageString]}
+            joNew:SetString[image,"${jo.Get[Image,ImageString]~}"]
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew

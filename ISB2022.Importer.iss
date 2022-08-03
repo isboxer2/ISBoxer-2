@@ -287,6 +287,35 @@ objectdef isb2022_importer
         return joNew        
     }
 
+    member:jsonvalueref ConvertAction_KeyMapAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_KeyMapAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,mappable sheet state]        
+
+        joNew:SetString[name,"${jo.Get[keyMap]~}"]
+        joNew:SetString[value,"${jo.Get[Value]~}"]
+
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_MappedKeyStateAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_MappedKeyStateAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,mappable state]        
+
+        joNew:SetString[name,"${jo.Get[mappedKey]~}"]
+        if ${jo.Has[keyMap]}
+            joNew:SetString[sheet,"${jo.Get[keyMap]~}"]
+
+        joNew:SetString[value,"${jo.Get[Value]~}"]
+
+        return joNew        
+    }
+
     member:jsonvalueref ConvertAction_Keystroke(jsonvalueref jo)
     {
 ;       echo "ConvertAction_Keystroke ${jo~}"     
@@ -341,6 +370,32 @@ objectdef isb2022_importer
 
 ;        echo "GetWoWMacro checking for ${name~} in ${ja~}"
         return "This.FindInArray[ja,\"${name~}\",ColloquialName]"
+    }
+
+    member:jsonvalueref ConvertAction_ClickBarStateAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,click bar state]
+        joNew:SetString[name,"${jo.Get[ClickBar,ClickBarString]~}"]
+        joNew:SetString[value,"${jo.Get[Value]~}"]
+        joNew:SetString[action,"${jo.Get[ActionType]~}"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_MenuStateAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,click bar state]
+        joNew:SetString[name,"menu_${jo.Get[Menu,MenuString]~}"]
+;        joNew:SetString[value,"${jo.Get[Value]~}"]
+        joNew:SetString[action,"${jo.Get[ActionType]~}"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
     }
 
     member:jsonvalueref ConvertAction_VariableKeystrokeAction(jsonvalueref jo)

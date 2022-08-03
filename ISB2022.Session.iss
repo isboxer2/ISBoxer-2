@@ -17,9 +17,9 @@ objectdef isb2022session inherits isb2022_profileengine
             return
         }
 
-        if ${InnerSpace.Build} < 6945
+        if ${InnerSpace.Build} < 6952
         {
-            echo "ISBoxer 2022 inactive; Inner Space build 6944 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2022 inactive; Inner Space build 6952 or later required (currently ${InnerSpace.Build})"
             return
         }
 

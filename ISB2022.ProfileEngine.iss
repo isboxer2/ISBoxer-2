@@ -121,6 +121,13 @@ objectdef isb2022_profileengine
                 "retarget":true
             },
             {
+                "name":"mappable step",
+                "handler":"Action_MappableStep",
+                "variableProperties":["name","sheet"],
+                "activationState":true,
+                "retarget":true
+            },
+            {
                 "name":"mappable state",
                 "handler":"Action_MappableState",
                 "variableProperties":["name","sheet"],
@@ -956,6 +963,49 @@ objectdef isb2022_profileengine
         This:InstallInputMapping["${name~}",joMapping]
     }
 
+    method Action_MappableStep(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_MappableStep[${activate}] ${joAction~}"
+
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable string sheet
+        sheet:Set["${joAction.Get[sheet]~}"]
+
+        if !${sheet.NotNULLOrEmpty}
+            return
+
+        variable string name
+        name:Set["${joAction.Get[name]~}"]
+
+        if !${name.NotNULLOrEmpty}
+            return
+
+    
+        variable jsonvalueref joMappable
+        joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
+
+        switch ${joAction.Get[action]}
+        {
+            default
+            case Set
+                This:Rotator_SetStep[joMappable,${joAction.GetInteger[value]}]
+                break;
+            case Inc
+                This:Rotator_IncStep[joMappable,${joAction.GetInteger[value]}]
+                break;
+            case Dec
+                This:Rotator_DecStep[joMappable,${joAction.GetInteger[value]}]
+                break;
+        }
+
+
+/*
+        joMappable:SetBool["${joAction.GetBool[value]}"]
+        /**/
+    }
+
     method Action_MappableState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_MappableState[${activate}] ${joAction~}"
@@ -1267,6 +1317,79 @@ objectdef isb2022_profileengine
             return 1
         return ${numStep}
     }    
+
+    method Rotator_SetStep(jsonvalueref joRotator, int numStep)
+    {
+        variable int totalSteps = ${joRotator.Get[steps].Used}
+
+        if ${numStep}<1
+			numStep:Set[1]
+			
+		if ${This.Rotator_GetCurrentStep[joRotator]}==1
+            joRotator:SetInteger[firstAdvance,${Script.RunningTime}]
+		
+        ; increment step counter
+        This:Rotator_IncrementStepCounter[joRotator,${numStep}]
+
+
+		numStep:Set[ ((${numStep}-1) % ${totalSteps}) + 1 ]
+			
+        joRotator:SetInteger[step,${numStep}]
+
+        joRotator:SetInteger["stepTriggered",0]
+
+		if ${newState}
+		{
+            joRotator:SetInteger[stepTime,${Script.RunningTime}]
+		}
+		else
+		{
+            joRotator:SetInteger[stepTime,0]
+		}
+    }
+
+    method Rotator_IncStep(jsonvalueref joRotator, int value)
+    {
+        variable int totalSteps = ${joRotator.Get[steps].Used}
+        if ${totalSteps}==0
+            return
+
+        if ${value}==0
+			value:Set[1]            
+
+        variable int numStep
+        numStep:Set[${This.Rotator_GetCurrentStep[joRotator]}]			
+		if ${numStep}==1
+            joRotator:SetInteger[firstAdvance,${Script.RunningTime}]
+		
+        ; increment step counter
+        This:Rotator_IncrementStepCounter[joRotator,${numStep}]
+
+        numStep:Set[ ((${numStep}-1 + ${value} ) % ${totalSteps}) + 1 ]
+        while ${numStep} < 1
+        {
+            numStep:Inc[${totalSteps}]
+        }
+			
+        joRotator:SetInteger[step,${numStep}]
+
+        joRotator:SetInteger["stepTriggered",0]
+
+		if ${newState}
+		{
+            joRotator:SetInteger[stepTime,${Script.RunningTime}]
+		}
+		else
+		{
+            joRotator:SetInteger[stepTime,0]
+		}
+    }
+
+    method Rotator_DecStep(jsonvalueref joRotator, int value)
+    {
+        value:Set[-1*${value}]
+        This:Rotator_IncStep[joRotator,${value}]
+    }
 
     ; for any Rotator object, determines if the given step number is enabled
     member:bool Rotator_IsStepEnabled(jsonvalueref joRotator, int numStep)

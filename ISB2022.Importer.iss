@@ -271,6 +271,22 @@ objectdef isb2022_importer
         return joNew
     }
 
+    member:jsonvalueref ConvertAction_MappedKeyStepAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_MappedKeyStepAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,mappable step]        
+
+        joNew:SetString[name,"${jo.Get[MappedKey,MappedKeyString]~}"]
+        joNew:SetString[sheet,"${jo.Get[MappedKey,KeyMapString]~}"]
+
+        joNew:SetInteger[value,"${jo.GetInteger[Value]}"]
+        joNew:SetString[action,"${jo.Get[Action]~}"]
+
+        return joNew        
+    }
+
     member:jsonvalueref ConvertAction_Keystroke(jsonvalueref jo)
     {
 ;       echo "ConvertAction_Keystroke ${jo~}"     
@@ -333,6 +349,29 @@ objectdef isb2022_importer
 
         joNew:SetString[type,game key binding]
         joNew:SetString[name,"${jo.Get[Name]~}"]
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_SyncCursorAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,sync cursor]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew
+    }
+
+    member:jsonvalueref ConvertAction_TargetGroupAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,target group]
+
+        joNew:SetString[action,"${jo.Get[Action]~}"]
+        joNew:SetString[targetGroup,"${jo.Get[RelayGroupString]~}"]        
+
+;        joNew:Set[originalAction,"${jo~}"]
         return joNew
     }
 

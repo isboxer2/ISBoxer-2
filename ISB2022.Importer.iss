@@ -367,8 +367,13 @@ objectdef isb2022_importer
         joNew:SetString[type,mappable sheet state]        
 
         joNew:SetString[name,"${jo.Get[keyMap]~}"]
-        joNew:SetString[value,"${jo.Get[Value]~}"]
 
+        if ${joNew.Has[Value]}
+            joNew:SetString[value,"${jo.Get[Value]~}"]
+        else
+            joNew:SetString[value,"On"]
+
+;        joNew:Set[originalAction,"${jo~}"]
         return joNew        
     }
 
@@ -469,10 +474,21 @@ objectdef isb2022_importer
 
         joNew:SetString[type,click bar state]
         joNew:SetString[name,"${jo.Get[ClickBar,ClickBarString]~}"]
-        joNew:SetString[value,"${jo.Get[Value]~}"]
-        joNew:SetString[action,"${jo.Get[ActionType]~}"]
 
-;        joNew:Set[originalAction,"${jo~}"]
+        if ${jo.Get[Value]~.NotNULLOrEmpty}
+            joNew:SetString[value,"${jo.Get[Value]~}"]
+        else
+            joNew:SetString[value,On]
+
+        if ${jo.Get[ActionType]~.NotNULLOrEmpty}
+            joNew:SetString[action,"${jo.Get[ActionType]~}"]
+        else
+            joNew:SetString[action,Single]
+
+        if ${jo.Get[ClickBarSet]~.NotNULLOrEmpty}
+            joNew:SetString[sheet,"${jo.Get[ClickBarSet]~}"]
+
+        joNew:Set[originalAction,"${jo~}"]
         return joNew
     }
 
@@ -481,7 +497,8 @@ objectdef isb2022_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[type,click bar state]
-        joNew:SetString[name,"menu_${jo.Get[Menu,MenuString]~}"]
+        if ${jo.Get[Menu,MenuString]~.NotNULLOrEmpty}
+            joNew:SetString[name,"menu_${jo.Get[Menu,MenuString]~}"]
 ;        joNew:SetString[value,"${jo.Get[Value]~}"]
         joNew:SetString[action,"${jo.Get[ActionType]~}"]
 
@@ -549,12 +566,14 @@ objectdef isb2022_importer
 
     member:jsonvalueref ConvertAction_RepeaterRegionsAction(jsonvalueref jo)
     {
-;       echo "ConvertAction_KeyMapAction ${jo~}"     
+;       echo "ConvertAction_RepeaterRegionsAction ${jo~}"     
         variable jsonvalue joNew="{}"
 
         joNew:SetString[type,region sheet state]        
 
-        joNew:SetString[name,"${jo.Get[Profile]~}"]
+        if ${jo.Get[Profile]~.NotNULLOrEmpty}
+            joNew:SetString[name,"${jo.Get[Profile]~}"]
+
         joNew:SetString[action,"${jo.Get[Action]~}"]
 
         return joNew        
@@ -806,6 +825,145 @@ objectdef isb2022_importer
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew
+    }
+
+    member:jsonvalueref ConvertAction_InputDeviceKeySetAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_InputDeviceKeySetAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,input device key set]        
+        
+
+        if ${jo.Get[InputDevice]~.NotNULLOrEmpty}
+            joNew:SetString[device,"${jo.Get[InputDevice]~}"]
+        if ${jo.Get[KeySet]~.NotNULLOrEmpty}
+            joNew:SetString[keySet,"${jo.Get[KeySet]~}"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_MenuStyleAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_MenuStyleAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,menu style]        
+            
+        if ${jo.Get[Menu,MenuString]~.NotNULLOrEmpty}
+            joNew:SetString[menu,"${jo.Get[Menu,MenuString]~}"]
+
+        if ${jo.Get[HotkeySet]~.NotNULLOrEmpty}
+            joNew:SetString[hotkeySet,"${jo.Get[HotkeySet]~}"]
+
+        if ${jo.GetBool[BindSoft]}
+            joNew:SetBool[bindSoft,1]
+
+        if ${jo.GetInteger[StartButtonSetAtNumButton]}
+            joNew:SetInteger[startAtButton,"${jo.GetInteger[StartButtonSetAtNumButton]}"]
+
+        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+
+    member:jsonvalueref ConvertAction_LightAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_LightAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,light]        
+            
+        joNew:SetString[light,"${jo.Get[Light]~}"]
+
+;        if ${jo.Get[Value]~}
+        joNew:SetString[value,"${jo.Get[Value]~}"]
+
+        if ${jo.Get[ComputerString]~.NotNULLOrEmpty}
+            joNew:SetString[computer,"${jo.Get[ComputerString]~}"]
+
+        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_SoundAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_SoundAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,sound]        
+        
+
+        if ${jo.Get[Filename]~.NotNULLOrEmpty}
+            joNew:SetString[filename,"${jo.Get[Filename]~}"]
+        if ${jo.Get[ComputerString]~.NotNULLOrEmpty}
+            joNew:SetString[computer,"${jo.Get[ComputerString]~}"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_VolumeAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_VolumeAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,volume]        
+            
+        joNew:SetString[action,"${jo.Get[Action]~}"]
+
+        if ${jo.GetNumber[Value]}
+            joNew:SetNumber[value,"${jo.GetNumber[Value]}"]
+        if ${jo.GetNumber[OverSeconds]}
+            joNew:SetNumber[seconds,"${jo.GetNumber[OverSeconds]}"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_VideoFeedsAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_VideoFeedsAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,video fx]        
+            
+        if ${jo.Get[Name]~.NotNULLOrEmpty}
+            joNew:SetString[name,"${jo.Get[Name]~}"]
+        if ${jo.Get[Action]~.NotNULLOrEmpty}
+            joNew:SetString[action,"${jo.Get[Action]~}"]
+
+
+        if ${jo.Get[KeyMap,KeyMapString]~.NotNULLOrEmpty}
+            joNew:SetString[keyMap,"${jo.Get[MappedKey,KeyMapString]~}"]
+        if ${jo.Get[MappedKey,MappedKeyString]~.NotNULLOrEmpty}
+            joNew:SetString[mappedKey,"${jo.Get[MappedKey,MappedKeyString]~}"]
+
+        if ${jo.GetBool[IsSource]}
+            joNew:SetBool[isSource,"${jo.GetBool[IsSource]}"]
+        if ${jo.GetBool[UseKeyRepeat]}
+            joNew:SetBool[useKeyRepeat,"${jo.GetBool[UseKeyRepeat]}"]
+        if ${jo.GetBool[UseMouseRepeat]}
+            joNew:SetBool[useMouseRepeat,"${jo.GetBool[UseMouseRepeat]}"]
+        if ${jo.GetBool[UseFocusHotkey]}
+            joNew:SetBool[useFocusHotkey,"${jo.GetBool[UseFocusHotkey]}"]
+        
+        if ${jo.GetInteger[Rect,X]}
+            joNew:SetInteger[X,${jo.GetInteger[Rect,X]}]
+        if ${jo.GetInteger[Rect,Y]}
+            joNew:SetInteger[Y,${jo.GetInteger[Rect,Y]}]
+        if ${jo.GetInteger[Rect,Width]}
+            joNew:SetInteger[Width,${jo.GetInteger[Rect,Width]}]
+        if ${jo.GetInteger[Rect,Height]}
+            joNew:SetInteger[Height,${jo.GetInteger[Rect,Height]}]
+
+
+        if ${jo.Get[borderColor]~.NotNULLOrEmpty}
+            joNew:SetString[borderColor,"${jo.Get[borderColor]~}"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
     }
 
 }

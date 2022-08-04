@@ -899,6 +899,7 @@ objectdef isb2022_isb1transformer
         This:TransformInteger[joTransform,FadeDurationMS,fadeDurationMS]
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
+        This:TransformColor[joTransform,BorderColor,borderColor]
 
         This:TransformSize[joTransform,VideoSourceSize,videoSourceSize]
         This:TransformSize[joTransform,VideoOutputSize,videoOutputSize]
@@ -1038,7 +1039,7 @@ objectdef isb2022_xmlreader
         if !${_node.Reference(exists)}
             return jo
 
-;        echo "ConvertNodeToObject ${_node.AsJSON~}"
+;        echo "ConvertNodeToObject ${_node.AsJSON~} Leaf=${_node.Leaf}"
 
         variable weakref _child
 
@@ -1060,13 +1061,13 @@ objectdef isb2022_xmlreader
  ;                       echo "... build an array of ${_child.Text~}"
 
                         jo:SetByRef["${_child.Text~}","This.ConvertNodesToArray[_node,\"${_child.Text~}\"]"]
-                        jo:Erase[Value]
+;                        jo:Erase[Value]
                     }
                     else
                     {
                         ; no.
                         jo:SetByRef["${_child.Text~}","This.ConvertNode[_child]"]
-                        jo:Erase[Value]
+;                        jo:Erase[Value]
                     }
                     childTypes:Add["${_child.Text~}"]
                 }
@@ -1075,9 +1076,10 @@ objectdef isb2022_xmlreader
             {
 ;                echo "ConvertNodeToObject ${_node.AsJSON~} child=${_child.AsJSON~}"
 
-                if ${_child.Type.Equal[TEXT]} && !${jo.Has[Value]} && ${childTypes.Used}==0
+                if ${_child.Type.Equal[TEXT]} && !${jo.Has[Value]} && ${_node.Leaf}
                 {
                     jo:SetString["Value","${_child.Text~}"]
+                    break
                 }
             }
             _child:SetReference[_child.Next]

@@ -685,6 +685,58 @@ objectdef isb2022_importer
         return joNew
     }
 
+    member:jsonvalueref ConvertAction_WindowStyleAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_WindowStyleAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,window style]
+
+        if ${jo.Get[RegionType]~.NotNULLOrEmpty}
+            joNew:SetString[regionType,"${jo.Get[RegionType]~}"]
+        else
+            joNew:SetString[regionType,"Background"]
+
+        if ${jo.GetBool[UseAlwaysOnTop]}
+        {
+            if ${jo.Get[AlwaysOnTop]~.NotNULLOrEmpty}
+                joNew:SetString[alwaysOnTop,"${jo.Get[AlwaysOnTop]~}"]
+            else
+                joNew:SetString[alwaysOnTop,"On"]
+        }
+
+        if ${jo.GetBool[UseSometimesOnTop]}
+        {
+            if ${jo.Get[SometimesOnTop]~.NotNULLOrEmpty}
+                joNew:SetString[sometimesOnTop,"${jo.Get[SometimesOnTop]~}"]
+            else
+                joNew:SetString[sometimesOnTop,"On"]
+        }
+
+        if ${jo.GetBool[UseSize]}
+        {
+            joNew:SetInteger[width,"${jo.GetInteger[Rect,Width]}"]
+            joNew:SetInteger[height,"${jo.GetInteger[Rect,Height]}"]
+        }
+        if ${jo.GetBool[UsePosition]}
+        {
+            joNew:SetInteger[x,"${jo.GetInteger[Rect,Left]}"]
+            joNew:SetInteger[y,"${jo.GetInteger[Rect,Top]}"]
+        }
+
+        if ${jo.GetBool[UseBorder]}
+        {
+            if ${jo.Get[Border]~.NotNULLOrEmpty}
+                joNew:SetString[border,"${jo.Get[Border]~}"]
+            else
+                joNew:SetString[border,None]
+        }
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+
     member:jsonvalueref ConvertAction_WindowFocusAction(jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
@@ -841,6 +893,86 @@ objectdef isb2022_importer
             joNew:SetString[keySet,"${jo.Get[KeySet]~}"]
 
 ;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+     member:jsonvalueref ConvertAction_ScreenshotAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_ScreenshotAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,screenshot]        
+        
+
+        if ${jo.Get[Filename]~.NotNULLOrEmpty}
+            joNew:SetString[filename,"${jo.Get[Filename]~}"]
+
+        if !${jo.GetBool[DirectXCapture]}
+            joNew:SetBool[DirectXCapture,0]
+
+        if ${jo.GetBool[UseRect]}
+        {
+            joNew:SetInteger[x,${jo.Get[Rect,Left]}]
+            joNew:SetInteger[y,${jo.Get[Rect,Top]}]
+            joNew:SetInteger[width,${jo.Get[Rect,Width]}]
+            joNew:SetInteger[height,${jo.Get[Rect,Height]}]
+        }
+
+        if !${jo.GetBool[UseClientCoords]}
+            joNew:SetBool[useClientCoords,0]
+
+        if ${jo.Get[Encoding]~.NotNULLOrEmpty}
+            joNew:SetString[encoding,"${jo.Get[Encoding]~}"]
+        else
+            joNew:SetString[encoding,"PNG"]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_DoMenuButtonAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_DoMenuButtonAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,do menu button]        
+        
+
+        if ${jo.Get[Menu,MenuString]~.NotNULLOrEmpty}
+            joNew:SetString[menu,"${jo.Get[Menu,MenuString]~}"]
+
+        if ${jo.GetInteger[NumButton]}
+            jo:SetInteger[numButton,${jo.GetInteger[NumButton]}]
+        else
+            jo:SetInteger[numButton,1]
+
+;        joNew:Set[originalAction,"${jo~}"]
+        return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_HotkeySetAction(jsonvalueref jo)
+    {
+;       echo "ConvertAction_HotkeySetAction ${jo~}"     
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,menu hotkey set]        
+            
+        if ${jo.Get[HotkeySet,HotkeySetString]~.NotNULLOrEmpty}
+            joNew:SetString[hotkeySet,"${jo.Get[HotkeySet,HotkeySetString]~}"]
+
+        if ${jo.Get[OtherHotkeySet]~.NotNULLOrEmpty}
+            joNew:SetString[otherHotkeySet,"${jo.Get[OtherHotkeySet]~}"]
+
+        if ${jo.Get[Menu]~.NotNULLOrEmpty}
+            joNew:SetString[menu,"${jo.Get[Menu]~}"]
+
+        if ${jo.GetBool[BindSoft]}
+            joNew:SetBool[bindSoft,1]
+
+        if ${jo.GetInteger[StartHotkeySetAtNumHotkey]}
+            joNew:SetInteger[startAtHotkey,"${jo.GetInteger[StartHotkeySetAtNumHotkey]}"]
+
+        joNew:Set[originalAction,"${jo~}"]
         return joNew        
     }
 

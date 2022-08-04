@@ -13,6 +13,26 @@ objectdef isb2022_importer
         This:WriteJSON["${filename~}.json"]
     }
 
+    member:jsonvalueref TransformRegionsXML(string filename)
+    {
+        variable isb2022_isb1transformer ISB1Transformer
+
+        variable jsonvalueref joProfile
+        joProfile:SetReference["ISB1Transformer.TransformRegionsXML[\"${filename~}\"]"]
+
+        return joProfile
+    }
+
+    member:jsonvalueref TransformVideoFXXML(string filename)
+    {
+        variable isb2022_isb1transformer ISB1Transformer
+
+        variable jsonvalueref joProfile
+        joProfile:SetReference["ISB1Transformer.TransformVideoFXXML[\"${filename~}\"]"]
+
+        return joProfile
+    }
+
     method WriteJSON(string filename)
     {
         if !${ISBProfile.Type.Equal[object]}

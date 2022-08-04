@@ -6,13 +6,222 @@ objectdef isb2022_isb1transformer
     member:jsonvalueref TransformXML(string filename)
     {
         ISBProfile:SetReference[NULL]
-       variable isb2022_xmlreader XMLReader
-       ISBProfile:SetReference["XMLReader.Read[\"${filename~}\"]"]
-       if !${ISBProfile.Type.Equal[object]}
+        variable isb2022_xmlreader XMLReader
+        ISBProfile:SetReference["XMLReader.Read[\"${filename~}\"]"]
+        if !${ISBProfile.Type.Equal[object]}
             return NULL
-       This:Transform
+        This:Transform
 
        return ISBProfile
+    }
+
+    member:jsonvalueref TransformRegionsXML(string filename)
+    {
+        variable jsonvalueref joProfile
+        
+        variable isb2022_xmlreader XMLReader
+        joProfile:SetReference["XMLReader.Read[\"${filename~}\",InnerSpaceSettings,1]"]
+        if !${joProfile.Type.Equal[object]}
+        {
+            return NULL
+        }
+        This:TransformInnerSpaceSettings[joProfile]
+
+        This:TransformRegionsRoot[joProfile]
+
+       return joProfile
+    }
+
+    member:jsonvalueref TransformVideoFXXML(string filename)
+    {
+        variable jsonvalueref joProfile
+        
+        variable isb2022_xmlreader XMLReader
+        joProfile:SetReference["XMLReader.Read[\"${filename~}\",InnerSpaceSettings,1]"]
+        if !${joProfile.Type.Equal[object]}
+        {
+            return NULL
+        }
+        This:TransformInnerSpaceSettings[joProfile]
+
+        This:TransformVideoFXRoot[joProfile]
+
+;        echo "TransformVideoFXXML ${joProfile~}"
+
+       return joProfile
+    }
+
+    method TransformInnerSpaceSettings(jsonvalueref joTransform)
+    {
+;        echo "TransformInnerSpaceSettings ${joTransform~}"
+        variable jsonvalue ja="[]"
+
+        This:TransformSingleToArray[joTransform,"Set"]
+
+        joTransform.Get[Set]:ForEach["ja:AddByRef[\"This.TransformInnerSpaceSet\[ForEach.Value\]\"]"]
+
+        joTransform:Erase[Set]
+
+        joTransform:SetByRef[sets,ja]        
+    }
+
+    member:jsonvalueref TransformInnerSpaceSet(jsonvalueref joTransform)
+    {
+;        echo "TransformInnerSpaceSet ${joTransform~}"
+        variable jsonvalue jaSets="[]"
+        variable jsonvalue jaSettings="[]"
+
+        This:TransformSingleToArray[joTransform,"Set"]
+        This:TransformSingleToArray[joTransform,"Setting"]
+
+        joTransform.Get[Set]:ForEach["jaSets:AddByRef[\"This.TransformInnerSpaceSet\[ForEach.Value\]\"]"]
+
+        joTransform:Erase[Set]
+
+        joTransform.Get[Setting]:ForEach["jaSettings:AddByRef[\"This.TransformInnerSpaceSetting\[ForEach.Value\]\"]"]
+
+        joTransform:Erase[Setting]
+
+        if ${jaSets.Used}
+            joTransform:SetByRef[sets,jaSets]                    
+        if ${jaSettings.Used}
+            joTransform:SetByRef[settings,jaSettings]        
+
+        return joTransform
+    }
+
+    member:jsonvalueref TransformInnerSpaceSetting(jsonvalueref joTransform)
+    {
+;        echo "TransformInnerSpaceSetting ${joTransform~}"
+        return joTransform
+    }
+
+    method TransformVideoFXRoot(jsonvalueref joTransform)
+    {
+;        echo "TransformVideoFXRoot ${joTransform~}"
+
+        variable jsonvalue ja="[]"
+
+        joTransform.Get[sets]:ForEach["ja:AddByRef[\"This.TransformVideoFXSet\[ForEach.Value\]\"]"]
+
+        joTransform:Erase[sets]
+
+        joTransform:SetByRef[vfxSheets,ja]
+    }
+
+    method TransformRegionsRoot(jsonvalueref joTransform)
+    {
+;        echo "TransformRegionsRoot ${joTransform~}"
+
+        variable jsonvalue ja="[]"
+
+        joTransform.Get[sets]:ForEach["ja:AddByRef[\"This.TransformRegionSet\[ForEach.Value\]\"]"]
+
+        joTransform:Erase[sets]
+
+        joTransform:SetByRef[regionSheets,ja]
+    }
+
+    
+    member:jsonvalueref TransformVideoFXSet(jsonvalueref joTransform)
+    {
+;        echo "TransformVideoFXSet ${joTransform~}"
+        variable jsonvalue joNew="{}"
+
+        variable jsonvalue ja="[]"
+
+        joNew:SetString[name,"${joTransform.Get[_Name]~}"]
+
+        joTransform.Get[settings]:ForEach["ja:AddByRef[\"This.TransformVideoFX\[ForEach.Value\]\"]"]
+
+        joNew:SetByRef["vfx",ja]
+
+        return joNew
+    }
+
+     member:jsonvalueref TransformVideoFX(jsonvalueref joTransform)
+    {
+;        echo "TransformVideoFX ${joTransform~}"
+        variable jsonvalue joNew="{}"
+
+        if ${joTransform.GetBool[_BlockLocal]}
+            joNew:SetBool[blockLocal,1]
+
+;        joNew:SetString[name,"${joTransform.Get[_Name]~}"]
+
+        if ${joTransform.Get[_regionname]~.NotNULLOrEmpty}
+            joNew:SetString[name,"${joTransform.Get[_regionname]~}"]
+
+        if ${joTransform.Get[_mappedkey]~.NotNULLOrEmpty} && ${joTransform.Get[_keymap]~.NotNULLOrEmpty}
+        {
+            joNew:SetString[keyMap,"${joTransform.Get[_keymap]~}"]
+            joNew:SetString[mappedKey,"${joTransform.Get[_mappedkey]~}"]
+        }
+
+        joNew:SetString[type,"${joTransform.Get[Value]~}"]
+        if ${joTransform.Get[_bordercolor]~.NotNULLOrEmpty}
+            joNew:SetString[borderColor,"${joTransform.Get[_bordercolor]~}"]
+
+        if ${joTransform.Has[_opacity]}
+            joNew:SetInteger[opacity,"${joTransform.GetInteger[_opacity]}"]
+
+        if ${joTransform.Get[_feedoutput]~.NotNULLOrEmpty}
+            joNew:SetString[feedOutput,"${joTransform.Get[_feedoutput]~}"]
+        if ${joTransform.Get[_feedsource]~.NotNULLOrEmpty}
+            joNew:SetString[feedSource,"${joTransform.Get[_feedsource]~}"]
+
+        joNew:SetInteger[width,"${joTransform.GetInteger[_Width]}"]
+        joNew:SetInteger[height,"${joTransform.GetInteger[_Height]}"]
+        joNew:SetInteger[x,"${joTransform.GetInteger[_X]}"]
+        joNew:SetInteger[y,"${joTransform.GetInteger[_Y]}"]
+
+        return joNew
+    }
+
+
+    member:jsonvalueref TransformRegionSet(jsonvalueref joTransform)
+    {
+;        echo "TransformRegionSet ${joTransform~}"
+        variable jsonvalue joNew="{}"
+
+        variable jsonvalue ja="[]"
+
+        joNew:SetString[name,"${joTransform.Get[_Name]~}"]
+
+        joTransform.Get[settings]:ForEach["ja:AddByRef[\"This.TransformRegion\[ForEach.Value\]\"]"]
+
+        joNew:SetByRef["regions",ja]
+
+        return joNew
+    }
+
+    member:jsonvalueref TransformRegion(jsonvalueref joTransform)
+    {
+        variable jsonvalue joNew="{}"
+
+        if ${joTransform.GetBool[_BlockLocal]}
+            joNew:SetBool[blockLocal,1]
+
+;        joNew:SetString[name,"${joTransform.Get[_Name]~}"]
+
+        if ${joTransform.Get[_regionname]~.NotNULLOrEmpty}
+            joNew:SetString[name,"${joTransform.Get[_regionname]~}"]
+
+        if ${joTransform.Get[_mappedkey]~.NotNULLOrEmpty} && ${joTransform.Get[_keymap]~.NotNULLOrEmpty}
+        {
+            joNew:SetString[keyMap,"${joTransform.Get[_keymap]~}"]
+            joNew:SetString[mappedKey,"${joTransform.Get[_mappedkey]~}"]
+        }
+
+        joNew:SetString[target,"${joTransform.Get[Value]~}"]
+
+
+        joNew:SetInteger[width,"${joTransform.GetInteger[_Width]}"]
+        joNew:SetInteger[height,"${joTransform.GetInteger[_Height]}"]
+        joNew:SetInteger[x,"${joTransform.GetInteger[_X]}"]
+        joNew:SetInteger[y,"${joTransform.GetInteger[_Y]}"]
+
+        return joNew
     }
 
 /*
@@ -750,12 +959,12 @@ objectdef isb2022_xmlreader
 {
     variable xmlreader XMLReader
 
-    method Read(string filename)
+    method Read(string filename, string rootNode="ISBoxerToolkitProfile")
     {
-        noop ${This.Read["${filename~}",1]}
+        noop ${This.Read["${filename~}","${rootNode~}",1]}
     }
 
-    member:jsonvalueref Read(string filename, bool writeFile)
+    member:jsonvalueref Read(string filename, string rootNode="ISBoxerToolkitProfile", bool writeFile=0)
     {
         if !${filename.NotNULLOrEmpty}
             filename:Set["${LavishScript.HomeDirectory}/ISBoxerToolkitProfile.LastExported.XML"]
@@ -764,24 +973,24 @@ objectdef isb2022_xmlreader
         XMLReader:ParseFile["${filename~}"]
 
         variable weakref profileNode
-        profileNode:SetReference["XMLReader.Root.FindChildElement[ISBoxerToolkitProfile]"]
+        profileNode:SetReference["XMLReader.Root.FindChildElement[\"${rootNode~}\"]"]
 
         variable jsonvalueref joProfile
-        joProfile:SetReference["This.ConvertNodeToObject[profileNode]"]
+        joProfile:SetReference["This.ConvertNodeToObject[profileNode,0]"]
 
         if ${writeFile} && ${joProfile.Type.Equal[object]}
             joProfile:WriteFile["${filename~}.json",multiline]
 
         return joProfile
-    }
+    }    
 
     member:jsonvalueref ConvertNode(weakref _node)
     {
-;        echo ConvertNode ${_node}
+;        echo "ConvertNode ${_node.AsJSON~}"
         variable jsonvalue jv
         
         if ${_node.Attributes.Type.Equal[object]}
-            return "This.ConvertNodeToObject[_node]"
+            return "This.ConvertNodeToObject[_node,0]"
 
         if !${_node.Child(exists)}
         {                        
@@ -792,10 +1001,11 @@ objectdef isb2022_xmlreader
         if !${_node.Child.Next(exists)}
         {
             jv:SetValue["${_node.Child.Text.AsJSON~}"]
+;            echo "ConvertNode giving VALUE ${jv~}"
             return jv
         }
 
-        return "This.ConvertNodeToObject[_node]"
+        return "This.ConvertNodeToObject[_node,1]"
     }
 
     member:jsonvalueref ConvertNodesToArray(weakref _parent, string _tag)
@@ -822,12 +1032,13 @@ objectdef isb2022_xmlreader
         return ja
     }
 
-    member:jsonvalueref ConvertNodeToObject(weakref _node)
+    member:jsonvalueref ConvertNodeToObject(weakref _node, bool AutoArray=0)
     {
         variable jsonvalue jo="{}"
         if !${_node.Reference(exists)}
             return jo
 
+;        echo "ConvertNodeToObject ${_node.AsJSON~}"
 
         variable weakref _child
 
@@ -849,13 +1060,24 @@ objectdef isb2022_xmlreader
  ;                       echo "... build an array of ${_child.Text~}"
 
                         jo:SetByRef["${_child.Text~}","This.ConvertNodesToArray[_node,\"${_child.Text~}\"]"]
+                        jo:Erase[Value]
                     }
                     else
                     {
                         ; no.
                         jo:SetByRef["${_child.Text~}","This.ConvertNode[_child]"]
+                        jo:Erase[Value]
                     }
                     childTypes:Add["${_child.Text~}"]
+                }
+            }
+            else
+            {
+;                echo "ConvertNodeToObject ${_node.AsJSON~} child=${_child.AsJSON~}"
+
+                if ${_child.Type.Equal[TEXT]} && !${jo.Has[Value]} && ${childTypes.Used}==0
+                {
+                    jo:SetString["Value","${_child.Text~}"]
                 }
             }
             _child:SetReference[_child.Next]
@@ -864,16 +1086,18 @@ objectdef isb2022_xmlreader
         variable jsonvalueref joAttributes
         joAttributes:SetReference[_node.Attributes]
 
-        if ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
+        if ${AutoArray} && ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
             if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]}
+            {
+;                echo "ConvertNodeToObject ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"
+            }
         }
         /**/
 
         joAttributes:ForEach["jo:SetString[\"_\${ForEach.Key~}\",\"\${ForEach.Value~}\"]"]
-
         return jo
     }
 }

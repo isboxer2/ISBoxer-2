@@ -25,7 +25,7 @@
                     "handler":"Action_GameMacro",
                     "retarget":true,
                     "variableProperties":["name","sheet"]
-                }
+                },
                 {
                     "name":"keystring",
                     "handler":"Action_KeyString",

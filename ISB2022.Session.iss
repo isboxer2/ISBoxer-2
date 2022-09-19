@@ -25,9 +25,8 @@ objectdef isb2022session inherits isb2022_profileengine
 
         ValidSession:Set[1]
     
-        This:InstallDefaultActionTypes
-
         LGUI2:LoadPackageFile[ISB2022.Session.lgui2Package.json]
+        This:InstallDefaultActionTypes
     }
 
     method Shutdown()

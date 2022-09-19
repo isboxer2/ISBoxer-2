@@ -83,6 +83,7 @@ objectdef isb2022_profileengine
         return 0
     }
 
+#region Object Installers/Uninstallers
     method InstallActionTypes(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
@@ -441,6 +442,148 @@ objectdef isb2022_profileengine
             ja:ForEach["This:UninstallVFXSheet[ForEach.Value]"]
     }    
 
+     method InstallInputMapping(string name,jsonvalueref joMapping)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
+        echo "InstallInputMapping ${name~}: ${joMapping}"
+        InputMappings:SetByRef["${name~}",joMapping]
+    }
+
+    method UninstallInputMapping(string name)
+    {
+        InputMappings:Erase["${name~}"]
+    }
+    
+    method InstallVFX(string sheet, string name, jsonvalueref joVFX)
+    {
+        echo "InstallVFX ${sheet~} ${name~} ${joVFX~}"
+
+        variable jsonvalue joView
+        joView:SetValue["$$>
+        {
+            "name":"isb2022.vfx.${sheet~}.${name~}",
+            "type":"videofeed",
+            "x":${joVFX.GetInteger[x]},
+            "y":${joVFX.GetInteger[y]},
+            "width":${joVFX.GetInteger[width]},
+            "height":${joVFX.GetInteger[height]},
+            "feedName":${joVFX.Get[feedName]~.AsJSON~}
+        }
+        <$$"]
+
+        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
+    }
+
+    method UninstallVFX(string sheet, string name, jsonvalueref joVFX)
+    {
+        echo "UninnstallVFX ${sheet~} ${name~} ${joVFX~}"
+        LGUI2.Element["isb2022.vfx.${sheet~}.${name~}"]:Destroy
+
+        joVFX:SetInteger["elementID",0]
+    }
+    
+    method InstallHotkey(string sheet, string name, jsonvalueref joHotkey)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
+
+        echo "InstallHotkey[${sheet~},${name~}] ${joHotkey~}"
+        variable jsonvalue joBinding
+        ; initialize a LGUI2 input binding object with JSON
+        variable string fullName="isb2022.hks.${sheet~}.${name~}"
+        variable string onPress="ISB2022:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},1]"
+        variable string onRelease="ISB2022:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},0]"
+        variable string keyCombo="${joHotkey.Get[keyCombo]~}"
+
+        joBinding:SetValue["$$>
+        {
+            "name":${fullName.AsJSON~},
+            "combo":${keyCombo.AsJSON~},
+            "eventHandler":{
+                "type":"task",
+                "taskManager":"profileEngine",
+                "task":{
+                    "type":"ls1.code",
+                    "start":${onPress.AsJSON~},
+                    "stop":${onRelease.AsJSON~}
+                }
+            }
+        }
+        <$$"]
+
+        ; now add the binding to LGUI2!
+        echo "AddBinding ${joBinding~}"
+        LGUI2:AddBinding["${joBinding~}"]
+
+        Hotkeys:Add["${fullName~}"]
+    }
+
+    ; Installs a Hotkey, given a name, a key combination, and LavishScript code to execute on PRESS
+    method InstallHotkeyEx(string name, string keyCombo, string onPress, string onRelease)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
+        echo "InstallHotkeyEx ${name~}: ${keyCombo~}"
+
+        if !${onPress.NotNULLOrEmpty} && !${onRelease.NotNULLOrEmpty}
+        {
+            ; defaults
+            onPress:Set["ISB2022:OnHotkeyState[${name.AsJSON~},1]"]
+            onRelease:Set["ISB2022:OnHotkeyState[${name.AsJSON~},0]"]
+        }
+
+
+        variable jsonvalue joBinding
+        ; initialize a LGUI2 input binding object with JSON
+        joBinding:SetValue["$$>
+        {
+            "name":${name.AsJSON~},
+            "combo":${keyCombo.AsJSON~},
+            "eventHandler":{
+                "type":"task",
+                "taskManager":"profileEngine",
+                "task":{
+                    "type":"ls1.code",
+                    "start":${onPress.AsJSON~},
+                    "stop":${onRelease.AsJSON~}
+                }
+            }
+        }
+        <$$"]
+
+        ; now add the binding to LGUI2!
+        LGUI2:AddBinding["${joBinding~}"]
+
+        Hotkeys:Add["${name~}"]
+    }
+
+    method UninstallHotkey(string sheet, string name)
+    {
+        variable string fullName="isb2022.hks.${sheet~}.${name~}"
+        This:UninstallHotkeyEx["${fullName~}"]
+    }
+
+    method UninstallHotkeyEx(string name)
+    {
+        echo "UninstallHotkeyEx[${name~}]"
+        LGUI2:RemoveBinding["${name~}"]
+        Hotkeys:Remove["${name~}"]
+    }
+
+    method UninstallVFXs()
+    {
+        VFXSheets:ForEach["ForEach.Value:Disable"]
+    }
+
+    method UninstallHotkeys()
+    {
+        echo UninstallHotkeys
+        Hotkeys:ForEach["This:UninstallHotkeyEx[\"\${ForEach.Value~}\"]"]
+    }
+#endregion
+
+#region Object Activators/Deactivators
     method ActivateCharacterByName(string name)
     {
         variable weakref useCharacter="Characters.Get[\"${name~}\"]"
@@ -612,7 +755,9 @@ objectdef isb2022_profileengine
 
         LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated]
     }
+#endregion
 
+#region Variable Processors
     member:string ProcessVariables(string text)
     {
         if !${text.Find["{"]}
@@ -627,8 +772,40 @@ objectdef isb2022_profileengine
 
         return "${text~}"        
     }
+    ; for any object, process variables within a specific property 
+    method ProcessVariableProperty(jsonvalueref jo, string varName)
+    {
+;        echo "ProcessVariableProperty[${varName~}] ${jo~}"
+        if !${jo.Has["${varName~}"]}
+            return
 
+        jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]        
+    }
 
+    ; for any Action object of a given action type, process its variableProperties
+    method ProcessActionVariables(jsonvalueref joActionType, jsonvalueref joAction)
+    {
+        if !${joActionType.Get[variableProperties].Type.Equal[array]}
+            return
+
+        joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Value~}\"]"]
+    }
+#endregion
+
+    method OnHotkeyState(string name, bool newState)
+    {
+        echo "OnHotkeyState[${name.AsJSON~},${newState}]"
+
+        variable jsonvalueref joMapping
+        joMapping:SetReference["This.InputMappings.Get[\"${name~}\"]"]
+
+        if ${joMapping.Reference(exists)}
+            This:ExecuteInputMapping[joMapping,${newState}]
+        else
+        {
+            echo "Hotkey ${name~} NOT mapped"
+        }
+    }
 
     method TestKeystroke(string key)
     {
@@ -671,6 +848,7 @@ objectdef isb2022_profileengine
         return TRUE
     }
 
+#region Action Types
     method Action_Keystroke(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_Keystroke[${activate}] ${joAction~}"
@@ -934,284 +1112,9 @@ objectdef isb2022_profileengine
 
         joMappable:SetBool["${joAction.GetBool[value]}"]
     }
+#endregion
 
-    method InstallInputMapping(string name,jsonvalueref joMapping)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-
-        echo "InstallInputMapping ${name~}: ${joMapping}"
-        InputMappings:SetByRef["${name~}",joMapping]
-    }
-
-    method UninstallInputMapping(string name)
-    {
-        InputMappings:Erase["${name~}"]
-    }
-    
-    method InstallVFX(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "InstallVFX ${sheet~} ${name~} ${joVFX~}"
-
-        variable jsonvalue joView
-        joView:SetValue["$$>
-        {
-            "name":"isb2022.vfx.${sheet~}.${name~}",
-            "type":"videofeed",
-            "x":${joVFX.GetInteger[x]},
-            "y":${joVFX.GetInteger[y]},
-            "width":${joVFX.GetInteger[width]},
-            "height":${joVFX.GetInteger[height]},
-            "feedName":${joVFX.Get[feedName]~.AsJSON~}
-        }
-        <$$"]
-
-        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
-    }
-
-    method UninstallVFX(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "UninnstallVFX ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["isb2022.vfx.${sheet~}.${name~}"]:Destroy
-
-        joVFX:SetInteger["elementID",0]
-    }
-    
-    method InstallHotkey(string sheet, string name, jsonvalueref joHotkey)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
-
-        echo "InstallHotkey[${sheet~},${name~}] ${joHotkey~}"
-        variable jsonvalue joBinding
-        ; initialize a LGUI2 input binding object with JSON
-        variable string fullName="isb2022.hks.${sheet~}.${name~}"
-        variable string onPress="ISB2022:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},1]"
-        variable string onRelease="ISB2022:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},0]"
-        variable string keyCombo="${joHotkey.Get[keyCombo]~}"
-
-        joBinding:SetValue["$$>
-        {
-            "name":${fullName.AsJSON~},
-            "combo":${keyCombo.AsJSON~},
-            "eventHandler":{
-                "type":"task",
-                "taskManager":"profileEngine",
-                "task":{
-                    "type":"ls1.code",
-                    "start":${onPress.AsJSON~},
-                    "stop":${onRelease.AsJSON~}
-                }
-            }
-        }
-        <$$"]
-
-        ; now add the binding to LGUI2!
-        echo "AddBinding ${joBinding~}"
-        LGUI2:AddBinding["${joBinding~}"]
-
-        Hotkeys:Add["${fullName~}"]
-    }
-
-    ; Installs a Hotkey, given a name, a key combination, and LavishScript code to execute on PRESS
-    method InstallHotkeyEx(string name, string keyCombo, string onPress, string onRelease)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-
-        echo "InstallHotkeyEx ${name~}: ${keyCombo~}"
-
-        if !${onPress.NotNULLOrEmpty} && !${onRelease.NotNULLOrEmpty}
-        {
-            ; defaults
-            onPress:Set["ISB2022:OnHotkeyState[${name.AsJSON~},1]"]
-            onRelease:Set["ISB2022:OnHotkeyState[${name.AsJSON~},0]"]
-        }
-
-
-        variable jsonvalue joBinding
-        ; initialize a LGUI2 input binding object with JSON
-        joBinding:SetValue["$$>
-        {
-            "name":${name.AsJSON~},
-            "combo":${keyCombo.AsJSON~},
-            "eventHandler":{
-                "type":"task",
-                "taskManager":"profileEngine",
-                "task":{
-                    "type":"ls1.code",
-                    "start":${onPress.AsJSON~},
-                    "stop":${onRelease.AsJSON~}
-                }
-            }
-        }
-        <$$"]
-
-        ; now add the binding to LGUI2!
-        LGUI2:AddBinding["${joBinding~}"]
-
-        Hotkeys:Add["${name~}"]
-    }
-
-    method UninstallHotkey(string sheet, string name)
-    {
-        variable string fullName="isb2022.hks.${sheet~}.${name~}"
-        This:UninstallHotkeyEx["${fullName~}"]
-    }
-
-    method UninstallHotkeyEx(string name)
-    {
-        echo "UninstallHotkeyEx[${name~}]"
-        LGUI2:RemoveBinding["${name~}"]
-        Hotkeys:Remove["${name~}"]
-    }
-
-    method UninstallVFXs()
-    {
-        VFXSheets:ForEach["ForEach.Value:Disable"]
-    }
-
-    method UninstallHotkeys()
-    {
-        echo UninstallHotkeys
-        Hotkeys:ForEach["This:UninstallHotkeyEx[\"\${ForEach.Value~}\"]"]
-    }
-
-    method OnHotkeyState(string name, bool newState)
-    {
-        echo "OnHotkeyState[${name.AsJSON~},${newState}]"
-
-        variable jsonvalueref joMapping
-        joMapping:SetReference["This.InputMappings.Get[\"${name~}\"]"]
-
-        if ${joMapping.Reference(exists)}
-            This:ExecuteInputMapping[joMapping,${newState}]
-        else
-        {
-            echo "Hotkey ${name~} NOT mapped"
-        }
-    }
-
-    method ExecuteInputMappingByName(string name, bool newState)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-
-        variable jsonvalueref joMapping
-        joMapping:SetReference["This.InputMappings.Get[\"${name~}\"]"]
-
-        if ${joMapping.Reference(exists)}
-        {
-            return ${This:ExecuteInputMapping[joMapping,${newState}](exists)}
-        }
-        return FALSE
-    }
-
-    method ExecuteHotkeyByName(string sheet, string name, bool newState)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
-
-        variable jsonvalueref joHotkey
-        joHotkey:SetReference["HotkeySheets.Get[${sheet.AsJSON~}].Hotkeys.Get[${name.AsJSON~}]"]
-
-        This:ExecuteHotkey[joHotkey,${newState}]
-    }
-
-    method ExecuteHotkey(jsonvalueref joHotkey, bool newState)
-    {
-        if !${newState}
-        {
-            This:IncrementCounter[joHotkey]
-        }
-
-        This:ExecuteInputMapping["joHotkey.Get[inputMapping]",${newState}]
-    }
-
-    method ExecuteMappableByName(string sheet, string name, bool newState)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
-
-        variable jsonvalueref joMappable
-        joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
-        
-        This:ExecuteMappable["joMappable",${newState}]
-    }
-
-    method ExecuteGameKeyBindingByName(string name, bool newState)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-
-        variable jsonvalueref joGameKeyBinding
-        joGameKeyBinding:SetReference["GameKeyBindings.Get[${name.AsJSON~}]"]
-        
-        This:ExecuteGameKeyBinding["joGameKeyBinding",${newState}]
-    }
-
-    method ExecuteGameKeyBinding(jsonvalueref joGameKeyBinding, bool newState)
-    {
-        if !${joGameKeyBinding.Type.Equal[object]}
-            return
-
-        variable string keystroke
-        keystroke:Set["${joGameKeyBinding.Get[key]~}"]
-        if !${keystroke.NotNULLOrEmpty}
-            return
-
-        if ${newState}
-        {
-            echo press -hold "${keystroke}"
-            press -hold "${keystroke}"
-        }
-        else
-        {
-            echo press -release "${keystroke}"
-            press -release "${keystroke}"
-        }
-    }
-
-    method ExecuteTriggerByName(string name, bool newState)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-
-        TriggerChains.Get["${name}"].Handlers:ForEach["This:ExecuteTrigger[ForEach.Value,${newState}]"]
-    }
-
-    method ExecuteTrigger(jsonvalueref joTrigger, bool newState)
-    {
-        if !${joTrigger.Type.Equal[object]}
-            return
-        This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
-    }
-
-    method ExecuteMappable(jsonvalueref joMappable, bool newState)
-    {
-        if !${joMappable.Type.Equal[object]}
-            return
-
-        echo "ExecuteMappable[${newState}] ${joMappable~}"
-
-        ; make sure it's not disabled. to be disabled requires "enable":false
-        if ${joMappable.GetBool[enable].Equal[FALSE]}
-            return
-
-        ; get current step, then call This:ExecuteRotatorStep
-        if !${newState}
-        {
-            This:IncrementCounter[joMappable]
-        }
-
-        variable int numStep=1
-        This:Rotator_PreExecute[joMappable,${newState}]
-
-        numStep:Set[${This.Rotator_GetCurrentStep[joMappable]}]
-        if ${numStep}>0
-        {
-            This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]",${newState}]
-            This:Rotator_PostExecute[joMappable,${newState},${numStep}]
-        }
-
-        LastMappable:SetReference[joMappable]
-    }
-
+#region Rotator Implementation
     ; for any Rotator object, gets the current `step` value (or 1 by default)
     member:int Rotator_GetCurrentStep(jsonvalueref joRotator)
     {
@@ -1531,6 +1434,130 @@ objectdef isb2022_profileengine
         joRotator:SetInteger[stepTriggered,0]
 		joRotator:SetInteger[stepTime,${timeNew}]
     }
+#endregion
+
+#region Input/Mappable Executors
+    method ExecuteInputMappingByName(string name, bool newState)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
+        variable jsonvalueref joMapping
+        joMapping:SetReference["This.InputMappings.Get[\"${name~}\"]"]
+
+        if ${joMapping.Reference(exists)}
+        {
+            return ${This:ExecuteInputMapping[joMapping,${newState}](exists)}
+        }
+        return FALSE
+    }
+
+    method ExecuteHotkeyByName(string sheet, string name, bool newState)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
+
+        variable jsonvalueref joHotkey
+        joHotkey:SetReference["HotkeySheets.Get[${sheet.AsJSON~}].Hotkeys.Get[${name.AsJSON~}]"]
+
+        This:ExecuteHotkey[joHotkey,${newState}]
+    }
+
+    method ExecuteHotkey(jsonvalueref joHotkey, bool newState)
+    {
+        if !${newState}
+        {
+            This:IncrementCounter[joHotkey]
+        }
+
+        This:ExecuteInputMapping["joHotkey.Get[inputMapping]",${newState}]
+    }
+
+    method ExecuteMappableByName(string sheet, string name, bool newState)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+        sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
+
+        variable jsonvalueref joMappable
+        joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
+        
+        This:ExecuteMappable["joMappable",${newState}]
+    }
+
+    method ExecuteGameKeyBindingByName(string name, bool newState)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
+        variable jsonvalueref joGameKeyBinding
+        joGameKeyBinding:SetReference["GameKeyBindings.Get[${name.AsJSON~}]"]
+        
+        This:ExecuteGameKeyBinding["joGameKeyBinding",${newState}]
+    }
+
+    method ExecuteGameKeyBinding(jsonvalueref joGameKeyBinding, bool newState)
+    {
+        if !${joGameKeyBinding.Type.Equal[object]}
+            return
+
+        variable string keystroke
+        keystroke:Set["${joGameKeyBinding.Get[key]~}"]
+        if !${keystroke.NotNULLOrEmpty}
+            return
+
+        if ${newState}
+        {
+            echo press -hold "${keystroke}"
+            press -hold "${keystroke}"
+        }
+        else
+        {
+            echo press -release "${keystroke}"
+            press -release "${keystroke}"
+        }
+    }
+
+    method ExecuteTriggerByName(string name, bool newState)
+    {
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
+
+        TriggerChains.Get["${name}"].Handlers:ForEach["This:ExecuteTrigger[ForEach.Value,${newState}]"]
+    }
+
+    method ExecuteTrigger(jsonvalueref joTrigger, bool newState)
+    {
+        if !${joTrigger.Type.Equal[object]}
+            return
+        This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
+    }
+
+    method ExecuteMappable(jsonvalueref joMappable, bool newState)
+    {
+        if !${joMappable.Type.Equal[object]}
+            return
+
+        echo "ExecuteMappable[${newState}] ${joMappable~}"
+
+        ; make sure it's not disabled. to be disabled requires "enable":false
+        if ${joMappable.GetBool[enable].Equal[FALSE]}
+            return
+
+        ; get current step, then call This:ExecuteRotatorStep
+        if !${newState}
+        {
+            This:IncrementCounter[joMappable]
+        }
+
+        variable int numStep=1
+        This:Rotator_PreExecute[joMappable,${newState}]
+
+        numStep:Set[${This.Rotator_GetCurrentStep[joMappable]}]
+        if ${numStep}>0
+        {
+            This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]",${newState}]
+            This:Rotator_PostExecute[joMappable,${newState},${numStep}]
+        }
+
+        LastMappable:SetReference[joMappable]
+    }
 
     ; for any Rotate object, execute a given step, depending on press/release state
     method ExecuteRotatorStep(jsonvalueref joRotator, jsonvalueref joStep, bool newState)
@@ -1586,24 +1613,7 @@ objectdef isb2022_profileengine
         jaList:ForEach["This:ExecuteAction[joState,ForEach.Value,${newState}]"]
     }
 
-    ; for any object, process variables within a specific property 
-    method ProcessVariableProperty(jsonvalueref jo, string varName)
-    {
-;        echo "ProcessVariableProperty[${varName~}] ${jo~}"
-        if !${jo.Has["${varName~}"]}
-            return
 
-        jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]        
-    }
-
-    ; for any Action object of a given action type, process its variableProperties
-    method ProcessActionVariables(jsonvalueref joActionType, jsonvalueref joAction)
-    {
-        if !${joActionType.Get[variableProperties].Type.Equal[array]}
-            return
-
-        joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Value~}\"]"]
-    }
 
     member:bool ShouldExecuteAction(jsonvalueref joState, jsonvalueref joActionType, jsonvalueref joAction, bool activate)
     {
@@ -1701,4 +1711,5 @@ objectdef isb2022_profileengine
 
         return FALSE
     }
+#endregion
 }

@@ -1641,6 +1641,12 @@ objectdef isb2022_profileengine
         variable string actionType = "${_joAction.Get[type].Lower~}"
         variable jsonvalueref joActionType = "ActionTypes.Get[\"${actionType~}\"]"
 
+        if !${joActionType.Reference(exists)}
+        {
+            echo "ExecuteAction: Unhandled action type: \"${actionType~}\""
+            return
+        }
+        
         ; check activationState settings to make sure we should execute the action here
         if !${This.ShouldExecuteAction[joState,joActionType,_joAction,${activate}]}
             return

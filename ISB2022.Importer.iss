@@ -430,15 +430,20 @@ objectdef isb2022_importer
         if !${ja.Type.Equal[array]}
             return NULL
 
-        variable uint i
-        for (i:Set[1] ; ${i}<=${ja.Used} ; i:Inc)
-        {
-            if ${ja.Get[${i}].Assert["${fieldName~}","${name.AsJSON~}"]}
-            {
-                return "ja.Get[${i}]"
-            }
-        }
-        return NULL
+/*
+    {
+        "eval":"This.Get[\"${fieldName~}\"]",
+        "op":"==",
+        "value":"${name~}"
+    }
+/**/
+
+        variable jsonvalue joQuery="{}"
+        joQuery:SetString[eval,"This.Get[\"${fieldName~}\"]"]
+        joQuery:SetString[op,"=="]
+        joQuery:SetString[value,"${name~}"]
+
+        return "ja.SelectValue[joQuery]"
     }
 
     member:jsonvalueref GetWoWMacroSet(string name)

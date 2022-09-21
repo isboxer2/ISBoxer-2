@@ -71,16 +71,20 @@ objectdef isb2022_profileengine
         if !${jaSlots.Type.Equal[array]}
             return 0
         
-        variable uint i
-        for (i:Set[1] ; ${i}<=${jaSlots.Used} ; i:Inc )
-        {
-            if ${jaSlots.Assert[${i},character,"${name.AsJSON~}"]}
-            {
-                return ${i}
-            }
-        }
+/*
+    {
+        "eval":"This.Get[character]",
+        "op":"==",
+        "value":"${name~}"
+    }
+/**/
 
-        return 0
+        variable jsonvalue joQuery="{}"
+        joQuery:SetString[eval,"This.Get[character]"]
+        joQuery:SetString[op,"=="]
+        joQuery:SetString[value,"${name~}"]
+
+        return ${ja.SelectKey[joQuery]}
     }
 
 #region Object Installers/Uninstallers

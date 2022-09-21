@@ -68,7 +68,7 @@
                 }
             }
         },
-        "isb2022.keyLayoutView":{
+        "isb2022.mappableSheetView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{

@@ -6,7 +6,7 @@
             "default":200,
             "isb2022.characterEditor":200,
             "isb2022.teamEditor":200,
-            "isb2022.keyLayoutEditor":200
+            "isb2022.mappableSheetEditor":200
         },
         "isb2022.leftPane":{
             "_dock":"left",
@@ -145,13 +145,13 @@
                 }
             ]
         },
-        "isb2022.keyLayoutEditor":{
+        "isb2022.mappableSheetEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
                 {
                     "jsonTemplate":"isb2022.leftPane",
-                    "_pane":"isb2022.keyLayoutEditor",
+                    "_pane":"isb2022.mappableSheetEditor",
                     "content":{
                         "type":"treepanel",
                         "verticalAlignment":"stretch",
@@ -379,25 +379,25 @@
                                     "children":[
                                         {
                                             "type":"textblock",
-                                            "text":"Key Layouts"
+                                            "text":"Mappable Sheets"
                                         },
                                         {
                                             "type":"listbox",
-                                            "name":"profile.keyLayouts",
+                                            "name":"profile.mappableSheets",
                                             "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.KeyLayouts}"
+                                                "pullFormat": "${This.Context.Editing.MappableSheets}"
                                             },
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.keyLayoutView"
+                                                    "template":"isb2022.mappableSheetView"
                                                 }
                                             },
                                             "eventHandlers":{
                                                 "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
-                                                    "method":"OnKeyLayoutSelected"
+                                                    "method":"OnKMappableSheetSelected"
                                                 }
                                             }
                                         }

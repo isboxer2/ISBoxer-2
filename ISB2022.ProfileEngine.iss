@@ -359,18 +359,6 @@ objectdef isb2022_profileengine
             ja:ForEach["This:UninstallGameKeyBinding[ForEach.Value]"]
     }
 
-    method InstallKeyLayouts(jsonvalueref ja)
-    {
-        if ${ja.Type.Equal[array]}
-            ja:ForEach["This:InstallKeyLayout[ForEach.Value]"]
-    }
-
-    method UninstallKeyLayouts(jsonvalueref ja)
-    {
-        if ${ja.Type.Equal[array]}
-            ja:ForEach["This:UninstallKeyLayout[ForEach.Value]"]
-    }
-
     method InstallProfiles(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}

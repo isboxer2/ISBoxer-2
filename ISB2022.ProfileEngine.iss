@@ -683,8 +683,8 @@ objectdef isb2022_profileengine
         }
         <$$"]
 
-        echo TeamScope:SetReference["InnerSpace.AddDistributedScope[\"${dscopeDefinition.AsJSON~}\"]"]
-        TeamScope:SetReference["InnerSpace.AddDistributedScope[\"${dscopeDefinition.AsJSON~}\"]"]
+        echo TeamScope:SetReference["distributedscope.New[\"${dscopeDefinition.AsJSON~}\"]"]
+        TeamScope:SetReference["distributedscope.New[\"${dscopeDefinition.AsJSON~}\"]"]
 
         echo "ActivateTeam: TeamScope.active=${TeamScope.GetBool[active]}"
 

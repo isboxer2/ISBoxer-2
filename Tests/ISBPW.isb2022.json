@@ -1,7 +1,24 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
     "name": "ISBoxer Per-Window",
-    "mappableSheets":[
+    "hotkeySheets": [
+        {
+            "name": "Base Hotkeys",
+            "enable": true,
+            "hotkeys": [
+                {
+                    "name": "Follow Me",
+                    "keyCombo": "Alt+F",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "Base Hotkeys",
+                        "name": "Follow Me"
+                    }
+                }
+            ]
+        }
+    ],
+        "mappableSheets":[
         {
             "name":"Always On",
             "mappables":[

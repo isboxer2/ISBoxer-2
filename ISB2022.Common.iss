@@ -593,6 +593,14 @@ objectdef isb2022_triggerchain
         Name:Set["${name~}"]
     }
 
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+        jo:SetByRef[handlers,Handlers]
+        return jo
+    }
+
     method AddHandler(jsonvalueref joTrigger)
     {
         if !${jo.Type.Equal[object]}
@@ -731,6 +739,14 @@ objectdef isb2022_mappablesheet
         jo.Get[mappables]:ForEach["This:Add[ForEach.Value]"]
     }
 
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+        jo:SetByRef[mappables,Mappables]
+        return jo
+    }
+
     method Add(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -763,6 +779,15 @@ objectdef isb2022_gamemacrosheet
             Game:Set["${jo.Get[game]~}"]
 
         jo.Get[macros]:ForEach["This:Add[ForEach.Value]"]
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+        jo:SetString[game,"${Game~}"]
+        jo:SetByRef[macros,Macros]
+        return jo
     }
 
     method Add(jsonvalueref jo)
@@ -802,6 +827,14 @@ objectdef isb2022_regionsheet
         }
     }
 
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+        jo:SetByRef[regions,Regions]
+        return jo
+    }
+
     method Add(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -838,6 +871,15 @@ objectdef isb2022_vfxsheet
             This:Enable
         }
 
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+        jo:SetBool[enabled,${Enabled}]
+        jo:SetByRef[vfx,VFX]
+        return jo
     }
 
     method Add(jsonvalueref jo)

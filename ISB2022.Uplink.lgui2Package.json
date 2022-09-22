@@ -43,7 +43,7 @@
                                 "eventHandlers": {
                                     "onPress":{
                                         "type":"code",
-                                        "code":"InnerSpace.Agent[ISBoxer 2022]:Stop:Reload:Start"
+                                        "code":"agent.Get[ISBoxer 2022]:Stop:Reload:Start"
                                     }
                                 }
                             },

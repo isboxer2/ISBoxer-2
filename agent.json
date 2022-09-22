@@ -1,8 +1,8 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/agent.json",
     "name": "ISBoxer 2022",
-    "version": "20220921.1",
-    "minimumBuild": 6995,
+    "version": "20220922.1",
+    "minimumBuild": 6997,
     "platforms": {
         "inner space uplink": {
             "eventHandlers": {

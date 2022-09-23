@@ -99,14 +99,14 @@
                         {
                             "actions":[
                                 {
-                                    "type":"Mapped Key",
-                                    "keyLayout":"World of Warcraft",
-                                    "mappedKey":"Follow Me"
+                                    "type":"mappable",
+                                    "sheet":"World of Warcraft",
+                                    "name":"Follow Me"
                                 },
                                 {
-                                    "type":"Mapped Key",
-                                    "keyLayout":"World of Warcraft",
-                                    "mappedKey":"JambaMaster"
+                                    "type":"mappable",
+                                    "sheet":"World of Warcraft",
+                                    "name":"JambaMaster"
                                 }
                             ]
                         }
@@ -118,14 +118,14 @@
                         {
                             "actions":[
                                 {
-                                    "type":"Mapped Key",
-                                    "keyLayout":"World of Warcraft",
-                                    "mappedKey":"Follow Me"
+                                    "type":"mappable",
+                                    "sheet":"World of Warcraft",
+                                    "name":"Follow Me"
                                 },
                                 {
-                                    "type":"Mapped Key",
-                                    "keyLayout":"World of Warcraft",
-                                    "mappedKey":"JambaStrobe ON"
+                                    "type":"mappable",
+                                    "sheet":"World of Warcraft",
+                                    "name":"JambaStrobe ON"
                                 }
                             ]
                         }
@@ -137,19 +137,19 @@
                         {
                             "actions":[
                                 {
-                                    "type":"Mapped Key",
-                                    "keyLayout":"World of Warcraft",
-                                    "mappedKey":"Follow Me"
+                                    "type":"mappable",
+                                    "sheet":"World of Warcraft",
+                                    "name":"Follow Me"
                                 },
                                 {
-                                    "type":"Mapped Key",
-                                    "keyLayout":"World of Warcraft",
-                                    "mappedKey":"JambaMaster"
+                                    "type":"mappable",
+                                    "sheet":"World of Warcraft",
+                                    "name":"JambaMaster"
                                 },
                                 {
-                                    "type":"Mapped Key",
-                                    "keyLayout":"World of Warcraft",
-                                    "mappedKey":"JambaStrobe ON"
+                                    "type":"mappable",
+                                    "sheet":"World of Warcraft",
+                                    "name":"JambaStrobe ON"
                                 }
                             ]
                         }

@@ -30,7 +30,7 @@ objectdef isb2022 inherits isb2022_profilecollection
     method SelectProfile(string name)
     {
         SelectedProfile:SetReference["Profiles.Get[\"${name~}\"]"]
-        LGUI2.Element[weq2022.events]:FireEventHandler[onSelectedProfileChanged]
+        LGUI2.Element[isb2022.events]:FireEventHandler[onSelectedProfileChanged]
     }
 }
 

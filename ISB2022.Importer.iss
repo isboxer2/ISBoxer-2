@@ -13,6 +13,45 @@ objectdef isb2022_importer
         This:WriteJSON["${filename~}.json"]
     }
 
+    member:jsonvalueref TransformProfileXML(string filename)
+    {
+        variable isb2022_isb1transformer ISB1Transformer
+        variable jsonvalue jo="{}"
+        variable jsonvalueref jRef
+
+        ISBProfile:SetReference["ISB1Transformer.TransformXML[\"${filename~}\"]"]
+        
+        jRef:SetReference[This.ConvertCharacters]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[characters,jRef]
+        }
+        jRef:SetReference[This.ConvertCharacterSets]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[teams,jRef]
+        }
+        jRef:SetReference[This.ConvertKeyMapsAsHotkeySheets]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[hotkeySheets,jRef]
+        }
+        jRef:SetReference[This.ConvertKeyMapsAsMappableSheets]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[mappableSheets,jRef]
+        }
+        
+        return jo
+    }
+
+    method TransformCurrentProfileXML()
+    {
+        variable jsonvalueref jo
+        jo:SetReference["This.TransformProfileXML[\"${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.XML\"]"]
+        jo:WriteFile["${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.isb2022.json",multiline]
+    }
+
     member:jsonvalueref TransformRegionsXML(string filename)
     {
         variable isb2022_isb1transformer ISB1Transformer
@@ -257,13 +296,11 @@ objectdef isb2022_importer
     {
 ;       echo "ConvertAction ${jo~}"
 
-        variable jsonvalueref joRef
         variable jsonvalue joNew
 
         if ${This(type).Member["ConvertAction_${jo.Get[type]~}"]}
         {
-            joRef:SetReference["This.ConvertAction_${jo.Get[type]~}[jo]"]
-            joNew:SetValue["${joRef~}"]
+            joNew:SetValue["${This.ConvertAction_${jo.Get[type]~}[jo]~}"]
 
             if ${jo.Has[Target]}
                 joNew:SetString[target,"${jo.Get[Target]~}"]
@@ -1057,6 +1094,19 @@ objectdef isb2022_importer
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew        
+    }
+
+    member:jsonvalueref ConvertAction_SetVariableKeystrokeAction(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[type,set game key binding]
+        if ${jo.Get[Name]~.NotNULLOrEmpty}
+            joNew:SetString[name,"${jo.Get[Name]~}"]
+        if ${jo.Has[combo,Combo]}
+            joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
+
+        return joNew
     }
 
     member:jsonvalueref ConvertAction_VideoFeedsAction(jsonvalueref jo)

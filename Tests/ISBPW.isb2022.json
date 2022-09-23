@@ -18,7 +18,7 @@
             ]
         }
     ],
-        "mappableSheets":[
+    "mappableSheets":[
         {
             "name":"Always On",
             "mappables":[
@@ -168,7 +168,7 @@
                                 },
                                 {
                                     "type":"keystroke",
-                                    "key":"2"
+                                    "keyCombo":"2"
                                 }
                             ]
                         }

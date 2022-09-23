@@ -404,7 +404,7 @@ objectdef isb2022_importer
         joNew:SetString[type,keystroke]        
 
         if ${jo.Has[combo,Combo]}
-            joNew:SetString[combo,"${jo.Get[combo,Combo]~}"]
+            joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
 
         return joNew
     }

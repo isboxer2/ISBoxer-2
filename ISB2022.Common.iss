@@ -522,7 +522,7 @@ objectdef isb2022_clickbar
     {
         echo isb2022_clickbar:GenerateButtonView ${Context(type)} ${Context.Args}
         ;isb2022_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
-        ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","key":"2"}}}]}
+        ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
         variable jsonvalue joButton
         joButton:SetValue["$$>

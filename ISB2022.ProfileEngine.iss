@@ -802,7 +802,7 @@ objectdef isb2022_profileengine
     method TestKeystroke(string key)
     {
         variable jsonvalue joAction="{}"
-        joAction:SetString["key","${key~}"]
+        joAction:SetString["keyCombo","${key~}"]
 
         This:Action_Keystroke[NULL,joAction,TRUE]
         This:Action_Keystroke[NULL,joAction,FALSE]
@@ -848,7 +848,7 @@ objectdef isb2022_profileengine
             return
 
         variable string keystroke
-        keystroke:Set["${joAction.Get[key]~}"]
+        keystroke:Set["${joAction.Get[keyCombo]~}"]
         if !${keystroke.NotNULLOrEmpty}
             return
 

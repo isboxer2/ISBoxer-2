@@ -672,7 +672,12 @@ objectdef isb2022_hotkeysheet
     method Enable()
     {
         Enabled:Set[1]
-        Hotkeys:ForEach["This:EnableHotkey[ForEach.Value]"]
+
+        variable jsonvalue joQuery="{}"
+        joQuery:SetString[op,"!="]
+        joQuery:SetBool[value,0]
+        joQuery:SetString[eval,"This.GetBool[enable]"]
+        Hotkeys:ForEach["This:EnableHotkey[ForEach.Value]",joQuery]
     }
 
     method Disable()

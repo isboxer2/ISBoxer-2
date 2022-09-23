@@ -21,6 +21,8 @@ objectdef isb2022_importer
 
         ISBProfile:SetReference["ISB1Transformer.TransformXML[\"${filename~}\"]"]
         
+        This:WriteJSON["${filename~}.json"]
+
         jRef:SetReference[This.ConvertCharacters]        
         if ${jRef.Used}
         {
@@ -200,6 +202,7 @@ objectdef isb2022_importer
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
+        joNew:SetBool[enable,1]
 
         variable jsonvalue ja="[]"
 
@@ -231,6 +234,9 @@ objectdef isb2022_importer
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
+
+        if ${jo.GetBool[manualLoad]}
+            joNew:SetBool[enable,0]
 
         joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
         

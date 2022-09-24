@@ -411,7 +411,7 @@ objectdef isb2022_importer
 
         joNew:SetString[name,"${jo.Get[keyMap]~}"]
 
-        if ${joNew.Has[Value]}
+        if ${jo.Has[Value]}
             joNew:SetString[value,"${jo.Get[Value]~}"]
         else
             joNew:SetString[value,"On"]

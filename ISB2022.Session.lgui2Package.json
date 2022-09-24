@@ -172,6 +172,12 @@
                     "handler":"Action_BroadcastingList",
                     "activationState":true,
                     "retarget":true
+                },
+                {
+                    "name":"popup text",
+                    "handler":"Action_PopupText",
+                    "activationState":true,
+                    "retarget":true
                 }
             ]
         },

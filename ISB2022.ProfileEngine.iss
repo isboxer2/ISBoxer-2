@@ -985,6 +985,14 @@ objectdef isb2022_profileengine
         }
     }
 
+    method Action_PopupText(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_PopupText[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
     method Action_WindowFocus(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_WindowFocus[${activate}] ${joAction~}"

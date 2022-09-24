@@ -962,6 +962,35 @@ objectdef isb2022_profileengine
         }
     }
 
+    method Action_MappableSheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_MappableSheetState[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable string name
+        name:Set["${joAction.Get[name]~}"]
+
+        switch ${joAction.GetBool[state]}
+        {
+            case TRUE
+                MappableSheets.Get["${name~}"]:Enable
+                break
+            case FALSE
+                MappableSheets.Get["${name~}"]:Disable
+                break
+            case NULL
+                MappableSheets.Get["${name~}"]:Toggle
+                break
+        }
+    }
+
+    method Action_KeyMapState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        This:Action_HotkeySheetState[joState,joAction,${activate}]
+        This:Action_MappableSheetState[joState,joAction,${activate}]
+    }
+
     method Action_VFXSheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "Action_VFXSheetState[${activate}] ${joAction~}"
@@ -1016,6 +1045,14 @@ objectdef isb2022_profileengine
             return
 
         This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",${activate}]
+    }
+
+    method Action_VirtualizeMappable(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "Action_VirtualizeMappable[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
     }
 
     method Action_InputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1474,8 +1511,12 @@ objectdef isb2022_profileengine
 
     method ExecuteMappableByName(string sheet, string name, bool newState)
     {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
         sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
+
+        if !${MappableSheets.Get["${sheet~}"].Enabled}
+            return
+
+        name:Set["${This.ProcessVariables["${name~}"]~}"]
 
         variable jsonvalueref joMappable
         joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]

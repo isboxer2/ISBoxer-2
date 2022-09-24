@@ -126,8 +126,15 @@
                     "retarget":true
                 },
                 {
+                    "name":"key map state",
+                    "handler":"Action_KeyMapState",
+                    "variableProperties":["name"],
+                    "activationState":true,
+                    "retarget":true
+                },
+                {
                     "name":"virtualize mappable",
-                    "handler":"Action_MappableSheetState",
+                    "handler":"Action_VirtualizeMappable",
                     "variableProperties":["fromSheet","toSheet","fromName","toName"],
                     "activationState":true,
                     "retarget":true

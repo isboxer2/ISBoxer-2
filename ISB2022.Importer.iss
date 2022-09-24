@@ -407,7 +407,7 @@ objectdef isb2022_importer
 ;       echo "ConvertAction_KeyMapAction ${jo~}"     
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,mappable sheet state]        
+        joNew:SetString[type,key map state]        
 
         joNew:SetString[name,"${jo.Get[keyMap]~}"]
 

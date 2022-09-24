@@ -728,8 +728,11 @@ objectdef isb2022_mappablesheet
 
     variable jsonvalue Mappables="{}"
 
+    variable bool Enabled
+
     method Initialize(jsonvalueref jo)
     {
+        Enabled:Set[1]
         This:FromJSON[jo]
     }
 
@@ -740,6 +743,9 @@ objectdef isb2022_mappablesheet
 
         if ${jo.Has[name]}
             Name:Set["${jo.Get[name]~}"]
+
+        if ${jo.Has[enable]}
+            Enabled:Set[${jo.GetBool[enable]}]
 
         jo.Get[mappables]:ForEach["This:Add[ForEach.Value]"]
     }
@@ -758,6 +764,25 @@ objectdef isb2022_mappablesheet
             return FALSE
         Mappables:SetByRef["${jo.Get[name]~}",jo]
     }
+
+
+    method Enable()
+    {
+        Enabled:Set[1]
+    }
+
+    method Disable()
+    {
+        Enabled:Set[0]
+    }
+
+    method Toggle()
+    {
+        if ${Enabled}
+            This:Disable
+        else
+            This:Enable
+    }    
 }
 
 objectdef isb2022_gamemacrosheet

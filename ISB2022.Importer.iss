@@ -98,6 +98,30 @@ objectdef isb2022_importer
         return ja
     }
 
+    member:jsonvalueref ConvertClickBars()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[ClickBar]:ForEach["ja:AddByRef[\"This.ConvertClickBar[ForEach.Value]\"]"]
+
+        return ja
+    }
+
+    member:jsonvalueref ConvertClickBarImages()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[ClickBarImage]:ForEach["ja:AddByRef[\"This.ConvertClickBarImage[ForEach.Value]\"]"]
+
+        return ja
+    }
+
+    member:jsonvalueref ConvertComputers()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[Computer]:ForEach["ja:AddByRef[\"This.ConvertComputer[ForEach.Value]\"]"]
+
+        return ja
+    }
+
     member:jsonvalueref ConvertKeyMapsAsHotkeySheets()
     {
         variable jsonvalue ja="[]"
@@ -114,6 +138,72 @@ objectdef isb2022_importer
         return ja
     }
 
+    member:jsonvalueref ConvertMenus()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[Menu]:ForEach["ja:AddByRef[\"This.ConvertMenu[ForEach.Value]\"]"]
+
+        return ja
+    }
+
+    member:jsonvalueref ConvertMenuButtonSets()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[MenuButtonSet]:ForEach["ja:AddByRef[\"This.ConvertMenuButtonSet[ForEach.Value]\"]"]
+
+        return ja
+    }
+
+    member:jsonvalueref ConvertMenuHotkeySets()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[MenuHotkeySet]:ForEach["ja:AddByRef[\"This.ConvertMenuHotkeySet[ForEach.Value]\"]"]
+
+        return ja
+    }
+
+    member:jsonvalueref ConvertMenuTemplates()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[MenuTemplate]:ForEach["ja:AddByRef[\"This.ConvertMenuTemplate[ForEach.Value]\"]"]
+
+        return ja
+    }
+
+    member:jsonvalueref ConvertRepeaterProfiles()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[RepeaterProfile]:ForEach["ja:AddByRef[\"This.ConvertRepeaterProfile[ForEach.Value]\"]"]
+        return ja
+    }
+
+    member:jsonvalueref ConvertWindowLayouts()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[WindowLayout]:ForEach["ja:AddByRef[\"This.ConvertWindowLayout[ForEach.Value]\"]"]
+        return ja
+    }
+
+    member:jsonvalueref ConvertWoWMacroSets()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[WoWMacroSet]:ForEach["ja:AddByRef[\"This.ConvertWoWMacroSet[ForEach.Value]\"]"]
+        return ja
+    }
+
+    member:jsonvalueref ConvertCrypticMacroSets()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[CrypticMacroSet]:ForEach["ja:AddByRef[\"This.ConvertCrypticMacroSet[ForEach.Value]\"]"]
+        return ja
+    }
+
+    member:jsonvalueref ConvertVariableKeystrokes()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[VariableKeystroke]:ForEach["ja:AddByRef[\"This.ConvertVariableKeystroke[ForEach.Value]\"]"]
+        return ja
+    }
 
     member:jsonvalueref ConvertCharacter(jsonvalueref jo)
     {
@@ -213,6 +303,89 @@ objectdef isb2022_importer
 
         joNew:SetByRef[hotkeys,ja]    
         return joNew
+    }
+
+    member:jsonvalueref ConvertClickBar(jsonvalueref jo)
+    {
+        echo "ConvertClickBar ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertClickBarImage(jsonvalueref jo)
+    {
+        echo "ConvertClickBarImage ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertComputer(jsonvalueref jo)
+    {
+        echo "ConvertComputer ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertRepeaterProfile(jsonvalueref jo)
+    {
+        echo "ConvertRepeaterProfile ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertVariableKeystroke(jsonvalueref jo)
+    {
+        echo "ConvertVariableKeystroke ${jo~}"
+        return NULL
+    }
+
+    member:jsonvalueref ConvertWindowLayout(jsonvalueref jo)
+    {
+        echo "ConvertWindowLayout ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertWoWMacroSet(jsonvalueref jo)
+    {
+        echo "ConvertWoWMacroSet ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertCrypticMacroSet(jsonvalueref jo)
+    {
+        echo "ConvertCrypticMacroSet ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertMenu(jsonvalueref jo)
+    {
+        echo "ConvertMenu ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertMenuHotkeySet(jsonvalueref jo)
+    {
+        echo "ConvertMenuHotkeySet ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertMenuTemplate(jsonvalueref jo)
+    {
+        echo "ConvertMenuTemplate ${jo~}"
+
+        return NULL
+    }
+
+    member:jsonvalueref ConvertMenuButtonSet(jsonvalueref jo)
+    {
+        echo "ConvertMenuButtonSet ${jo~}"
+
+        return NULL
     }
 
 #region Mapped Key Conversion

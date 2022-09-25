@@ -681,7 +681,7 @@ objectdef isb2022_hotkeysheet
         variable jsonvalue joQuery="{}"
         joQuery:SetString[op,"!="]
         joQuery:SetBool[value,0]
-        joQuery:SetString[eval,"This.GetBool[enable]"]
+        joQuery:SetString[eval,"Select.GetBool[enable]"]
         Hotkeys:ForEach["This:EnableHotkey[ForEach.Value]",joQuery]
     }
 

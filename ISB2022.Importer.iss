@@ -481,14 +481,14 @@ objectdef isb2022_importer
 
 /*
     {
-        "eval":"This.Get[\"${fieldName~}\"]",
+        "eval":"Select.Get[\"${fieldName~}\"]",
         "op":"==",
         "value":"${name~}"
     }
 /**/
 
         variable jsonvalue joQuery="{}"
-        joQuery:SetString[eval,"This.Get[\"${fieldName~}\"]"]
+        joQuery:SetString[eval,"Select.Get[\"${fieldName~}\"]"]
         joQuery:SetString[op,"=="]
         joQuery:SetString[value,"${name~}"]
 

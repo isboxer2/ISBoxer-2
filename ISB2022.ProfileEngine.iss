@@ -80,7 +80,7 @@ objectdef isb2022_profileengine
 /**/
 
         variable jsonvalue joQuery="{}"
-        joQuery:SetString[eval,"This.Get[character]"]
+        joQuery:SetString[eval,"Select.Get[character]"]
         joQuery:SetString[op,"=="]
         joQuery:SetString[value,"${name~}"]
 

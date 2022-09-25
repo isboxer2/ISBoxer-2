@@ -21,6 +21,7 @@ objectdef isb2022_profile
     variable jsonvalue HotkeySheets=[]
     variable jsonvalue MappableSheets=[]
     variable jsonvalue GameKeyBindings=[]
+    variable jsonvalue GameMacroSheets=[]
     variable jsonvalue ClickBars=[]
     variable jsonvalue VFXSheets=[]
 
@@ -70,6 +71,8 @@ objectdef isb2022_profile
             VFXSheets:SetValue["${jo.Get[vfxSheets]~}"]
         if ${jo.Has[clickBars]}
             ClickBars:SetValue["${jo.Get[clickBars]~}"]
+        if ${jo.Has[gameMacroSheets]}
+            GameMacroSheets:SetValue["${jo.Get[gameMacroSheets]~}"]
     }
 
     member:jsonvalueref AsJSON()
@@ -113,6 +116,8 @@ objectdef isb2022_profile
             jo:Set["vfxSheets","${VFXSheets.AsJSON~}"]
         if ${ClickBars.Used}
             jo:Set["clickBars","${ClickBars.AsJSON~}"]
+        if ${GameMacroSheets.Used}
+            jo:Set["gameMacroSheets","${GameMacroSheets.AsJSON~}"]
         return jo
     }
 

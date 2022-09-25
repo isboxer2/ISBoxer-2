@@ -4,6 +4,7 @@ objectdef isb2022_importer
 
     variable jsonvalueref ISBProfile
 
+#region XML Transformers -- API Entry Points 
     method TransformXML(string filename)
     {
         variable isb2022_isb1transformer ISB1Transformer
@@ -43,6 +44,11 @@ objectdef isb2022_importer
         {
             jo:SetByRef[mappableSheets,jRef]
         }
+        jRef:SetReference[This.ConvertWoWMacroSets]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[gameMacroSheets,jRef]
+        }
         
         return jo
     }
@@ -73,15 +79,9 @@ objectdef isb2022_importer
 
         return joProfile
     }
+#endregion
 
-    method WriteJSON(string filename)
-    {
-        if !${ISBProfile.Type.Equal[object]}
-            return
-
-        ISBProfile:WriteFile["${filename~}",multiline]
-    }
-
+#region Mass Conversion -- Fully implemented
     member:jsonvalueref ConvertCharacters()
     {
         variable jsonvalue ja="[]"
@@ -204,7 +204,9 @@ objectdef isb2022_importer
         ISBProfile.Get[VariableKeystroke]:ForEach["ja:AddByRef[\"This.ConvertVariableKeystroke[ForEach.Value]\"]"]
         return ja
     }
+#endregion
 
+#region Individual Conversion -- TODO
     member:jsonvalueref ConvertCharacter(jsonvalueref jo)
     {
 ;        echo "ConvertCharacter ${jo~}"
@@ -350,7 +352,45 @@ objectdef isb2022_importer
     {
         echo "ConvertWoWMacroSet ${jo~}"
 
-        return NULL
+        if !${jo.Get[WoWMacros].Used}
+        {
+            return NULL
+        }
+
+        variable jsonvalue joNew="{}"
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+        joNew:SetString[game,"World of Warcraft"]
+        joNew:SetString[description,"${jo.Get[Description]~}"]
+
+        variable jsonvalue ja="[]"
+
+        jo.Get[WoWMacroSet]:ForEach["This:ConvertWoWMacroInto[ja,ForEach.Value]"]
+
+        if !${ja.Used}
+            return NULL
+
+        joNew:SetByRef[macros,ja]    
+        return joNew
+    }
+
+    method ConvertWoWMacroInto(jsonvalueref ja, jsonvalueref jo)
+    {
+        echo "ConvertWoWMacroInto ${jo~}"
+
+        variable jsonvalue joNew="{}"
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+        joNew:SetString[colloquialName,"${jo.Get[ColloquialName]~}"]
+        joNew:SetString[description,"${jo.Get[Description]~}"]
+        joNew:SetString[commands,"${jo.Get[MacroCommands]~}"]
+        joNew:SetBool[useFTLModifiers,"${jo.GetBool[useFTLModifiers]}"]
+
+        if ${jo.Has[AllowCustomModifiers]}
+            joNew:SetByRef[allowCustomModifiers,"jo.Get[AllowCustomModifiers]"]
+
+        if ${jo.Has[combo,Combo]}
+            joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
+
+        ja:AddByRef[joNew]
     }
 
     member:jsonvalueref ConvertCrypticMacroSet(jsonvalueref jo)
@@ -387,8 +427,9 @@ objectdef isb2022_importer
 
         return NULL
     }
+#endregion
 
-#region Mapped Key Conversion
+#region Mapped Key Conversion -- Fully implemented
     method ConvertMappedKeyAsHotkeyInto(jsonvalueref ja, jsonvalueref joKeyMap, jsonvalueref jo)
     {
 ;        echo ConvertMappedKeyAsHotkeyInto
@@ -412,7 +453,8 @@ objectdef isb2022_importer
         if ${jo.GetBool[manualLoad]}
             joNew:SetBool[enable,0]
 
-        joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
+        if ${jo.Has[combo,Combo]}
+            joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
         
         variable jsonvalue joInputMapping="{}"
 
@@ -473,73 +515,7 @@ objectdef isb2022_importer
     }
 #endregion
 
-
-    member:jsonvalueref FindInArray(jsonvalueref ja, string name, string fieldName="Name")
-    {
-        if !${ja.Type.Equal[array]}
-            return NULL
-
-/*
-    {
-        "eval":"Select.Get[\"${fieldName~}\"]",
-        "op":"==",
-        "value":"${name~}"
-    }
-/**/
-
-        variable jsonvalue joQuery="{}"
-        joQuery:SetString[eval,"Select.Get[\"${fieldName~}\"]"]
-        joQuery:SetString[op,"=="]
-        joQuery:SetString[value,"${name~}"]
-
-        return "ja.SelectValue[joQuery]"
-    }
-
-    member:jsonvalueref GetWoWMacroSet(string name)
-    {
-        variable jsonvalueref ja="ISBProfile.Get[WoWMacroSet]"
-
-        return "This.FindInArray[ja,\"${name~}\"]"
-    }
-
-    member:jsonvalueref GetWoWMacro(string setName, string name)
-    {
-        variable jsonvalueref jo="This.GetWoWMacroSet[\"${setName~}\"]"
-        if !${jo.Type.Equal[object]}
-        {
-            echo "GetWoWMacro: Set ${setName~} not found ${jo~}"
-            return NULL
-        }
-        variable jsonvalueref ja
-        ja:SetReference["jo.Get[WoWMacros]"]
-        if !${ja.Type.Equal[array]}
-        {
-            echo "GetWoWMacro: Set ${setName~} missing WoWMacros"
-            return NULL
-        }
-
-;        echo "GetWoWMacro checking for ${name~} in ${ja~}"
-        return "This.FindInArray[ja,\"${name~}\",ColloquialName]"
-    }
-
-    member:jsonvalueref ConvertISKey(jsonvalueref jo)
-    {
-        variable jsonvalue joNew="{}"
-
-        joNew:SetString[Key,"${jo.Get[Key]~}"]
-
-        if ${jo.GetInteger[Code]}
-            joNew:SetInteger[code,${jo.GetInteger[Code]}]    
-        return joNew
-    }
-
-    method AddConvertedISKey(jsonvalueref ja, jsonvalueref jo)
-    {
-        ja:AddByRef["This.ConvertISKey[jo]"]
-    }
-
-
-#region Action conversion
+#region Action conversion -- Fully implemented
     member:jsonvalueref ConvertAction(jsonvalueref jo)
     {
 ;       echo "ConvertAction ${jo~}"
@@ -1336,5 +1312,80 @@ objectdef isb2022_importer
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew        
     }
+#endregion
+
+#region Utilities
+    method WriteJSON(string filename)
+    {
+        if !${ISBProfile.Type.Equal[object]}
+            return
+
+        ISBProfile:WriteFile["${filename~}",multiline]
+    }
+
+    member:jsonvalueref FindInArray(jsonvalueref ja, string name, string fieldName="Name")
+    {
+        if !${ja.Type.Equal[array]}
+            return NULL
+
+/*
+    {
+        "eval":"Select.Get[\"${fieldName~}\"]",
+        "op":"==",
+        "value":"${name~}"
+    }
+/**/
+
+        variable jsonvalue joQuery="{}"
+        joQuery:SetString[eval,"Select.Get[\"${fieldName~}\"]"]
+        joQuery:SetString[op,"=="]
+        joQuery:SetString[value,"${name~}"]
+
+        return "ja.SelectValue[joQuery]"
+    }
+
+    member:jsonvalueref GetWoWMacroSet(string name)
+    {
+        variable jsonvalueref ja="ISBProfile.Get[WoWMacroSet]"
+
+        return "This.FindInArray[ja,\"${name~}\"]"
+    }
+
+    member:jsonvalueref GetWoWMacro(string setName, string name)
+    {
+        variable jsonvalueref jo="This.GetWoWMacroSet[\"${setName~}\"]"
+        if !${jo.Type.Equal[object]}
+        {
+            echo "GetWoWMacro: Set ${setName~} not found ${jo~}"
+            return NULL
+        }
+        variable jsonvalueref ja
+        ja:SetReference["jo.Get[WoWMacros]"]
+        if !${ja.Type.Equal[array]}
+        {
+            echo "GetWoWMacro: Set ${setName~} missing WoWMacros"
+            return NULL
+        }
+
+;        echo "GetWoWMacro checking for ${name~} in ${ja~}"
+        return "This.FindInArray[ja,\"${name~}\",ColloquialName]"
+    }
+
+    member:jsonvalueref ConvertISKey(jsonvalueref jo)
+    {
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[Key,"${jo.Get[Key]~}"]
+
+        if ${jo.GetInteger[Code]}
+            joNew:SetInteger[code,${jo.GetInteger[Code]}]    
+        return joNew
+    }
+
+    method AddConvertedISKey(jsonvalueref ja, jsonvalueref jo)
+    {
+        ja:AddByRef["This.ConvertISKey[jo]"]
+    }
+
 #endregion
 }

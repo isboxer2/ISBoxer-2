@@ -63,6 +63,13 @@ objectdef isb2022_importer
         return jo
     }
 
+    method TransformProfileXML(string filename)
+    {
+        variable jsonvalueref jo
+        jo:SetReference["This.TransformProfileXML[\"${LavishScript.HomeDirectory~}/${filename~}\"]"]
+        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename~}.isb2022.json",multiline]
+    }
+
     method TransformCurrentProfileXML()
     {
         variable jsonvalueref jo

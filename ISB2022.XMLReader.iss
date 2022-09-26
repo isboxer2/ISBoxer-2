@@ -400,7 +400,7 @@ objectdef isb2022_isb1transformer
         joTransform:Erase["${oldProperty~}"]
     }
 
-    method TransformColor(jsonvalueref joTransform, string oldProperty, string newProperty)
+    method TransformColor(jsonvalueref joTransform, string oldProperty, string newProperty, string defaultValue="")
     {
         variable jsonvalueref jo
         jo:SetReference["joTransform.Get[\"${oldProperty~}\"]"]
@@ -416,14 +416,19 @@ objectdef isb2022_isb1transformer
             b:Set["${jo.GetInteger[Blue]}"]
             a:Set["${jo.GetInteger[Alpha]}"]
 
+        variable string newValue
+
         if ${jo.Has[Alpha]}
         {
-            joTransform:SetString["${newProperty~}","#${Math.Calc64[(${a}<<24) | (${r} << 16) | (${g} << 8) | ${b}].Hex[8]}"]
+            newValue:Set["#${Math.Calc64[(${a}<<24) | (${r} << 16) | (${g} << 8) | ${b}].Hex[8]}"]
         }
         else
         {
-            joTransform:SetString["${newProperty~}","#${Math.Calc64[(${r} << 16) | (${g} << 8) | ${b}].Hex[6]}"]
+            newValue:Set["#${Math.Calc64[(${r} << 16) | (${g} << 8) | ${b}].Hex[6]}"]
         }
+
+        if !${newValue.Equal[defaultValue]}
+            joTransform:SetString["${newProperty~}","${newValue~}"]
 
         joTransform:Erase["${oldProperty~}"]
     }
@@ -755,6 +760,10 @@ objectdef isb2022_isb1transformer
 
         Thos:TransformSingleToArray[joTransform,"ClickActions"]
 
+        This:TransformString[joTransform,Name,name]
+        This:TransformString[joTransform,Text,text]
+        This:AutoTransform[joTransform,TextStyle,ClickBarButton]
+
         This:TransformBool[joTransform,Enabled,enabled,1]
         This:AutoTransform[joTransform,ClickActions,ClickBarButton]
         This:AutoTransform[joTransform,MouseOverAction,ClickBarButton]
@@ -765,6 +774,15 @@ objectdef isb2022_isb1transformer
         This:TransformBool[joTransform,ClickThrough,clickThrough]        
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
+    }
+
+    method AutoTransform_ClickBarButton_TextStyle(jsonvalueref joTransform)
+    {
+        This:TransformString[joTransform,Face,face,Tahoma]
+
+        This:TransformColor[joTransform,Color,color,"#ffffff"]
+        This:TransformInteger[joTransform,Size,size,12]
+        This:TransformBool[joTransform,Bold,bold,FALSE]
     }
 
     method AutoTransform_ClickBarButton_ClickActions(jsonvalueref joTransform)

@@ -49,6 +49,11 @@ objectdef isb2022_importer
         {
             jo:SetByRef[gameMacroSheets,jRef]
         }
+        jRef:SetReference[This.ConvertVariableKeystrokes]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[gameKeyBindings,jRef]
+        }
         
         return jo
     }
@@ -338,14 +343,27 @@ objectdef isb2022_importer
     member:jsonvalueref ConvertVariableKeystroke(jsonvalueref jo)
     {
         echo "ConvertVariableKeystroke ${jo~}"
-        return NULL
+
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+        if ${jo.Has[Description]}
+            joNew:SetString[description,"${jo.Get[Description]~}"]
+        if ${jo.Has[Category]}
+            joNew:SetString[category,"${jo.Get[Category]~}"]
+        if ${jo.Has[defaultValue,Combo]}
+            joNew:SetString[keyCombo,"${jo.Get[defaultValue,Combo]~}"]
+
+        return joNew
     }
 
     member:jsonvalueref ConvertWindowLayout(jsonvalueref jo)
     {
         echo "ConvertWindowLayout ${jo~}"
-
         return NULL
+        variable jsonvalue joNew="{}"
+
+        return joNew
     }
 
     member:jsonvalueref ConvertWoWMacroSet(jsonvalueref jo)
@@ -360,7 +378,8 @@ objectdef isb2022_importer
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
         joNew:SetString[game,"World of Warcraft"]
-        joNew:SetString[description,"${jo.Get[Description]~}"]
+        if ${jo.Has[Description]}
+            joNew:SetString[description,"${jo.Get[Description]~}"]
 
         variable jsonvalue ja="[]"
 

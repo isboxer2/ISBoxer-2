@@ -295,13 +295,23 @@ objectdef isb2022_isb1transformer
         This:AutoTransform[joProfile,"WoWMacroSet"]
     }    
 
-    method TransformSingleToArray(jsonvalueref joTransform, string property)
+    method TransformSingleToArray(jsonvalueref joTransform, string property, bool spam=0)
     {
+        if ${spam}
+        {
+            echo "\ayTransformSingleToArray[${property~}]:\ax ${joTransform~}"
+        }
         variable jsonvalueref joEntry
         joEntry:SetReference["joTransform.Get[\"${property~}\"]"]
 
         if !${joEntry.Type.Equal[object]}
+        {
+            if ${spam}
+            {
+                echo "\ayTransformSingleToArray:\ax not object"
+            }
             return
+        }
 
         variable jsonvalue ja="[]"
         if ${joEntry.Used} == 1        
@@ -492,10 +502,14 @@ objectdef isb2022_isb1transformer
         return "AutoTransform_${name~}"
     }
 
-    method AutoTransform(jsonvalueref joTransform, string name, string prefix)
+    method AutoTransform(jsonvalueref joTransform, string name, string prefix, bool spam=0)
     {    
         if !${joTransform.Type.Equal[object]}
         {
+            if !${spam}
+            {
+                echo "AutoTransform: type not object"
+            }
             return
         }
 
@@ -505,6 +519,10 @@ objectdef isb2022_isb1transformer
 ;        echo AutoTransform trying ${methodName~}
         if !${This(type).Method["${methodName~}"]}
         {
+            if !${spam}
+            {
+                echo "AutoTransform: no method ${methodName~}"
+            }
             return
         }
         variable jsonvalueref jVal
@@ -514,11 +532,14 @@ objectdef isb2022_isb1transformer
             variable string cmd
             cmd:Set["This:${methodName~}[jVal]"]
 
- ;           echo "executing ${cmd~}"
+            if ${spam}
+               echo "AutoTransform: executing ${cmd~}"
             execute "${cmd~}"
         }
         elseif ${jVal.Type.Equal[array]}
         {
+            if ${spam}
+                echo "AutoTransform: jsonarray:ForEach"
             jVal:ForEach["This:${methodName~}[ForEach.Value]"]
         }
     }
@@ -617,7 +638,7 @@ objectdef isb2022_isb1transformer
 
     method AutoTransform_CharacterSet_Slots(jsonvalueref joTransform)
     {
-        echo "\arAutoTransform_CharacterSet_Slots\ax ${joTransform~}"
+;        echo "\arAutoTransform_CharacterSet_Slots\ax ${joTransform~}"
 
         This:TransformSingleToArrayValues[joTransform,FTLModifiers]
         This:TransformSingleToArrayValues[joTransform,CPUCores]
@@ -730,7 +751,7 @@ objectdef isb2022_isb1transformer
 
     method AutoTransform_ClickBar(jsonvalueref joTransform)
     {
-;        echo "AutoTransform_ClickBar ${joTransform~}"
+;        echo "\ayAutoTransform_ClickBar\ax ${joTransform~}"
 
         This:TransformSingleToArray[joTransform,Buttons]
 
@@ -756,9 +777,9 @@ objectdef isb2022_isb1transformer
 
     method AutoTransform_ClickBar_Buttons(jsonvalueref joTransform)
     {
-;        echo "AutoTransform_ClickBar_Buttons ${joTransform~}"
+;        echo "\ayAutoTransform_ClickBar_Buttons\ax ${joTransform~}"
 
-        Thos:TransformSingleToArray[joTransform,"ClickActions"]
+        This:TransformSingleToArray[joTransform,"ClickActions"]
 
         This:TransformString[joTransform,Name,name]
         This:TransformString[joTransform,Text,text]
@@ -1184,7 +1205,7 @@ objectdef isb2022_xmlreader
         if ${AutoArray} && ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
-            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]}
+            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]}
             {
 ;                echo "\ayConvertNodeToObject\ax ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"

@@ -59,6 +59,11 @@ objectdef isb2022_importer
         {
             jo:SetByRef[computers,jRef]
         }
+        jRef:SetReference[This.ConvertClickBars]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[clickBars,jRef]
+        }
         
         return jo
     }
@@ -339,11 +344,61 @@ objectdef isb2022_importer
         return NULL
     }
 
+    member:jsonvalueref ConvertClickBarButton(jsonvalueref jo)
+    {
+        echo "ConvertClickBarButton ${jo~}"
+
+        variable jsonvalue joNew="{}"
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+        joNew:SetString[text,"${jo.Get[text]~}"]
+        joNew:SetBool[enabled,"${jo.GetBool[enabled]~}"]
+
+        variable jsonvalue ja="[]"
+        if ${jo.Has[ClickActions]}
+        {
+            jo.Get[ClickActions]:ForEach["ja:AddByRef[\"This.ConvertClickAction[ForEach.Value]\"]"]            
+
+            if ${ja.Used}
+                joNew:SetByRef[clicks,ja]    
+        }        
+
+        return joNew
+    }
+
     member:jsonvalueref ConvertClickBar(jsonvalueref jo)
     {
         echo "ConvertClickBar ${jo~}"
 
-        return NULL
+        variable jsonvalue joNew="{}"
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+        if ${jo.Has[enable]}
+            joNew:SetBool[enable,"${jo.GetBool[enable]}"]
+
+        if ${jo.Has[alpha]}
+            joNew:SetInteger[alpha,"${jo.GetInteger[alpha]}"]
+        if ${jo.Has[x]}
+            joNew:SetInteger[x,"${jo.GetInteger[x]}"]
+        if ${jo.Has[y]}
+            joNew:SetInteger[y,"${jo.GetInteger[y]}"]
+        if ${jo.Has[rows]}
+            joNew:SetInteger[rows,"${jo.GetInteger[rows]}"]
+        if ${jo.Has[columns]}
+            joNew:SetInteger[columns,"${jo.GetInteger[columns]}"]
+        if ${jo.Has[rowHeight]}
+            joNew:SetInteger[rowHeight,"${jo.GetInteger[rowHeight]}"]
+        if ${jo.Has[columnWidth]}
+            joNew:SetInteger[columnWidth,"${jo.GetInteger[columnWidth]}"]
+
+        variable jsonvalue ja="[]"
+        if ${jo.Has[Buttons]}
+        {
+            jo.Get[Buttons]:ForEach["ja:AddByRef[\"This.ConvertClickBarButton[ForEach.Value]\"]"]            
+
+            if ${ja.Used}
+                joNew:SetByRef[buttons,ja]    
+        }        
+
+        return joNew
     }
 
     member:jsonvalueref ConvertClickBarImage(jsonvalueref jo)

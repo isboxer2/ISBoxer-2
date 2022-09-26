@@ -87,6 +87,14 @@ objectdef isb2022_importer
 #endregion
 
 #region Mass Conversion -- Fully implemented
+    member:jsonvalueref ConvertActionTimerPools()
+    {
+        variable jsonvalue ja="[]"
+        ISBProfile.Get[ActionTimerPool]:ForEach["ja:AddByRef[\"This.ConvertActionTimerPool[ForEach.Value]\"]"]
+
+        return ja
+    }
+
     member:jsonvalueref ConvertCharacters()
     {
         variable jsonvalue ja="[]"
@@ -310,6 +318,13 @@ objectdef isb2022_importer
 
         joNew:SetByRef[hotkeys,ja]    
         return joNew
+    }
+
+    member:jsonvalueref ConvertActionTimerPool(jsonvalueref jo)
+    {
+        echo "ConvertActionTimerPool ${jo~}"
+
+        return NULL
     }
 
     member:jsonvalueref ConvertClickBar(jsonvalueref jo)

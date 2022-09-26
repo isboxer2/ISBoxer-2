@@ -54,6 +54,11 @@ objectdef isb2022_importer
         {
             jo:SetByRef[gameKeyBindings,jRef]
         }
+        jRef:SetReference[This.ConvertComputers]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[computers,jRef]
+        }
         
         return jo
     }
@@ -341,11 +346,65 @@ objectdef isb2022_importer
         return NULL
     }
 
+    member:jsonvalueref ConvertUserScreen(jsonvalueref jo)
+    {
+        echo "ConvertUserScreen ${jo~}"
+
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[deviceName,"${jo.Get[deviceName]~}"]
+
+        if ${jo.Has[primary]}
+            joNew:SetBool[primary,${jo.GetBool[primary]}]
+
+        if ${jo.Has[bounds]}
+            joNew:Set[bounds,"${jo.Get[bounds]~}"]
+        if ${jo.Has[workingArea]}
+            joNew:Set[workingArea,"${jo.Get[workingArea]~}"]
+
+        return joNew
+    }
+
+    member:jsonvalueref ConvertUserScreenSet(jsonvalueref jo)
+    {
+        echo "ConvertUserScreenSet ${jo~}"
+
+        variable jsonvalue joNew="{}"
+
+        if ${jo.Has[name]}
+            joNew:SetString[name,"${jo.Get[name]~}"]
+        
+        variable jsonvalue ja="[]"
+        if ${jo.Has[AllScreens]}
+        {
+            jo.Get[AllScreens]:ForEach["ja:AddByRef[\"This.ConvertUserScreen[ForEach.Value]\"]"]            
+
+            if ${ja.Used}
+                joNew:SetByRef[screens,ja]    
+        }        
+
+        return joNew
+    }
+
     member:jsonvalueref ConvertComputer(jsonvalueref jo)
     {
         echo "ConvertComputer ${jo~}"
+        variable jsonvalue joNew="{}"
 
-        return NULL
+        joNew:SetString[name,"${jo.Get[name]~}"]
+        if ${jo.Has[host]}
+            joNew:SetString[host,"${jo.Get[host]~}"]
+        if ${jo.Has[port]}
+            joNew:SetInteger[port,"${jo.GetInteger[port]}"]
+        if ${jo.Has[processorCount]}
+            joNew:SetInteger[cpuCount,"${jo.GetInteger[processorCount]}"]
+
+        if ${jo.Has[ScreenSet]}
+        {
+            joNew:SetByRef["screenSet","This.ConvertUserScreenSet[\"jo.Get[ScreenSet]\"]"]
+        }
+
+        return joNew
     }
 
     member:jsonvalueref ConvertRepeaterProfile(jsonvalueref jo)

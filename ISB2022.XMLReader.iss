@@ -263,6 +263,7 @@ objectdef isb2022_isb1transformer
         This:TransformSingleToArray[joProfile,"CharacterSet"]
         This:TransformSingleToArray[joProfile,"Character"]
         This:TransformSingleToArray[joProfile,"ClickBar"]
+        This:TransformSingleToArray[joProfile,"Computer"]
         This:TransformSingleToArray[joProfile,"KeyMap"]
         This:TransformSingleToArray[joProfile,"Menu"]
         This:TransformSingleToArray[joProfile,"MenuButtonSet"]
@@ -280,6 +281,7 @@ objectdef isb2022_isb1transformer
         This:AutoTransform[joProfile,"CharacterSet"]
         This:AutoTransform[joProfile,"Character"]
         This:AutoTransform[joProfile,"ClickBar"]        
+        This:AutoTransform[joProfile,"Computer"]        
         This:AutoTransform[joProfile,"KeyMap"]
         This:AutoTransform[joProfile,"Menu"]
         This:AutoTransform[joProfile,"MenuButtonSet"]
@@ -364,6 +366,23 @@ objectdef isb2022_isb1transformer
             joTransform:SetBool["${newProperty~}","${joTransform.Get["${oldProperty~}"].GetBool[Value]}"]
             joTransform:Erase["${oldProperty~}"]
         }
+    }
+
+    method TransformRect(jsonvalueref joTransform, string oldProperty, string newProperty)
+    {
+        variable jsonvalueref jo
+        jo:SetReference["joTransform.Get[\"${oldProperty~}\"]"]
+        if !${jo.Type.Equal[object]}
+            return
+
+        variable jsonvalue ja="[]"
+        ja:AddInteger["${jo.GetInteger[Left]}"]
+        ja:AddInteger["${jo.GetInteger[Top]}"]
+        ja:AddInteger["${jo.GetInteger[Width]}"]
+        ja:AddInteger["${jo.GetInteger[Height]}"]
+
+        joTransform:SetByRef["${newProperty~}",ja]
+        joTransform:Erase["${oldProperty~}"]
     }
 
     method TransformSize(jsonvalueref joTransform, string oldProperty, string newProperty)
@@ -463,7 +482,7 @@ objectdef isb2022_isb1transformer
 
     member:string GetMethodName(string name, string prefix)
     {
-        if ${prefix.NotNULLOrEmpty}
+        if ${prefix.NotNULLOrEmpty} && ${This(type).Method["AutoTransform_${prefix~}_${name~}"]}
             return "AutoTransform_${prefix~}_${name~}"        
         return "AutoTransform_${name~}"
     }
@@ -471,15 +490,18 @@ objectdef isb2022_isb1transformer
     method AutoTransform(jsonvalueref joTransform, string name, string prefix)
     {    
         if !${joTransform.Type.Equal[object]}
+        {
             return
+        }
 
         variable string methodName
         methodName:Set["${This.GetMethodName["${name~}","${prefix~}"]}"]
 
 ;        echo AutoTransform trying ${methodName~}
         if !${This(type).Method["${methodName~}"]}
+        {
             return
-
+        }
         variable jsonvalueref jVal
         jVal:SetReference["joTransform.Get[\"${name~}\"]"]
         if ${jVal.Type.Equal[object]}
@@ -590,7 +612,7 @@ objectdef isb2022_isb1transformer
 
     method AutoTransform_CharacterSet_Slots(jsonvalueref joTransform)
     {
-;        echo "AutoTransform_CharacterSet_Slots ${joTransform~}"
+        echo "\arAutoTransform_CharacterSet_Slots\ax ${joTransform~}"
 
         This:TransformSingleToArrayValues[joTransform,FTLModifiers]
         This:TransformSingleToArrayValues[joTransform,CPUCores]
@@ -613,6 +635,18 @@ objectdef isb2022_isb1transformer
         This:AutoTransform[joTransform,"VariableKeystrokeInstances"]
     }
 
+    method AutoTransform_Computer(jsonvalueref joTransform)
+    {
+;        echo "\arAutoTransform_Computer ${joTransform~}"
+
+        This:TransformInteger[joTransform,"Port","port"]
+        This:TransformInteger[joTransform,"ProcessorCount","processorCount"]
+        This:TransformString[joTransform,Host,host]
+        This:TransformString[joTransform,UplinkName,uplinkName]
+        This:TransformString[joTransform,Name,name]
+
+        This:AutoTransform[joTransform,"ScreenSet","Computer"]
+    }
 
     method AutoTransform_KeyMap(jsonvalueref joTransform)
     {
@@ -926,6 +960,10 @@ objectdef isb2022_isb1transformer
     method AutoTransform_WindowLayout(jsonvalueref joTransform)
     {
         This:TransformSingleToArray[joTransform,Regions]
+        This:TransformSingleToArray[joTransform,SwapGroups]
+
+        This:TransformString[joTransform,Name,name]
+        This:TransformString[joTransform,Description,description]
 
         This:TransformString[joTransform,SwapMode,swapMode,Never]
         This:TransformString[joTransform,FocusClickMode,focusClickMode,ApplicationDefined]
@@ -935,6 +973,8 @@ objectdef isb2022_isb1transformer
 
         This:AutoTransform[joTransform,Regions,WindowLayout]
         This:AutoTransform[joTransform,SwapGroups,WindowLayout]
+
+        This:AutoTransform[joTransform,UserScreenSet,WindowLayout]
     }
 
     method AutoTransform_WindowLayout_Regions(jsonvalueref joTransform)
@@ -942,9 +982,14 @@ objectdef isb2022_isb1transformer
         This:TransformInteger[joTransform,CharacterSetSlot,characterSetSlot]
         This:TransformInteger[joTransform,SwapGroup,swapGroup]
 
+        This:TransformString[joTransform,Name,name]
+        This:TransformString[joTransform,Description,description]
+
         This:TransformBool[joTransform,Permanent,permanent]
         This:TransformString[joTransform,BorderStyle,borderStyle,None]
         This:TransformString[joTransform,AlwaysOnTopMode,alwaysOnTopMode,Normal]
+
+        This:TransformRect[joTransform,Rect,rect]
     }
 
     method AutoTransform_WindowLayout_SwapGroups(jsonvalueref joTransform)
@@ -954,6 +999,36 @@ objectdef isb2022_isb1transformer
         This:TransformInteger[joTransform,_PiPSqueakSlot,pipSqueakSlot]
         This:TransformInteger[joTransform,_ResetRegion,resetRegion,-1]
     }
+
+    method AutoTransform_UserScreenSet(jsonvalueref joTransform)
+    {
+        This:AutoTransform_ScreenSet[joTransform]
+    }
+
+    method AutoTransform_ScreenSet(jsonvalueref joTransform)
+    {
+;        echo "AutoTransform_ScreenSet ${joTransform~}"
+        This:TransformString[joTransform,Name,name]
+
+        This:TransformSingleToArray[joTransform,AllScreens]
+
+        This:AutoTransform[joTransform,AllScreens,ScreenSet]
+    }
+
+    method AutoTransform_ScreenSet_AllScreens(jsonvalueref joTransform)
+    {
+;        echo "AutoTransform_ScreenSet_AllScreens ${joTransform~}"
+
+        This:TransformString[joTransform,DeviceName,deviceName]
+
+        This:TransformInteger[joTransform,DPIScale,dpiScale,100]
+        This:TransformBool[joTransform,Primary,primary]
+
+        This:TransformRect[joTransform,Bounds,bounds]
+        This:TransformRect[joTransform,WorkingArea,workingArea]
+    }
+
+    
 }
 
 objectdef isb2022_xmlreader
@@ -1091,9 +1166,9 @@ objectdef isb2022_xmlreader
         if ${AutoArray} && ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
-            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]}
+            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]}
             {
-;                echo "ConvertNodeToObject ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
+;                echo "\ayConvertNodeToObject\ax ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"
             }
         }

@@ -133,22 +133,14 @@ objectdef isb2022_profile
 
     member:jsonvalueref FindOne(string arrayName,string objectName)
     {
-        variable jsoniterator Iterator
-        noop ${This.${arrayName}:GetIterator[Iterator]}
-
-        if !${Iterator:First(exists)}
-            return NULL
-
-        do
+        variable jsonvalue joSelect="$$>
         {
-            if ${objectName.Equal["${Iterator.Value.Get[name]~}"]}
-            {
-                return Iterator.Value
-            }
+            "eval":"Select.Get[name]",
+            "op":"==",
+            "value":${objectName.AsJSON~}
         }
-        while ${Iterator:Next(exists)}
-
-        return NULL
+        <$$"
+        return "This.${arrayName~}.SelectValue[joSelect]"
     }
 }
 
@@ -250,6 +242,40 @@ objectdef isb2022_profilecollection
         Profiles:GetIterator[Iterator]
 
         if !${Iterator:First(exists)}
+        {
+ ;           echo "FindOne[${arrayName~},${objectName~}] !Iterator:First"
+            return NULL
+        }
+        do
+        {
+            if ${Iterator.Value.Priority} > ${foundPriority}
+            {
+                checkObject:SetReference["Iterator.Value.FindOne[\"${arrayName~}\",\"${objectName~}\"]"]
+;                echo checkObject:SetReference["Iterator.Value.FindOne[\"${arrayName~}\",\"${objectName~}\"]"]
+;                echo "FindOne: Profile ${Iterator.Key~} had ${checkObject~}"
+                if ${checkObject.Type.Equal[object]}
+                {
+                    foundObject:SetReference[checkObject]
+                    foundPriority:Set[${Iterator.Value.Priorioty}]
+                }
+            }
+        }
+        while ${Iterator:Next(exists)}
+
+        return foundObject
+    }
+
+    member:jsonvalueref Locate(string arrayName,string objectName)
+    {
+        variable uint foundPriority=0
+        variable jsonvalue result
+
+        variable jsonvalueref checkObject
+
+        variable iterator Iterator
+        Profiles:GetIterator[Iterator]
+
+        if !${Iterator:First(exists)}
             return NULL
 
         do
@@ -259,14 +285,16 @@ objectdef isb2022_profilecollection
                 checkObject:SetReference["Iterator.Value.FindOne[\"${arrayName~}\",\"${objectName~}\"]"]
                 if ${checkObject.Type.Equal[object]}
                 {
-                    foundObject:Set[checkObject]
+                    result:SetValue["{}"]
+                    result:SetString["profile","${Iterator.Key~}"]
+                    result:SetByRef["object",checkObject]
                     foundPriority:Set[${Iterator.Value.Priorioty}]
                 }
             }
         }
         while ${Iterator:Next(exists)}
 
-        return foundObject
+        return result
     }
 }
 

@@ -165,6 +165,25 @@ objectdef isb2022_profilecollection
     }
     /**/
 
+    member:jsonvalueref GetLoadedFilenames()
+    {
+        variable set Filenames
+        Profiles:ForEach["Filenames:Add[\"\${ForEach.Value.LocalFilename~}\"]"]
+
+        variable jsonvalue ja
+        ja:SetValue["${Filenames.AsJSON~}"]
+        return ja
+    }
+
+    method LoadFiles(jsonvalueref jaFilenames)
+    {
+        if !${jaFilenames.Type.Equal[array]}
+            return FALSE
+
+        jaFilenames:ForEach["This:LoadFile[\"\${ForEach.Value~}\"]"]
+        return TRUE
+    }
+
     method LoadFolder(filepath filePath)
     {
         echo LoadFolder ${filePath~}
@@ -231,7 +250,7 @@ objectdef isb2022_profilecollection
         LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated] 
     }
 
-    member:jsonvalueref FindOne(string arrayName,string objectName)
+    member:jsonvalueref FindOne(string arrayName,string objectName, string preferProfile="")
     {
         variable uint foundPriority=0
         variable jsonvalueref foundObject
@@ -239,6 +258,14 @@ objectdef isb2022_profilecollection
         variable jsonvalueref checkObject
 
         variable iterator Iterator
+
+        if !${preferProfile.NotNULLOrEmpty}
+        {
+            checkObject:SetReference["Profiles.Get[\"${preferProfile~}\"].FindOne[\"${arrayName~}\",\"${objectName~}\"]"]
+            if ${checkObject.Type.Equal[object]}
+                return checkObject            
+        }
+
         Profiles:GetIterator[Iterator]
 
         if !${Iterator:First(exists)}
@@ -265,12 +292,24 @@ objectdef isb2022_profilecollection
         return foundObject
     }
 
-    member:jsonvalueref Locate(string arrayName,string objectName)
+    member:jsonvalueref Locate(string arrayName,string objectName, string preferProfile="")
     {
         variable uint foundPriority=0
         variable jsonvalue result
 
         variable jsonvalueref checkObject
+
+        if !${preferProfile.NotNULLOrEmpty}
+        {
+            checkObject:SetReference["Profiles.Get[\"${preferProfile~}\"].FindOne[\"${arrayName~}\",\"${objectName~}\"]"]
+            if ${checkObject.Type.Equal[object]}
+            {
+                result:SetValue["{}"]
+                result:SetString["profile","${Iterator.Key~}"]
+                result:SetByRef["object",checkObject]
+                return result
+            }
+        }
 
         variable iterator Iterator
         Profiles:GetIterator[Iterator]

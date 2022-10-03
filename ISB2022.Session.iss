@@ -17,9 +17,9 @@ objectdef isb2022session inherits isb2022_profileengine
             return
         }
 
-        if ${InnerSpace.Build} < 6998
+        if ${InnerSpace.Build} < 7012
         {
-            echo "ISBoxer 2022 inactive; Inner Space build 6998 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2022 inactive; Inner Space build 7011 or later required (currently ${InnerSpace.Build})"
             return
         }
 
@@ -27,11 +27,33 @@ objectdef isb2022session inherits isb2022_profileengine
     
         LGUI2:LoadPackageFile[ISB2022.Session.lgui2Package.json]
         This:InstallDefaultActionTypes
+
+        if ${ISSession.Metadata.Has[isb2022]}
+        {
+            This:InstallFromSessionMetadata[ISSession.Metadata]
+        }
     }
 
     method Shutdown()
     {
         LGUI2:UnloadPackageFile[ISB2022.Session.lgui2Package.json]
+    }
+
+    method InstallFromSessionMetadata(jsonvalueref joMetadata)
+    {
+        echo "isb2022session:InstallFromSessionMetadata ${joMetadata~}"
+
+        ProfileDB:LoadFiles["joMetadata.Get[isb2022profiles]"]
+        
+        if ${joMetadata.Has[teamProfile]}
+            This:ActivateProfileByName["${joMetadata.Get[teamProfile]~}"]
+        if ${joMetadata.Has[characterProfile]}
+            This:ActivateProfileByName["${joMetadata.Get[characterProfile]~}"]
+
+        if ${joMetadata.Has[team]}
+            This:ActivateTeamByName["${joMetadata.Get[team,name]~}"]
+        if ${joMetadata.Has[character]}
+            This:ActivateCharacterByName["${joMetadata.Get[character,name]~}"]
     }
 
     method ActivateProfilesByName(jsonvalueref jaProfiles)

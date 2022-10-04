@@ -79,7 +79,7 @@ objectdef isb2_managedSlot
         Launcher:SetReference["SlotObserver.NewLauncher[joGLI]"]
         if ${Script.LastError.NotNULLOrEmpty}
         {
-            echo "isb2_managedSlot:Launch: error detected: ${Script.LastError~}"
+            Error:Set["${Script.LastError~}"]            
         }
         if !${Launcher.Reference(exists)}
         {
@@ -239,16 +239,22 @@ objectdef isb2_managedSlot
 
         jo:SetInteger["slot","${NumSlot}"]
 
-        if ${Launcher.Error.NotNULLOrEmpty}
-            jo:SetString["launcherError","${Launcher.Error~}"]
-
         jo:SetInteger["state",${State}]
+        jo:SetString["error","${This.GetError~}"]
         jo:SetByRef["launchInfo",joLaunchInfo]
         return jo
     }
 
+    member GetError()
+    {
+        if ${Launcher.Error.NotNULLOrEmpty}
+            return "${Launcher.Error~}"
+        return "${Error~}"
+    }
+
     variable sessionlauncher Launcher
     variable slotobserver SlotObserver
+    variable string Error
     variable uint NumSlot
 
     variable jsonvalueref joLaunchInfo
@@ -339,10 +345,10 @@ objectdef isb2_slotmanager
             }
 
             profileName:Set["${joTeam.Get[profile]~}"]
-            echo "Located team=${joTeam~}"
+;            echo "Located team=${joTeam~}"
             joTeam:SetReference["joTeam.Get[object]"]
 
-            echo "Located team=${joTeam~}"
+;            echo "Located team=${joTeam~}"
         }
 
         return ${This:LaunchTeam[joTeam,"${profileName~}"](exists)}

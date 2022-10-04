@@ -160,7 +160,50 @@
                                 "content":{
                                     "type":"dockpanel",
                                     "horizontalAlignment": "stretch",
-                                    "verticalAlignment": "stretch"                    
+                                    "verticalAlignment": "stretch",
+                                    "children":[
+                                        {
+                                            "type":"dockpanel",
+                                            "horizontalAlignment": "stretch",
+                                            "_dock":"top",
+                                            "padding":5,
+                                            "children":[
+                                                {
+                                                    "type":"button",
+                                                    "_dock":"right",
+                                                    "content":"Launch",
+                                                    "margin":[5,0,0,0],
+                                                    "eventHandlers":{
+                                                        "onPress":{
+                                                            "type":"method",
+                                                            "object":"ISB2",
+                                                            "method":"LaunchSelectedTeam"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "type":"textblock",
+                                                    "text":"Team: ",
+                                                    "_dock":"left",
+                                                    "verticalAlignment":"center"
+                                                },
+                                                {
+                                                    "type":"combobox",
+                                                    "_dock":"left",
+                                                    "horizontalAlignment":"stretch",
+                                                    "name":"isb2.launcher.teams",
+                                                    "itemsBinding":{
+                                                        "pullFormat":"${ISB2.SelectAllNames[Teams]}",
+                                                        "pullHook":{
+                                                            "elementName":"isb2.events",
+                                                            "flags":"global",
+                                                            "event":"onProfilesUpdated"
+                                                        }
+                                                    }                                            
+                                                }
+                                            ]
+                                        }
+                                    ]         
                                 }                                
                             },
                             {

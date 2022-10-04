@@ -33,6 +33,15 @@ objectdef isb2 inherits isb2_profilecollection
         SelectedProfile:SetReference["Profiles.Get[\"${name~}\"]"]
         LGUI2.Element[isb2.events]:FireEventHandler[onSelectedProfileChanged]
     }
+
+    method LaunchSelectedTeam()
+    {
+        variable string teamName="${LGUI2.Element[isb2.launcher.teams].SelectedItem.Data}"
+        if !${teamName.NotNULLOrEmpty}
+            return FALSE
+
+        return ${SlotManager:LaunchTeamByName["${teamName~}"]}
+    }
 }
 
 objectdef isb2_managedSlot

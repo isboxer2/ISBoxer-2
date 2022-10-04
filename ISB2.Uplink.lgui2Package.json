@@ -71,13 +71,34 @@
                 "margin":5,
                 "children":[
                     {
-                        "type":"textblock",
-                        "text":"Launching ...",
+                        "type":"dockpanel",
                         "_dock":"top",
-                        "font":{
-                            "heightFactor":2.0
-                        },
-                        "margin":[0,0,0,5]
+                        "horizontalAlignment":"stretch",
+                        "children":[
+                            {
+                                "type":"textblock",
+                                "text":"Launching ...",
+                                "_dock":"left",
+                                "verticalAlignment":"bottom",
+                                "font":{
+                                    "heightFactor":2.0
+                                },
+                                "margin":[0,0,0,5]        
+                            },
+                            {
+                                "type":"button",
+                                "_dock":"right",
+                                "verticalAlignment":"center",
+                                "content":"Copy to Clipboard",
+                                "eventHandlers":{
+                                    "onPress":{
+                                        "type":"method",
+                                        "object":"ISB2.SlotManager",
+                                        "method":"CopyStateToClipboard"
+                                    }
+                                }
+                            }
+                        ]
                     },
                     {
                         "type":"listbox",

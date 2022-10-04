@@ -247,6 +247,7 @@ objectdef isb2_managedSlot
         variable jsonvalueref jo="{}"
 
         jo:SetInteger["slot","${NumSlot}"]
+        jo:SetString["title","${This.Title~}"]
 
         jo:SetInteger["state",${State}]
         jo:SetString["error","${This.GetError~}"]
@@ -499,6 +500,11 @@ objectdef isb2_slotmanager
             LaunchingSlot.Value:Launch
         }
         while 1
+    }
+
+    method CopyStateToClipboard()
+    {
+        System:SetClipboardText["${Slots.AsJSON[array,multiline]~}"]        
     }
 
     variable iterator LaunchingSlot

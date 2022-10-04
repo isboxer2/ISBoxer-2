@@ -5,8 +5,8 @@
         {
             "name":"Character One",
             "gameLaunchInfo":{
-                "path":"d:/games/wow/_classic_",
-                "executable":"wow.exe"
+                "path":"C:/Program Files (x86)/World of Warcraft/_classic_",
+                "executable":"wowclassic.exe"
             }
         },
         {
@@ -14,6 +14,20 @@
             "gameLaunchInfo":{
                 "game": "WoW Classic",
                 "gameProfile": "WoW Classic Default Profile"
+            }
+        },
+        {
+            "name":"Character Three",
+            "gameLaunchInfo":{
+                "path":"x64",
+                "executable":"dxnothing.exe"
+            }
+        },
+        {
+            "name":"Character Four",
+            "gameLaunchInfo":{
+                "game":"World of Warcraft",
+                "gameProfile":"World of Warcraft Classic Client"
             }
         }
     ],
@@ -26,6 +40,12 @@
                 },
                 {
                     "character":"Character Two"
+                },
+                {
+                    "character":"Character Three"
+                },
+                {
+                    "character":"Character Four"
                 }
             ],
             "profiles":[

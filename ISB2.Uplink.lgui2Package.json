@@ -10,7 +10,11 @@
         "isb2.slotmanager.slotView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
-                "content":{
+            "borderThickness":[0,0,0,1],
+            "borderBrush":{
+                "color":"#333333"
+            },
+            "content":{
                     "type":"dockpanel",
                     "contextBinding":{
                         "pullFormat":"${ISB2.SlotManager.Slots.Get[${_CONTEXTITEMDATA_.Get[slot]}]}"
@@ -24,7 +28,7 @@
                             },
                             "text":"${This.Context.NumSlot}",
                             "verticalAlignment":"center",
-                            "margin":[5,0,5,0]
+                            "margin":[10,0,15,0]
                         },
                         {
                             "_dock":"top",
@@ -38,12 +42,7 @@
                         {
                             "_dock":"top",
                             "type":"textblock",
-                            "text":"${This.Context.Launcher.Error}"        
-                        },
-                        {
-                            "_dock":"top",
-                            "type":"textblock",
-                            "text":"${This.Context.AsJSON}"        
+                            "text":"${This.Context.GetError}"        
                         }
                     ]
                 }

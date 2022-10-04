@@ -131,6 +131,23 @@ objectdef isb2_profile
         return FALSE
     }
 
+    member:jsonvalueref SelectNames(string arrayName)
+    {
+        if !${arrayName.NotNULLOrEmpty}
+            return NULL
+
+        variable set Names
+
+        variable jsonvalueref ja="This.${arrayName~}"
+
+        ja:ForEach["Names:Add[\"\${ForEach.Value.Get[name]~}\"]"]
+
+        variable jsonvalue jaOutput
+        jaOutput:SetValue["${Names.AsJSON~}"]
+
+        return jaOutput
+    }
+
     member:jsonvalueref FindOne(string arrayName,string objectName)
     {
         variable jsonvalue joSelect="$$>
@@ -248,6 +265,18 @@ objectdef isb2_profilecollection
 
         ; fire an event for the GUI to refresh its Profiles if needed
         LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated] 
+    }
+
+    member:jsonvalueref SelectAllNames(string arrayName)
+    {
+        variable set Names
+
+        Profiles:ForEach["ForEach.Value.SelectNames[\"${arrayName~}\"]:ForEach[\"Names:Add[\"\\\${ForEach.Value~}\"]\"]"]
+
+        variable jsonvalue ja
+        ja:SetValue["${Names.AsJSON~}"]
+
+        return ja
     }
 
     member:jsonvalueref FindOne(string arrayName,string objectName, string preferProfile="")

@@ -356,7 +356,7 @@ objectdef isb2_slotmanager
 
     method AddTeamLaunchSlot(jsonvalueref ja, jsonvalueref joTeam, uint numSlot, jsonvalueref joSlot, jsonvalueref jo)
     {
-        echo "AddTeamLaunchSlot ${numSlot} ${joSlot~}"
+;        echo "AddTeamLaunchSlot ${numSlot} ${joSlot~}"
         jo:SetInteger["slot",${numSlot}]
         jo:SetString["character","${joSlot.Get[character]~}"]
         jo:SetByRef["team",joTeam]
@@ -365,7 +365,12 @@ objectdef isb2_slotmanager
 
     method LaunchTeam(jsonvalueref joTeam, string profileName="")
     {
-        echo "LaunchTeam[${profileName~}] ${joTeam~}"
+        if !${joTeam.Type.Equal[object]}
+        {
+            Script:SetLastError["LaunchTeam: expected json object"]
+            return FALSE
+        }
+;        echo "LaunchTeam[${profileName~}] ${joTeam~}"
         variable jsonvalue ja="[]"
 
         variable jsonvalue jo="{}"

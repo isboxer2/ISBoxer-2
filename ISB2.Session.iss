@@ -17,9 +17,9 @@ objectdef isb2session inherits isb2_profileengine
             return
         }
 
-        if ${InnerSpace.Build} < 7013
+        if ${InnerSpace.Build} < 7014
         {
-            echo "ISBoxer 2 inactive; Inner Space build 7013 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2 inactive; Inner Space build 7014 or later required (currently ${InnerSpace.Build})"
             return
         }
 

@@ -1,5 +1,5 @@
 {
-    "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
+    "$schema": "http://www.lavishsoft.com/schema/isb2.json",
     "name":"My Window Layout",
     "windowLayouts":[
         {

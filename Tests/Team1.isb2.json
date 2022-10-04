@@ -1,5 +1,5 @@
 {
-    "$schema": "http://www.lavishsoft.com/schema/isb2022.json",
+    "$schema": "http://www.lavishsoft.com/schema/isb2.json",
     "name":"Team 1",
     "characters":[
         {

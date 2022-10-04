@@ -1,5 +1,6 @@
 #include "ISB2.Common.iss"
 #include "ISB2.ProfileEngine.iss"
+#include "ISB2.WindowLayoutEngine.iss"
 
 ; run "ISBoxer 2/ISB2.Session"
 

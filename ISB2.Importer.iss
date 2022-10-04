@@ -1,5 +1,5 @@
-#include "ISB2022.XMLReader.iss"
-objectdef isb2022_importer
+#include "ISB2.XMLReader.iss"
+objectdef isb2_importer
 {
 
     variable jsonvalueref ISBProfile
@@ -7,7 +7,7 @@ objectdef isb2022_importer
 #region XML Transformers -- API Entry Points 
     method TransformXML(string filename)
     {
-        variable isb2022_isb1transformer ISB1Transformer
+        variable isb2_isb1transformer ISB1Transformer
 
         ISBProfile:SetReference["ISB1Transformer.TransformXML[\"${filename~}\"]"]
         
@@ -16,7 +16,7 @@ objectdef isb2022_importer
 
     member:jsonvalueref TransformProfileXML(string filename)
     {
-        variable isb2022_isb1transformer ISB1Transformer
+        variable isb2_isb1transformer ISB1Transformer
         variable jsonvalue jo="{}"
         variable jsonvalueref jRef
 
@@ -72,19 +72,19 @@ objectdef isb2022_importer
     {
         variable jsonvalueref jo
         jo:SetReference["This.TransformProfileXML[\"${LavishScript.HomeDirectory~}/${filename~}\"]"]
-        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename~}.isb2022.json",multiline]
+        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename~}.isb2.json",multiline]
     }
 
     method TransformCurrentProfileXML()
     {
         variable jsonvalueref jo
         jo:SetReference["This.TransformProfileXML[\"${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.XML\"]"]
-        jo:WriteFile["${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.isb2022.json",multiline]
+        jo:WriteFile["${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.isb2.json",multiline]
     }
 
     member:jsonvalueref TransformRegionsXML(string filename)
     {
-        variable isb2022_isb1transformer ISB1Transformer
+        variable isb2_isb1transformer ISB1Transformer
 
         variable jsonvalueref joProfile
         joProfile:SetReference["ISB1Transformer.TransformRegionsXML[\"${filename~}\"]"]
@@ -94,7 +94,7 @@ objectdef isb2022_importer
 
     member:jsonvalueref TransformVideoFXXML(string filename)
     {
-        variable isb2022_isb1transformer ISB1Transformer
+        variable isb2_isb1transformer ISB1Transformer
 
         variable jsonvalueref joProfile
         joProfile:SetReference["ISB1Transformer.TransformVideoFXXML[\"${filename~}\"]"]

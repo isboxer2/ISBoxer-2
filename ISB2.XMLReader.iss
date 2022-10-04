@@ -1,4 +1,4 @@
-objectdef isb2022_isb1transformer
+objectdef isb2_isb1transformer
 {
     variable jsonvalueref ISBProfile
 
@@ -6,7 +6,7 @@ objectdef isb2022_isb1transformer
     member:jsonvalueref TransformXML(string filename)
     {
         ISBProfile:SetReference[NULL]
-        variable isb2022_xmlreader XMLReader
+        variable isb2_xmlreader XMLReader
         ISBProfile:SetReference["XMLReader.Read[\"${filename~}\"]"]
         if !${ISBProfile.Type.Equal[object]}
             return NULL
@@ -19,7 +19,7 @@ objectdef isb2022_isb1transformer
     {
         variable jsonvalueref joProfile
         
-        variable isb2022_xmlreader XMLReader
+        variable isb2_xmlreader XMLReader
         joProfile:SetReference["XMLReader.Read[\"${filename~}\",InnerSpaceSettings,1]"]
         if !${joProfile.Type.Equal[object]}
         {
@@ -36,7 +36,7 @@ objectdef isb2022_isb1transformer
     {
         variable jsonvalueref joProfile
         
-        variable isb2022_xmlreader XMLReader
+        variable isb2_xmlreader XMLReader
         joProfile:SetReference["XMLReader.Read[\"${filename~}\",InnerSpaceSettings,1]"]
         if !${joProfile.Type.Equal[object]}
         {
@@ -1070,7 +1070,7 @@ objectdef isb2022_isb1transformer
     
 }
 
-objectdef isb2022_xmlreader
+objectdef isb2_xmlreader
 {
     variable xmlreader XMLReader
 

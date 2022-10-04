@@ -1,7 +1,7 @@
-/* isb2022_profileengine: 
-    An active ISBoxer 2022 Profile collection
+/* isb2_profileengine: 
+    An active ISBoxer 2 Profile collection
 */
-objectdef isb2022_profileengine
+objectdef isb2_profileengine
 {
     ; a list of active Profiles
     variable set Profiles
@@ -12,13 +12,13 @@ objectdef isb2022_profileengine
     ; a distributed scope which shares data with the Team
     variable weakref TeamScope
 
-    variable collection:isb2022_hotkeysheet HotkeySheets
-    variable collection:isb2022_mappablesheet MappableSheets
-    variable collection:isb2022_regionsheet RegionSheets
-    variable collection:isb2022_gamemacrosheet GameMacroSheets
-    variable collection:isb2022_vfxsheet VFXSheets
-    variable collection:isb2022_triggerchain TriggerChains
-    variable collection:isb2022_clickbar ClickBars
+    variable collection:isb2_hotkeysheet HotkeySheets
+    variable collection:isb2_mappablesheet MappableSheets
+    variable collection:isb2_regionsheet RegionSheets
+    variable collection:isb2_gamemacrosheet GameMacroSheets
+    variable collection:isb2_vfxsheet VFXSheets
+    variable collection:isb2_triggerchain TriggerChains
+    variable collection:isb2_clickbar ClickBars
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -59,7 +59,7 @@ objectdef isb2022_profileengine
 
 
         variable jsonvalue ja
-        ja:SetValue["${LGUI2.Skin[default].Template[isb2022.data].Get[defaultActionTypes]~}"]
+        ja:SetValue["${LGUI2.Skin[default].Template[isb2.data].Get[defaultActionTypes]~}"]
 
 ;        echo "InstallDefaultActionTypes ${ja~}"
         This:InstallActionTypes[ja]
@@ -454,7 +454,7 @@ objectdef isb2022_profileengine
         variable jsonvalue joView
         joView:SetValue["$$>
         {
-            "name":"isb2022.vfx.${sheet~}.${name~}",
+            "name":"isb2.vfx.${sheet~}.${name~}",
             "type":"videofeed",
             "x":${joVFX.GetInteger[x]},
             "y":${joVFX.GetInteger[y]},
@@ -470,7 +470,7 @@ objectdef isb2022_profileengine
     method UninstallVFX(string sheet, string name, jsonvalueref joVFX)
     {
         echo "UninnstallVFX ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["isb2022.vfx.${sheet~}.${name~}"]:Destroy
+        LGUI2.Element["isb2.vfx.${sheet~}.${name~}"]:Destroy
 
         joVFX:SetInteger["elementID",0]
     }
@@ -483,9 +483,9 @@ objectdef isb2022_profileengine
         echo "InstallHotkey[${sheet~},${name~}] ${joHotkey~}"
         variable jsonvalue joBinding
         ; initialize a LGUI2 input binding object with JSON
-        variable string fullName="isb2022.hks.${sheet~}.${name~}"
-        variable string onPress="ISB2022:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},1]"
-        variable string onRelease="ISB2022:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},0]"
+        variable string fullName="isb2.hks.${sheet~}.${name~}"
+        variable string onPress="ISB2:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},1]"
+        variable string onRelease="ISB2:ExecuteHotkeyByName[${sheet.AsJSON~},${name.AsJSON~},0]"
         variable string keyCombo="${joHotkey.Get[keyCombo]~}"
 
         joBinding:SetValue["$$>
@@ -521,8 +521,8 @@ objectdef isb2022_profileengine
         if !${onPress.NotNULLOrEmpty} && !${onRelease.NotNULLOrEmpty}
         {
             ; defaults
-            onPress:Set["ISB2022:OnHotkeyState[${name.AsJSON~},1]"]
-            onRelease:Set["ISB2022:OnHotkeyState[${name.AsJSON~},0]"]
+            onPress:Set["ISB2:OnHotkeyState[${name.AsJSON~},1]"]
+            onRelease:Set["ISB2:OnHotkeyState[${name.AsJSON~},0]"]
         }
 
 
@@ -552,7 +552,7 @@ objectdef isb2022_profileengine
 
     method UninstallHotkey(string sheet, string name)
     {
-        variable string fullName="isb2022.hks.${sheet~}.${name~}"
+        variable string fullName="isb2.hks.${sheet~}.${name~}"
         This:UninstallHotkeyEx["${fullName~}"]
     }
 
@@ -641,7 +641,7 @@ objectdef isb2022_profileengine
         This:ActivateSlot["${This.GetCharacterSlot["${Character.Get[name]~}"]}"]
         This:ActivateProfilesByName["Character.Get[profiles]"]
 
-        LGUI2.Element[isb2022.events]:FireEventHandler[onCharacterChanged]
+        LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
     }
 
     method DeactivateTeam()
@@ -650,7 +650,7 @@ objectdef isb2022_profileengine
             return
 
         variable string qualifiedName
-        qualifiedName:Set["isb2022team_${Team.Get[name]~}"]
+        qualifiedName:Set["isb2team_${Team.Get[name]~}"]
         uplink relaygroup -leave "${qualifiedName~}"
 
         TeamScope:Remove
@@ -667,7 +667,7 @@ objectdef isb2022_profileengine
         Team:SetReference[jo]
 
         variable string qualifiedName
-        qualifiedName:Set["isb2022team_${Team.Get[name]~}"]
+        qualifiedName:Set["isb2team_${Team.Get[name]~}"]
         uplink relaygroup -join "${qualifiedName~}"
 
         This:ActivateProfilesByName["Team.Get[profiles]"]
@@ -688,7 +688,7 @@ objectdef isb2022_profileengine
 
         echo "ActivateTeam: TeamScope.active=${TeamScope.GetBool[active]}"
 
-        LGUI2.Element[isb2022.events]:FireEventHandler[onTeamChanged]
+        LGUI2.Element[isb2.events]:FireEventHandler[onTeamChanged]
     }
 
     method ActivateProfile(weakref _profile)
@@ -717,7 +717,7 @@ objectdef isb2022_profileengine
 
         echo ActivateProfile ${_profile.Name} complete.
 
-        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated]
+        LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated]
     }
 
     method DeactivateProfile(weakref _profile)
@@ -745,7 +745,7 @@ objectdef isb2022_profileengine
         This:UninstallCharacters[_profile.Characters]
         This:UninstallTeams[_profile.Teams]
 
-        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated]
+        LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated]
     }
 #endregion
 
@@ -835,8 +835,8 @@ objectdef isb2022_profileengine
         joActionState:SetByRef[state,joState]
         joActionState:SetBool[activate,${activate}]
 
-        relay "${useTarget~}" "noop \${ISB2022:RemoteAction[\"${joActionState~}\"]}"
-;        echo relay "${useTarget~}" "noop \${ISB2022:RemoteAction[\"${joActionState~}\"]}"
+        relay "${useTarget~}" "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
+;        echo relay "${useTarget~}" "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
         return TRUE
     }
 

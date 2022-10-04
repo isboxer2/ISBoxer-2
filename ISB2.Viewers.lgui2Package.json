@@ -1,8 +1,8 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
-    "skin":"ISBoxer 2022",
+    "skin":"ISBoxer 2",
     "templates": {
-        "isb2022.profileView":{
+        "isb2.profileView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -13,7 +13,7 @@
                 }
             }
         },
-        "isb2022.characterView":{
+        "isb2.characterView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -24,7 +24,7 @@
                 }
             }
         },
-        "isb2022.teamView":{
+        "isb2.teamView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -35,7 +35,7 @@
                 }
             }
         },
-        "isb2022.windowLayoutView":{
+        "isb2.windowLayoutView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -46,7 +46,7 @@
                 }
             }
         },
-        "isb2022.hotkeyView":{
+        "isb2.hotkeyView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -57,7 +57,7 @@
                 }
             }
         },
-        "isb2022.gameKeyBindingView":{
+        "isb2.gameKeyBindingView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -68,7 +68,7 @@
                 }
             }
         },
-        "isb2022.mappableSheetView":{
+        "isb2.mappableSheetView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -79,7 +79,7 @@
                 }
             }
         },
-        "isb2022.virtualFileView":{
+        "isb2.virtualFileView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{

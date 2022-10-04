@@ -1,14 +1,14 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
-    "skin":"ISBoxer 2022",
+    "skin":"ISBoxer 2",
     "templates": {
-        "isb2022.draggerWidths":{
+        "isb2.draggerWidths":{
             "default":200,
-            "isb2022.characterEditor":200,
-            "isb2022.teamEditor":200,
-            "isb2022.mappableSheetEditor":200
+            "isb2.characterEditor":200,
+            "isb2.teamEditor":200,
+            "isb2.mappableSheetEditor":200
         },
-        "isb2022.leftPane":{
+        "isb2.leftPane":{
             "_dock":"left",
             "_pane":"default",
             "type":"dragger",
@@ -20,21 +20,21 @@
             "eventHandlers":{
                 "onVisualAttached":{
                     "type":"code",
-                    "code":"This:SetSize[${LGUI2.Template[isb2022.draggerWidths].Get[${This.Metadata.Get[pane]}]},-1]"
+                    "code":"This:SetSize[${LGUI2.Template[isb2.draggerWidths].Get[${This.Metadata.Get[pane]}]},-1]"
                 },
                 "lostMouseCapture":{
                     "type":"code",
-                    "code":"LGUI2.Skin[default].Template[isb2022.draggerWidths]:Set[${This.Metadata.Get[pane]},${This.Width}]"
+                    "code":"LGUI2.Skin[default].Template[isb2.draggerWidths]:Set[${This.Metadata.Get[pane]},${This.Width}]"
                 }
             }
         },
-        "isb2022.characterEditor":{
+        "isb2.characterEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
                 {
-                    "jsonTemplate":"isb2022.leftPane",
-                    "_pane":"isb2022.characterEditor",
+                    "jsonTemplate":"isb2.leftPane",
+                    "_pane":"isb2.characterEditor",
                     "content":{
                         "type":"treepanel",
                         "verticalAlignment":"stretch",
@@ -109,13 +109,13 @@
                 }
             ]
         },
-        "isb2022.teamEditor":{
+        "isb2.teamEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
                 {
-                    "jsonTemplate":"isb2022.leftPane",
-                    "_pane":"isb2022.teamEditor",
+                    "jsonTemplate":"isb2.leftPane",
+                    "_pane":"isb2.teamEditor",
                     "content":{
                         "type":"treepanel",
                         "verticalAlignment":"stretch",
@@ -145,13 +145,13 @@
                 }
             ]
         },
-        "isb2022.mappableSheetEditor":{
+        "isb2.mappableSheetEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
                 {
-                    "jsonTemplate":"isb2022.leftPane",
-                    "_pane":"isb2022.mappableSheetEditor",
+                    "jsonTemplate":"isb2.leftPane",
+                    "_pane":"isb2.mappableSheetEditor",
                     "content":{
                         "type":"treepanel",
                         "verticalAlignment":"stretch",
@@ -181,7 +181,7 @@
                 }
             ]
         },
-        "isb2022.hotkeyEditor":{
+        "isb2.hotkeyEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
@@ -216,7 +216,7 @@
                 }
             ]
         },
-        "isb2022.gameKeyBindingEditor":{
+        "isb2.gameKeyBindingEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
@@ -251,7 +251,7 @@
                 }
             ]
         },
-        "isb2022.virtualFileEditor":{
+        "isb2.virtualFileEditor":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
@@ -286,7 +286,7 @@
                 }
             ]
         },
-        "isb2022.profileEditor":{
+        "isb2.profileEditor":{
             "type":"window",
             "jsonTemplate":"window",
             "title":"ISBoxer Profile: ${This.Context.Editing.Name}",
@@ -328,7 +328,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.characterView"
+                                                    "template":"isb2.characterView"
                                                 }
                                             },
                                             "eventHandlers":{
@@ -359,7 +359,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.teamView"
+                                                    "template":"isb2.teamView"
                                                 }
                                             },
                                             "eventHandlers":{
@@ -390,7 +390,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.mappableSheetView"
+                                                    "template":"isb2.mappableSheetView"
                                                 }
                                             },
                                             "eventHandlers":{
@@ -421,7 +421,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.gameKeyBindingView"
+                                                    "template":"isb2.gameKeyBindingView"
                                                 }
                                             },
                                             "eventHandlers":{
@@ -452,7 +452,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.windowLayoutView"
+                                                    "template":"isb2.windowLayoutView"
                                                 }
                                             },
                                             "eventHandlers":{
@@ -483,7 +483,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.virtualFileView"
+                                                    "template":"isb2.virtualFileView"
                                                 }
                                             },
                                             "eventHandlers":{

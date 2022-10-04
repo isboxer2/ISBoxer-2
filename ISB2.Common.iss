@@ -1,7 +1,7 @@
-/* isb2022_profile: 
-    A set of definitions for ISBoxer 2022. Like an ISBoxer Toolkit Profile, but preferably more generic.
+/* isb2_profile: 
+    A set of definitions for ISBoxer 2. Like an ISBoxer Toolkit Profile, but preferably more generic.
 */
-objectdef isb2022_profile
+objectdef isb2_profile
 {
     variable string LocalFilename
     variable uint Priority
@@ -81,7 +81,7 @@ objectdef isb2022_profile
 
         jo:SetValue["$$>
         {
-            "$schema":"http://www.lavishsoft.com/schema/isb2022.json",
+            "$schema":"http://www.lavishsoft.com/schema/isb2.json",
             "name":${Name.AsJSON~}
         }
         <$$"]
@@ -145,23 +145,23 @@ objectdef isb2022_profile
 }
 
 
-/* isb2022_profilecollection: 
-    A collection of ISBoxer 2022 profiles
+/* isb2_profilecollection: 
+    A collection of ISBoxer 2 profiles
 */
-objectdef isb2022_profilecollection
+objectdef isb2_profilecollection
 {
     ; The variable that contains the actual list
-    variable collection:isb2022_profile Profiles
+    variable collection:isb2_profile Profiles
 
-    variable collection:isb2022_profileeditor Editors
+    variable collection:isb2_profileeditor Editors
 
     variable uint LoadCount
 
     /*
     member:jsonvalueref ScanFolder(filepath filePath)
     {
-        echo ${filePath.GetFiles[*.isb2022.json]}
-        return "filePath.GetFiles[*.isb2022.json]"
+        echo ${filePath.GetFiles[*.isb2.json]}
+        return "filePath.GetFiles[*.isb2.json]"
     }
     /**/
 
@@ -187,7 +187,7 @@ objectdef isb2022_profilecollection
     method LoadFolder(filepath filePath)
     {
         echo LoadFolder ${filePath~}
-        filePath.GetFiles["*.isb2022.json"]:ForEach["This:LoadFile[\"${filePath~}/\${ForEach.Value.Get[filename]}\"]"]
+        filePath.GetFiles["*.isb2.json"]:ForEach["This:LoadFile[\"${filePath~}/\${ForEach.Value.Get[filename]}\"]"]
     }
 
     method OpenEditor(string profileName)
@@ -204,7 +204,7 @@ objectdef isb2022_profilecollection
     ; Loads a profile from a given file
     method LoadFile(filepath fileName)
     {
-        ; given a path like "Tests/WoW.isb2022.json" this turns it into like "C:/blah blah/Tests/isb2022.json"
+        ; given a path like "Tests/WoW.isb2.json" this turns it into like "C:/blah blah/Tests/isb2.json"
         fileName:MakeAbsolute
         
         ; parse the file into, hopefully, a json object
@@ -215,14 +215,14 @@ objectdef isb2022_profilecollection
         ; if we got something else, forget it
         if !${jo.Type.Equal[object]}
         {
-            echo "isb2022_profilecollection:LoadFile[${fileName~}]: expected JSON object, got ${jo.Type~}"
+            echo "isb2_profilecollection:LoadFile[${fileName~}]: expected JSON object, got ${jo.Type~}"
             return FALSE
         }
 
         ; a profile is required to have a name, so we can more easily work with multiple profiles!
         if !${jo.Has[name]}
         {
-            echo "isb2022_profilecollection:LoadFile[${fileName~}]: 'name' field required"
+            echo "isb2_profilecollection:LoadFile[${fileName~}]: 'name' field required"
             return FALSE
         }
 
@@ -234,12 +234,12 @@ objectdef isb2022_profilecollection
         ; Assign the Profile
         Profiles:Set["${name~}","jo",${LoadCount},"${fileName~}"]
 
-        ; the isb2022_profile object is now created, assign its LocalFilename
+        ; the isb2_profile object is now created, assign its LocalFilename
         Profiles.Get["${name~}"].LocalFilename:Set["${fileName~}"]
         echo "Profile added: ${name~}"
 
         ; fire an event for the GUI to refresh its Profiles if needed
-        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated] 
+        LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated] 
     }
 
     method RemoveProfile(string name)
@@ -247,7 +247,7 @@ objectdef isb2022_profilecollection
         Profiles:Erase["${name~}"]
 
         ; fire an event for the GUI to refresh its Profiles if needed
-        LGUI2.Element[isb2022.events]:FireEventHandler[onProfilesUpdated] 
+        LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated] 
     }
 
     member:jsonvalueref FindOne(string arrayName,string objectName, string preferProfile="")
@@ -337,7 +337,7 @@ objectdef isb2022_profilecollection
     }
 }
 
-objectdef isb2022_profileeditor
+objectdef isb2_profileeditor
 {
     variable weakref Editing
     variable weakref EditingItem
@@ -346,9 +346,9 @@ objectdef isb2022_profileeditor
     method Initialize(weakref _profile)
     {
         Editing:SetReference[_profile]
-        LGUI2:PushSkin["ISBoxer 2022"]
-        Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2022.profileEditor]",This].ID}"]
-        LGUI2:PopSkin["ISBoxer 2022"]
+        LGUI2:PushSkin["ISBoxer 2"]
+        Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2.profileEditor]",This].ID}"]
+        LGUI2:PopSkin["ISBoxer 2"]
     }
 
     method Shutdown()
@@ -378,7 +378,7 @@ objectdef isb2022_profileeditor
     method SetEditingItem(string editingType, uint editingNumber)
     {
         EditingItem:SetReference["Editing.${editingType~}s.Get[${editingNumber}]"]
-        Window.Locate["profile.editorContainer"]:SetChild["${LGUI2.Template[isb2022.${This.GetLowerCamelCase["${editingType~}"]}Editor]~}","EditingItem"]
+        Window.Locate["profile.editorContainer"]:SetChild["${LGUI2.Template[isb2.${This.GetLowerCamelCase["${editingType~}"]}Editor]~}","EditingItem"]
     }
 
     method OnCharacterSelected()
@@ -416,7 +416,7 @@ objectdef isb2022_profileeditor
     }
 }
 
-objectdef isb2022_clickbar
+objectdef isb2_clickbar
 {
     variable string Name
     
@@ -456,18 +456,18 @@ objectdef isb2022_clickbar
 
     method GotMouseFocus()
     {
-;        echo isb2022_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+;        echo isb2_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
     }
 
     method LostMouseFocus()
     {
-;        echo isb2022_clickbar:LostMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+;        echo isb2_clickbar:LostMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
     }
 
     method GotMouseOver()
     {
         variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
-;        echo isb2022_clickbar:GotMouseOver numButton=${numButton}
+;        echo isb2_clickbar:GotMouseOver numButton=${numButton}
 
         variable jsonvalueref joButton
         joButton:SetReference["Data.Get[buttons,${numButton}]"]
@@ -479,13 +479,13 @@ objectdef isb2022_clickbar
         if !${joButton.Has[mouseOver]}
             return
 
-        ISB2022:ExecuteInputMapping["joButton.Get[mouseover]",1]
+        ISB2:ExecuteInputMapping["joButton.Get[mouseover]",1]
     }
 
     method LostMouseOver()
     {
         variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
-;        echo isb2022_clickbar:LostMouseOver numButton=${numButton}
+;        echo isb2_clickbar:LostMouseOver numButton=${numButton}
 
         variable jsonvalueref joButton
         joButton:SetReference["Data.Get[buttons,${numButton}]"]
@@ -497,7 +497,7 @@ objectdef isb2022_clickbar
         if !${joButton.Has[mouseOver]}
             return
 
-        ISB2022:ExecuteInputMapping["joButton.Get[mouseover]",0]
+        ISB2:ExecuteInputMapping["joButton.Get[mouseover]",0]
     }
 
     member:bool ClickMatches(jsonvalueref joClick, jsonvalueref joMatch)
@@ -540,7 +540,7 @@ objectdef isb2022_clickbar
 
         joButton.Get[activeClicks]:Set[${joData.GetInteger[controlID]},"${joClick~}"]
 
-        ISB2022:ExecuteInputMapping["joClick.Get[inputMapping]",1]
+        ISB2:ExecuteInputMapping["joClick.Get[inputMapping]",1]
     }
 
     method OnButtonRelease(jsonvalueref joButton, jsonvalueref joData)
@@ -554,14 +554,14 @@ objectdef isb2022_clickbar
             return
 
         joButton.Get[activeClicks]:Set[${mouseButton},NULL]
-        ISB2022:ExecuteInputMapping["joClick.Get[inputMapping]",0]
+        ISB2:ExecuteInputMapping["joClick.Get[inputMapping]",0]
     }
 
     method OnMouseButtonMove()
     {
         variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
         variable bool pressed=${Context.Args.Get[position]}
-        echo isb2022_clickbar:OnMouseButtonMove numButton=${numButton} ${Context(type)} ${Context.Args} 
+        echo isb2_clickbar:OnMouseButtonMove numButton=${numButton} ${Context(type)} ${Context.Args} 
 
         variable jsonvalueref joButton
         joButton:SetReference["Data.Get[buttons,${numButton}]"]
@@ -592,14 +592,14 @@ objectdef isb2022_clickbar
 
     method GenerateButtonView()
     {
-        echo isb2022_clickbar:GenerateButtonView ${Context(type)} ${Context.Args}
-        ;isb2022_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
+        echo isb2_clickbar:GenerateButtonView ${Context(type)} ${Context.Args}
+        ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
         ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
         variable jsonvalue joButton
         joButton:SetValue["$$>
         {
-            "jsonTemplate":"isb2022.clickbarButton",
+            "jsonTemplate":"isb2.clickbarButton",
             "width":${This.GetButtonHeight},
             "height":${This.GetButtonWidth},
             "_numButton":${Context.Args.Get[numButton]}
@@ -612,17 +612,17 @@ objectdef isb2022_clickbar
 
     method CreateWindow()
     {
-        echo isb2022_clickbar:CreateWindow
+        echo isb2_clickbar:CreateWindow
         if ${Window.Reference(exists)}
             return
 
-        variable string useName="isb2022.cb.${Name~}"        
+        variable string useName="isb2.cb.${Name~}"        
 
         variable jsonvalue joWindow
         joWindow:SetValue["$$>
         {
             "type":"window",
-            "jsonTemplate":"isb2022.clickbar",
+            "jsonTemplate":"isb2.clickbar",
             "name":${useName.AsJSON~},
             "title":${Name.AsJSON~},
             "x":${Data.GetInteger[x]},
@@ -630,9 +630,9 @@ objectdef isb2022_clickbar
         }
         <$$"]
 
-        LGUI2:PushSkin["ISBoxer 2022"]
+        LGUI2:PushSkin["ISBoxer 2"]
         Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
-        LGUI2:PopSkin["ISBoxer 2022"]
+        LGUI2:PopSkin["ISBoxer 2"]
     }
 
     method FromJSON(jsonvalueref jo)
@@ -655,7 +655,7 @@ objectdef isb2022_clickbar
 
 }
 
-objectdef isb2022_triggerchain
+objectdef isb2_triggerchain
 {
     variable string Name
     variable jsonvalue Handlers="{}"
@@ -698,10 +698,10 @@ objectdef isb2022_triggerchain
     }
 }
 
-/* isb2022_hotkeysheet: 
+/* isb2_hotkeysheet: 
     
 */
-objectdef isb2022_hotkeysheet
+objectdef isb2_hotkeysheet
 {
     variable string Name
     variable bool Enabled
@@ -775,7 +775,7 @@ objectdef isb2022_hotkeysheet
             return
 
         ; install binding
-        ISB2022:InstallHotkey["${Name~}","${jo.Get[name]~}",jo]
+        ISB2:InstallHotkey["${Name~}","${jo.Get[name]~}",jo]
 
         jo:SetBool["enabled",1]
     }
@@ -788,13 +788,13 @@ objectdef isb2022_hotkeysheet
         if !${jo.Has[name]}
             return
         
-        ISB2022:UninstallHotkey["${Name~}","${jo.Get[name]~}"]
+        ISB2:UninstallHotkey["${Name~}","${jo.Get[name]~}"]
 
         jo:SetBool["enabled",0]
     }
 }
 
-objectdef isb2022_mappablesheet
+objectdef isb2_mappablesheet
 {
     variable string Name
 
@@ -857,7 +857,7 @@ objectdef isb2022_mappablesheet
     }    
 }
 
-objectdef isb2022_gamemacrosheet
+objectdef isb2_gamemacrosheet
 {
     variable string Name
     variable string Game
@@ -900,7 +900,7 @@ objectdef isb2022_gamemacrosheet
     }
 }
 
-objectdef isb2022_regionsheet
+objectdef isb2_regionsheet
 {
     variable string Name
     variable bool Enabled
@@ -945,7 +945,7 @@ objectdef isb2022_regionsheet
     }
 }
 
-objectdef isb2022_vfxsheet
+objectdef isb2_vfxsheet
 {
     variable string Name
     variable bool Enabled
@@ -1020,7 +1020,7 @@ objectdef isb2022_vfxsheet
         if !${jo.Has[name]}
             return
 
-        ISB2022:InstallVFX["${Name~}","${jo.Get[name]~}",jo]
+        ISB2:InstallVFX["${Name~}","${jo.Get[name]~}",jo]
 
         jo:SetBool["enabled",1]
     }
@@ -1033,7 +1033,7 @@ objectdef isb2022_vfxsheet
         if !${jo.Has[name]}
             return
         
-        ISB2022:UninstallVFX["${Name~}","${jo.Get[name]~}",jo]
+        ISB2:UninstallVFX["${Name~}","${jo.Get[name]~}",jo]
 
         jo:SetBool["enabled",0]
     }

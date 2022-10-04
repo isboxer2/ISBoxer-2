@@ -1,45 +1,45 @@
-#include "ISB2022.Common.iss"
-#include "ISB2022.Importer.iss"
+#include "ISB2.Common.iss"
+#include "ISB2.Importer.iss"
 
-objectdef isb2022 inherits isb2022_profilecollection
+objectdef isb2 inherits isb2_profilecollection
 {
     ; Reference to the currently selected Profile in the main window
     variable weakref SelectedProfile
 
-    variable isb2022_importer Importer
-    variable isb2022_slotmanager SlotManager
+    variable isb2_importer Importer
+    variable isb2_slotmanager SlotManager
 
     method Initialize()
     {
-        LGUI2:LoadPackageFile[ISB2022.Uplink.lgui2Package.json]
+        LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
     }
 
     method Shutdown()
     {
-        LGUI2:UnloadPackageFile[ISB2022.Uplink.lgui2Package.json]
+        LGUI2:UnloadPackageFile[ISB2.Uplink.lgui2Package.json]
     }
 
     method LoadTests()
     {
-        This:LoadFile["Tests/ISBPW.isb2022.json"]
-        This:LoadFile["Tests/MyWindowLayout.isb2022.json"]
-        This:LoadFile["Tests/Team1.isb2022.json"]
-        This:LoadFile["Tests/VariableFollowMe.isb2022.json"]
-        This:LoadFile["Tests/WoW.isb2022.json"]
+        This:LoadFile["Tests/ISBPW.isb2.json"]
+        This:LoadFile["Tests/MyWindowLayout.isb2.json"]
+        This:LoadFile["Tests/Team1.isb2.json"]
+        This:LoadFile["Tests/VariableFollowMe.isb2.json"]
+        This:LoadFile["Tests/WoW.isb2.json"]
     }
 
     method SelectProfile(string name)
     {
         SelectedProfile:SetReference["Profiles.Get[\"${name~}\"]"]
-        LGUI2.Element[isb2022.events]:FireEventHandler[onSelectedProfileChanged]
+        LGUI2.Element[isb2.events]:FireEventHandler[onSelectedProfileChanged]
     }
 }
 
-objectdef isb2022_managedSlot
+objectdef isb2_managedSlot
 {
     method Initialize(jsonvalueref joLaunch)
     {
-        echo "\agisb2022_managedSlot:Initialize\ax ${joLaunch~}"
+        echo "\agisb2_managedSlot:Initialize\ax ${joLaunch~}"
 
         NumSlot:Set[${joLaunch.GetInteger[slot]}]
 
@@ -71,15 +71,15 @@ objectdef isb2022_managedSlot
         if !${joGLI.Type.Equal[object]}
             return FALSE      
 
-        joLaunchInfo:SetBool[isb2022,1]
-        joLaunchInfo:SetByRef["isb2022profiles",ISB2022.GetLoadedFilenames]
+        joLaunchInfo:SetBool[isb2,1]
+        joLaunchInfo:SetByRef["isb2profiles",ISB2.GetLoadedFilenames]
         joGLI:SetByRef[metadata,joLaunchInfo]
 
         Script:SetLastError        
         Launcher:SetReference["SlotObserver.NewLauncher[joGLI]"]
         if ${Script.LastError.NotNULLOrEmpty}
         {
-            echo "isb2022_managedSlot:Launch: error detected: ${Script.LastError~}"
+            echo "isb2_managedSlot:Launch: error detected: ${Script.LastError~}"
         }
         if !${Launcher.Reference(exists)}
         {
@@ -109,44 +109,44 @@ objectdef isb2022_managedSlot
     method OnLaunchStarted()
     {
         State:Set[2]
-        echo "isb2022_managedSlot[${NumSlot}]:OnLaunchStarted"
+        echo "isb2_managedSlot[${NumSlot}]:OnLaunchStarted"
     }
 
     method OnLaunchFailed()
     {
         State:Set[-3]
-        echo "isb2022_managedSlot[${NumSlot}]:OnLaunchFailed: ${Launcher.Error~}"
+        echo "isb2_managedSlot[${NumSlot}]:OnLaunchFailed: ${Launcher.Error~}"
     }
 
     method OnLaunchSucceeded()
     {
         State:Set[3]
-        echo "isb2022_managedSlot[${NumSlot}]:OnLaunchSucceeded"
+        echo "isb2_managedSlot[${NumSlot}]:OnLaunchSucceeded"
     }
 
     method OnSessionAdded()
     {
         State:Set[4]
-        echo "isb2022_managedSlot[${NumSlot}]:OnSessionAdded"
+        echo "isb2_managedSlot[${NumSlot}]:OnSessionAdded"
     }
 
     method OnSessionLost()
     {
         ; this will occur during many normal launches due to multiple processes        
-        echo "isb2022_managedSlot[${NumSlot}]:OnSessionLost"
+        echo "isb2_managedSlot[${NumSlot}]:OnSessionLost"
     }
 
     method OnMainSessionLost()
     {
         ; this was specifically a main session. during startup, this is not normal
         State:Set[-4]
-        echo "isb2022_managedSlot[${NumSlot}]:OnMainSessionLost"
+        echo "isb2_managedSlot[${NumSlot}]:OnMainSessionLost"
     }
 
     method OnMainSessionUpdated()
     {
         State:Set[5]
-        echo "isb2022_managedSlot[${NumSlot}]:OnMainSessionUpdated"
+        echo "isb2_managedSlot[${NumSlot}]:OnMainSessionUpdated"
     }
 
     member:bool Waiting()
@@ -164,6 +164,89 @@ objectdef isb2022_managedSlot
         return FALSE
     }
 
+    member StateName()
+    {
+        switch ${State}
+        {
+            case -4
+                return "Lost"
+            case -3
+                return "Launch Failed"
+            case -2
+                return "Launch Aborted"
+            case -1
+                return "Could Not Launch"
+            case 0
+                return "Idle"
+            case 1
+                return "Queued"
+            case 2
+                return "Launching"
+            case 3
+                return "Pre-Startup"
+            case 4
+                return "Startup"
+            case 5
+                return "Live"
+        }
+    }
+    
+    member:string GetFileNameOnly(filepath fullName)
+    {
+        variable int numSlashes = ${fullName.Count["/"]}
+        if !${numSlashes}
+            return "${fullName~}"
+
+        return "${fullName.Token[${numSlashes.Inc[1]},"/"]~}"
+    }
+
+    member:string GetFilePathOnly(filepath fullName)
+    {
+        variable int numSlashes = ${fullName.Count["/"]}
+        if !${numSlashes}
+            return "${fullName~}"
+
+        return "${fullName.Token[${numSlashes.Inc[1]},"/"]~}"
+    }
+
+    member Title()
+    {               
+
+        variable filepath fp
+        if ${SlotObserver.MainSession(exists)}
+        {
+            fp:Set["${SlotObserver.MainSession.Executable~}"]
+        }
+        else
+        {
+            fp:Set["${joLaunchInfo.Get[character,gameLaunchInfo,path]~}\\${joLaunchInfo.Get[character,gameLaunchInfo,executable]~}"]
+        }
+        
+        if ${joLaunchInfo.Has[character,gameLaunchInfo,game]}
+        {
+            if ${fp.FilenameOnly.NotNULLOrEmpty}
+                return "${This.StateName~}: ${joLaunchInfo.Get[character,gameLaunchInfo,game]} (${fp.FilenameOnly~})"
+                
+            return "${This.StateName~}: ${joLaunchInfo.Get[character,gameLaunchInfo,game]}"
+        }
+
+        return "${This.StateName~}: ${fp.FilenameOnly~}"
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalueref jo="{}"
+
+        jo:SetInteger["slot","${NumSlot}"]
+
+        if ${Launcher.Error.NotNULLOrEmpty}
+            jo:SetString["launcherError","${Launcher.Error~}"]
+
+        jo:SetInteger["state",${State}]
+        jo:SetByRef["launchInfo",joLaunchInfo]
+        return jo
+    }
+
     variable sessionlauncher Launcher
     variable slotobserver SlotObserver
     variable uint NumSlot
@@ -176,12 +259,14 @@ objectdef isb2022_managedSlot
     variable bool WaitForMainSession
 }
 
-objectdef isb2022_slotmanager
+objectdef isb2_slotmanager
 {
     method Clear()
     {
         Slots:Clear
         Launching:SetReference[0]
+        LGUI2.Element[isb2.events]:FireEventHandler[onSlotsUpdated]
+        
     }
 
     method Start()
@@ -237,7 +322,7 @@ objectdef isb2022_slotmanager
 
         if ${profileName.NotNULLOrEmpty}
         {
-            joTeam:SetReference["ISB2022.Profiles.Get[\"${jo.Get[teamProfile]~}\"].FindOne[\"Teams\",\"${jo.Get[team]~}\"]"]
+            joTeam:SetReference["ISB2.Profiles.Get[\"${jo.Get[teamProfile]~}\"].FindOne[\"Teams\",\"${jo.Get[team]~}\"]"]
             if !${joTeam.Type.Equal[object]}            
             {
                 Script:SetLastError["team ${teamName~} not found in profile ${profileName~}"]
@@ -246,7 +331,7 @@ objectdef isb2022_slotmanager
         }
         else
         {
-            joTeam:SetReference["ISB2022.Locate[Teams,\"${teamName~}\"]"]
+            joTeam:SetReference["ISB2.Locate[Teams,\"${teamName~}\"]"]
             if !${joTeam.Type.Equal[object]}
             {
                 Script:SetLastError["team ${teamName~} not found"]
@@ -295,12 +380,12 @@ objectdef isb2022_slotmanager
 
         if ${jo.Has[characterProfile]}
         {
-            jo:SetByRef["character","ISB2022.Profiles.Get[\"${jo.Get[characterProfile]~}\"].FindOne[\"Characters\",\"${jo.Get[character]~}\"]"]
+            jo:SetByRef["character","ISB2.Profiles.Get[\"${jo.Get[characterProfile]~}\"].FindOne[\"Characters\",\"${jo.Get[character]~}\"]"]
         }
         elseif ${jo.Has[character]}
         {
             variable jsonvalueref joLocated
-            joLocated:SetReference["ISB2022.Locate[Characters,\"${jo.Get[character]~}\",\"${jo.Get[teamProfile]~}\"]"]
+            joLocated:SetReference["ISB2.Locate[Characters,\"${jo.Get[character]~}\",\"${jo.Get[teamProfile]~}\"]"]
             if ${joLocated.Type.Equal[object]}
             {
                 jo:SetByRef[character,"joLocated.Get[object]"]
@@ -316,12 +401,12 @@ objectdef isb2022_slotmanager
 
         if ${jo.Has[teamProfile]}
         {
-            jo:SetByRef["team","ISB2022.Profiles.Get[\"${jo.Get[teamProfile]~}\"].FindOne[\"Teams\",\"${jo.Get[team]~}\"]"]
+            jo:SetByRef["team","ISB2.Profiles.Get[\"${jo.Get[teamProfile]~}\"].FindOne[\"Teams\",\"${jo.Get[team]~}\"]"]
         }
         elseif ${jo.Has[team]}
         {
             variable jsonvalueref joLocated
-            joLocated:SetReference["ISB2022.Locate[Teams,\"${jo.Get[team]~}\"]"]
+            joLocated:SetReference["ISB2.Locate[Teams,\"${jo.Get[team]~}\"]"]
             if ${joLocated.Type.Equal[object]}
             {
                 jo:SetByRef[team,"joLocated.Get[object]"]
@@ -366,12 +451,13 @@ objectdef isb2022_slotmanager
         joLaunch:SetInteger["slot",${numSlot}]
 
         Slots:Set[${numSlot},"joLaunch"]
+        LGUI2.Element[isb2.events]:FireEventHandler[onSlotsUpdated]
         return TRUE
     }
 
     method Pulse()
     {
-;        echo "isb2022_launcher:Pulse"
+;        echo "isb2_launcher:Pulse"
 
         if !${LaunchingSlot.Value(exists)}
         {
@@ -396,11 +482,11 @@ objectdef isb2022_slotmanager
     }
 
     variable iterator LaunchingSlot
-    variable collection:isb2022_managedSlot Slots
+    variable collection:isb2_managedSlot Slots
     variable weakref Launching
 }
 
-variable(global) isb2022 ISB2022
+variable(global) isb2 ISB2
 
 function main()
 {

@@ -1,19 +1,19 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/agent.json",
-    "name": "ISBoxer 2022",
-    "version": "20221003.1",
-    "minimumBuild": 7012,
+    "name": "ISBoxer 2",
+    "version": "20221004.1",
+    "minimumBuild": 7014,
     "platforms": {
         "inner space uplink": {
             "eventHandlers": {
                 "onAgentStartup": {
                     "code": [
-                        "run ISB2022.Uplink.iss"
+                        "run ISB2.Uplink.iss"
                     ]
                 },
                 "onAgentShutdown": {
                     "code": [                        
-                        "endscript ISB2022.Uplink"
+                        "endscript ISB2.Uplink"
                     ]
                 }
             }
@@ -22,12 +22,12 @@
             "eventHandlers": {
                 "onAgentStartup": {
                     "code": [
-                        "run ISB2022.Session.iss"
+                        "run ISB2.Session.iss"
                     ]
                 },
                 "onAgentShutdown": {
                     "code": [                        
-                        "endscript ISB2022.Session"
+                        "endscript ISB2.Session"
                     ]
                 }
             }

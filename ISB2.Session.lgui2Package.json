@@ -1,13 +1,13 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
     "includes": [
-        "ISB2022.Skin.lgui2Package.json",
-        "ISB2022.Live.lgui2Package.json",
-        "ISB2022.Viewers.lgui2Package.json"
+        "ISB2.Skin.lgui2Package.json",
+        "ISB2.Live.lgui2Package.json",
+        "ISB2.Viewers.lgui2Package.json"
     ],
-    "skin":"ISBoxer 2022",
+    "skin":"ISBoxer 2",
     "templates": {
-        "isb2022.data":{
+        "isb2.data":{
             "defaultActionTypes":[
                 {
                     "name":"keystroke",
@@ -188,7 +188,7 @@
                 }
             ]
         },
-        "isb2022.clickbarButton":{
+        "isb2.clickbarButton":{
             "type":"button",
             "jsonTemplate":"button",
             "eventHandlers":{
@@ -209,7 +209,7 @@
                 }
             }
         },
-        "isb2022.clickbar":{
+        "isb2.clickbar":{
             "type":"window",
             "jsonTemplate":"window",
             "content":{
@@ -231,7 +231,7 @@
                 }
             }
         },
-        "isb2022.rotatorStepView":{
+        "isb2.rotatorStepView":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
@@ -274,7 +274,7 @@
                 }
             ]
         },
-        "isb2022.mappableView":{
+        "isb2.mappableView":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
@@ -364,13 +364,13 @@
         {
             "type": "panel",
             "visibility": "hidden",
-            "name": "isb2022.events"
+            "name": "isb2.events"
         },
         {
             "type":"window",
-            "name":"isb2022.MainWindow",
+            "name":"isb2.MainWindow",
             "hideOnClose":true,
-            "title":"ISBoxer 2022",
+            "title":"ISBoxer 2",
             "width":750,
             "height":400,
             "minSize":[600,300],
@@ -394,7 +394,7 @@
                                 "eventHandlers": {
                                     "onPress":{
                                         "type":"code",
-                                        "code":"ISB2022:Restart"
+                                        "code":"ISB2:Restart"
                                     }
                                 }
                             },
@@ -406,7 +406,7 @@
                                 "eventHandlers": {
                                     "onPress":{
                                         "type":"code",
-                                        "code":"ISB2022:BeginTest"
+                                        "code":"ISB2:BeginTest"
                                     }
                                 }
                             }
@@ -433,20 +433,20 @@
                                             "eventHandlers":{
                                                 "onRelease":{
                                                     "type":"code",
-                                                    "code":"ISB2022:ActivateProfileByName[\"${LGUI2.Element[isb2022.listAvailableProfiles].SelectedItem.Data.Get[name]~}\"]"
+                                                    "code":"ISB2:ActivateProfileByName[\"${LGUI2.Element[isb2.listAvailableProfiles].SelectedItem.Data.Get[name]~}\"]"
                                                 }
                                             }
                                         },
                                         {
                                             "type":"listbox",
-                                            "name":"isb2022.listAvailableProfiles",
+                                            "name":"isb2.listAvailableProfiles",
                                             "_dock":"bottom",
                                             "minSize":[0,80],
                                             "horizontalAlignment":"stretch",
                                             "itemsBinding":{
-                                                "pullFormat":"${ISB2022.ProfileDB.Profiles.AsJSON[array]}",
+                                                "pullFormat":"${ISB2.ProfileDB.Profiles.AsJSON[array]}",
                                                 "pullHook": {
-                                                    "elementName": "isb2022.events",
+                                                    "elementName": "isb2.events",
                                                     "flags": "global",
                                                     "event": "onProfilesUpdated"
                                                 }
@@ -454,7 +454,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"isb2022.profileView"
+                                                    "template":"isb2.profileView"
                                                 }
                                             }
                                         },
@@ -470,14 +470,14 @@
                                         },
                                         {
                                             "type":"listbox",
-                                            "name":"isb2022.listActiveProfiles",
+                                            "name":"isb2.listActiveProfiles",
                                             "_dock":"top",
                                             "minSize":[0,80],
                                             "horizontalAlignment":"stretch",
                                             "itemsBinding":{
-                                                "pullFormat":"${ISB2022.Profiles.AsJSON}",
+                                                "pullFormat":"${ISB2.Profiles.AsJSON}",
                                                 "pullHook": {
-                                                    "elementName": "isb2022.events",
+                                                    "elementName": "isb2.events",
                                                     "flags": "global",
                                                     "event": "onProfilesUpdated"
                                                 }
@@ -485,7 +485,7 @@
                                             "itemViewGenerators":{
                                                 "-default":{
                                                     "type":"template",
-                                                    "template":"isb2022.profileView"
+                                                    "template":"isb2.profileView"
                                                 }
                                             }
                                         },
@@ -497,7 +497,7 @@
                                             "eventHandlers":{
                                                 "onRelease":{
                                                     "type":"code",
-                                                    "code":"ISB2022:DeactivateProfileByName[\"${LGUI2.Element[isb2022.listActiveProfiles].SelectedItem.Data~}\"]"
+                                                    "code":"ISB2:DeactivateProfileByName[\"${LGUI2.Element[isb2.listActiveProfiles].SelectedItem.Data~}\"]"
                                                 }
                                             }
                                         }
@@ -514,30 +514,30 @@
                                     "children":[
                                         {
                                             "type":"textblock",
-                                            "text":"Available Profiles: ${ISB2022.ProfileDB.Profiles.Used}",
+                                            "text":"Available Profiles: ${ISB2.ProfileDB.Profiles.Used}",
                                             "_dock":"top"
                                         },
                                         {
                                             "type":"textblock",
-                                            "text":"Active Profiles: ${ISB2022.Profiles.Used}",
+                                            "text":"Active Profiles: ${ISB2.Profiles.Used}",
                                             "_dock":"top"
                                         },
                                         {
                                             "type":"textblock",
-                                            "text":"Hotkey Sheets: ${ISB2022.HotkeySheets.Used}",
+                                            "text":"Hotkey Sheets: ${ISB2.HotkeySheets.Used}",
                                             "_dock":"top"
                                         },
                                         {
                                             "type":"textblock",
-                                            "text":"Mappable Sheets: ${ISB2022.MappableSheets.Used}",
+                                            "text":"Mappable Sheets: ${ISB2.MappableSheets.Used}",
                                             "_dock":"top"
                                         },
                                         {
-                                            "jsonTemplate":"isb2022.mappableView",
+                                            "jsonTemplate":"isb2.mappableView",
                                             "_dock":"top",
-                                            "name":"isb2022.viewingMappable",
+                                            "name":"isb2.viewingMappable",
                                             "contextBinding":{
-                                                "pullFormat":"${ISB2022.LastMappable}"
+                                                "pullFormat":"${ISB2.LastMappable}"
                                             }
                                         }
                                     ]

@@ -1,26 +1,26 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
     "skin": {
-        "name": "ISBoxer 2022",
+        "name": "ISBoxer 2",
         "brushes":{
             "window.titleBar.backgroundBrush": {
-                "jsonTemplate": "isb2022.headerBackground"
+                "jsonTemplate": "isb2.headerBackground"
             },
             "window.backgroundBrush":{
-                "jsonTemplate":"isb2022.background1"
+                "jsonTemplate":"isb2.background1"
             },
             "window.borderBrush":{
-                "jsonTemplate":"isb2022.background1border"
+                "jsonTemplate":"isb2.background1border"
             }
         },
         "templates": {
-            "isb2022.headerBackground": {
+            "isb2.headerBackground": {
                 "color": [ 0.15, 0.3, 0.15 ]
             },
-            "isb2022.background1": {
+            "isb2.background1": {
                 "color": [ 0.05, 0.1, 0.05 ]
             },
-            "isb2022.background1border": {
+            "isb2.background1border": {
                 "color": [ 0.1, 0.2, 0.1 ]
             },
             "window": {

@@ -1,25 +1,114 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
     "includes": [
-        "ISB2022.Skin.lgui2Package.json",
-        "ISB2022.Editors.lgui2Package.json",
-        "ISB2022.Viewers.lgui2Package.json"
+        "ISB2.Skin.lgui2Package.json",
+        "ISB2.Editors.lgui2Package.json",
+        "ISB2.Viewers.lgui2Package.json"
     ],
-    "skin":"ISBoxer 2022",
+    "skin":"ISBoxer 2",
     "templates": {
-              
+        "isb2.slotmanager.slotView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+                "content":{
+                    "type":"dockpanel",
+                    "contextBinding":{
+                        "pullFormat":"${ISB2.SlotManager.Slots.Get[${_CONTEXTITEMDATA_.Get[slot]}]}"
+                    },
+                    "children":[
+                        {
+                            "_dock":"left",
+                            "type":"textblock",
+                            "font":{
+                                "heightFactor":3.0
+                            },
+                            "text":"${This.Context.NumSlot}",
+                            "verticalAlignment":"center",
+                            "margin":[5,0,5,0]
+                        },
+                        {
+                            "_dock":"top",
+                            "type":"textblock",
+                            "text":"${This.Context.Title}",
+                            "font":{
+                                "heightFactor":2.0,
+                                "bold":true
+                            }
+                        },
+                        {
+                            "_dock":"top",
+                            "type":"textblock",
+                            "text":"${This.Context.Launcher.Error}"        
+                        },
+                        {
+                            "_dock":"top",
+                            "type":"textblock",
+                            "text":"${This.Context.AsJSON}"        
+                        }
+                    ]
+                }
+            }
     },
     "elements": [
         {
             "type": "panel",
             "visibility": "hidden",
-            "name": "isb2022.events"
+            "name": "isb2.events"
         },
         {
             "type":"window",
-            "name":"isb2022.MainWindow",
+            "visibility":"visible",
+            "name":"isb2.launching",
             "hideOnClose":true,
-            "title":"ISBoxer 2022",
+            "title":"ISBoxer 2: Launching",
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "width":750,
+            "height":400,
+            "content":{
+                "type":"dockpanel",
+                "horizontalAlignment":"stretch",
+                "verticalAlignment":"stretch",
+                "margin":5,
+                "children":[
+                    {
+                        "type":"textblock",
+                        "text":"Launching ...",
+                        "_dock":"top",
+                        "font":{
+                            "heightFactor":2.0
+                        },
+                        "margin":[0,0,0,5]
+                    },
+                    {
+                        "type":"listbox",
+                        "_dock":"top",
+                        "name":"isb2.launching.list",
+                        "horizontalAlignment":"stretch",
+                        "verticalAlignment":"stretch",
+                        "itemsBinding":{
+                            "pullFormat":"${ISB2.SlotManager.Slots.AsJSON[array]}",
+                            "pullHook":{
+                                "elementName":"isb2.events",
+                                "flags": "global",
+                                "event": "onSlotsUpdated"
+                            }
+                        },
+                        "itemViewGenerators":{
+                            "default":{
+                                "type":"template",
+                                "template":"isb2.slotmanager.slotView"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type":"window",
+            "name":"isb2.MainWindow",
+            "hideOnClose":true,
+            "title":"ISBoxer 2",
             "width":750,
             "height":400,
             "minSize":[600,300],
@@ -43,7 +132,7 @@
                                 "eventHandlers": {
                                     "onPress":{
                                         "type":"code",
-                                        "code":"agent.Get[ISBoxer 2022]:Stop:Reload:Start"
+                                        "code":"agent.Get[ISBoxer 2]:Stop:Reload:Start"
                                     }
                                 }
                             },
@@ -55,7 +144,7 @@
                                 "eventHandlers": {
                                     "onPress":{
                                         "type":"code",
-                                        "code":"ISB2022:LoadTests"
+                                        "code":"ISB2:LoadTests"
                                     }
                                 }
                             }
@@ -96,7 +185,7 @@
                                                     "eventHandlers":{
                                                         "onPress":{
                                                             "type":"code",
-                                                            "code":"ISB2022:OpenEditor[\"${ISB2022.SelectedProfile.Name~}\"]"
+                                                            "code":"ISB2:OpenEditor[\"${ISB2.SelectedProfile.Name~}\"]"
                                                         }
                                                     }
                                                 }
@@ -108,22 +197,22 @@
                                             "horizontalAlignment": "stretch",
                                             "verticalAlignment": "stretch",
                                             "itemsBinding":{
-                                                "pullFormat": "${ISB2022.Profiles.AsJSON[array]}",
+                                                "pullFormat": "${ISB2.Profiles.AsJSON[array]}",
                                                 "pullHook": {
-                                                    "elementName": "isb2022.events",
+                                                    "elementName": "isb2.events",
                                                     "flags": "global",
                                                     "event": "onProfilesUpdated"
                                                 }
                                             },
                                             "selectedItemBinding":{
-                                                "pullFormat":"${ISB2022.SelectedProfile.Name}",
-                                                "pushFormat":["ISB2022:SelectProfile[\"","\"]"]
+                                                "pullFormat":"${ISB2.SelectedProfile.Name}",
+                                                "pushFormat":["ISB2:SelectProfile[\"","\"]"]
                                             },
                                             "selectedItemBindingProperty":"name",
                                             "itemViewGenerators":{
                                                 "default":{
                                                   "type":"template",
-                                                  "template":"isb2022.profileView"
+                                                  "template":"isb2.profileView"
                                                 }
                                             }
                                         }

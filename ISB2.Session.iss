@@ -1,34 +1,34 @@
-#include "ISB2022.Common.iss"
-#include "ISB2022.ProfileEngine.iss"
+#include "ISB2.Common.iss"
+#include "ISB2.ProfileEngine.iss"
 
-; run "ISBoxer 2022/ISB2022.Session"
+; run "ISBoxer 2/ISB2.Session"
 
-objectdef isb2022session inherits isb2022_profileengine
+objectdef isb2session inherits isb2_profileengine
 {
     variable bool ValidSession
 
-    variable isb2022_profilecollection ProfileDB
+    variable isb2_profilecollection ProfileDB
 
     method Initialize()
     {
-        if ${JMB(exists)} && !${JMB.Slot.Metadata.Get[launcher]~.Equal["ISBoxer 2022"]}
+        if ${JMB(exists)} && !${JMB.Slot.Metadata.Get[launcher]~.Equal["ISBoxer 2"]}
         {
-            echo "ISBoxer 2022 inactive; Session not launched by ISBoxer 2022."
+            echo "ISBoxer 2 inactive; Session not launched by ISBoxer 2."
             return
         }
 
-        if ${InnerSpace.Build} < 7012
+        if ${InnerSpace.Build} < 7013
         {
-            echo "ISBoxer 2022 inactive; Inner Space build 7011 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2 inactive; Inner Space build 7013 or later required (currently ${InnerSpace.Build})"
             return
         }
 
         ValidSession:Set[1]
     
-        LGUI2:LoadPackageFile[ISB2022.Session.lgui2Package.json]
+        LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]
         This:InstallDefaultActionTypes
 
-        if ${ISSession.Metadata.Has[isb2022]}
+        if ${ISSession.Metadata.Has[isb2]}
         {
             This:InstallFromSessionMetadata[ISSession.Metadata]
         }
@@ -36,14 +36,14 @@ objectdef isb2022session inherits isb2022_profileengine
 
     method Shutdown()
     {
-        LGUI2:UnloadPackageFile[ISB2022.Session.lgui2Package.json]
+        LGUI2:UnloadPackageFile[ISB2.Session.lgui2Package.json]
     }
 
     method InstallFromSessionMetadata(jsonvalueref joMetadata)
     {
-        echo "isb2022session:InstallFromSessionMetadata ${joMetadata~}"
+        echo "isb2session:InstallFromSessionMetadata ${joMetadata~}"
 
-        ProfileDB:LoadFiles["joMetadata.Get[isb2022profiles]"]
+        ProfileDB:LoadFiles["joMetadata.Get[isb2profiles]"]
         
         if ${joMetadata.Has[teamProfile]}
             This:ActivateProfileByName["${joMetadata.Get[teamProfile]~}"]
@@ -123,7 +123,7 @@ objectdef isb2022session inherits isb2022_profileengine
     method Unicast(string relay_target, string command)
     {
         variable string wrappedCommand
-        wrappedCommand:Set["ISB2022:OnReceiveCommand[\"${Session~}\",\"${command~}\"]"]
+        wrappedCommand:Set["ISB2:OnReceiveCommand[\"${Session~}\",\"${command~}\"]"]
         echo BeginTask=${TaskManager:BeginTask["$$>
         {
             "type":"unicast",
@@ -151,11 +151,11 @@ objectdef isb2022session inherits isb2022_profileengine
 
 }
 
-variable(global) isb2022session ISB2022
+variable(global) isb2session ISB2
 
 function main()
 {
-    if !${ISB2022.ValidSession}
+    if !${ISB2.ValidSession}
         return
     while 1
         waitframe

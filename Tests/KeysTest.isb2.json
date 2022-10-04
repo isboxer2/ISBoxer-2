@@ -24,14 +24,21 @@
             "mappables": [
                 {
                     "name": "first",
-                    "hotkeyCombo":"1",
                     "steps": [
-                        {
+                        {                            
                             "actions": [
                                 {
-                                    "type": "Keystroke",
-                                    "key":"a",
-                                    "target":"self"
+                                    "type": "keystroke",
+                                    "key":"a"                                    
+                                },
+                                {
+                                    "type":"popup text",
+                                    "text": "that's right bitches"
+                                },
+                                {
+                                    "type":"game macro",
+                                    "sheet":"Quick Setup 42",
+                                    "name": "/follow FTL"
                                 }
                             ]
                         }

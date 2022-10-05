@@ -42,8 +42,8 @@
             ],
             "swapGroups":[
                 {
-                    "reset":0,
-                    "active":0
+                    "reset":1,
+                    "active":1
                 }
             ]
         }

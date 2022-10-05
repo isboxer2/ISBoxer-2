@@ -50,7 +50,8 @@
             ],
             "profiles":[
                 "ISBoxer Per-Window",
-                "World of Warcraft Base Profile"
+                "World of Warcraft Base Profile",
+                "My Window Layout"
             ],
             "windowLayout":"My Window Layout"
         }

@@ -84,7 +84,7 @@ objectdef isb2_profileengine
         joQuery:SetString[op,"=="]
         joQuery:SetString[value,"${name~}"]
 
-        return ${ja.SelectKey[joQuery]}
+        return ${jaSlots.SelectKey[joQuery]}
     }
 
 #region Object Installers/Uninstallers
@@ -602,7 +602,8 @@ objectdef isb2_profileengine
         if !${jo.Type.Equal[object]}
             return
         
-        echo "TODO: ActivateWindowLayout ${jo~}"
+        ISB2WindowLayout:SetLayout[jo]
+        ; echo "TODO: ActivateWindowLayout ${jo~}"
     }
 
     method DeactivateCharacter()
@@ -640,6 +641,8 @@ objectdef isb2_profileengine
         Character:SetReference[jo]
         This:ActivateSlot["${This.GetCharacterSlot["${Character.Get[name]~}"]}"]
         This:ActivateProfilesByName["Character.Get[profiles]"]
+
+        This:ActivateWindowLayoutByName["${Team.Get["windowLayout"]~}"]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
     }

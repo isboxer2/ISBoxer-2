@@ -5,8 +5,9 @@ variable(global) isb2_windowlayoutengine ISB2WindowLayout
 
 objectdef isb2_windowlayoutengine
 {
-    variable jsonvalue Settings="{}"
-    variable jsonvalue Regions="[]"
+    variable jsonvalueref Settings="{}"
+    variable jsonvalueref Regions="[]"
+    variable jsonvalueref SwapGroup="{}"
 
     variable jsonvalueref CurrentRegion
 
@@ -16,9 +17,9 @@ objectdef isb2_windowlayoutengine
     variable uint NumResetRegion
 
     variable jsonvalueref ActiveRegion
-    variable uint NumActiveRegion
+    variable uint NumActiveRegion=1
     variable jsonvalueref InactiveRegion
-    variable uint NumInactiveRegion
+    variable uint NumInactiveRegion=2
 
     variable bool Active=FALSE
 
@@ -41,6 +42,15 @@ objectdef isb2_windowlayoutengine
         Event[OnHotkeyFocused]:AttachAtom[This:Event_OnHotkeyFocused]
 
 
+        Settings:SetReference["$$>
+        {
+            "frame":"none",
+            "swapOnActivate":true,
+            "swapOnDeactivate":true,
+            "sometimesOnTop":true
+        }
+        <$$"]
+
 ;        LGUI2:LoadPackageFile[WindowLayoutEngine.Session.lgui2Package.json]        
 ;        This:LoadTests
         This:RefreshActiveStatus
@@ -56,17 +66,18 @@ objectdef isb2_windowlayoutengine
 
     method LoadTests()
     {
-        Settings:SetValue["$$>
+        Settings:SetReference["$$>
         {
             "resetRegion":1,
             "frame":"none",
             "swapOnActivate":true,
-            "swapOnDeactivate":true
+            "swapOnDeactivate":true,
+            "sometimesOnTop":true
         }
         <$$"]
         
         /*
-        Regions:SetValue["$$>
+        Regions:SetReference["$$>
         [
             {"bounds":[0,0,640,360],"numRegion":1},
             {"bounds":[640,0,640,360],"numRegion":2},
@@ -77,7 +88,7 @@ objectdef isb2_windowlayoutengine
         <$$"]
         /**/
         
-        Regions:SetValue["$$>
+        Regions:SetReference["$$>
         [
             {"bounds":[0,0,1920,900],"numRegion":1,"mainRegion":true},
             {"bounds":[0,900,384,180],"numRegion":2},
@@ -272,6 +283,18 @@ objectdef isb2_windowlayoutengine
         return FALSE
     }
 
+    member:uint GetInactiveRegionForSlot(uint numSlot)
+    {
+        variable jsonvalueref joQuery="$$>
+        {
+            "eval":"Select.Get[slot]",
+            "op":"==",
+            "value":${numSlot}
+        }
+        <$$"
+        return ${Regions.SelectKey[joQuery]}
+    }
+    
     method SetLayout(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -282,9 +305,29 @@ objectdef isb2_windowlayoutengine
 
         echo "isb2_windowlayoutengine:SetLayout ${jo~}"
 
-        Regions:SetValue["${jo.Get[regions]}"]
+        if ${jo.Has[settings]}
+            Settings:SetReference["${jo.Get[settings]~}"]
+
+        Regions:SetReference["${jo.Get[regions]}"]
         LGUI2.Element["windowLayoutEngine.events"]:FireEventHandler[regionsChanged]
 
+        if ${Settings.Has[resetRegion]}
+            NumResetRegion:Set["${Settings.GetInteger[resetRegion]}"]
+
+        NumInactiveRegion:Set[${This.GetInactiveRegionForSlot[${ISB2.Slot}]}]
+
+        variable jsonvalueref joInactiveRegion
+        joInactiveRegion:SetReference["Regions.Get[joInactiveRegion]"]
+        
+        variable uint numSwapGroup
+        numSwapGroup:Set["${joInactiveRegion.GetInteger[swapGroup]}+1"]
+        SwapGroup:SetReference["${jo.Get[swapGroups,${numSwapGroup}]}"]
+        if ${SwapGroup.Type.Equal[object]}
+        {
+            NumActiveRegion:Set["${SwapGroup.GetInteger[active]}"]
+            NumResetRegion:Set["${SwapGroup.GetInteger[reset]}"]
+        }
+        
         This:SelectRegions[${NumActiveRegion},${NumInactiveRegion}]
         This:SelectResetRegion[${NumResetRegion}]
     }
@@ -299,19 +342,17 @@ objectdef isb2_windowlayoutengine
 
         if !${Settings.GetBool[swapOnActivate]} && !${Settings.GetBool[refreshOnActivate]} 
         {
-            echo !${Settings.GetBool[swapOnActivate]} && !${Settings.GetBool[refreshOnActivate]} 
             return
         }
 
         if !${This:RefreshActiveStatus(exists)}
         {
-            echo "!\${This:RefreshActiveStatus(exists)}"
             return
         }
 
         if ${Settings.GetBool[swapOnActivate]} && !${Settings.GetBool[focusFollowsMouse]}
         {
-            echo Applying.
+            echo "isbw2inwodwlayout: Applying."
             This:Apply
         }
     }
@@ -324,19 +365,17 @@ objectdef isb2_windowlayoutengine
 
         if !${Settings.GetBool[swapOnDeactivate]} && !${Settings.GetBool[refreshOnDeactivate]} 
         {
-            echo !${Settings.GetBool[swapOnDeactivate]} && !${Settings.GetBool[refreshOnDeactivate]} 
             return
         }
 
         if !${This:RefreshActiveStatus(exists)}
         {
-            echo "!\${This:RefreshActiveStatus(exists)}"
             return
         }
 
         if ${Settings.GetBool[swapOnDeactivate]} && !${Settings.GetBool[focusFollowsMouse]}
         {
-            echo Applying.
+            echo "isbw2inwodwlayout: Applying."
             This:Apply
         }
     }

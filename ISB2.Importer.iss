@@ -64,7 +64,19 @@ objectdef isb2_importer
         {
             jo:SetByRef[clickBars,jRef]
         }
-        
+        /*
+        jRef:SetReference[This.ConvertRepeaterProfiles]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[repeaterProfiles,jRef]
+        }
+        */
+        jRef:SetReference[This.ConvertWindowLayouts]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[windowLayouts,jRef]
+        }
+
         return jo
     }
 
@@ -493,11 +505,67 @@ objectdef isb2_importer
         return joNew
     }
 
+    method ConvertWindowLayoutRegion(jsonvalueref jaRegions,jsonvalueref jo)
+    {  
+        variable jsonvalue joNew="${jo~}"
+
+        joNew:Set[bounds,"${jo.Get[rect]~}"]
+
+        if ${jo.Has[characterSetSlot]}
+            joNew:SetInteger[slot,"${jo.Get[characterSetSlot]}"]
+
+        joNew:Erase[rect]
+        joNew:Erase[characterSetSlot]
+
+        jaRegions:AddByRef[joNew]    
+    }
+
+    method ConvertWindowLayoutSwapGroup(jsonvalueref jaSwapGroups,jsonvalueref jo)
+    {  
+        variable jsonvalue joNew="{}"
+
+        variable int resetRegion
+        variable int activeRegion
+        resetRegion:Set["${jo.GetInteger[resetRegion]}+1"]
+        activeRegion:Set["${jo.GetInteger[activeRegion]}+1"]
+        
+        joNew:SetInteger["reset",${resetRegion}]
+        joNew:SetInteger["active",${activeRegion}]
+
+        if ${jo.Has[deactivateSwapGroup]}
+            joNew:SetInteger[deactivateSwapGroup,"${jo.GetInteger[deactivateSwapGroup]}"]
+
+        if ${jo.Has[pipSqueakSlot]}
+            joNew:SetInteger[roamingSlot,"${jo.GetInteger[pipSqueakSlot]}"]
+
+        jaSwapGroups:AddByRef[joNew]
+    }
+
     member:jsonvalueref ConvertWindowLayout(jsonvalueref jo)
     {
         echo "ConvertWindowLayout ${jo~}"
-        return NULL
         variable jsonvalue joNew="{}"
+    
+;        joNew:SetByRef[original,jo]
+
+        joNew:SetString[name,"${jo.Get[name]~}"]
+        joNew:SetString[description,"${jo.Get[description]~}"]
+        
+        variable jsonvalueref jaRegions="[]"
+        jo.Get[Regions]:ForEach["This:ConvertWindowLayoutRegion[jaRegions,ForEach.Value]"]
+        joNew:SetByRef[regions,jaRegions]
+
+        variable jsonvalueref jaSwapGroups="[]"
+        jo.Get[SwapGroups]:ForEach["This:ConvertWindowLayoutSwapGroup[jaSwapGroups,ForEach.Value]"]
+        joNew:SetByRef[swapGroups,jaSwapGroups]
+
+        variable jsonvalueref joSettings="{}"
+        joSettings:SetBool[focusFollowsMouse,"${jo.GetBool[focusFollowsMouse]}"]
+        joSettings:SetBool[instantSwap,"${jo.GetBool[instantSwap]}"]
+        joSettings:SetString[swapMode,"${jo.Get[swapMode]~}"]
+
+        joNew:SetByRef[settings,joSettings]
+
 
         return joNew
     }

@@ -42,6 +42,28 @@ objectdef isb2 inherits isb2_profilecollection
 
         return ${SlotManager:LaunchTeamByName["${teamName~}"]}
     }
+
+    method OnImportButton()
+    {
+        ; select a file to import
+        LGUI2.Element[isb2.import.window]:SetVisibility[Visible]
+    }
+
+    method OnImportWindowFinalized()
+    {
+        variable filepath fileName="${Context.Source.Value~}"
+        echo "File selected for import: ${fileName~}"
+        LGUI2.Element[isb2.import.window]:SetVisibility[Hidden]
+
+        Importer:TransformProfileXML["${fileName~}"]
+
+        This:LoadFile["${LavishScript.HomeDirectory~}/${fileName.FilenameOnly~}.isb2.json"]
+    }
+
+    method OnLoadButton()
+    {
+
+    }
 }
 
 objectdef isb2_managedSlot

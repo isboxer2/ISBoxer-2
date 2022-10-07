@@ -15,44 +15,77 @@
                 "color":"#333333"
             },
             "content":{
-                    "type":"dockpanel",
-                    "contextBinding":{
-                        "pullFormat":"${ISB2.SlotManager.Slots.Get[${_CONTEXTITEMDATA_.Get[slot]}]}"
+                "type":"dockpanel",
+                "contextBinding":{
+                    "pullFormat":"${ISB2.SlotManager.Slots.Get[${_CONTEXTITEMDATA_.Get[slot]}]}"
+                },
+                "children":[
+                    {
+                        "_dock":"left",
+                        "type":"textblock",
+                        "font":{
+                            "heightFactor":3.0
+                        },
+                        "text":"${This.Context.NumSlot}",
+                        "verticalAlignment":"center",
+                        "margin":[10,0,15,0]
                     },
-                    "children":[
-                        {
-                            "_dock":"left",
-                            "type":"textblock",
-                            "font":{
-                                "heightFactor":3.0
-                            },
-                            "text":"${This.Context.NumSlot}",
-                            "verticalAlignment":"center",
-                            "margin":[10,0,15,0]
-                        },
-                        {
-                            "_dock":"top",
-                            "type":"textblock",
-                            "text":"${This.Context.Title}",
-                            "font":{
-                                "heightFactor":2.0,
-                                "bold":true
-                            }
-                        },
-                        {
-                            "_dock":"top",
-                            "type":"textblock",
-                            "text":"${This.Context.GetError}"        
+                    {
+                        "_dock":"top",
+                        "type":"textblock",
+                        "text":"${This.Context.Title}",
+                        "font":{
+                            "heightFactor":2.0,
+                            "bold":true
                         }
-                    ]
-                }
-            }
+                    },
+                    {
+                        "_dock":"top",
+                        "type":"textblock",
+                        "text":"${This.Context.GetError}"        
+                    }
+                ]   
+            }            
+        }
     },
     "elements": [
         {
             "type": "panel",
             "visibility": "hidden",
             "name": "isb2.events"
+        },
+        {
+            "type":"window",
+            "width":400,
+            "height":600,
+            "title":"ISBoxer 2: ISBoxer Toolkit Profile Importer",
+            "name":"isb2.import.window",
+            "visibility":"hidden",
+            "hideOnClose":true,
+            "strata":0.6,
+            "content":{
+                "type":"dockpanel",
+                "horizontalAlignment":"stretch",
+                "verticalAlignment":"stretch",
+                "children":[
+                    {
+                        "type":"filepicker",
+                        "_dock":"top",
+                        "horizontalAlignment":"stretch",
+                        "verticalAlignment":"stretch",
+                        "requireExisting":true,
+                        "wildcard":"*.XML",
+                        "path":"%USERPROFILE%/Documents",
+                        "eventHandlers":{
+                            "onFinalized":{
+                                "type": "method",
+                                "object":"ISB2",
+                                "method":"OnImportWindowFinalized"
+                            }
+                        }
+                    }
+                ]            
+            }
         },
         {
             "type":"window",
@@ -249,6 +282,32 @@
                                                         "onPress":{
                                                             "type":"code",
                                                             "code":"ISB2:OpenEditor[\"${ISB2.SelectedProfile.Name~}\"]"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "type":"button",
+                                                    "_dock":"top",
+                                                    "margin":[0,5,0,0],
+                                                    "content":"Import ...",
+                                                    "eventHandlers":{
+                                                        "onPress":{
+                                                            "type":"method",
+                                                            "object":"ISB2",
+                                                            "method":"OnImportButton"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "type":"button",
+                                                    "_dock":"top",
+                                                    "margin":[0,5,0,0],
+                                                    "content":"Load ...",
+                                                    "eventHandlers":{
+                                                        "onPress":{
+                                                            "type":"method",
+                                                            "object":"ISB2",
+                                                            "method":"OnLoadButton"
                                                         }
                                                     }
                                                 }

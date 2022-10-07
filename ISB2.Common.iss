@@ -382,7 +382,7 @@ objectdef isb2_profileeditor
 
     method Shutdown()
     {
-
+        Window:Destroy
     }
 
     member:string GetLowerCamelCase(string fromString)

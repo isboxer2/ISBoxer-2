@@ -14,7 +14,7 @@ objectdef isb2_importer
         This:WriteJSON["${filename~}.json"]
     }
 
-    member:jsonvalueref TransformProfileXML(string filename)
+    member:jsonvalueref TransformProfileXML(filepath filename)
     {
         variable isb2_isb1transformer ISB1Transformer
         variable jsonvalue jo="{}"
@@ -77,14 +77,15 @@ objectdef isb2_importer
             jo:SetByRef[windowLayouts,jRef]
         }
 
+        jo:SetString[name,"${filename.FilenameOnly~}"]
         return jo
     }
 
-    method TransformProfileXML(string filename)
+    method TransformProfileXML(filepath filename)
     {
         variable jsonvalueref jo
-        jo:SetReference["This.TransformProfileXML[\"${LavishScript.HomeDirectory~}/${filename~}\"]"]
-        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename~}.isb2.json",multiline]
+        jo:SetReference["This.TransformProfileXML[\"${filename~}\"]"]
+        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename.FilenameOnly~}.isb2.json",multiline]
     }
 
     method TransformCurrentProfileXML()
@@ -528,7 +529,7 @@ objectdef isb2_importer
         variable int activeRegion
         resetRegion:Set["${jo.GetInteger[resetRegion]}+1"]
         activeRegion:Set["${jo.GetInteger[activeRegion]}+1"]
-        
+
         joNew:SetInteger["reset",${resetRegion}]
         joNew:SetInteger["active",${activeRegion}]
 

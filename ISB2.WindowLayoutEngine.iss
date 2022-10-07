@@ -42,8 +42,14 @@ objectdef isb2_windowlayoutengine
         Event[OnHotkeyFocused]:AttachAtom[This:Event_OnHotkeyFocused]
 
 
+        SwapGroup:SetReference["$$>
+        {
+            "resetRegion":1,
+        }
+        <$$"]
         Settings:SetReference["$$>
         {
+            "resetRegion":1,
             "frame":"none",
             "swapOnActivate":true,
             "swapOnDeactivate":true,

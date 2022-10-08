@@ -6,17 +6,54 @@ objectdef isb2 inherits isb2_profilecollection
     ; Reference to the currently selected Profile in the main window
     variable weakref SelectedProfile
 
+    variable jsonvalueref Settings="{}"
+
     variable isb2_importer Importer
     variable isb2_slotmanager SlotManager
 
     method Initialize()
     {
+        This:LoadSettings
+
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
     }
 
     method Shutdown()
     {
         LGUI2:UnloadPackageFile[ISB2.Uplink.lgui2Package.json]
+    }
+
+    member:filepath SettingsFilename()
+    {
+        return "${Script.CurrentDirectory}/ISB2.Settings.json"
+    }
+
+    method LoadDefaultSettings()
+    {
+        Settings:SetReference["{}"]
+    }
+
+    method LoadSettings()
+    {
+        if ${Script.CurrentDirectory.FileExists[ISB2.Settings.json]}
+        {
+            Settings:SetReference["jsonobject.ParseFile[\"${This.SettingsFilename~}\"]"]
+            if !${Settings.Reference(exists)}
+            {
+                This:LoadDefaultSettings
+            }
+        }
+        else
+        {
+            This:LoadDefaultSettings
+            This:StoreSettings
+        }
+
+    }
+
+    method StoreSettings()
+    {
+        return ${Settings:WriteFile["${This.SettingsFilename~}",multiline](exists)}
     }
 
     method LoadTests()

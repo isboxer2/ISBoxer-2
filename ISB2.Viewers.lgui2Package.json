@@ -2,6 +2,47 @@
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
     "skin":"ISBoxer 2",
     "templates": {
+        "isb2.profileComplexView":{
+            "jsonTemplate":"listboxitem",
+            "padding":[5,2],
+            "content":{
+                "type":"dockpanel",
+                "children":[
+                    {
+                        "type":"button",
+                        "_dock":"right",
+                        "content":"Unload",
+                        "eventHandlers":{
+                            "onPress":{
+                                "type":"code",
+                                "code":"ISB2:RemoveProfile[\"${This.Context.Data.Get[name]~}\"]"
+                            }
+                        }
+                    },
+                    {
+                        "type":"button",
+                        "_dock":"right",
+                        "margin":[5,0],
+                        "content":"Edit",
+                        "eventHandlers":{
+                            "onPress":{
+                                "type":"code",
+                                "code":"ISB2:OpenEditor[\"${This.Context.Data.Get[name]~}\"]"
+                            }
+                        }
+                    },
+                    {
+                        "type":"textblock",
+                        "_dock":"left",
+                        "verticalAlignment":"center",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                            "pullReplaceNull":""
+                        }
+                    }        
+                ]
+            }
+        },        
         "isb2.profileView":{
             "jsonTemplate":"listboxitem",
             "padding":2,

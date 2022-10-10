@@ -277,18 +277,6 @@
                                                 {
                                                     "type":"button",
                                                     "_dock":"top",
-                                                    "content":"Edit",
-                                                    "eventHandlers":{
-                                                        "onPress":{
-                                                            "type":"code",
-                                                            "code":"ISB2:OpenEditor[\"${ISB2.SelectedProfile.Name~}\"]"
-                                                        }
-                                                    }
-                                                },
-                                                {
-                                                    "type":"button",
-                                                    "_dock":"top",
-                                                    "margin":[0,5,0,0],
                                                     "content":"Import ...",
                                                     "eventHandlers":{
                                                         "onPress":{
@@ -334,7 +322,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                   "type":"template",
-                                                  "template":"isb2.profileView"
+                                                  "template":"isb2.profileComplexView"
                                                 }
                                             }
                                         }

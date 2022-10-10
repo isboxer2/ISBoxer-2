@@ -253,7 +253,7 @@ objectdef isb2_profilecollection
 
         ; the isb2_profile object is now created, assign its LocalFilename
         Profiles.Get["${name~}"].LocalFilename:Set["${fileName~}"]
-        echo "Profile added: ${name~}"
+;        echo "Profile added: ${name~}"
 
         ; fire an event for the GUI to refresh its Profiles if needed
         LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated] 
@@ -377,12 +377,24 @@ objectdef isb2_profileeditor
         Editing:SetReference[_profile]
         LGUI2:PushSkin["ISBoxer 2"]
         Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2.profileEditor]",This].ID}"]
+        Window:AddHook["onVisualDetached","$$>
+        {
+            "type":"method",
+            "object":"This.Context",
+            "method":"OnWindowClosed"
+        }
+        <$$"]
         LGUI2:PopSkin["ISBoxer 2"]
     }
 
     method Shutdown()
     {
         Window:Destroy
+    }
+
+    method OnWindowClosed()
+    {
+        ISB2.Editors:Erase["${Editing.Name~}"]
     }
 
     member:string GetLowerCamelCase(string fromString)

@@ -11,16 +11,37 @@ objectdef isb2 inherits isb2_profilecollection
     variable isb2_importer Importer
     variable isb2_slotmanager SlotManager
 
+    variable bool bAutoStoreSettings=TRUE
+
     method Initialize()
     {
         This:LoadSettings
 
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
+
+        This:LoadPreviousProfiles
+
+        LGUI2.Element[isb2.events]:AddHook[onProfilesUpdated,"$$>
+        {
+            "type":"method",
+            "method":"OnProfilesUpdated",
+            "object":"ISB2"
+        }
+        <$$"]
     }
 
     method Shutdown()
     {
         LGUI2:UnloadPackageFile[ISB2.Uplink.lgui2Package.json]
+    }
+
+    method OnProfilesUpdated()
+    {
+        variable jsonvalueref ja="[]"
+        Profiles:ForEach["ja:AddString[\"\${ForEach.Value.LocalFilename~}\"]"]
+        Settings:SetByRef[loadedProfiles,ja]
+
+        This:AutoStoreSettings
     }
 
     member:filepath SettingsFilename()
@@ -31,6 +52,11 @@ objectdef isb2 inherits isb2_profilecollection
     method LoadDefaultSettings()
     {
         Settings:SetReference["{}"]
+    }
+
+    method LoadPreviousProfiles()
+    {
+        Settings.Get[loadedProfiles]:ForEach["This:LoadFile[\"\${ForEach.Value~}\"]"]
     }
 
     method LoadSettings()
@@ -52,8 +78,16 @@ objectdef isb2 inherits isb2_profilecollection
     }
 
     method StoreSettings()
-    {
+    {        
         return ${Settings:WriteFile["${This.SettingsFilename~}",multiline](exists)}
+    }
+
+    method AutoStoreSettings()
+    {
+        if !${bAutoStoreSettings}
+            return
+
+        This:StoreSettings
     }
 
     method LoadTests()
@@ -76,6 +110,8 @@ objectdef isb2 inherits isb2_profilecollection
         variable string teamName="${LGUI2.Element[isb2.launcher.teams].SelectedItem.Data}"
         if !${teamName.NotNULLOrEmpty}
             return FALSE
+
+        Settings:SetString[lastLaunchedTeam,"${teamName~}"]
 
         return ${SlotManager:LaunchTeamByName["${teamName~}"]}
     }
@@ -353,7 +389,7 @@ objectdef isb2_slotmanager
         Event[OnFrame]:AttachAtom[This:Pulse]
         LaunchingSlot.Value:Launch
         return TRUE
-    }
+    }  
 
     method Stop()
     {

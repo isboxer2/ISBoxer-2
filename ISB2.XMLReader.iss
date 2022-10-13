@@ -662,6 +662,7 @@ objectdef isb2_isb1transformer
 
         This:TransformInteger[joTransform,"SwitchToComboIsGlobal",switchToComboIsGlobal]
         This:TransformKeyCombo[joTransform,SwitchToCombo,switchToCombo]
+        This:TransformKeyCombo[joTransform,SwitchToEffect,switchToEffect]
         This:TransformString[joTransform,EffectType,effectType,None]
 
         This:TransformInteger[joTransform,"GenerateFocusTargetMacro",generateFocusTargetMacro]
@@ -1224,7 +1225,7 @@ objectdef isb2_xmlreader
         if ${AutoArray} && ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
-            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]}
+            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]} || ${childTypes.FirstKey.Equal[unsignedInt]} || ${childTypes.FirstKey.Equal[FTLModifierEnum]}
             {
 ;                echo "\ayConvertNodeToObject\ax ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"

@@ -323,7 +323,7 @@ objectdef isb2_importer
             joNew:SetByRef[gameKeyBindings,ja]
         }        
 
-        if ${jo.Has[KeyMapWhiteOrBlackListType]}
+        if ${jo.Has[KeyMapWhiteOrBlackListType]} && ${jo.Get[KeyMapWhiteOrBlackListType]~.NotEqual[Ignore]}
         {
             joNew:SetString[mappableSheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
             joNew:SetString[hotkeySheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
@@ -405,7 +405,7 @@ objectdef isb2_importer
             joNew:SetByRef[gameKeyBindings,ja]
         }        
 
-        if ${jo.Has[KeyMapWhiteOrBlackListType]}
+        if ${jo.Has[KeyMapWhiteOrBlackListType]} && ${jo.Get[KeyMapWhiteOrBlackListType]~.NotEqual[Ignore]}
         {
             joNew:SetString[mappableSheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
             joNew:SetString[hotkeySheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
@@ -455,7 +455,7 @@ objectdef isb2_importer
             joNew:SetByRef[onLoad,joAction]
         }
 
-        if ${jo.Has[launchDelay]}
+        if ${jo.Has[launchDelay]} && ${jo.GetNumber[launchDelay]}
             joNew:SetNumber[launchDelay,"${jo.GetNumber[launchDelay]}"]
 
         if ${jo.Has[dynamicLaunchMode]}

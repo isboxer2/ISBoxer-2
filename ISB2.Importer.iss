@@ -482,7 +482,8 @@ objectdef isb2_importer
 
         variable jsonvalue jaSlots="[]"        
         jo.Get[Slots]:ForEach["jaSlots:AddByRef[\"This.ConvertCharacterSetSlot[ForEach.Value]\"]"]
-        joNew:SetByRef[slots,jaSlots]        
+        if ${jaSlots.Used}
+            joNew:SetByRef[slots,jaSlots]        
         return joNew
     }
 

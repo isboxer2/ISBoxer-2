@@ -299,7 +299,7 @@ objectdef isb2_isb1transformer
     {
         if ${spam}
         {
-            echo "\ayTransformSingleToArray[${property~}]:\ax ${joTransform~}"
+            echo "\ayTransformSingleToArray[${property~}]:\ax ${joTransform.Get["${property~}"]~}"
         }
         variable jsonvalueref joEntry
         joEntry:SetReference["joTransform.Get[\"${property~}\"]"]
@@ -332,7 +332,7 @@ objectdef isb2_isb1transformer
             if ${joEntry.Reference(exists)}
             {
 ;                echo "\arTransformSingleToArrayValues\ax ${property~} expected object: ${joEntry~}"
-                joTransform:SetByRef["${property~}",joEntry]
+                ; joTransform:SetByRef["${property~}",joEntry]
             }
             return
         }
@@ -587,8 +587,8 @@ objectdef isb2_isb1transformer
 
         This:AutoTransform[joTransform,"VirtualFileTargets"]  
 
-        This:AutoTransform[joTransform,"MenuInstances",Character]
-        This:AutoTransform[joTransform,"KeyMapWhiteOrBlackList",Character]
+;        This:AutoTransform[joTransform,"MenuInstances",Character]
+;        This:AutoTransform[joTransform,"KeyMapWhiteOrBlackList",Character]
         This:AutoTransform[joTransform,"VirtualMappedKeys",Character]
 
         This:TransformEventAction[joTransform,ExecuteOnLoad,executeOnLoad]
@@ -604,9 +604,17 @@ objectdef isb2_isb1transformer
     {
 ;        echo "AutoTransform_CharacterSet ${joTransform~}"
 
-        This:TransformSingleToArray[joTransform,"Slots"]
 
+        This:TransformSingleToArrayValues[joTransform,"LaunchCharacterSetStrings"]
+        This:TransformSingleToArray[joTransform,"KeyMapWhiteOrBlackList"]
+        This:TransformSingleToArray[joTransform,"MenuInstances"]
+        This:TransformSingleToArray[joTransform,"Slots"]
+        This:TransformSingleToArray[joTransform,"VirtualFileTargets"]
+        This:TransformSingleToArray[joTransform,"VirtualMappedKeys"]
+        This:TransformSingleToArray[joTransform,"VariableKeystrokeInstances"]
         This:TransformSingleToArray[joTransform,"WoWMacroSets"]        
+        This:TransformSingleToArrayValues[joTransform,"KeyMapStrings"]
+        This:TransformSingleToArrayValues[joTransform,"ClickBarStrings"]
 
         This:TransformKeyCombo[joTransform,GUIToggleCombo,guiToggleCombo]
         This:TransformKeyCombo[joTransform,ConsoleToggleCombo,consoleToggleCombo]
@@ -618,7 +626,7 @@ objectdef isb2_isb1transformer
 
         This:TransformBool[joTransform,UseConsoleToggleCombo,useConsoleToggleCombo]
 
-
+        This:TransformBool[joTransform,DynamicLaunchMode,dynamicLaunchMode]
         This:TransformBool[joTransform,LockForeground,lockForeground]
         This:TransformBool[joTransform,LockWindow,lockWindow]
         This:TransformBool[joTransform,DisableJambaTeamManagement,disableJambaTeamManagement]
@@ -632,6 +640,11 @@ objectdef isb2_isb1transformer
         This:TransformWoWMacroSets[joTransform,WoWMacroSets,wowMacroSets]
 
         This:AutoTransform[joTransform,"Slots","CharacterSet"]
+
+;        This:AutoTransform[joTransform,"MenuInstances",CharacterSet]
+;        This:AutoTransform[joTransform,"KeyMapWhiteOrBlackList",CharacterSet]
+        This:AutoTransform[joTransform,"VirtualFileTargets"]  
+        This:AutoTransform[joTransform,"VirtualMappedKeys",CharacterSet]
     }
 
     method TransformWoWMacroSets(jsonvalueref joTransform, string oldProperty, string newProperty)
@@ -1261,7 +1274,7 @@ objectdef isb2_xmlreader
         if ${AutoArray} && ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
-            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]} || ${childTypes.FirstKey.Equal[unsignedInt]} || ${childTypes.FirstKey.Equal[FTLModifierEnum]} || ${childTypes.FirstKey.Equal[MenuInstance]}
+            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]} || ${childTypes.FirstKey.Equal[unsignedInt]} || ${childTypes.FirstKey.Equal[FTLModifierEnum]} || ${childTypes.FirstKey.Equal[MenuInstance]} || ${childTypes.FirstKey.Equal[KeyMapLooseRef]}
             {
 ;                echo "\ayConvertNodeToObject\ax ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"

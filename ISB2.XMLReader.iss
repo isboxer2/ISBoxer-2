@@ -576,13 +576,21 @@ objectdef isb2_isb1transformer
     {
 ;        echo "AutoTransform_Character ${joTransform~}"
         This:TransformSingleToArray[joTransform,"VirtualFileTargets"]
+        This:TransformSingleToArray[joTransform,"KeyMapWhiteOrBlackList"]
+        This:TransformSingleToArray[joTransform,"MenuInstances"]
+        This:TransformSingleToArray[joTransform,"VirtualMappedKeys"]
+        This:TransformSingleToArray[joTransform,"VariableKeystrokeInstances"]
+        This:TransformSingleToArray[joTransform,"WoWMacroSets"]
         This:TransformSingleToArrayValues[joTransform,"RelayGroupStrings"]
         This:TransformSingleToArrayValues[joTransform,"KeyMapStrings"]
+        This:TransformSingleToArrayValues[joTransform,"ClickBarStrings"]
 
-;        echo transforming WoWMacroSets...
-        This:TransformSingleToArray[joTransform,"WoWMacroSets"]
+        This:AutoTransform[joTransform,"VirtualFileTargets"]  
 
-        This:AutoTransform[joTransform,"VirtualFileTargets"]        
+        This:AutoTransform[joTransform,"MenuInstances",Character]
+        This:AutoTransform[joTransform,"KeyMapWhiteOrBlackList",Character]
+        This:AutoTransform[joTransform,"VirtualMappedKeys",Character]
+
         This:TransformEventAction[joTransform,ExecuteOnLoad,executeOnLoad]
 
         This:TransformBool[joTransform,MuteBroadcasts,muteBroadcasts]
@@ -673,6 +681,34 @@ objectdef isb2_isb1transformer
         This:TransformInteger[joTransform,"LoadTwitch",loadTwitch]
 
         This:AutoTransform[joTransform,"VariableKeystrokeInstances"]
+    }
+
+    method AutoTransform_VirtualMappedKeys(jsonvalueref joTransform)
+    {
+        echo "\arAutoTransform_VirtualMappedKeys ${joTransform~}"
+        variable jsonvalue jo
+        if ${joTransform.Has[FromMappedKey]}
+        {
+            jo:SetValue["{}"]
+            if ${joTransform.Has[FromMappedKey,KeyMapString]}
+                jo:SetString[sheet,"${joTransform.Get[FromMappedKey,KeyMapString]~}"]
+            if ${joTransform.Has[FromMappedKey,MappedKeyString]}
+                jo:SetString[name,"${joTransform.Get[FromMappedKey,MappedKeyString]~}"]
+            joTransform:SetByRef[from,jo]
+
+            joTransform:Erase[FromMappedKey]
+        }
+        if ${joTransform.Has[ToMappedKey]}
+        {
+            jo:SetValue["{}"]
+            if ${joTransform.Has[ToMappedKey,KeyMapString]}
+                jo:SetString[sheet,"${joTransform.Get[ToMappedKey,KeyMapString]~}"]
+            if ${joTransform.Has[ToMappedKey,MappedKeyString]}
+                jo:SetString[name,"${joTransform.Get[ToMappedKey,MappedKeyString]~}"]
+            joTransform:SetByRef[to,jo]
+
+            joTransform:Erase[ToMappedKey]
+        }
     }
 
     method AutoTransform_Computer(jsonvalueref joTransform)
@@ -1225,7 +1261,7 @@ objectdef isb2_xmlreader
         if ${AutoArray} && ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
-            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]} || ${childTypes.FirstKey.Equal[unsignedInt]} || ${childTypes.FirstKey.Equal[FTLModifierEnum]}
+            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]} || ${childTypes.FirstKey.Equal[unsignedInt]} || ${childTypes.FirstKey.Equal[FTLModifierEnum]} || ${childTypes.FirstKey.Equal[MenuInstance]}
             {
 ;                echo "\ayConvertNodeToObject\ax ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"

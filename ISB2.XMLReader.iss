@@ -521,7 +521,7 @@ objectdef isb2_isb1transformer
         {
             if !${spam}
             {
-                echo "AutoTransform: no method ${methodName~}"
+                echo "\arAutoTransform: no method\ax ${methodName~}"
             }
             return
         }
@@ -944,11 +944,17 @@ objectdef isb2_isb1transformer
         This:TransformBool[joTransform,VideoFXAlwaysAffectsBroadcasting,videoFXAlwaysAffectsBroadcasting]
         This:TransformInteger[joTransform,CursorFeedAlpha,cursorFeedAlpha]
 
+        This:TransformSingleToArray[joTransform,"WhiteOrBlackList"]
         This:TransformColor[joTransform,CursorColorMask,cursorColorMask]
         
         This:TransformString[joTransform,MouseLight,mouseLight,None]
         This:TransformString[joTransform,KeyboardLight,keyboardLight,None]
         This:TransformString[joTransform,MouseTransformMode,mouseTransformMode,None]
+
+        This:TransformSize[joTransform,CursorFeedSourceSize,cursorFeedSourceSize]
+        This:TransformSize[joTransform,CursorFeedOutputSize,cursorFeedOutputSize]
+        This:TransformColor[joTransform,CursorFeedBorder,cursorFeedBorder]
+
     }
 
     method AutoTransform_Actions(jsonvalueref joTransform)

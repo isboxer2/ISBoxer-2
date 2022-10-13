@@ -64,13 +64,12 @@ objectdef isb2_importer
         {
             jo:SetByRef[clickBars,jRef]
         }
-        /*
+        
         jRef:SetReference[This.ConvertRepeaterProfiles]        
         if ${jRef.Used}
         {
-            jo:SetByRef[repeaterProfiles,jRef]
+            jo:SetByRef[broadcastProfiles,jRef]
         }
-        */
         jRef:SetReference[This.ConvertWindowLayouts]        
         if ${jRef.Used}
         {
@@ -78,6 +77,7 @@ objectdef isb2_importer
         }
 
         jo:SetString[name,"${filename.FilenameOnly~}"]
+        jo:SetString["$schema","http://www.lavishsoft.com/schema/isb2.json"]
         return jo
     }
 
@@ -291,7 +291,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertCharacterSetSlot(jsonvalueref jo)
     {
-        echo "ConvertCharacterSetSlot ${jo~}"
+        echo "\agConvertCharacterSetSlot\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         if ${jo.Has[CharacterString]}
@@ -352,7 +352,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertActionTimerPool(jsonvalueref jo)
     {
-        echo "ConvertActionTimerPool ${jo~}"
+        echo "\arConvertActionTimerPool\ax ${jo~}"
 
         return NULL
     }
@@ -416,14 +416,14 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertClickBarImage(jsonvalueref jo)
     {
-        echo "ConvertClickBarImage ${jo~}"
+        echo "\arConvertClickBarImage\ax ${jo~}"
 
         return NULL
     }
 
     member:jsonvalueref ConvertUserScreen(jsonvalueref jo)
     {
-        echo "ConvertUserScreen ${jo~}"
+        echo "\agConvertUserScreen\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
 
@@ -442,7 +442,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertUserScreenSet(jsonvalueref jo)
     {
-        echo "ConvertUserScreenSet ${jo~}"
+        echo "\agConvertUserScreenSet\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
 
@@ -463,7 +463,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertComputer(jsonvalueref jo)
     {
-        echo "ConvertComputer ${jo~}"
+        echo "\agConvertComputer\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[name]~}"]
@@ -484,14 +484,80 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertRepeaterProfile(jsonvalueref jo)
     {
-        echo "ConvertRepeaterProfile ${jo~}"
+        echo "\agConvertRepeaterProfile\ax ${jo~}"
+        variable jsonvalue joNew="{}"
 
-        return NULL
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+        if ${jo.Has[Description]}
+            joNew:SetString[description,"${jo.Get[Description]~}"]
+
+        if ${jo.Has[WhiteOrBlackListType]} && !${jo.Assert[WhiteOrBlackListType,"\"Ignore\""]}
+            joNew:SetString[whiteOrBlackListType,"${jo.Get[WhiteOrBlackListType]~}"]
+
+        if ${jo.Has[cursorColorMask]} && !${jo.Assert[cursorColorMask,"\"#ffffff\""]}
+            joNew:SetString[cursorColorMask,"${jo.Get[cursorColorMask]~}"]
+
+        if ${jo.Has[cursorFeedBorder]} && !${jo.Assert[cursorFeedBorder,"\"#ffffff\""]}
+            joNew:SetString[cursorFeedBorder,"${jo.Get[cursorFeedBorder]~}"]
+
+        if ${jo.Has[cursorFeedSourceSize]} && ${jo.GetInteger[cursorFeedSourceSize,Width]} && ${jo.GetInteger[cursorFeedSourceSize,Height]}
+            joNew:Set[cursorFeedSourceSize,"[${jo.GetInteger[cursorFeedSourceSize,Width]},${jo.GetInteger[cursorFeedSourceSize,Height]}]"]
+
+        if ${jo.Has[cursorFeedOutputSize]} && ${jo.GetInteger[cursorFeedOutputSize,Width]} && ${jo.GetInteger[cursorFeedOutputSize,Height]}
+            joNew:Set[cursorFeedOutputSize,"[${jo.GetInteger[cursorFeedOutputSize,Width]},${jo.GetInteger[cursorFeedOutputSize,Height]}]"]
+
+        if ${jo.Has[cursorFeedAlpha]}
+            joNew:SetInteger[cursorFeedAlpha,"${jo.GetInteger[cursorFeedAlpha]~}"]
+
+        if ${jo.Has[RepeaterTarget]}
+            joNew:SetString[broadcastTarget,"${jo.Get[RepeaterTarget]~}"]
+
+        if ${jo.Has[mouseTransformMode]}
+            joNew:SetString[mouseTransformMode,"${jo.Get[mouseTransformMode]~}"]
+
+        if ${jo.Has[mouseLight]}
+            joNew:SetString[mouseLight,"${jo.Get[mouseLight]~}"]
+
+        if ${jo.Has[keyboardLight]}
+            joNew:SetString[keyboardLight,"${jo.Get[keyboardLight]~}"]
+
+        if ${jo.Has[blockLocal]}
+            joNew:SetBool[blockLocal,${jo.GetBool[blockLocal]}]
+
+        if ${jo.Has[muteCursorWhenForeground]}
+            joNew:SetBool[muteCursorWhenForeground,${jo.GetBool[muteCursorWhenForeground]}]
+
+        if ${jo.Has[videoFXAlwaysAffectsBroadcasting]}
+            joNew:SetBool[videoFXAlwaysAffectsBroadcasting,${jo.GetBool[videoFXAlwaysAffectsBroadcasting]}]
+
+        if ${jo.Has[keyRepeatEnabled]}
+            joNew:SetBool[keyBroadcastEnabled,${jo.GetBool[keyBroadcastEnabled]}]
+
+        if ${jo.Has[mouseRepeatEnabled]}
+            joNew:SetBool[mouseBroadcastEnabled,${jo.GetBool[mouseBroadcastEnabled]}]
+
+        if ${jo.Has[falseCursor]}
+            joNew:SetBool[falseCursor,${jo.GetBool[falseCursor]}]
+
+        if ${jo.Has[cursorFeed]}
+            joNew:SetBool[cursorFeed,${jo.GetBool[cursorFeed]}]
+
+        if ${jo.Has[WhiteOrBlackList]}
+        {
+                variable jsonvalue ja="[]"
+
+                jo.Get[WhiteOrBlackList]:ForEach["This:AddConvertedISKey[ja,ForEach.Value]"]
+
+                joNew:SetByRef[whiteOrBlackList,ja]
+
+        }
+
+        return joNew
     }
 
     member:jsonvalueref ConvertVariableKeystroke(jsonvalueref jo)
     {
-        echo "ConvertVariableKeystroke ${jo~}"
+;        echo "\agConvertVariableKeystroke\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
 
@@ -544,7 +610,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertWindowLayout(jsonvalueref jo)
     {
-        echo "ConvertWindowLayout ${jo~}"
+        echo "\agConvertWindowLayout\ax ${jo~}"
         variable jsonvalue joNew="{}"
     
 ;        joNew:SetByRef[original,jo]
@@ -573,7 +639,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertWoWMacroSet(jsonvalueref jo)
     {
-        echo "ConvertWoWMacroSet ${jo~}"
+;        echo "\agConvertWoWMacroSet\ax ${jo~}"
 
         if !${jo.Get[WoWMacros].Used}
         {
@@ -599,7 +665,7 @@ objectdef isb2_importer
 
     method ConvertWoWMacroInto(jsonvalueref ja, jsonvalueref jo)
     {
-        echo "ConvertWoWMacroInto ${jo~}"
+;        echo "\agConvertWoWMacroInto\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -619,35 +685,35 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertCrypticMacroSet(jsonvalueref jo)
     {
-        echo "ConvertCrypticMacroSet ${jo~}"
+        echo "\arConvertCrypticMacroSet\ax ${jo~}"
 
         return NULL
     }
 
     member:jsonvalueref ConvertMenu(jsonvalueref jo)
     {
-        echo "ConvertMenu ${jo~}"
+        echo "\arConvertMenu\ax ${jo~}"
 
         return NULL
     }
 
     member:jsonvalueref ConvertMenuHotkeySet(jsonvalueref jo)
     {
-        echo "ConvertMenuHotkeySet ${jo~}"
+        echo "\arConvertMenuHotkeySet\ax ${jo~}"
 
         return NULL
     }
 
     member:jsonvalueref ConvertMenuTemplate(jsonvalueref jo)
     {
-        echo "ConvertMenuTemplate ${jo~}"
+        echo "\arConvertMenuTemplate\ax ${jo~}"
 
         return NULL
     }
 
     member:jsonvalueref ConvertMenuButtonSet(jsonvalueref jo)
     {
-        echo "ConvertMenuButtonSet ${jo~}"
+        echo "\arConvertMenuButtonSet\ax ${jo~}"
 
         return NULL
     }
@@ -761,7 +827,7 @@ objectdef isb2_importer
             return joNew
         }
 
-        echo "ConvertAction unhandled: ${jo.Get[type]~}"        
+        echo "\arConvertAction unhandled\ax: ${jo.Get[type]~}"        
         jo:SetString[originalActionType,"${jo.Get[type]~}"]
         jo:Erase[type]
         return jo

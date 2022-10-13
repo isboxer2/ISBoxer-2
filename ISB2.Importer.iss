@@ -1281,6 +1281,8 @@ objectdef isb2_importer
 
         if ${jo.Has[RepeaterTarget]}
             joNew:SetString[value,"${jo.Get[RepeaterTarget]~}"]
+        else
+            joNew:SetString[value,"all other"]
 
         if ${jo.GetBool[BlockLocal]}
             joNew:SetBool[blockLocal,1]

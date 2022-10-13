@@ -52,6 +52,114 @@ objectdef isb2_profileengine
         TaskManager:Destroy
     }
 
+    method InstallDefaultVirtualFiles()
+    {
+
+		;fileredirect "SavedVariables/Jamba.lua" "SavedVariables/Jamba-ISBoxer.lua"
+		fileredirect "Global/DAoCi1" "Global\\DAoCi1-${ISSession.Slot}-${Time.Timestamp}-${Math.Rand[1000]}"
+		fileredirect "Global/DAoCi2" "Global\\DAoCi2-${ISSession.Slot}-${Time.Timestamp}-${Math.Rand[1000]}"
+		fileredirect "ui.log" "ui.Slot-${ISSession.Slot}.log"
+
+		fileredirect "SwgClientInstanceRunning" "SwgClientInstanceRunning-${ISSession.Slot}-${Time.Timestamp}-${Math.Rand[1000]}"
+		fileredirect "AN-Mutex-Window-Guild Wars 2" "AN-Mutex-Window-Guild Wars 2-${ISSession.Slot}-${Time.Timestamp}-${Math.Rand[1000]}"
+		fileredirect "AN-Mutex-Window-Guild Wars" "AN-Mutex-Window-Guild Wars-${ISSession.Slot}-${Time.Timestamp}-${Math.Rand[1000]}"
+;		fileredirect "AN-Mutex-OsPatch" "AN-Mutex-OsPatch-${ISSession.Slot}"
+		fileredirect "wot_client_mutex" "wot_client_mutex-${ISSession.Slot}-${Time.Timestamp}-${Math.Rand[1000]}"
+		fileredirect "AionClientLaunchedCounter" "AionClientLaunchedCounter-${ISSession.Slot}-${Time.Timestamp}-${Math.Rand[1000]}"
+		
+		; fileredirect "gw2.dat" "gw2-ISBoxerSlot${ISSession.Slot}.dat"
+
+		; Star Wars: The Old Republic
+		fileredirect "DiskCacheArena" "DiskCacheArena-${ISSession.Slot}"
+		fileredirect "DiskCacheStatic" "DiskCacheStatic-${ISSession.Slot}"
+		fileredirect "DiskCacheStream" "DiskCacheStream-${ISSession.Slot}"
+
+		fileredirect "Empyrean Client" "Empyrean Client-${ISSession.Slot}"
+		fileredirect "Heroes of the Storm IPC Mem" "Heroes of the Storm IPC Mem-${ISSession.Slot}"
+		fileredirect "Heroes of the Storm Game Application" "Heroes of the Storm Game Application-${ISSession.Slot}"
+		
+		fileredirect "DiabloII Check For Other Instances" "DiabloII Check For Other Instances-${ISSession.Slot}"
+		fileredirect "Data_D3/PC/MPQs/Cache/" "Data_D3/PC/MPQs/Cache-${ISSession.Slot}/"
+		fileredirect "DSOClient/dlcache/" "DSOClient/dlcache-${ISSession.Slot}/"
+		fileredirect "Entropia_0" "Entropia_0-${ISSession.Slot}"
+		fileredirect "PlanetSide 2.running" "PlanetSide 2.running-${ISSession.Slot}"
+		fileredirect "Wizardry Online Beta.running" "Wizardry Online Beta.running-${ISSession.Slot}"
+		fileredirect "Wizardry Online.running" "Wizardry Online.running-${ISSession.Slot}"
+		fileredirect "Dragon" "Dragon-${ISSession.Slot}"
+		fileredirect "Global/Lunia" "Global/Lunia-${ISSession.Slot}"
+		fileredirect "Global/6AA83AB5-BAC4-4a36-9F66-A309770760CB_ffxiv_game00" "Global/6AA83AB5-BAC4-4a36-9F66-A309770760CB_ffxiv_game00-${ISSession.Slot}"
+		fileredirect "Global/6AA83AB5-BAC4-4a36-9F66-A309770760CB_ffxiv_game01" "Global/6AA83AB5-BAC4-4a36-9F66-A309770760CB_ffxiv_game01-${ISSession.Slot}"
+		fileredirect "Global/PoERunMutexA" "Global/PoERunMutexA-${ISSession.Slot}"
+		fileredirect "Global/PoERunMutexB" "Global/PoERunMutexB-${ISSession.Slot}"
+
+		fileredirect "Global/Valve_SteamIPC_Class" "Global/Valve_SteamIPC_Class-${ISSession.Slot}"
+		fileredirect "Global/SteamInstanceGlobal" "Global/SteamInstanceGlobal-${ISSession.Slot}"
+        
+        fileredirect "STEAM_DIPC_*" "STEAM_DIPC_{1}-${ISSession.Slot}"
+        fileredirect "SREAM_DIPC_*" "SREAM_DIPC_{1}-${ISSession.Slot}"
+        fileredirect "STEAM_DRM_IPC" "STEAM_DRM_IPC-${ISSession.Slot}"
+        fileredirect "SteamOverlayRunning_*" "SteamOverlayRunning_${ISSession.Slot}_{1}"
+        fileredirect "Steam3Master_*" "Steam3Master_${ISSession.Slot}_{1}"
+
+		fileredirect "Software/Valve/Steam/" "Software/Valve/Steam-ISBoxer/Slot${ISSession.Slot}/"
+		; config.vdf, SteamAppData.vdf, loginusers.vdf
+
+		; Glyph
+		fileredirect "glyphcrashhandler" "glyphcrashhandler-${ISSession.Slot}"
+
+		; Tree of Savior
+		fileredirect "/TreeOfSavior/" "/TreeOfSavior-${ISSession.Slot}/"
+		fileredirect "tosUpdater$%&%%^@&^*($#" "tosUpdater$%&%%^@&^*($#-${ISSession.Slot}"
+		fileredirect "^&(%($$#^@@%$^!Project_R1!@$%^&!#*()#$%^" "^&(%($$#^@@%$^!Project_R1!@$%^&!#*()#$%^-${ISSession.Slot}"
+
+		; The Secret World
+		fileredirect lock2.txt lock2-${ISSession.Slot}
+;		fileredirect "${System.CurrentDirectory(string)~}/Default/"  "${System.CurrentDirectory(string)~}/Default-${ISSession.Slot}/"
+
+		fileredirect "Allods_Online_Game" "Allods_Online_Game-${ISSession.Slot}"
+		fileredirect "wgc_running_games_mtx" "wgc_running_games_mtx-${ISSession.Slot}"
+		fileredirect "World of Warships" "World of Warships-${ISSession.Slot}"
+
+		fileredirect "ROBLOX_singletonEvent" "ROBLOX_singletonEvent-${ISSession.Slot}"
+
+		; SWTOR Bitraider
+		fileredirect "Local/BRWCExtApp_FM_V1" "Local/BRWCExtApp_FM_V1-${ISSession.Slot}"
+
+		if ${LavishScript.Executable.Find[acclient.exe]} || ${LavishScript.Executable.Find[aclauncher.exe]}
+		{
+			fileredirect "client_highres.dat" "ISBoxer.Slot${ISSession.Slot}.client_highres.dat"
+			fileredirect "client_portal.dat" "ISBoxer.Slot${ISSession.Slot}.client_portal.dat"
+			fileredirect "client_local_English.dat" "ISBoxer.Slot${ISSession.Slot}.client_local_English.dat"
+			fileredirect "client_cell_1.dat" "ISBoxer.Slot${ISSession.Slot}.client_cell_1.dat"
+		}
+		if ${LavishScript.Executable.Find[ac2client.exe]} || ${LavishScript.Executable.Find[ac2launcher.exe]}
+		{
+			fileredirect "highres.dat" "ISBoxer.Slot${ISSession.Slot}.highres.dat"
+			fileredirect "portal.dat" "ISBoxer.Slot${ISSession.Slot}.portal.dat"
+			fileredirect "cell_1.dat" "ISBoxer.Slot${ISSession.Slot}.cell_1.dat"
+			fileredirect "cell_2.dat" "ISBoxer.Slot${ISSession.Slot}.cell_2.dat"
+			fileredirect "country.dat" "ISBoxer.Slot${ISSession.Slot}.country.dat"
+
+			fileredirect "local_Chinese.dat" "ISBoxer.Slot${ISSession.Slot}.local_Chinese.dat"
+			fileredirect "local_Deutsch.dat" "ISBoxer.Slot${ISSession.Slot}.local_Deutsch.dat"
+			fileredirect "local_English.dat" "ISBoxer.Slot${ISSession.Slot}.local_English.dat"
+			fileredirect "local_Francais.dat" "ISBoxer.Slot${ISSession.Slot}.local_Francais.dat"
+			fileredirect "local_Japanese.dat" "ISBoxer.Slot${ISSession.Slot}.local_Japanese.dat"
+			fileredirect "local_Korean.dat" "ISBoxer.Slot${ISSession.Slot}.local_Korean.dat"
+		}
+
+		if ${LavishScript.Executable.Find[swtor.exe]}
+		{
+			fileredirect "Local/" "Local/${ISSession.Slot}::"
+		}
+
+
+		fileredirect "isboxer-binds.txt" "isboxer-${Team.Get[name]~}-${Character.Get[name]~}-binds.txt"
+		
+		fileredirect "ISBoxer_Character_Set.lua" "ISBoxer_Character_Set-${Team.Get[name]~}.lua"
+		fileredirect "ISBoxer_Character.lua" "ISBoxer_Character-${Character.Get[name]~}.lua"
+    }
+
     method InstallDefaultActionTypes()
     {
 ;        Actions.ActionObject:Set["${actionObject~}"]
@@ -644,6 +752,8 @@ objectdef isb2_profileengine
 
         This:ActivateWindowLayoutByName["${Team.Get["windowLayout"]~}"]
 
+        This:InstallVirtualFiles["Character.Get[virtualFiles]"]
+
         LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
     }
 
@@ -674,6 +784,8 @@ objectdef isb2_profileengine
         uplink relaygroup -join "${qualifiedName~}"
 
         This:ActivateProfilesByName["Team.Get[profiles]"]
+
+        This:InstallVirtualFiles["Team.Get[virtualFiles]"]
 
         variable jsonvalue dscopeDefinition
         dscopeDefinition:SetValue["$$>

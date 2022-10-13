@@ -252,7 +252,7 @@ objectdef isb2_importer
 #region Individual Conversion -- TODO
     member:jsonvalueref ConvertCharacter(jsonvalueref jo)
     {
-        echo "\arConvertCharacter\ax ${jo~}"
+;        echo "\agConvertCharacter\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -362,19 +362,127 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertCharacterSet(jsonvalueref jo)
     {
-        echo "\arConvertCharacterSet\ax ${jo~}"
+;        echo "\agConvertCharacterSet\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
 
+        if ${jo.Has[Description]}
+            joNew:SetString[description,"${jo.Get[Description]~}"]
+
+        if ${jo.Has[CursorClippingMode]}
+            joNew:SetString[cursorClippingMode,"${jo.Get[CursorClippingMode]~}"]
+
+        if ${jo.Has[ComputerString]}
+            joNew:SetString[computer,"${jo.Get[ComputerString]~}"]
+
+        if ${jo.Has[RepeaterProfile]}
+            joNew:SetString[broadcastProfile,"${jo.Get[RepeaterProfile]~}"]
+
         if ${jo.Get[WindowLayout,WindowLayoutString].NotNULLOrEmpty}
             joNew:SetString[windowLayout,"${jo.Get[WindowLayout,WindowLayoutString]~}"]
+
+        if ${jo.Has[VirtualFileTargets]}
+            joNew:SetByRef["virtualFiles","jo.Get[VirtualFileTargets]"]
+
+        if ${jo.Has[KeyMapStrings]}
+        {
+            joNew:SetByRef[hotkeySheets,"jo.Get[KeyMapStrings]"]
+            joNew:SetByRef[mappableSheets,"jo.Get[KeyMapStrings]"]
+        }
+
+        if ${jo.Has[ClickBarStrings]}
+            joNew:SetByRef[clickBars,"jo.Get[ClickBarStrings]"]
+
+        if ${jo.Has[LaunchCharacterSetStrings]}
+            joNew:SetByRef[alsoLaunch,"jo.Get[LaunchCharacterSetStrings]"]
+
+        variable jsonvalue ja
+        if ${jo.Has[VariableKeystrokeInstances]}
+        {
+            ja:SetValue["[]"]
+            jo.Get[VariableKeystrokeInstances]:ForEach["This:ConvertVariableKeystrokeInto[ja,ForEach.Value]"]
+            joNew:SetByRef[gameKeyBindings,ja]
+        }        
+
+        if ${jo.Has[KeyMapWhiteOrBlackListType]}
+        {
+            joNew:SetString[mappableSheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
+            joNew:SetString[hotkeySheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
+
+            if ${jo.Has[KeyMapWhiteOrBlackList]}
+            {
+                ja:SetValue["[]"]
+                jo.Get[KeyMapWhiteOrBlackList]:ForEach["ja:AddString[\"\${ForEach.Value.Get[KeyMapString]}\"]"]
+
+                joNew:SetByRef[mappableSheetWhiteOrBlackList,ja]
+                joNew:SetByRef[hotkeySheetWhiteOrBlackList,ja]
+            }
+        }
+
+        if ${jo.Has[VirtualMappedKeys]}
+            joNew:SetByRef[virtualMappables,"jo.Get[VirtualMappedKeys]"]
+
+        if ${jo.Has[MenuInstances]}
+        {
+            ja:SetValue["[]"]
+            jo.Get[MenuInstances]:ForEach["ja:AddString[\"\${ForEach.Value.Get[MenuString]}\"]"]
+
+            joNew:SetByRef[menus,ja]
+        }      
+
+        if ${jo.Has[guiToggleCombo,Combo]}
+            joNew:SetString[guiToggleCombo,"${jo.Get[guiToggleCombo,Combo]~}"]
+
+        if !${jo.Has[useConsoleToggleCombo]} || ${jo.GetBool[useConsoleToggleCombo]}
+        {
+            if ${jo.Has[consoleToggleCombo,Combo]}
+                joNew:SetString[consoleToggleCombo,"${jo.Get[consoleToggleCombo,Combo]~}"]
+        }
+        if ${jo.Has[videoFXFocusCombo,Combo]}
+            joNew:SetString[vfxFocusCombo,"${jo.Get[videoFXFocusCombo,Combo]~}"]
+
+        if ${jo.Has[executeOnLoad]}
+        {
+            variable jsonvalue joAction="{}"
+            joAction:SetString[type,mappable]
+            if ${jo.Has[executeOnLoad,Target]}
+                joAction:SetString[target,"${jo.Get[executeOnLoad,Target]~}"]
+
+            joAction:SetString[sheet,"${jo.Get[executeOnLoad,KeyMapString]~}"]
+            joAction:SetString[name,"${jo.Get[executeOnLoad,MappedKeyString]~}"]
+
+            joNew:SetByRef[onLoad,joAction]
+        }
+
+        if ${jo.Has[launchDelay]}
+            joNew:SetNumber[launchDelay,"${jo.GetNumber[launchDelay]}"]
+
+        if ${jo.Has[dynamicLaunchMode]}
+            joNew:SetBool[dynamicLaunchMode,"${jo.GetBool[dynamicLaunchMode]}"]
+
+        if ${jo.Has[lockWindow]}
+            joNew:SetBool[lockWindow,"${jo.GetBool[lockWindow]}"]
+
+        if ${jo.Has[disableJambaTeamManagement]}
+            joNew:SetBool[disableJambaTeamManagement,"${jo.GetBool[disableJambaTeamManagement]}"]
+
+        if ${jo.Has[disableFPSIndicator]}
+            joNew:SetBool[disableFPSIndicator,"${jo.GetBool[disableFPSIndicator]}"]
+
+        if ${jo.Has[disableForceWindowed]}
+            joNew:SetBool[disableForceWindowed,"${jo.GetBool[disableForceWindowed]}"]
+
+        if ${jo.Has[autoMuteBackground]}
+            joNew:SetBool[autoMuteBackground,"${jo.GetBool[autoMuteBackground]}"]
+
+        if ${jo.Has[enforceSingleWindowControl]} && ${jo.GetBool[enforceSingleWindowControlTested]}
+            joNew:SetBool[enforceSingleWindowControl,"${jo.GetBool[enforceSingleWindowControl]}"]
+
 
         variable jsonvalue jaSlots="[]"        
         jo.Get[Slots]:ForEach["jaSlots:AddByRef[\"This.ConvertCharacterSetSlot[ForEach.Value]\"]"]
         joNew:SetByRef[slots,jaSlots]        
-
-        joNew:SetByRef[original,jo]     
         return joNew
     }
 

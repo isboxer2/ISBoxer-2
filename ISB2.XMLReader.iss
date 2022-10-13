@@ -328,14 +328,22 @@ objectdef isb2_isb1transformer
         joEntry:SetReference["joTransform.Get[\"${property~}\"]"]
 
         if !${joEntry.Type.Equal[object]}
+        {
+            if ${joEntry.Reference(exists)}
+            {
+;                echo "\arTransformSingleToArrayValues\ax ${property~} expected object: ${joEntry~}"
+                joTransform:SetByRef["${property~}",joEntry]
+            }
             return
+        }
 
+;        echo "TransformSingleToArrayValues ${joEntry~}"
         variable jsonvalue ja="[]"
         if ${joEntry.Used} == 1        
             joEntry:ForEach["ja:Add[\"\${ForEach.Value.AsJSON~}\"]"]
         else
             ja:AddByRef[joEntry]
-;        echo Transformed ${property~}
+;        echo "Transformed ${property~}: ${ja~}"
         joTransform:SetByRef["${property~}",ja]
     }
 
@@ -641,6 +649,11 @@ objectdef isb2_isb1transformer
 ;        echo "\arAutoTransform_CharacterSet_Slots\ax ${joTransform~}"
 
         This:TransformSingleToArrayValues[joTransform,FTLModifiers]
+
+        if ${joTransform.Has[CPUCores]}
+        {
+            joTransform:SetByRef[CPUCores,"joTransform.Get[CPUCores,unsignedInt]"]
+        }
         This:TransformSingleToArrayValues[joTransform,CPUCores]
         This:TransformSingleToArray[joTransform,VariableKeystrokeInstances]
 

@@ -259,21 +259,104 @@ objectdef isb2_importer
         if ${jo.Has[ActualName]}
             joNew:SetString[actualName,"${jo.Get[ActualName]~}"]
 
+        if ${jo.Has[SubAccountName]}
+        {
+            if ${jo.Has[AccountName]}
+                joNew:SetString[email,"${jo.Get[AccountName]~}"]
+
+            joNew:SetString[accountName,"${jo.Get[SubAccountName]~}"]
+        }
+        elseif ${jo.Has[AccountName]}
+        {
+            variable string accountName
+            accountName:Set["${jo.Get[AccountName]~}"]
+            if ${accountName.Find["@"]}
+                joNew:SetString[email,"${accountName~}"]
+            else
+                joNew:SetString[accountName,"${accountName~}"]
+        }
+
+        if ${jo.Has[muteBroadcasts]}
+            joNew:SetBool[muteBroadcasts,${jo.GetBool[muteBroadcasts]}]
+        if ${jo.Has[videoFeedViewersPermanent]}
+            joNew:SetBool[vfxViewersPermanent,${jo.GetBool[videoFeedViewersPermanent]}]
+
+        if ${jo.Has[ServerName]}
+            joNew:SetString[gameServer,"${jo.Get[ServerName]~}"]
+
         if ${jo.Has[VirtualFileTargets]}
             joNew:SetByRef["virtualFiles","jo.Get[VirtualFileTargets]"]
 
         if ${jo.Has[RelayGroupStrings]}
-            joNew:Set[targetGroups,"${jo.Get[RelayGroupStrings]~}"]
+            joNew:SetByRef[targetGroups,"jo.Get[RelayGroupStrings]"]
 
-        jo:SetString[game,"${jo.Get[KnownGame]~}"]
+        if ${jo.Has[KeyMapStrings]}
+        {
+            joNew:SetByRef[hotkeySheets,"jo.Get[KeyMapStrings]"]
+            joNew:SetByRef[mappableSheets,"jo.Get[KeyMapStrings]"]
+        }
+
+        if ${jo.Has[ClickBarStrings]}
+            joNew:SetByRef[clickBars,"jo.Get[ClickBarStrings]"]
+
+
+        if ${jo.Has[executeOnLoad]}
+        {
+            variable jsonvalue joAction="{}"
+            joAction:SetString[type,mappable]
+            if ${jo.Has[executeOnLoad,Target]}
+                joAction:SetString[target,"${jo.Get[executeOnLoad,Target]~}"]
+
+            joAction:SetString[sheet,"${jo.Get[executeOnLoad,KeyMapString]~}"]
+            joAction:SetString[name,"${jo.Get[executeOnLoad,MappedKeyString]~}"]
+
+            joNew:SetByRef[onLoad,joAction]
+        }
+
+        joNew:SetString[game,"${jo.Get[KnownGame]~}"]
+
+        variable jsonvalue ja
+        if ${jo.Has[VariableKeystrokeInstances]}
+        {
+            ja:SetValue["[]"]
+            jo.Get[VariableKeystrokeInstances]:ForEach["This:ConvertVariableKeystrokeInto[ja,ForEach.Value]"]
+            joNew:SetByRef[gameKeyBindings,ja]
+        }        
+
+        if ${jo.Has[KeyMapWhiteOrBlackListType]}
+        {
+            joNew:SetString[mappableSheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
+            joNew:SetString[hotkeySheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
+
+            if ${jo.Has[KeyMapWhiteOrBlackList]}
+            {
+                ja:SetValue["[]"]
+                jo.Get[KeyMapWhiteOrBlackList]:ForEach["ja:AddString[\"\${ForEach.Value.Get[KeyMapString]}\"]"]
+
+                joNew:SetByRef[mappableSheetWhiteOrBlackList,ja]
+                joNew:SetByRef[hotkeySheetWhiteOrBlackList,ja]
+            }
+        }
+
+        if ${jo.Has[VirtualMappedKeys]}
+            joNew:SetByRef[virtualMappables,"jo.Get[VirtualMappedKeys]"]
+
+        if ${jo.Has[MenuInstances]}
+        {
+            ja:SetValue["[]"]
+            jo.Get[MenuInstances]:ForEach["ja:AddString[\"\${ForEach.Value.Get[MenuString]}\"]"]
+
+            joNew:SetByRef[menus,ja]
+        }
 
         variable jsonvalue joGLI="{}"
         joGLI:SetString[game,"${jo.Get[Game]~}"]
         joGLI:SetString[gameProfile,"${jo.Get[GameProfile]~}"]
 
-        joNew:SetByRef[gameLaunchInfo,joGLI]
+        if ${jo.Has[AppendParameters]}
+            joGLI:SetString[appendParameters,"${jo.Get[AppendParameters]~}"]
 
-        joNew:SetByRef[original,jo]
+        joNew:SetByRef[gameLaunchInfo,joGLI]
         return joNew
     }
 
@@ -636,6 +719,8 @@ objectdef isb2_importer
         ; applies to overrides (e.g. per slot)
         if ${jo.Has[combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
+        if ${jo.Has[Combo,Combo]}
+            joNew:SetString[keyCombo,"${jo.Get[Combo,Combo]~}"]
 
         return joNew
     }

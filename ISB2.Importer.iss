@@ -252,7 +252,7 @@ objectdef isb2_importer
 #region Individual Conversion -- TODO
     member:jsonvalueref ConvertCharacter(jsonvalueref jo)
     {
-;        echo "ConvertCharacter ${jo~}"
+        echo "\arConvertCharacter\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -262,6 +262,9 @@ objectdef isb2_importer
         if ${jo.Has[VirtualFileTargets]}
             joNew:SetByRef["virtualFiles","jo.Get[VirtualFileTargets]"]
 
+        if ${jo.Has[RelayGroupStrings]}
+            joNew:Set[targetGroups,"${jo.Get[RelayGroupStrings]~}"]
+
         jo:SetString[game,"${jo.Get[KnownGame]~}"]
 
         variable jsonvalue joGLI="{}"
@@ -270,12 +273,13 @@ objectdef isb2_importer
 
         joNew:SetByRef[gameLaunchInfo,joGLI]
 
+        joNew:SetByRef[original,jo]
         return joNew
     }
 
     member:jsonvalueref ConvertCharacterSet(jsonvalueref jo)
     {
-;        echo "ConvertCharacterSet ${jo~}"
+        echo "\arConvertCharacterSet\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -286,12 +290,14 @@ objectdef isb2_importer
         variable jsonvalue jaSlots="[]"        
         jo.Get[Slots]:ForEach["jaSlots:AddByRef[\"This.ConvertCharacterSetSlot[ForEach.Value]\"]"]
         joNew:SetByRef[slots,jaSlots]        
+
+        joNew:SetByRef[original,jo]     
         return joNew
     }
 
     member:jsonvalueref ConvertCharacterSetSlot(jsonvalueref jo)
     {
-        echo "\agConvertCharacterSetSlot\ax ${jo~}"
+;        echo "\agConvertCharacterSetSlot\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         if ${jo.Has[CharacterString]}
@@ -301,6 +307,54 @@ objectdef isb2_importer
         if ${jo.Has[backgroundMaxFPS]}
             joNew:SetInteger[backgroundFPS,"${jo.GetInteger[backgroundMaxFPS]~}"]
 
+        if ${jo.Has[switchToCombo,Combo]}
+            joNew:SetString[switchToCombo,"${jo.Get[switchToCombo,Combo]~}"]
+
+        if ${jo.Has[switchToComboIsGlobal]}
+            joNew:SetBool[switchToComboIsGlobal,"${jo.GetBool[switchToComboIsGlobal]}"]
+
+        if ${jo.Has[effectType]}
+            joNew:SetString[switchToEffectType,"${jo.Get[effectType]~}"]
+
+        variable jsonvalue joAction="{}"
+        if ${jo.Has[switchToEffect,Combo]}
+        {
+            joAction:SetString["type","keystroke"]
+            joAction:SetString["target","all other"]
+            joAction:SetString["keyCombo","${jo.Get[switchToEffect,Combo]~}"]
+
+            joNew:SetByRef[onSwitchTo,joAction]
+        }
+        elseif ${jo.Has[SwitchToKeyMapString]}
+        {
+            joAction:SetString["type","mappable"]
+            joAction:SetString["sheet","${jo.Get[SwitchToKeyMapString]~}"]
+            joAction:SetString["name","${jo.Get[SwitchToMappedKeyString]~}"]
+
+            joNew:SetByRef[onSwitchTo,joAction]
+        }
+        
+        if ${jo.Has[WindowTitle]}
+            joNew:SetString[windowTitle,"${jo.Get[WindowTitle]~}"]
+
+        if ${jo.Has[FTLModifiers]}
+            joNew:SetByRef[ftlModifiers,"jo.Get[FTLModifiers]"]
+
+        variable jsonvalue ja="[]"
+        if ${jo.Has[VariableKeystrokeInstances]}
+        {
+            jo.Get[VariableKeystrokeInstances]:ForEach["This:ConvertVariableKeystrokeInto[ja,ForEach.Value]"]
+            joNew:SetByRef[gameKeyBindings,ja]
+        }
+
+        if ${jo.Has[CPUCores]}
+        {
+            ja:SetValue["[]"]
+            jo.Get[CPUCores]:ForEach["ja:AddInteger[\"\${ForEach.Value~}\"]"]
+            joNew:SetByRef[cpuCores,ja]
+        }
+
+;        joNew:SetByRef[original,jo]
         return joNew
     }
 
@@ -359,7 +413,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertClickBarButton(jsonvalueref jo)
     {
-        echo "ConvertClickBarButton ${jo~}"
+        echo "\agConvertClickBarButton\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -380,7 +434,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertClickBar(jsonvalueref jo)
     {
-        echo "ConvertClickBar ${jo~}"
+        echo "\agConvertClickBar\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -555,6 +609,16 @@ objectdef isb2_importer
         return joNew
     }
 
+    method ConvertVariableKeystrokeInto(jsonvalueref ja, jsonvalueref jo)
+    {
+;        echo ConvertMappedKeyAsHotkeyInto
+        variable jsonvalueref joNew="This.ConvertVariableKeystroke[jo]"
+        if !${joNew.Reference(exists)}
+            return
+
+        ja:AddByRef[joNew]
+    }
+
     member:jsonvalueref ConvertVariableKeystroke(jsonvalueref jo)
     {
 ;        echo "\agConvertVariableKeystroke\ax ${jo~}"
@@ -566,8 +630,12 @@ objectdef isb2_importer
             joNew:SetString[description,"${jo.Get[Description]~}"]
         if ${jo.Has[Category]}
             joNew:SetString[category,"${jo.Get[Category]~}"]
+        ; applies to globally defined variable keystrokes
         if ${jo.Has[defaultValue,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[defaultValue,Combo]~}"]
+        ; applies to overrides (e.g. per slot)
+        if ${jo.Has[combo,Combo]}
+            joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
 
         return joNew
     }

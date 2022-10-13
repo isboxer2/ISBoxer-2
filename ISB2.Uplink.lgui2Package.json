@@ -233,7 +233,12 @@
                                                             "object":"ISB2",
                                                             "method":"LaunchSelectedTeam"
                                                         }
-                                                    }
+                                                    },
+                                                    "selectedItemBinding":{
+                                                        "pullFormat":"${ISB2.SelectedTeamName}",
+                                                        "pushFormat":["ISB2:SelectTeam[\"","\"]"]
+                                                    },
+                                                    "selectedItemBindingProperty":"name"        
                                                 },
                                                 {
                                                     "type":"textblock",
@@ -256,6 +261,18 @@
                                                     }                                            
                                                 }
                                             ]
+                                        },
+                                        {
+                                            "type":"checkbox",
+                                            "_dock":"top",
+                                            "horizontalAlignment":"right",
+                                            "content":"Launch Slots simultaneously",
+                                            "tooltip":"Enables quick launching of game clients.\nMany game launchers will not support this setting.",
+                                            "margin":[15,5,0,0],
+                                            "checkedBinding":{
+                                                "pullFormat":"${ISB2.QuickLaunch}",
+                                                "pushFormat":["ISB2:SetQuickLaunch[\"","\"]"]
+                                            }
                                         }
                                     ]         
                                 }                                

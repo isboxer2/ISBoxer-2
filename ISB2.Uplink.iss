@@ -12,14 +12,17 @@ objectdef isb2 inherits isb2_profilecollection
     variable isb2_slotmanager SlotManager
 
     variable bool bAutoStoreSettings=TRUE
+    variable string SelectedTeamName
 
     method Initialize()
     {
         This:LoadSettings
-
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
 
         This:LoadPreviousProfiles
+
+        if ${Settings.Has[lastSelectedTeam]}
+            This:SelectTeam["${Settings.Get[lastSelectedTeam]~}"]
 
         LGUI2.Element[isb2.events]:AddHook[onProfilesUpdated,"$$>
         {
@@ -99,10 +102,38 @@ objectdef isb2 inherits isb2_profilecollection
         This:LoadFile["Tests/WoW.isb2.json"]
     }
 
+    member:bool QuickLaunch()
+    {
+        return ${Settings.GetBool[quickLaunch]}
+    }
+
+    method SetQuickLaunch(bool newValue=TRUE)
+    {
+        Settings:SetBool[quickLaunch,${newValue}]
+        This:AutoStoreSettings
+    }
+
     method SelectProfile(string name)
     {
         SelectedProfile:SetReference["Profiles.Get[\"${name~}\"]"]
         LGUI2.Element[isb2.events]:FireEventHandler[onSelectedProfileChanged]
+    }
+
+    method SelectTeam(string name)
+    {
+        if ${name.NotNULLOrEmpty}
+        {
+            SelectedTeamName:Set["${name~}"]
+
+            Settings:SetString[lastSelectedTeam,"${name~}"]
+        }
+        else
+        {
+            SelectedTeamName:Set[""]
+            Settings:Erase[lastSelectedTeam]
+        }
+        This:AutoStoreSettings
+        LGUI2.Element[isb2.events]:FireEventHandler[onSelectedTeamChanged]
     }
 
     method LaunchSelectedTeam()
@@ -111,7 +142,6 @@ objectdef isb2 inherits isb2_profilecollection
         if !${teamName.NotNULLOrEmpty}
             return FALSE
 
-        Settings:SetString[lastLaunchedTeam,"${teamName~}"]
 
         return ${SlotManager:LaunchTeamByName["${teamName~}"]}
     }
@@ -481,8 +511,10 @@ objectdef isb2_slotmanager
         variable jsonvalue jo="{}"
         if ${profileName.NotNULLOrEmpty}
             jo:SetString["teamProfile","${profileName~}"]
-        jo:SetBool[waitForMainSession,FALSE]
 
+        if !${Settings.GetBool[quickLaunch]}
+            jo:SetBool[waitForMainSession,TRUE]
+        
         joTeam.Get[slots]:ForEach["This:AddTeamLaunchSlot[ja,joTeam,\${ForEach.Key},ForEach.Value,jo]"]
 
         This:Prepare[ja]

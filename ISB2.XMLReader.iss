@@ -451,16 +451,16 @@ objectdef isb2_isb1transformer
         joTransform:Erase["${oldProperty~}"]
     }
 
-    method AutoTransform_Color(jsonvalueref joTransform, string newProperty)
+    method AutoTransform_Color(jsonvalueref joTransform, string newProperty, int r=0,int g=0,int b=0,int a=0)
     {
-        variable int r
-        variable int g
-        variable int b
-        variable int a
-        r:Set["${joTransform.GetInteger[Red]}"]
-        g:Set["${joTransform.GetInteger[Green]}"]
-        b:Set["${joTransform.GetInteger[Blue]}"]
-        a:Set["${joTransform.GetInteger[Alpha]}"]
+        if ${joTransform.Has[Red]}
+            r:Set["${joTransform.GetInteger[Red]}"]
+        if ${joTransform.Has[Green]}
+            g:Set["${joTransform.GetInteger[Green]}"]
+        if ${joTransform.Has[Blue]}
+            b:Set["${joTransform.GetInteger[Blue]}"]
+        if ${joTransform.Has[Alpha]}
+            a:Set["${joTransform.GetInteger[Alpha]}"]
 
         if ${joTransform.Has[Alpha]}
         {
@@ -1059,7 +1059,7 @@ objectdef isb2_isb1transformer
 
         if ${joTransform.Has[Red]} || ${joTransform.Has[Green]} || ${joTransform.Has[Blue]}
         {
-            This:AutoTransform_Color[joTransform,color]
+            This:AutoTransform_Color[joTransform,color,255,255,255]
         }
 
         This:TransformString[joTransform,"_xsi:type","type"]

@@ -1656,7 +1656,6 @@ objectdef isb2_importer
         if ${jo.Has[color]}
             joNew:Set[color,"${jo.Get[color].AsJSON~}"]
 
-;        joNew:Set[originalAction,"${jo~}"]
         return joNew
     }
 

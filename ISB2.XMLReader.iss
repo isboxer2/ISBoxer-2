@@ -730,8 +730,8 @@ objectdef isb2_isb1transformer
 ;        echo "\agAutoTransform_Menu\ax ${joTransform~}"
 
         This:TransformBool[joTransform,BindSoft,bindSoft]
-        This:TransformInteger[joTransform,X,X]
-        This:TransformInteger[joTransform,Y,Y]
+        This:TransformInteger[joTransform,X,x]
+        This:TransformInteger[joTransform,Y,y]
     }
 
     method AutoTransform_Computer(jsonvalueref joTransform)

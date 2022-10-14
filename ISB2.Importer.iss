@@ -386,7 +386,17 @@ objectdef isb2_importer
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
         if ${jo.Has[CursorClippingMode]}
-            joNew:SetString[cursorClippingMode,"${jo.Get[CursorClippingMode]~}"]
+        {
+            switch ${jo.Get[CursorClippingMode]~}
+            {
+                case On
+                    joNew:SetBool[clipCursor,1]
+                    break
+                case Off
+                    joNew:SetBool[clipCursor,0]
+                    break
+            }
+        }
 
         if ${jo.Has[ComputerString]}
             joNew:SetString[computer,"${jo.Get[ComputerString]~}"]
@@ -624,12 +634,21 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertClickBarButton(jsonvalueref jo)
     {
-        echo "\agConvertClickBarButton\ax ${jo~}"
+        echo "\arConvertClickBarButton\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
-        joNew:SetString[name,"${jo.Get[Name]~}"]
-        joNew:SetString[text,"${jo.Get[text]~}"]
-        joNew:SetBool[enabled,"${jo.GetBool[enabled]~}"]
+        if ${jo.Has[name]}
+            joNew:SetString[name,"${jo.Get[name]~}"]
+        if ${jo.Has[text]}
+            joNew:SetString[text,"${jo.Get[text]~}"]
+        if ${jo.Has[enabled]}
+            joNew:SetBool[enabled,"${jo.GetBool[enabled]~}"]
+
+        if ${jo.Has[backgroundColor]}
+            joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
+
+        if ${jo.Has[clickThrough]}
+            joNew:SetbBool[clickThrough,"${jo.GetBool[clickThrough]}"]
 
         variable jsonvalue ja="[]"
         if ${jo.Has[ClickActions]}
@@ -640,6 +659,12 @@ objectdef isb2_importer
                 joNew:SetByRef[clicks,ja]    
         }        
 
+/*
+; TODO
+        This:AutoTransform[joTransform,TextStyle,ClickBarButton]
+
+        This:AutoTransform[joTransform,MouseOverAction,ClickBarButton]
+*/
         return joNew
     }
 
@@ -910,7 +935,9 @@ objectdef isb2_importer
         variable jsonvalueref joSettings="{}"
         joSettings:SetBool[focusFollowsMouse,"${jo.GetBool[focusFollowsMouse]}"]
         joSettings:SetBool[instantSwap,"${jo.GetBool[instantSwap]}"]
-        joSettings:SetString[swapMode,"${jo.Get[swapMode]~}"]
+
+        if ${jo.Has[swapMode]}
+            joSettings:SetString[swapMode,"${jo.Get[swapMode]~}"]
 
         joNew:SetByRef[settings,joSettings]
 
@@ -983,6 +1010,11 @@ objectdef isb2_importer
             joNew:SetString[buttonLayout,"${jo.Get[ButtonLayout]~}"]
         if ${jo.Has[HotkeyLayout]}
             joNew:SetString[hotkeyLayout,"${jo.Get[HotkeyLayout]~}"]
+
+        if ${jo.Has[x]}
+            joNew:SetInteger[x,${jo.GetInteger[x]}]
+        if ${jo.Has[y]}
+            joNew:SetInteger[y,${jo.GetInteger[y]}]
 
         return joNew
     }
@@ -1458,7 +1490,7 @@ objectdef isb2_importer
         joNew:SetString[type,target group]
 
         joNew:SetString[action,"${jo.Get[Action]~}"]
-        joNew:SetString[targetGroup,"${jo.Get[RelayGroupString]~}"]        
+        joNew:SetString[name,"${jo.Get[RelayGroupString]~}"]        
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew

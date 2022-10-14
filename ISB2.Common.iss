@@ -10,20 +10,20 @@ objectdef isb2_profile
     variable string Description
     variable string Version
     variable uint MinimumBuild
-    variable jsonvalue Metadata
+    variable jsonvalueref Metadata
 
-    variable jsonvalue Profiles=[]
-    variable jsonvalue Teams=[]
-    variable jsonvalue Characters=[]
-    variable jsonvalue WindowLayouts=[]
-    variable jsonvalue VirtualFiles=[]
-    variable jsonvalue Triggers=[]
-    variable jsonvalue HotkeySheets=[]
-    variable jsonvalue MappableSheets=[]
-    variable jsonvalue GameKeyBindings=[]
-    variable jsonvalue GameMacroSheets=[]
-    variable jsonvalue ClickBars=[]
-    variable jsonvalue VFXSheets=[]
+    variable jsonvalueref Profiles=[]
+    variable jsonvalueref Teams=[]
+    variable jsonvalueref Characters=[]
+    variable jsonvalueref WindowLayouts=[]
+    variable jsonvalueref VirtualFiles=[]
+    variable jsonvalueref Triggers=[]
+    variable jsonvalueref HotkeySheets=[]
+    variable jsonvalueref MappableSheets=[]
+    variable jsonvalueref GameKeyBindings=[]
+    variable jsonvalueref GameMacroSheets=[]
+    variable jsonvalueref ClickBars=[]
+    variable jsonvalueref VFXSheets=[]
 
     method Initialize(jsonvalueref jo, uint priority, string localFilename)
     {
@@ -48,31 +48,31 @@ objectdef isb2_profile
             Name:Set["${jo.Get[minimumBuild]~}"]
 
         if ${jo.Has[metadata]}
-            Metadata:SetValue["${jo.Get[metadata]~}"]
+            Metadata:SetReference["jo.Get[metadata]"]
         if ${jo.Has[profiles]}
-            Profiles:SetValue["${jo.Get[profiles]~}"]
+            Profiles:SetReference["jo.Get[profiles]"]
         if ${jo.Has[teams]}
-            Teams:SetValue["${jo.Get[teams]~}"] 
+            Teams:SetReference["jo.Get[teams]"] 
         if ${jo.Has[characters]}
-            Characters:SetValue["${jo.Get[characters]~}"]
+            Characters:SetReference["jo.Get[characters]"]
         if ${jo.Has[windowLayouts]}
-            WindowLayouts:SetValue["${jo.Get[windowLayouts]~}"]
+            WindowLayouts:SetReference["jo.Get[windowLayouts]"]
         if ${jo.Has[virtualFiles]}
-            VirtualFiles:SetValue["${jo.Get[virtualFiles]~}"]
+            VirtualFiles:SetReference["jo.Get[virtualFiles]"]
         if ${jo.Has[triggers]}
-            Triggers:SetValue["${jo.Get[triggers]~}"]
+            Triggers:SetReference["jo.Get[triggers]"]
         if ${jo.Has[hotkeySheets]}
-            HotkeySheets:SetValue["${jo.Get[hotkeySheets]~}"]
+            HotkeySheets:SetReference["jo.Get[hotkeySheets]"]
         if ${jo.Has[gameKeyBindings]}
-            GameKeyBindings:SetValue["${jo.Get[gameKeyBindings]~}"]
+            GameKeyBindings:SetReference["jo.Get[gameKeyBindings]"]
         if ${jo.Has[mappableSheets]}
-            MappableSheets:SetValue["${jo.Get[mappableSheets]~}"]
+            MappableSheets:SetReference["jo.Get[mappableSheets]"]
         if ${jo.Has[vfxSheets]}
-            VFXSheets:SetValue["${jo.Get[vfxSheets]~}"]
+            VFXSheets:SetReference["jo.Get[vfxSheets]"]
         if ${jo.Has[clickBars]}
-            ClickBars:SetValue["${jo.Get[clickBars]~}"]
+            ClickBars:SetReference["jo.Get[clickBars]"]
         if ${jo.Has[gameMacroSheets]}
-            GameMacroSheets:SetValue["${jo.Get[gameMacroSheets]~}"]
+            GameMacroSheets:SetReference["jo.Get[gameMacroSheets]"]
     }
 
     member:jsonvalueref AsJSON()
@@ -87,37 +87,37 @@ objectdef isb2_profile
         <$$"]
 
         if ${Description.NotNULLOrEmpty}
-            jo:Set["description","${Description.AsJSON~}"]
+            jo:Set["description",Description]
         if ${Version.NotNULLOrEmpty}
-            jo:Set["version","${Version.AsJSON~}"]
+            jo:Set["version",Version]
         if ${MinimumBuild}
-            jo:Set["description","${Description.AsJSON~}"]
+            jo:Set["description",Description]
         if ${Metadata.Type.Equal[object]}
-            jo:Set["metadata","${Metadata.AsJSON~}"]
+            jo:SetByRef["metadata","Metadata"]
         if ${Profiles.Used}
-            jo:Set["profiles","${Profiles.AsJSON~}"]
+            jo:SetByRef["profiles",Profiles]
         if ${Teams.Used}
-            jo:Set["teams","${Teams.AsJSON~}"]
+            jo:SetByRef["teams",Teams]
         if ${Characters.Used}
-            jo:Set["characters","${Characters.AsJSON~}"]
+            jo:SetByRef["characters",Characters]
         if ${WindowLayouts.Used}
-            jo:Set["windowLayouts","${WindowLayouts.AsJSON~}"]
+            jo:SetByRef["windowLayouts",WindowLayouts]
         if ${VirtualFiles.Used}
-            jo:Set["virtualFiles","${VirtualFiles.AsJSON~}"]
+            jo:SetByRef["virtualFiles",VirtualFiles]
         if ${Triggers.Used}
-            jo:Set["triggers","${Triggers.AsJSON~}"]
+            jo:SetByRef["triggers",Triggers]
         if ${HotkeySheets.Used}
-            jo:Set["hotkeySheets","${HotkeySheets.AsJSON~}"]
+            jo:SetByRef["hotkeySheets",HotkeySheets]
         if ${GameKeyBindings.Used}
-            jo:Set["gameKeyBindings","${GameKeyBindings.AsJSON~}"]
+            jo:SetByRef["gameKeyBindings",GameKeyBindings]
         if ${MappableSheets.Used}
-            jo:Set["mappableSheets","${MappableSheets.AsJSON~}"]
+            jo:SetByRef["mappableSheets",MappableSheets]
         if ${VFXSheets.Used}
-            jo:Set["vfxSheets","${VFXSheets.AsJSON~}"]
+            jo:SetByRef["vfxSheets",VFXSheets]
         if ${ClickBars.Used}
-            jo:Set["clickBars","${ClickBars.AsJSON~}"]
+            jo:SetByRef["clickBars",ClickBars]
         if ${GameMacroSheets.Used}
-            jo:Set["gameMacroSheets","${GameMacroSheets.AsJSON~}"]
+            jo:SetByRef["gameMacroSheets","GameMacroSheets"]
         return jo
     }
 

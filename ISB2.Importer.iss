@@ -64,6 +64,21 @@ objectdef isb2_importer
         {
             jo:SetByRef[clickBars,jRef]
         }
+        jRef:SetReference[This.ConvertMenus]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[menus,jRef]
+        }
+        jRef:SetReference[This.ConvertMenuTemplates]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[menuTemplates,jRef]
+        }        
+        jRef:SetReference[This.ConvertMenuButtonLayouts]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[menuButtonLayouts,jRef]
+        }        
         
         jRef:SetReference[This.ConvertRepeaterProfiles]        
         if ${jRef.Used}
@@ -461,8 +476,12 @@ objectdef isb2_importer
         if ${jo.Has[dynamicLaunchMode]}
             joNew:SetBool[dynamicLaunchMode,"${jo.GetBool[dynamicLaunchMode]}"]
 
-        if ${jo.Has[lockWindow]}
-            joNew:SetBool[lockWindow,"${jo.GetBool[lockWindow]}"]
+; unused setting
+;        if ${jo.Has[lockWindow]}
+;            joNew:SetBool[lockWindow,"${jo.GetBool[lockWindow]}"]
+
+        if ${jo.Has[lockForeground]}
+            joNew:SetBool[lockForeground,"${jo.GetBool[lockForeground]}"]
 
         if ${jo.Has[disableJambaTeamManagement]}
             joNew:SetBool[disableJambaTeamManagement,"${jo.GetBool[disableJambaTeamManagement]}"]
@@ -480,7 +499,7 @@ objectdef isb2_importer
             joNew:SetBool[enforceSingleWindowControl,"${jo.GetBool[enforceSingleWindowControl]}"]
 
 
-        variable jsonvalue jaSlots="[]"        
+        variable jsonvalue jaSlots="[]"
         jo.Get[Slots]:ForEach["jaSlots:AddByRef[\"This.ConvertCharacterSetSlot[ForEach.Value]\"]"]
         if ${jaSlots.Used}
             joNew:SetByRef[slots,jaSlots]        
@@ -954,9 +973,18 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertMenu(jsonvalueref jo)
     {
-        echo "\arConvertMenu\ax ${jo~}"
+        echo "\agConvertMenu\ax ${jo~}"
+        variable jsonvalue joNew="{}"
 
-        return NULL
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+        if ${jo.Has[Template]}
+            joNew:SetString[template,"${jo.Get[Template]~}"]
+        if ${jo.Has[ButtonLayout]}
+            joNew:SetString[buttonLayout,"${jo.Get[ButtonLayout]~}"]
+        if ${jo.Has[HotkeyLayout]}
+            joNew:SetString[hotkeyLayout,"${jo.Get[HotkeyLayout]~}"]
+
+        return joNew
     }
 
     member:jsonvalueref ConvertMenuHotkeySet(jsonvalueref jo)

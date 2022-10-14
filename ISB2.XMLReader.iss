@@ -698,7 +698,7 @@ objectdef isb2_isb1transformer
 
     method AutoTransform_VirtualMappedKeys(jsonvalueref joTransform)
     {
-        echo "\arAutoTransform_VirtualMappedKeys ${joTransform~}"
+;        echo "\agAutoTransform_VirtualMappedKeys\ax ${joTransform~}"
         variable jsonvalue jo
         if ${joTransform.Has[FromMappedKey]}
         {
@@ -722,6 +722,16 @@ objectdef isb2_isb1transformer
 
             joTransform:Erase[ToMappedKey]
         }
+    }
+
+    
+    method AutoTransform_Menu(jsonvalueref joTransform)
+    {
+;        echo "\agAutoTransform_Menu\ax ${joTransform~}"
+
+        This:TransformBool[joTransform,BindSoft,bindSoft]
+        This:TransformInteger[joTransform,X,X]
+        This:TransformInteger[joTransform,Y,Y]
     }
 
     method AutoTransform_Computer(jsonvalueref joTransform)

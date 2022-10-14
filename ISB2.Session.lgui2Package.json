@@ -367,6 +367,30 @@
             "name": "isb2.events"
         },
         {
+            "type":"border",
+            "visibility":"visible",
+            "name":"isb2.popupTextPanel",
+            "padding":[20,10],
+            "opacity":0.0,
+            "acceptsMouseFocus": false,
+            "acceptsKeyboardFocus":false,
+            "horizontalAlignment":"center",
+            "yFactor":0.2,
+            "child":{
+                "type":"textblock",
+                "name":"isb2.popupText",
+                "text":"No Popup Text",
+                "font":{
+                    "heightFactor":2.0
+                },
+                "color":"#ff0000"                
+            },
+            "backgroundBrush":{
+                "color":"#cc222222"
+            },
+            "strata":0.6            
+        },
+        {
             "type":"window",
             "name":"isb2.MainWindow",
             "hideOnClose":true,

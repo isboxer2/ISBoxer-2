@@ -958,7 +958,7 @@ objectdef isb2_profileengine
 #region Action Types
     method Action_Keystroke(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_Keystroke[${activate}] ${joAction~}"
+        echo "\agAction_Keystroke\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -981,7 +981,7 @@ objectdef isb2_profileengine
 
     method Action_GameKeyBinding(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_GameKeyBinding[${activate}] ${joAction~}"
+        echo "\agAction_GameKeyBinding\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1018,7 +1018,7 @@ objectdef isb2_profileengine
 
     method Action_SetGameKeyBinding(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_SetGameKeyBinding[${activate}] ${joAction~}"
+        echo "\agAction_SetGameKeyBinding\ax[${activate}] ${joAction~}"
 
         if !${joAction.Type.Equal[object]}
             return
@@ -1033,7 +1033,7 @@ objectdef isb2_profileengine
     
     method Action_ClickBarState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_ClickBarState[${activate}] ${joAction~}"
+        echo "\agAction_ClickBarState\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1056,7 +1056,7 @@ objectdef isb2_profileengine
 
     method Action_HotkeySheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_HotkeySheetState[${activate}] ${joAction~}"
+        echo "\agAction_HotkeySheetState\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1079,7 +1079,7 @@ objectdef isb2_profileengine
 
     method Action_MappableSheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_MappableSheetState[${activate}] ${joAction~}"
+        echo "\agAction_MappableSheetState\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1108,7 +1108,7 @@ objectdef isb2_profileengine
 
     method Action_VFXSheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_VFXSheetState[${activate}] ${joAction~}"
+        echo "\agAction_VFXSheetState\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1131,15 +1131,61 @@ objectdef isb2_profileengine
 
     method Action_PopupText(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_PopupText[${activate}] ${joAction~}"
+        echo "\arAction_PopupText\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
+
+        variable jsonvalue joStyle={}
+        joStyle:SetString[text,"${joAction.Get[text]~}"]
+
+        if ${joAction.Has[color]}
+        {
+            joStyle:SetString[color,"${joAction.Get[color]~}"]
+        }
+        else
+        {
+            joStyle:SetString[color,"#ffffff"]
+        }
+
+        variable float duration=1
+        if ${joAction.Has[duration]}
+            duration:Set[${joAction.GetNumber[duration]}]
+
+        variable jsonvalue joAnimation="$$>
+        {
+            "type":"chain",
+            "name":"fade",
+            "animations":[
+                {
+                    "type":"fade",
+                    "name":"fadeIn",
+                    "opacity":1.0,
+                    "duration":0.1,
+                },
+                {
+                    "type":"delay",
+                    "name":"fadeDelay",
+                    "duration":${duration}
+                },
+                {
+                    "type":"fade",
+                    "name":"fadeOut",
+                    "opacity":0.0,
+                    "duration":0.25
+                }
+            ]
+        }
+        <$$"
+
+        LGUI2.Element[isb2.popupText]:ApplyStyleJSON[joStyle]
+        LGUI2.Element[isb2.popupTextPanel]:ApplyStyleJSON["{\"opacity\":1.0}"]
+        LGUI2.Element[isb2.popupTextPanel]:Animate[joAnimation]
 
     }
 
     method Action_WindowFocus(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_WindowFocus[${activate}] ${joAction~}"
+        echo "\arAction_WindowFocus\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1147,7 +1193,7 @@ objectdef isb2_profileengine
 
     method Action_WindowClose(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_WindowClose[${activate}] ${joAction~}"
+        echo "\arAction_WindowClose\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1155,7 +1201,7 @@ objectdef isb2_profileengine
 
     method Action_Mappable(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_Mappable[${activate}] ${joAction~}"
+        echo "\agAction_Mappable\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1164,7 +1210,7 @@ objectdef isb2_profileengine
 
     method Action_VirtualizeMappable(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_VirtualizeMappable[${activate}] ${joAction~}"
+        echo "\arAction_VirtualizeMappable\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1172,7 +1218,7 @@ objectdef isb2_profileengine
 
     method Action_InputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_InputMapping[${activate}] ${joAction~}"
+        echo "\agAction_InputMapping\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1181,7 +1227,7 @@ objectdef isb2_profileengine
 
     method Action_SetInputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_SetInputMapping[${activate}] ${joAction~}"
+        echo "\agAction_SetInputMapping\ax[${activate}] ${joAction~}"
 
         if !${joAction.Type.Equal[object]}
             return
@@ -1199,7 +1245,7 @@ objectdef isb2_profileengine
 
     method Action_MappableStep(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_MappableStep[${activate}] ${joAction~}"
+        echo "\agAction_MappableStep\ax[${activate}] ${joAction~}"
 
         if !${joAction.Type.Equal[object]}
             return
@@ -1242,7 +1288,7 @@ objectdef isb2_profileengine
 
     method Action_MappableState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "Action_MappableState[${activate}] ${joAction~}"
+        echo "\agAction_MappableState\ax[${activate}] ${joAction~}"
 
         if !${joAction.Type.Equal[object]}
             return
@@ -1799,7 +1845,7 @@ objectdef isb2_profileengine
 
         if !${joActionType.Reference(exists)}
         {
-            echo "ExecuteAction: Unhandled action type: \"${actionType~}\""
+            Script:SetLastError["ExecuteAction: \arUnhandled action type: \"${actionType~}\"\ax"]
             return
         }
         

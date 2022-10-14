@@ -16,6 +16,7 @@ objectdef isb2 inherits isb2_profilecollection
 
     method Initialize()
     {
+        Script.OnSetLastError:AttachAtom[This:OnScriptError]
         This:LoadSettings
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
 
@@ -36,6 +37,11 @@ objectdef isb2 inherits isb2_profilecollection
     method Shutdown()
     {
         LGUI2:UnloadPackageFile[ISB2.Uplink.lgui2Package.json]
+    }
+
+    method OnScriptError()
+    {
+        Script:DumpStack
     }
 
     method OnProfilesUpdated()

@@ -334,8 +334,10 @@ objectdef isb2_windowlayoutengine
             NumResetRegion:Set["${SwapGroup.GetInteger[reset]}"]
         }
         
+;        echo active=${NumActiveRegion} inactive=${NumInactiveRegion} reset=${NumResetRegion}
         This:SelectRegions[${NumActiveRegion},${NumInactiveRegion}]
         This:SelectResetRegion[${NumResetRegion}]
+        This:Apply
     }
 
 #region events

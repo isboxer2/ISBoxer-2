@@ -24,17 +24,21 @@ objectdef isb2session inherits isb2_profileengine
             return
         }
 
-        ValidSession:Set[1]
-    
-        LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]
-        This:InstallDefaultActionTypes
-
         if ${ISSession.Metadata.Has[isb2]}
         {
-            This:InstallFromSessionMetadata[ISSession.Metadata]
-        }
+            echo "\agISBoxer 2 Activating\ax"
+            ValidSession:Set[1]
+        
+            This:StripInnerSpaceDefaults
+            LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]
+            This:InstallDefaultActionTypes
 
-        This:InstallDefaultVirtualFiles
+            This:InstallFromSessionMetadata[ISSession.Metadata]
+
+            This:InstallDefaultVirtualFiles
+
+            echo "\agISBoxer 2 activated.\ax"
+        }
     }
 
     method Shutdown()
@@ -42,10 +46,27 @@ objectdef isb2session inherits isb2_profileengine
         LGUI2:UnloadPackageFile[ISB2.Session.lgui2Package.json]
     }
 
+    method StripInnerSpaceDefaults()
+    {
+        echo "\ayStripping Inner Space defaults...\ax"
+        bind -delete console
+        bind -delete tinykey
+		bind -delete normalkey
+		bind -delete fullscreenkey
+		bind -delete next
+		bind -delete previous
+
+        hudgroup -hide "fps indicator"
+        hudgroup -hide "memory indicator"
+
+        echo "\ayDone stripping Inner Space defaults\ax"
+    }
+
     method InstallFromSessionMetadata(jsonvalueref joMetadata)
     {
-        echo "isb2session:InstallFromSessionMetadata ${joMetadata~}"
+        echo "\ayisb2session:InstallFromSessionMetadata\ax ${joMetadata~}"
 
+        echo "\ayLoading Files ...\ax"
         ProfileDB:LoadFiles["joMetadata.Get[isb2profiles]"]
         
         if ${joMetadata.Has[teamProfile]}
@@ -57,6 +78,8 @@ objectdef isb2session inherits isb2_profileengine
             This:ActivateTeamByName["${joMetadata.Get[team,name]~}"]
         if ${joMetadata.Has[character]}
             This:ActivateCharacterByName["${joMetadata.Get[character,name]~}"]
+
+        echo "\ayInstallFromSessionMetadata complete\ax"
     }
 
     method ActivateProfilesByName(jsonvalueref jaProfiles)
@@ -70,14 +93,14 @@ objectdef isb2session inherits isb2_profileengine
     method ActivateProfileByName(string name)
     {
         variable weakref useProfile="ProfileDB.Profiles.Get[\"${name~}\"]"
-        echo "ActivateProfileByName ${name} = ${useProfile.AsJSON~}"
+;        echo "ActivateProfileByName ${name} = ${useProfile.AsJSON~}"
         return "${This:ActivateProfile[useProfile](exists)}"
     }
 
     method DeactivateProfileByName(string name)
     {
         variable weakref useProfile="ProfileDB.Profiles.Get[\"${name~}\"]"
-        echo "DeactivateProfileByName ${name} = ${useProfile.AsJSON~}"
+;        echo "DeactivateProfileByName ${name} = ${useProfile.AsJSON~}"
         return "${This:DeactivateProfile[useProfile](exists)}"
     }
 

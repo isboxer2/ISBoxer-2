@@ -738,6 +738,8 @@ objectdef isb2_profileengine
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
 
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]
+
+        This:ExecuteEventAction[SlotRef,onLoad]
     }
 
     method ActivateCharacter(jsonvalueref jo)
@@ -755,6 +757,13 @@ objectdef isb2_profileengine
         This:InstallVirtualFiles["Character.Get[virtualFiles]"]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
+
+        This:ExecuteEventAction[Character,onLoad]
+
+        if ${Slot} == ${Team.Get[slots].Used}
+        {
+            This:ExecuteEventAction[Team,onLastSlotLoaded]
+        }
     }
 
     method DeactivateTeam()
@@ -804,6 +813,8 @@ objectdef isb2_profileengine
         echo "ActivateTeam: TeamScope.active=${TeamScope.GetBool[active]}"
 
         LGUI2.Element[isb2.events]:FireEventHandler[onTeamChanged]
+
+        This:ExecuteEventAction[Team,onLoad]
     }
 
     method ActivateProfile(weakref _profile)
@@ -944,6 +955,9 @@ objectdef isb2_profileengine
 
         if ${useTarget.Equal[self]}
             return FALSE
+
+        if ${useTarget.Equal[${Int64[${useTarget~}]}]}
+            useTarget:Set["is${useTarget~}"]
 
         variable jsonvalue joActionState="{}"
         joActionState:SetByRef[action,joAction]
@@ -1833,12 +1847,31 @@ objectdef isb2_profileengine
         
         return TRUE
     }
+
+    method ExecuteEventAction(jsonvalueref joOwner, string eventName)
+    {
+        if !${joOwner.Type.Equal[object]}
+            return FALSE
+
+        variable jsonvalueref joAction
+        joAction:SetReference["joOwner.Get[\"${eventName~}\"]"]
+
+        if !${joAction.Type.Equal[object]}
+            return FALSE
+
+        This:ExecuteAction[joOwner,joAction,1]
+        This:ExecuteAction[joOwner,joAction,0]
+    }
     
     method ExecuteAction(jsonvalueref joState, jsonvalueref _joAction, bool activate)
     {
+;        echo \ayExecuteAction\ax
         ; ensure we have a valid json object representing the action
         if !${_joAction.Type.Equal[object]}
-            return
+        {
+;            echo "!\${_joAction.Type.Equal[object]}"
+            return FALSE
+        }
 
         variable string actionType = "${_joAction.Get[type].Lower~}"
         variable jsonvalueref joActionType = "ActionTypes.Get[\"${actionType~}\"]"
@@ -1846,12 +1879,15 @@ objectdef isb2_profileengine
         if !${joActionType.Reference(exists)}
         {
             Script:SetLastError["ExecuteAction: \arUnhandled action type: \"${actionType~}\"\ax"]
-            return
+            return FALSE
         }
         
         ; check activationState settings to make sure we should execute the action here
         if !${This.ShouldExecuteAction[joState,joActionType,_joAction,${activate}]}
-            return
+        {
+;            echo "!\${This.ShouldExecuteAction[joState,joActionType,_joAction,${activate}]}"
+            return TRUE
+        }
 
         variable jsonvalue joAction
         joAction:SetValue["${_joAction~}"]
@@ -1864,18 +1900,23 @@ objectdef isb2_profileengine
         {
             ; yeah see if we should retarget the action
             if ${This:RetargetAction[joState,joAction,${activate}](exists)}
-                return
+            {
+;                echo "Action retargeted"
+                return TRUE
+            }
             ; we didn't retarget the action, execute it here
         }
         
         variable string actionMethod
         actionMethod:Set["${joActionType.Get[handler]~}"]
    
-        echo "ExecuteAction[${actionType~}]=${actionMethod~}"
+ ;       echo "ExecuteAction[${actionType~}]=${actionMethod~}"
         if ${actionMethod.NotNULLOrEmpty}
         {
             execute "This:${actionMethod}[joState,joAction,${activate}]"
+            return TRUE
         }
+        return FALSE
     }
 
     method ExecuteInputMapping(jsonvalueref joMapping, bool newState)

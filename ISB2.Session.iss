@@ -18,9 +18,9 @@ objectdef isb2session inherits isb2_profileengine
             return
         }
 
-        if ${InnerSpace.Build} < 7014
+        if ${InnerSpace.Build} < 7033
         {
-            echo "ISBoxer 2 inactive; Inner Space build 7014 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2 inactive; Inner Space build 7033 or later required (currently ${InnerSpace.Build})"
             return
         }
 
@@ -33,6 +33,8 @@ objectdef isb2session inherits isb2_profileengine
         {
             This:InstallFromSessionMetadata[ISSession.Metadata]
         }
+
+        This:InstallDefaultVirtualFiles
     }
 
     method Shutdown()

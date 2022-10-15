@@ -477,7 +477,7 @@ objectdef isb2_importer
             joAction:SetString[sheet,"${jo.Get[executeOnLoad,KeyMapString]~}"]
             joAction:SetString[name,"${jo.Get[executeOnLoad,MappedKeyString]~}"]
 
-            joNew:SetByRef[onLoad,joAction]
+            joNew:SetByRef[onLastSlotLoaded,joAction]
         }
 
         if ${jo.Has[launchDelay]} && ${jo.GetNumber[launchDelay]}

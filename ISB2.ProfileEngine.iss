@@ -546,7 +546,7 @@ objectdef isb2_profileengine
     {
         name:Set["${This.ProcessVariables["${name~}"]~}"]
 
-        echo "InstallInputMapping ${name~}: ${joMapping}"
+        echo "\agInstallInputMapping\ax ${name~}: ${joMapping}"
         InputMappings:SetByRef["${name~}",joMapping]
     }
 
@@ -557,7 +557,7 @@ objectdef isb2_profileengine
     
     method InstallVFX(string sheet, string name, jsonvalueref joVFX)
     {
-        echo "InstallVFX ${sheet~} ${name~} ${joVFX~}"
+        echo "\agInstallVFX\ax ${sheet~} ${name~} ${joVFX~}"
 
         variable jsonvalue joView
         joView:SetValue["$$>
@@ -577,7 +577,7 @@ objectdef isb2_profileengine
 
     method UninstallVFX(string sheet, string name, jsonvalueref joVFX)
     {
-        echo "UninnstallVFX ${sheet~} ${name~} ${joVFX~}"
+        echo "\agUninnstallVFX\ax ${sheet~} ${name~} ${joVFX~}"
         LGUI2.Element["isb2.vfx.${sheet~}.${name~}"]:Destroy
 
         joVFX:SetInteger["elementID",0]
@@ -588,7 +588,7 @@ objectdef isb2_profileengine
         name:Set["${This.ProcessVariables["${name~}"]~}"]
         sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
 
-        echo "InstallHotkey[${sheet~},${name~}] ${joHotkey~}"
+        echo "\agInstallHotkey\ax[${sheet~},${name~}] ${joHotkey~}"
         variable jsonvalue joBinding
         ; initialize a LGUI2 input binding object with JSON
         variable string fullName="isb2.hks.${sheet~}.${name~}"
@@ -666,7 +666,7 @@ objectdef isb2_profileengine
 
     method UninstallHotkeyEx(string name)
     {
-        echo "UninstallHotkeyEx[${name~}]"
+        echo "\agUninstallHotkeyEx\ax[${name~}]"
         LGUI2:RemoveBinding["${name~}"]
         Hotkeys:Remove["${name~}"]
     }
@@ -678,7 +678,7 @@ objectdef isb2_profileengine
 
     method UninstallHotkeys()
     {
-        echo UninstallHotkeys
+        echo "\agUninstallHotkeys\ax"
         Hotkeys:ForEach["This:UninstallHotkeyEx[\"\${ForEach.Value~}\"]"]
     }
 #endregion
@@ -687,21 +687,21 @@ objectdef isb2_profileengine
     method ActivateCharacterByName(string name)
     {
         variable weakref useCharacter="Characters.Get[\"${name~}\"]"
-        echo "ActivateCharacterByName ${name} = ${useCharacter.AsJSON~}"
+        echo "\agActivateCharacterByName\ax ${name} = ${useCharacter.AsJSON~}"
         return "${This:ActivateCharacter[useCharacter](exists)}"
     }
 
     method ActivateTeamByName(string name)
     {
         variable weakref useTeam="Teams.Get[\"${name~}\"]"
-        echo "ActivateTeamByName ${name} = ${useTeam.AsJSON~}"
+        echo "\agActivateTeamByName\ax ${name} = ${useTeam.AsJSON~}"
         return "${This:ActivateTeam[useTeam](exists)}"
     }
 
     method ActivateWindowLayoutByName(string name)
     {
         variable weakref useLayout="WindowLayouts.Get[\"${name~}\"]"
-        echo "ActivateWindowLayoutByName ${name} = ${useLayout.AsJSON~}"
+        echo "\agActivateWindowLayoutByName\ax ${name} = ${useLayout.AsJSON~}"
         return "${This:ActivateWindowLayout[useLayout](exists)}"
     }
 
@@ -937,7 +937,7 @@ objectdef isb2_profileengine
 
     method RemoteAction(jsonvalue joActionState)
     {
-        echo "RemoteAction[${joActionState~}]"
+        echo "\ayRemoteAction\ax[${joActionState~}]"
         variable jsonvalueref joState="joActionState.Get[state]"
         variable jsonvalueref joAction="joActionState.Get[action]"
 
@@ -1481,7 +1481,7 @@ objectdef isb2_profileengine
         variable int fromStep
         variable int stepCounter
 
-        echo Rotator_Advance ${newState}
+;        echo Rotator_Advance ${newState}
 
         fromStep:Set[${numStep}]
 
@@ -1750,7 +1750,7 @@ objectdef isb2_profileengine
         if !${joMappable.Type.Equal[object]}
             return
 
-        echo "ExecuteMappable[${newState}] ${joMappable~}"
+        echo "\agExecuteMappable\ax[${newState}] ${joMappable~}"
 
         ; make sure it's not disabled. to be disabled requires "enable":false
         if ${joMappable.GetBool[enable].Equal[FALSE]}
@@ -1783,7 +1783,7 @@ objectdef isb2_profileengine
         if !${joStep.Type.Equal[object]}
             return
 
-        echo "ExecuteRotatorStep[${newState}] ${joStep~}"
+        echo "\agExecuteRotatorStep\ax[${newState}] ${joStep~}"
 
         ; if the step is disabled, don't execute it.
         if ${joStep.GetBool[enable].Equal[FALSE]}
@@ -1825,7 +1825,7 @@ objectdef isb2_profileengine
         if !${jaList.Type.Equal[array]}
             return
 
-        echo "ExecuteActionList[${newState}] ${jaList~}"
+        echo "\agExecuteActionList\ax[${newState}] ${jaList~}"
         jaList:ForEach["This:ExecuteAction[joState,ForEach.Value,${newState}]"]
     }
 

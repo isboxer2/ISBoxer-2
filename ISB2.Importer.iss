@@ -887,6 +887,9 @@ objectdef isb2_importer
         if ${jo.Has[characterSetSlot]}
             joNew:SetInteger[slot,"${jo.Get[characterSetSlot]}"]
 
+        if ${jo.Has[borderStyle]}
+            joNew:SetString[frame,"${jo.Get[borderStyle]~}"]
+
         joNew:Erase[rect]
         joNew:Erase[characterSetSlot]
 
@@ -933,11 +936,58 @@ objectdef isb2_importer
         joNew:SetByRef[swapGroups,jaSwapGroups]
 
         variable jsonvalueref joSettings="{}"
+        ; all ISB1 window layouts default to no frame
+        joSettings:SetString[frame,none]
+
         joSettings:SetBool[focusFollowsMouse,"${jo.GetBool[focusFollowsMouse]}"]
         joSettings:SetBool[instantSwap,"${jo.GetBool[instantSwap]}"]
 
         if ${jo.Has[swapMode]}
+        {
+            switch ${jo.Get[swapMode]}
+            {
+                case Never
+                    break
+                case Always
+;                    joSettings:SetBool[refreshOnActivate,1]
+                    joSettings:SetBool[swapOnActivate,1]
+
+;                    joSettings:SetBool[refreshOnDeactivate,1]
+                    joSettings:SetBool[swapOnDeactivate,1]
+                    break
+                case AlwaysForGames
+;                    joSettings:SetBool[refreshOnActivate,1]
+                    joSettings:SetBool[swapOnActivate,1]
+
+;                    joSettings:SetBool[refreshOnDeactivate,1]
+;                    joSettings:SetBool[swapOnDeactivate,1]
+                    break
+                case SlotActivate
+                    joSettings:SetBool[swapOnSlotActivate,1]
+                    break
+                case SpecificHotkey
+                    break
+                case AnyInternal
+                    joSettings:SetBool[swapOnInternalActivate,1]
+                    break
+            }
+
+/*
+            [Description("never")]
+            Never,
+            [Description("always")]
+            Always,
+            [Description("always, for game windows")]
+            AlwaysForGames,
+            [Description("only when I press a Slot activate hotkey")]
+            SlotActivate,
+            [Description("only when I press the Activate Current Window Hotkey")]
+            SpecificHotkey,
+            [Description("any time ISBoxer focuses a window")]
+            AnyInternal,
+*/
             joSettings:SetString[swapMode,"${jo.Get[swapMode]~}"]
+        }
 
         joNew:SetByRef[settings,joSettings]
 

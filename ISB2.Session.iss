@@ -24,6 +24,8 @@ objectdef isb2session inherits isb2_profileengine
             return
         }
 
+        This[parent]:Initialize
+
         if ${ISSession.Metadata.Has[isb2]}
         {
             echo "\agISBoxer 2 Activating\ax"
@@ -37,24 +39,35 @@ objectdef isb2session inherits isb2_profileengine
 
             This:InstallDefaultVirtualFiles
 
+            ISSession.OnStartupCompleted:AttachAtom[This:Event_OnStartupCompleted]
             echo "\agISBoxer 2 activated.\ax"
         }
     }
 
     method Shutdown()
-    {
+    {        
         LGUI2:UnloadPackageFile[ISB2.Session.lgui2Package.json]
+    }
+
+    method Event_OnStartupCompleted()
+    {
+        This:StripInnerSpaceDefaults
     }
 
     method StripInnerSpaceDefaults()
     {
         echo "\ayStripping Inner Space defaults...\ax"
-        bind -delete console
+;        bind -delete console
         bind -delete tinykey
 		bind -delete normalkey
 		bind -delete fullscreenkey
 		bind -delete next
 		bind -delete previous
+
+        bind -delete memoryindicator
+        bind -delete fpsindicator
+
+        globalbind -delete is${ISSession.Slot}_key
 
         hudgroup -hide "fps indicator"
         hudgroup -hide "memory indicator"

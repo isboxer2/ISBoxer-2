@@ -1,8 +1,10 @@
 /* isb2_profileengine: 
     An active ISBoxer 2 Profile collection
 */
+variable(global) weakref ISB2ProfileEngine
 objectdef isb2_profileengine
-{
+{    
+
     ; a list of active Profiles
     variable set Profiles
 
@@ -41,15 +43,22 @@ objectdef isb2_profileengine
     ; task manager used for hotkeys and such
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
 
+    variable anonevent OnSlotActivate
+
     method Initialize()
     {
+        ISB2ProfileEngine:SetReference[This]
     }
 
     method Shutdown()
     {
+        This:DeactivateTeam
+        This:DeactivateSlot
+        This:DeactivateCharacter
         This:UninstallVFXs
         This:UninstallHotkeys
         TaskManager:Destroy
+        ISB2ProfileEngine:SetReference[NULL]
     }
 
     method InstallDefaultVirtualFiles()
@@ -193,6 +202,21 @@ objectdef isb2_profileengine
         joQuery:SetString[value,"${name~}"]
 
         return ${jaSlots.SelectKey[joQuery]}
+    }
+
+    ; slot activation hotkey
+    method OnSwitchTo(bool isGlobal)
+    {
+        if ${isGlobal}
+        {
+            WindowVisibility foreground
+            Event[OnInternalActivate]:Execute
+            ISSession.OnFocused:Execute[1]
+            OnSlotActivate:Execute
+            return
+        }
+
+        OnSlotActivate:Execute
     }
 
 #region Object Installers/Uninstallers
@@ -722,6 +746,50 @@ objectdef isb2_profileengine
         Character:SetReference[NULL]
     }
 
+    method InstallSlotActivateHotkey(uint numSlot, jsonvalueref joSlot)
+    {
+        if ${joSlot.Has[switchToCombo]}
+            bind is${numSlot}_key "${joSlot.Get[switchToCombo]~}" "focus is${numSlot};relay is${numSlot} -noredirect ISB2ProfileEngine:OnSwitchTo"
+    }
+
+    method InstallSlotActivateHotkeys()
+    {
+        if !${Team.Type.Equal[object]} || !${Team.Get[slots].Type.Equal[array]}
+            return
+
+        Team.Get[slots]:ForEach["This:InstallSlotActivateHotkey[\${ForEach.Key},ForEach.Value]"]
+    }
+
+    method UninstallSlotActivateHotkey(uint numSlot, jsonvalueref joSlot)
+    {
+        if ${joSlot.Has[switchToCombo]}
+            bind -delete is${numSlot}_key
+    }
+
+    method UninstallSlotActivateHotkeys()
+    {
+        if !${Team.Type.Equal[object]} || !${Team.Get[slots].Type.Equal[array]}
+            return
+
+        Team.Get[slots]:ForEach["This:UninstallSlotActivateHotkey[\${ForEach.Key},ForEach.Value]"]
+    }
+
+    method DeactivateSlot()
+    {
+        if !${SlotRef.Type.Equal[object]}
+            return
+
+        if ${SlotRef.Has[switchToCombo]}
+        {
+            if !${SlotRef.Has[switchToComboIsGlobal]} || ${SlotRef.GetBool[switchToComboIsGlobal]}
+            {
+                globalbind -delete isb2_switchto
+            }
+        }
+        This:UninstallSlotActivateHotkeys
+        SlotRef:SetReference[NULL]
+    }
+
     method ActivateSlot(uint numSlot)
     {
         Slot:Set[${numSlot}]
@@ -737,6 +805,20 @@ objectdef isb2_profileengine
         if ${SlotRef.Has[backgroundFPS]}
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
 
+        if ${SlotRef.Has[switchToCombo]}
+        {
+            if !${SlotRef.Has[switchToComboIsGlobal]} || ${SlotRef.GetBool[switchToComboIsGlobal]}
+            {
+                globalbind isb2_switchto "${SlotRef.Get[switchToCombo]~}" "ISB2ProfileEngine:OnSwitchTo[1]"
+            }
+            else
+            {
+            ; add binds for each slot
+               ;  bind isb2_switchto "${SlotRef.Get[switchToCombo]~}" "ISB2ProfileEngine:OnSwitchTo[0]"
+            }
+        }
+
+        This:InstallSlotActivateHotkeys
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]
 
         This:ExecuteEventAction[SlotRef,onLoad]
@@ -964,7 +1046,7 @@ objectdef isb2_profileengine
         joActionState:SetByRef[state,joState]
         joActionState:SetBool[activate,${activate}]
 
-        relay "${useTarget~}" "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
+        relay "${useTarget~}" -noredirect "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
 ;        echo relay "${useTarget~}" "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
         return TRUE
     }

@@ -3,6 +3,17 @@
 */
 variable(global) isb2_windowlayoutengine ISB2WindowLayout
 
+enum ewindowlayoutreason
+{
+    Unknown=0
+    OnActivate=1,
+    OnDeactivate=2,
+    OnSlotActivate=3,
+    OnInternalActivate=4,
+    Startup=5,
+    Remote=6,
+}
+
 objectdef isb2_windowlayoutengine
 {
     variable jsonvalueref Settings="{}"
@@ -33,14 +44,15 @@ objectdef isb2_windowlayoutengine
 		LavishScript:RegisterEvent[OnMouseEnter]
 		LavishScript:RegisterEvent[OnMouseExit]
         LavishScript:RegisterEvent[OnHotkeyFocused]
+        LavishScript:RegisterEvent[OnInternalActivate]
 
         Event[On Activate]:AttachAtom[This:Event_OnActivate]
+        Event[OnInternalActivate]:AttachAtom[This:Event_OnInternalActivate]
         Event[On Deactivate]:AttachAtom[This:Event_OnDeactivate]
         Event[OnWindowStateChanging]:AttachAtom[This:Event_OnWindowStateChanging]
 		Event[OnMouseEnter]:AttachAtom[This:Event_OnMouseEnter]
 		Event[OnMouseExit]:AttachAtom[This:Event_OnMouseExit]
         Event[OnHotkeyFocused]:AttachAtom[This:Event_OnHotkeyFocused]
-
 
         SwapGroup:SetReference["$$>
         {
@@ -59,7 +71,7 @@ objectdef isb2_windowlayoutengine
 
 ;        LGUI2:LoadPackageFile[WindowLayoutEngine.Session.lgui2Package.json]        
 ;        This:LoadTests
-        This:RefreshActiveStatus
+        This:RefreshActiveStatus[Startup]
 
 ;        uplink "ISB2WindowLayout:Event_OnSessionStartup[\"${Session~}\"]"
     }
@@ -140,7 +152,7 @@ objectdef isb2_windowlayoutengine
 
         variable bool rescale
 
-        ; check desired rendering size
+        ; check desired rendering size        
         if ${ResetRegion.Reference(exists)}
         {
             rescale:Set[1]
@@ -153,8 +165,15 @@ objectdef isb2_windowlayoutengine
         if !${forceReset} && ${rescale}
             wlParams:Set["-stealth ${wlParams~}"]
 
+        variable string useFrame
+
+        if ${useRegion.Has[frame]}
+            useFrame:Set["${useRegion.Get[frame]~}"]
         if ${Settings.Has[frame]}
-            wlParams:Concat[" -frame ${Settings.Get[frame]~}"]
+            useFrame:Set["${Settings.Get[frame]~}"]
+
+        if ${useFrame.NotNULLOrEmpty}
+            wlParams:Concat[" -frame ${useFrame~}"]
 
         echo "WindowCharacteristics ${wlParams~}"
         WindowCharacteristics ${wlParams~}
@@ -162,8 +181,18 @@ objectdef isb2_windowlayoutengine
 
     method Apply(bool forceReset=FALSE)
     {
-        This:ApplyRegion[CurrentRegion]
+        ; we're either going to apply ResetRegion or CurrentRegion.
 
+        if ${ResetRegion.Reference(exists)}
+        {
+            if !${This.RenderSizeMatchesReset} || ${forceReset}
+            {
+                This:ApplyRegion[ResetRegion]
+                return
+            }
+        }
+
+        This:ApplyRegion[CurrentRegion]
         ; WindowCharacteristics ${stealthFlag}-pos -viewable ${useX},${mainHeight} -size -viewable ${smallWidth}x${smallHeight} -frame none
     }
 
@@ -175,7 +204,7 @@ objectdef isb2_windowlayoutengine
 
     method SelectResetRegion(uint numRegion)
     {
-        if ${numRegion}>0 && ${numRegion}<${Regions.Size}
+        if ${numRegion}>0 && ${numRegion}<=${Regions.Size}
         {
             NumResetRegion:Set[${numRegion}]
             ResetRegion:SetReference["Regions.Get[${numRegion}]"]
@@ -191,7 +220,7 @@ objectdef isb2_windowlayoutengine
 
     method SelectActiveRegion(uint numRegion)
     {
-        if ${numRegion}>0 && ${numRegion}<${Regions.Size}
+        if ${numRegion}>0 && ${numRegion}<=${Regions.Size}
         {
             NumActiveRegion:Set[${numRegion}]
             ActiveRegion:SetReference["Regions.Get[${numRegion}]"]
@@ -211,7 +240,7 @@ objectdef isb2_windowlayoutengine
 
     method SelectInactiveRegion(uint numRegion)
     {
-        if ${numRegion}>0 && ${numRegion}<${Regions.Size}
+        if ${numRegion}>0 && ${numRegion}<=${Regions.Size}
         {
             NumInactiveRegion:Set[${numRegion}]
             InactiveRegion:SetReference["Regions.Get[${numRegion}]"]
@@ -235,16 +264,16 @@ objectdef isb2_windowlayoutengine
         This:SelectInactiveRegion[${numInactiveRegion}]
     }
 
-    method Remote_ActiveStatusChanged(string sessionName, uint numGroup, bool newValue)
+    method Remote_ActiveStatusChanged(string sessionName, uint numGroup, bool newValue, ewindowlayoutreason reason=0)
     {
-        echo "isb2_windowlayoutengine:Remote_ActiveStatusChanged \"${sessionName~}\" ${numGroup} ${newValue}"
+        echo "isb2_windowlayoutengine:Remote_ActiveStatusChanged \"${sessionName~}\" ${numGroup} ${newValue} ${reason}"
         if ${numGroup}==${Group}
         {
             if ${Settings.GetBool[swapOnActivate]} 
             {
                 if !${Settings.GetBool[focusFollowsMouse]}
                 {
-                    if ${This:RefreshActiveStatus(exists)}
+                    if ${This:RefreshActiveStatus[Remote](exists)}
                     {
                         This:Apply
                     }
@@ -252,16 +281,21 @@ objectdef isb2_windowlayoutengine
             }
             else
             {
-                This:RefreshActiveStatus
+                if ${newValue}
+                {
+                    This:SetActiveStatus[0,Remote]
+                    This:Apply
+                }
             }
         }        
     }
 
-    method SetActiveStatus(bool newValue)
+    method SetActiveStatus(bool newValue, ewindowlayoutreason reason=0)
     {
         variable bool oldValue=${Active}
         variable bool fireEvent
         Active:Set[${newValue}]
+        echo "isb2_windowlayoutengine:SetActiveStatus[${newValue}] oldValue=${oldValue}"
 
         if !${CurrentRegion.Reference(exists)}
             fireEvent:Set[1]
@@ -273,7 +307,7 @@ objectdef isb2_windowlayoutengine
 
         if ${fireEvent} || ${oldValue} != ${Active}
         {
-            relay "all other local" -noredirect "ISB2WindowLayout:Remote_ActiveStatusChanged[\"${Session~}\",${Group},${Active}]"
+            relay "all other local" -noredirect "ISB2WindowLayout:Remote_ActiveStatusChanged[\"${Session~}\",${Group},${Active},${reason.Value}]"
             LGUI2.Element["windowLayoutEngine.events"]:FireEventHandler[activeStatusChanged]
             return TRUE
         }
@@ -281,11 +315,11 @@ objectdef isb2_windowlayoutengine
         return FALSE
     }
 
-    method RefreshActiveStatus(bool forceUpdate=FALSE)
+    method RefreshActiveStatus(ewindowlayoutreason reason=0,bool forceUpdate=FALSE)
     {
         variable bool newValue=${Display.Window.IsForeground}
         if ${forceUpdate} || ${newValue}!=${Active}       
-            return ${This:SetActiveStatus[${newValue}](exists)}
+            return ${This:SetActiveStatus[${newValue},${reason.Value}](exists)}
         return FALSE
     }
 
@@ -305,11 +339,13 @@ objectdef isb2_windowlayoutengine
     {
         if !${jo.Type.Equal[object]}
         {
-            echo "isb2_windowlayoutengine:SetLayout expected object, got ${jo~}"
+            Script:SetLastError["isb2_windowlayoutengine:SetLayout expected object, got ${jo~}"]
             return
         }
 
         echo "isb2_windowlayoutengine:SetLayout ${jo~}"
+        ISB2ProfileEngine.OnSlotActivate:AttachAtom[This:Event_OnSlotActivate]
+        ISSession.OnWindowCaptured:AttachAtom[This:Event_OnWindowCaptured]
 
         if ${jo.Has[settings]}
             Settings:SetReference["${jo.Get[settings]~}"]
@@ -334,26 +370,70 @@ objectdef isb2_windowlayoutengine
             NumResetRegion:Set["${SwapGroup.GetInteger[reset]}"]
         }
         
-;        echo active=${NumActiveRegion} inactive=${NumInactiveRegion} reset=${NumResetRegion}
+        echo active=${NumActiveRegion} inactive=${NumInactiveRegion} reset=${NumResetRegion}
         This:SelectRegions[${NumActiveRegion},${NumInactiveRegion}]
         This:SelectResetRegion[${NumResetRegion}]
+
+        ISSession:SetFocusFollowsMouse["${Settings.GetBool[focusFollowsMouse]}"]
         This:Apply
     }
 
 #region events
 
+    method Event_OnSlotActivate()
+    {
+        echo "isb2_windowlayoutengine:Event_OnSlotActivate"
+
+        if !${Settings.GetBool[swapOnSlotActivate]} && !${Settings.GetBool[refreshOnSlotActivate]} 
+        {
+            echo "isb2_windowlayoutengine:Event_OnSlotActivate: Ignoring"
+            return
+        }
+
+        if !${This:SetActiveStatus[1,OnSlotActivate](exists)}
+        {
+            echo "isb2_windowlayoutengine:Event_OnSlotActivate: SetActiveStatus=FALSE"
+            return
+        }
+
+        if ${Settings.GetBool[swapOnSlotActivate]}
+        {
+            echo "isbw2inwodwlayout: Applying."
+            This:Apply
+        }
+    }
+
+    method Event_OnInternalActivate()
+    {
+        echo "isb2_windowlayoutengine:Event_OnInternalActivate"
+
+        if !${Settings.GetBool[swapOnInternalActivate]} && !${Settings.GetBool[refreshOnInternalActivate]} 
+        {
+            return
+        }
+
+        if !${This:RefreshActiveStatus[OnInternalActivate](exists)}
+        {
+            return
+        }
+
+        if ${Settings.GetBool[swapOnInternalActivate]} && !${Settings.GetBool[focusFollowsMouse]}
+        {
+            echo "isbw2inwodwlayout: Applying."
+            This:Apply
+        }
+    }
+
     method Event_OnActivate()
     {
         echo "isb2_windowlayoutengine:Event_OnActivate"
-
-        variable bool changed
 
         if !${Settings.GetBool[swapOnActivate]} && !${Settings.GetBool[refreshOnActivate]} 
         {
             return
         }
 
-        if !${This:RefreshActiveStatus(exists)}
+        if !${This:RefreshActiveStatus[OnActivate](exists)}
         {
             return
         }
@@ -369,14 +449,12 @@ objectdef isb2_windowlayoutengine
     {
         echo "isb2_windowlayoutengine:Event_OnDeactivate"
 
-        variable bool changed
-
         if !${Settings.GetBool[swapOnDeactivate]} && !${Settings.GetBool[refreshOnDeactivate]} 
         {
             return
         }
 
-        if !${This:RefreshActiveStatus(exists)}
+        if !${This:RefreshActiveStatus[OnDeactivate](exists)}
         {
             return
         }
@@ -400,7 +478,7 @@ objectdef isb2_windowlayoutengine
 
     method Event_OnWindowStateChanging(string change)
     {
-      ;  echo "isb2_windowlayoutengine:OnWindowStateChanging ${change~}"
+        echo "isb2_windowlayoutengine:OnWindowStateChanging ${change~}"
     }
 
     method Event_OnMouseEnter()
@@ -411,6 +489,11 @@ objectdef isb2_windowlayoutengine
     method Event_OnMouseExit()
     {
 
+    }
+
+    method Event_OnWindowCaptured()
+    {
+        This:Apply
     }
 #endregion
     

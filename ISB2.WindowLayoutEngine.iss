@@ -33,6 +33,7 @@ objectdef isb2_windowlayoutengine
     variable uint NumInactiveRegion=2
 
     variable bool Active=FALSE
+    variable bool Resetting=FALSE
 
     method Initialize()
     {
@@ -41,18 +42,23 @@ objectdef isb2_windowlayoutengine
         LavishScript:RegisterEvent[On Activate]
         LavishScript:RegisterEvent[On Deactivate]
         LavishScript:RegisterEvent[OnWindowStateChanging]
+        LavishScript:RegisterEvent[On Window Position]
+        
 		LavishScript:RegisterEvent[OnMouseEnter]
 		LavishScript:RegisterEvent[OnMouseExit]
         LavishScript:RegisterEvent[OnHotkeyFocused]
         LavishScript:RegisterEvent[OnInternalActivate]
+        LavishScript:RegisterEvent[On3DReset]
 
         Event[On Activate]:AttachAtom[This:Event_OnActivate]
         Event[OnInternalActivate]:AttachAtom[This:Event_OnInternalActivate]
         Event[On Deactivate]:AttachAtom[This:Event_OnDeactivate]
         Event[OnWindowStateChanging]:AttachAtom[This:Event_OnWindowStateChanging]
+        Event[On Window Position]:AttachAtom[This:Event_OnWindowPosition]
 		Event[OnMouseEnter]:AttachAtom[This:Event_OnMouseEnter]
 		Event[OnMouseExit]:AttachAtom[This:Event_OnMouseExit]
         Event[OnHotkeyFocused]:AttachAtom[This:Event_OnHotkeyFocused]
+        Event[On3DReset]:AttachAtom[This:Event_On3DReset]
 
         SwapGroup:SetReference["$$>
         {
@@ -187,11 +193,17 @@ objectdef isb2_windowlayoutengine
         {
             if !${This.RenderSizeMatchesReset} || ${forceReset}
             {
+                echo "isb2_windowlayoutengine:Apply applying Reset Region"
+                Resetting:Set[1]
                 This:ApplyRegion[ResetRegion]
                 return
             }
         }
 
+        if !${CurrentRegion.Reference(exists)}
+        {
+            Script:SetLastError["\arisb2_windowlayoutengine:Apply\ax: No CurrentRegion"]
+        }
         This:ApplyRegion[CurrentRegion]
         ; WindowCharacteristics ${stealthFlag}-pos -viewable ${useX},${mainHeight} -size -viewable ${smallWidth}x${smallHeight} -frame none
     }
@@ -375,6 +387,8 @@ objectdef isb2_windowlayoutengine
         This:SelectResetRegion[${NumResetRegion}]
 
         ISSession:SetFocusFollowsMouse["${Settings.GetBool[focusFollowsMouse]}"]
+
+        WindowCharacteristics -lock
         This:Apply
     }
 
@@ -398,7 +412,7 @@ objectdef isb2_windowlayoutengine
 
         if ${Settings.GetBool[swapOnSlotActivate]}
         {
-            echo "isbw2inwodwlayout: Applying."
+            echo "isb2_windowlayoutengine: Applying."
             This:Apply
         }
     }
@@ -419,7 +433,7 @@ objectdef isb2_windowlayoutengine
 
         if ${Settings.GetBool[swapOnInternalActivate]} && !${Settings.GetBool[focusFollowsMouse]}
         {
-            echo "isbw2inwodwlayout: Applying."
+            echo "isb2_windowlayoutengine: Applying."
             This:Apply
         }
     }
@@ -440,7 +454,7 @@ objectdef isb2_windowlayoutengine
 
         if ${Settings.GetBool[swapOnActivate]} && !${Settings.GetBool[focusFollowsMouse]}
         {
-            echo "isbw2inwodwlayout: Applying."
+            echo "isb2_windowlayoutengine: Applying."
             This:Apply
         }
     }
@@ -461,7 +475,7 @@ objectdef isb2_windowlayoutengine
 
         if ${Settings.GetBool[swapOnDeactivate]} && !${Settings.GetBool[focusFollowsMouse]}
         {
-            echo "isbw2inwodwlayout: Applying."
+            echo "isb2_windowlayoutengine: Applying."
             This:Apply
         }
     }
@@ -474,6 +488,12 @@ objectdef isb2_windowlayoutengine
 
         if ${This:RefreshActiveStatus(exists)}
             This:Apply
+    }
+
+    method Event_OnWindowPosition()
+    {
+        echo "isb2_windowlayoutengine:OnWindowPosition ${Display.ViewableX},${Display.ViewableY} ${Display.ViewableWidth}x${Display.ViewableHeight}  render=${Display.Width}x${Display.Height}"
+        
     }
 
     method Event_OnWindowStateChanging(string change)
@@ -491,8 +511,21 @@ objectdef isb2_windowlayoutengine
 
     }
 
+    method Event_On3DReset()
+    {
+        echo "isb2_windowlayoutengine:On3DReset"
+        if ${Resetting}
+        {
+            ;This:ApplyRegion[CurrentRegion]
+            This:Apply
+            Resetting:Set[0]
+        }
+    }
+
     method Event_OnWindowCaptured()
     {
+        echo "isb2_windowlayoutengine:Event_OnWindowCaptured, applying..."
+        Resetting:Set[1]        
         This:Apply
     }
 #endregion

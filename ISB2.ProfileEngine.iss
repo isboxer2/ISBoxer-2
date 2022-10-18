@@ -769,6 +769,7 @@ objectdef isb2_profileengine
         {
             if !${SlotRef.Has[switchToComboIsGlobal]} || ${SlotRef.GetBool[switchToComboIsGlobal]}
             {
+                globalbind -delete isb2_switchto
                 globalbind isb2_switchto "${SlotRef.Get[switchToCombo]~}" "ISB2ProfileEngine:OnSwitchTo[1]"
             }
         }

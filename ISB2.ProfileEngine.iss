@@ -29,6 +29,7 @@ objectdef isb2_profileengine
     variable jsonvalue Characters="{}"
     variable jsonvalue Teams="{}"
     variable jsonvalue WindowLayouts="{}"
+    variable jsonvalue BroadcastProfiles="{}"
 
     variable jsonvalueref Character
     variable jsonvalueref Team
@@ -521,6 +522,27 @@ objectdef isb2_profileengine
             ja:ForEach["This:UninstallVirtualFile[ForEach.Value]"]
     }
 
+    method InstallBroadcastProfile(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+;        echo InstallBroadcastProfile: BroadcastProfiles:SetByRef["${jo.Get[name]~}",jo] 
+        BroadcastProfiles:SetByRef["${jo.Get[name]~}",jo]
+    }
+
+    method InstallBroadcastProfiles(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallBroadcastProfile[ForEach.Value]"]
+    }
+
+    method UninstallBroadcastProfiles(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallBroadcastProfile[ForEach.Value]"]
+    }
+
     method InstallWindowLayout(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -728,6 +750,22 @@ objectdef isb2_profileengine
         return "${This:ActivateTeam[useTeam](exists)}"
     }
 
+    method ActivateBroadcastProfileByName(string name)
+    {
+        variable weakref useLayout="BroadcastProfiles.Get[\"${name~}\"]"
+        echo "\ayActivateBroadcastProfileByName\ax ${name} = ${useLayout.AsJSON~}"
+        return "${This:ActivateBroadcastProfile[useLayout](exists)}"
+    }
+
+    method ActivateBroadcastProfile(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return
+        
+        ISB2BroadcastMode:SetBroadcastProfile[jo]
+        ; echo "TODO: ActivateBroadcastProfile ${jo~}"
+    }
+
     method ActivateWindowLayoutByName(string name)
     {
         variable weakref useLayout="WindowLayouts.Get[\"${name~}\"]"
@@ -883,6 +921,8 @@ objectdef isb2_profileengine
 
         This:InstallVirtualFiles["Team.Get[virtualFiles]"]
 
+        This:ActivateBroadcastProfileByName["${Team.Get["broadcastProfile"]~}"]
+
         variable jsonvalue dscopeDefinition
         dscopeDefinition:SetValue["$$>
         {
@@ -917,6 +957,7 @@ objectdef isb2_profileengine
         This:InstallProfiles[_profile.Profiles]
 
         This:InstallVirtualFiles[_profile.VirtualFiles]
+        This:InstallBroadcastProfiles[_profile.BroadcastProfiles]
         This:InstallWindowLayouts[_profile.WindowLayouts]
         This:InstallTriggers[_profile.Triggers]
         This:InstallHotkeySheets[_profile.HotkeySheets]

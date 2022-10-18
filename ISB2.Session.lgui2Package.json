@@ -391,6 +391,23 @@
             "strata":0.6            
         },
         {
+            "type":"broadcaster",
+            "name":"isb2.MainBroadcaster",
+            "broadcastTarget": "all other",
+            "horizontalAlignment":"stretch",
+            "verticalAlignment":"stretch",
+            "strata":0.05,
+            "borderBrush":{
+                "color":"#ff0000"
+            },
+            "borderThickness":4,
+            "visibility":"hidden",
+            "sendKeyboard":true,
+            "sendMouse":true,
+            "useLocalBindings":true,
+            "sendForegroundOnly":true
+        },
+        {
             "type":"window",
             "name":"isb2.MainWindow",
             "hideOnClose":true,

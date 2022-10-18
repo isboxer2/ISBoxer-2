@@ -15,6 +15,7 @@ objectdef isb2_profile
     variable jsonvalueref Profiles=[]
     variable jsonvalueref Teams=[]
     variable jsonvalueref Characters=[]
+    variable jsonvalueref BroadcastProfiles=[]
     variable jsonvalueref WindowLayouts=[]
     variable jsonvalueref VirtualFiles=[]
     variable jsonvalueref Triggers=[]
@@ -55,6 +56,8 @@ objectdef isb2_profile
             Teams:SetReference["jo.Get[teams]"] 
         if ${jo.Has[characters]}
             Characters:SetReference["jo.Get[characters]"]
+        if ${jo.Has[broadcastProfiles]}
+            BroadcastProfiles:SetReference["jo.Get[broadcastProfiles]"]
         if ${jo.Has[windowLayouts]}
             WindowLayouts:SetReference["jo.Get[windowLayouts]"]
         if ${jo.Has[virtualFiles]}
@@ -102,6 +105,8 @@ objectdef isb2_profile
             jo:SetByRef["characters",Characters]
         if ${WindowLayouts.Used}
             jo:SetByRef["windowLayouts",WindowLayouts]
+        if ${BroadcastProfiles.Used}
+            jo:SetByRef["broadcastProfiles",BroadcastProfiles]
         if ${VirtualFiles.Used}
             jo:SetByRef["virtualFiles",VirtualFiles]
         if ${Triggers.Used}

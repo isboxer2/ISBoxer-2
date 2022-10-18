@@ -1,4 +1,5 @@
 #include "ISB2.Common.iss"
+#include "ISB2.BroadcastMode.iss"
 #include "ISB2.ProfileEngine.iss"
 #include "ISB2.WindowLayoutEngine.iss"
 
@@ -18,9 +19,9 @@ objectdef isb2session inherits isb2_profileengine
             return
         }
 
-        if ${InnerSpace.Build} < 7033
+        if ${InnerSpace.Build} < 7037
         {
-            echo "ISBoxer 2 inactive; Inner Space build 7033 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2 inactive; Inner Space build 7037 or later required (currently ${InnerSpace.Build})"
             return
         }
 

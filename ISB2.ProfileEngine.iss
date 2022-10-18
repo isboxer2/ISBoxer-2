@@ -204,6 +204,12 @@ objectdef isb2_profileengine
         return ${jaSlots.SelectKey[joQuery]}
     }
 
+    method OnWindowCaptured()
+    {
+        echo "\atisb2_profileengine:OnWindowCaptured\ax"
+        This:InstallSlotActivateHotkeys
+    }
+
     ; slot activation hotkey
     method OnSwitchTo(bool isGlobal)
     {
@@ -758,6 +764,16 @@ objectdef isb2_profileengine
             return
 
         Team.Get[slots]:ForEach["This:InstallSlotActivateHotkey[\${ForEach.Key},ForEach.Value]"]
+
+        if ${SlotRef.Has[switchToCombo]}
+        {
+            if !${SlotRef.Has[switchToComboIsGlobal]} || ${SlotRef.GetBool[switchToComboIsGlobal]}
+            {
+                globalbind isb2_switchto "${SlotRef.Get[switchToCombo]~}" "ISB2ProfileEngine:OnSwitchTo[1]"
+            }
+        }
+
+        ISSession.OnWindowCaptured:AttachAtom[This:OnWindowCaptured]        
     }
 
     method UninstallSlotActivateHotkey(uint numSlot, jsonvalueref joSlot)
@@ -772,12 +788,6 @@ objectdef isb2_profileengine
             return
 
         Team.Get[slots]:ForEach["This:UninstallSlotActivateHotkey[\${ForEach.Key},ForEach.Value]"]
-    }
-
-    method DeactivateSlot()
-    {
-        if !${SlotRef.Type.Equal[object]}
-            return
 
         if ${SlotRef.Has[switchToCombo]}
         {
@@ -786,6 +796,13 @@ objectdef isb2_profileengine
                 globalbind -delete isb2_switchto
             }
         }
+    }
+
+    method DeactivateSlot()
+    {
+        if !${SlotRef.Type.Equal[object]}
+            return
+
         This:UninstallSlotActivateHotkeys
         SlotRef:SetReference[NULL]
     }
@@ -804,19 +821,6 @@ objectdef isb2_profileengine
 
         if ${SlotRef.Has[backgroundFPS]}
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
-
-        if ${SlotRef.Has[switchToCombo]}
-        {
-            if !${SlotRef.Has[switchToComboIsGlobal]} || ${SlotRef.GetBool[switchToComboIsGlobal]}
-            {
-                globalbind isb2_switchto "${SlotRef.Get[switchToCombo]~}" "ISB2ProfileEngine:OnSwitchTo[1]"
-            }
-            else
-            {
-            ; add binds for each slot
-               ;  bind isb2_switchto "${SlotRef.Get[switchToCombo]~}" "ISB2ProfileEngine:OnSwitchTo[0]"
-            }
-        }
 
         This:InstallSlotActivateHotkeys
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]

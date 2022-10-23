@@ -1263,8 +1263,19 @@ objectdef isb2_importer
         if ${jo.Has[hold]}
             joNew:SetBool[hold,${jo.GetBool[hold]}]
 
-        if ${jo.Has[mode]}
-            joNew:SetString[mode,"${jo.Get[mode]~}"]
+        switch ${jo.Get[mode]}
+        {
+        case OnPressAndRelease
+            joNew:SetBool[onRelease,1]
+            joNew:SetBool[onPress,1]
+            break
+        case OnPress
+            joNew:SetBool[onPress,1]
+            break
+        case OnRelease
+            joNew:SetBool[onRelease,1]
+            break
+        }
 
         variable jsonvalue jaSteps="[]"
 

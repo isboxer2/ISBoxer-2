@@ -1941,17 +1941,8 @@ objectdef isb2_profileengine
         This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
     }
 
-    method ExecuteMappable(jsonvalueref joMappable, bool newState)
+    method ExecuteMappableActivationState(jsonvalueref joMappable, bool newState)
     {
-        if !${joMappable.Type.Equal[object]}
-            return
-
-        echo "\agExecuteMappable\ax[${newState}] ${joMappable~}"
-
-        ; make sure it's not disabled. to be disabled requires "enable":false
-        if ${joMappable.GetBool[enable].Equal[FALSE]}
-            return
-
         ; get current step, then call This:ExecuteRotatorStep
         if !${newState}
         {
@@ -1969,6 +1960,48 @@ objectdef isb2_profileengine
         }
 
         LastMappable:SetReference[joMappable]
+    }
+
+    method ExecuteMappable(jsonvalueref joMappable, bool newState)
+    {
+        if !${joMappable.Type.Equal[object]}
+            return
+
+        echo "\agExecuteMappable\ax[${newState}] ${joMappable~}"
+
+        ; make sure it's not disabled. to be disabled requires "enable":false
+        if ${joMappable.GetBool[enable].Equal[FALSE]}
+            return
+
+
+        if ${newState}
+        {
+            ; if we have "onPress", fire both press/release mechanics now
+            if ${joMappable.Has[onPress]}
+            {
+                if !${joMappable.GetBool[onPress]}
+                    return
+
+                This:ExecuteMappableActivationState[joMappable,1]
+                This:ExecuteMappableActivationState[joMappable,0]
+                return
+            }
+        }
+        else
+        {
+            ; if we have "onRelease", fire both press/release mechanics now
+            if ${joMappable.Has[onRelease]}
+            {
+                if !${joMappable.GetBool[onRelease]}
+                    return
+
+                This:ExecuteMappableActivationState[joMappable,1]
+                This:ExecuteMappableActivationState[joMappable,0]
+                return
+            }
+        }
+        
+        This:ExecuteMappableActivationState[joMappable,${newState}]
     }
 
     ; for any Rotate object, execute a given step, depending on press/release state

@@ -91,6 +91,8 @@ objectdef isb2_importer
             jo:SetByRef[windowLayouts,jRef]
         }
 
+        jo:SetByRef[vfxSheets,"ISBProfile.Get[vfxSheets]"]
+
         jo:SetString[name,"${filename.FilenameOnly~}"]
         jo:SetString["$schema","http://www.lavishsoft.com/schema/isb2.json"]
         return jo
@@ -260,6 +262,15 @@ objectdef isb2_importer
     {
         variable jsonvalue ja="[]"
         ISBProfile.Get[VariableKeystroke]:ForEach["ja:AddByRef[\"This.ConvertVariableKeystroke[ForEach.Value]\"]"]
+        return ja
+    }
+
+    member:jsonvalueref ConvertVideoFXSheets()
+    {
+        variable jsonvalue ja="[]"
+        ; ISBProfile.Get[VariableKeystroke]:ForEach["ja:AddByRef[\"This.ConvertVariableKeystroke[ForEach.Value]\"]"]
+
+
         return ja
     }
 #endregion
@@ -510,13 +521,13 @@ objectdef isb2_importer
 
 
         variable jsonvalue jaSlots="[]"
-        jo.Get[Slots]:ForEach["jaSlots:AddByRef[\"This.ConvertCharacterSetSlot[ForEach.Value]\"]"]
+        jo.Get[Slots]:ForEach["jaSlots:AddByRef[\"This.ConvertCharacterSetSlot[joNew,ForEach.Value]\"]"]
         if ${jaSlots.Used}
             joNew:SetByRef[slots,jaSlots]        
         return joNew
     }
 
-    member:jsonvalueref ConvertCharacterSetSlot(jsonvalueref jo)
+    member:jsonvalueref ConvertCharacterSetSlot(jsonvalueref joCharacterSet, jsonvalueref jo)
     {
 ;        echo "\agConvertCharacterSetSlot\ax ${jo~}"
         variable jsonvalue joNew="{}"
@@ -575,10 +586,56 @@ objectdef isb2_importer
             joNew:SetByRef[cpuCores,ja]
         }
 
+        
+        ; check for ClickBars file
+        ; check for Repeater Regions file
+        ; check for Video FX file
+        This:ConvertSlotClickBars[joCharacterSet,joNew]
+        This:ConvertSlotRepeaterRegions[joCharacterSet,joNew]
+        This:ConvertSlotVFX[joCharacterSet,joNew]
+
 ;        joNew:SetByRef[original,jo]
         return joNew
     }
 
+    method ConvertSlotVFXSheet(jsonvalueref joCharacterSet,jsonvalueref joSlot,jsonvalueref joSheet)
+    {
+        variable string name="${joSheet.Get[name]~}"
+        joSheet:SetString[name,"${joCharacterSet.Get[name]~}.${joSlot.Get[character]~}.${name~}"]
+
+        if ${name.Equal[Auto]}
+        {
+            variable jsonvalue ja="[]"
+            ja:AddString["${joSheet.Get[name]~}"]
+            joSlot:SetByRef["vfxSheets",ja]
+        }
+
+        ISBProfile.Get[vfxSheets]:AddByRef[joSheet]        
+    }
+
+    method ConvertSlotVFX(jsonvalueref joCharacterSet,jsonvalueref joSlot)
+    {
+        variable jsonvalueref jo        
+        variable filepath filename="${LavishScript.HomeDirectory~}/Scripts/ISBoxer.VideoFeeds.${joCharacterSet.Get[name]~}.${joSlot.Get[character]~}.XML"
+        if !${filename.PathExists}
+            return
+
+        jo:SetReference["This.TransformVideoFXXML[\"${filename~}\"]"]
+        
+        if !${jo.Reference(exists)}
+            return
+
+        echo "\ayConvertSlotVFX ${jo~}"
+
+        if !${jo.Get[vfxSheets].Used}
+            return
+
+        if !${ISBProfile.Has[vfxSheets]}
+            ISBProfile:Set[vfxSheets,"[]"]
+
+        ; we have multiple sheets, which we need to alter the name for
+        jo.Get[vfxSheets]:ForEach["This:ConvertSlotVFXSheet[joCharacterSet,joSlot,ForEach.Value]"]        
+    }
 
     member:jsonvalueref ConvertKeyMapAsMappableSheet(jsonvalueref jo)
     {

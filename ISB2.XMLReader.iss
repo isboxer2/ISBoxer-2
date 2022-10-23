@@ -63,6 +63,7 @@ objectdef isb2_isb1transformer
         joTransform:Erase[Set]
 
         joTransform:SetByRef[sets,ja]        
+        joTransform:Erase[Value]
     }
 
     member:jsonvalueref TransformInnerSpaceSet(jsonvalueref joTransform)
@@ -1164,7 +1165,11 @@ objectdef isb2_xmlreader
             filename:Set["${LavishScript.HomeDirectory}/ISBoxerToolkitProfile.LastExported.XML"]
 
         XMLReader:Reset
-        XMLReader:ParseFile["${filename~}"]
+        if !${XMLReader:ParseFile["${filename~}"](exists)}
+        {
+            Script:SetLastError["isb2_xmlreader:Read: Failed to parse file ${filename~}"]
+            return NULL
+        }
 
         variable weakref profileNode
         profileNode:SetReference["XMLReader.Root.FindChildElement[\"${rootNode~}\"]"]

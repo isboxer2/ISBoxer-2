@@ -1049,7 +1049,9 @@ objectdef isb2_profileengine
 
         ; todo ... handle variables!
 
-        if ${ISBoxerSlot(exists)}        
+        if ${Slot}
+            text:Set["${text.ReplaceSubstring["{SLOT}",${Slot}]}"]
+        elseif ${ISBoxerSlot(exists)}        
             text:Set["${text.ReplaceSubstring["{SLOT}",${ISBoxerSlot}]}"]
         else
             text:Set["${text.ReplaceSubstring["{SLOT}",1]}"]

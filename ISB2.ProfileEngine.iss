@@ -1271,9 +1271,24 @@ objectdef isb2_profileengine
         }
     }
 
+    method Action_BroadcastState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_BroadcastState\ax[${activate}] ${joAction~}"
+    }
+
+    method Action_BroadcastTarget(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_BroadcasTarget\ax[${activate}] ${joAction~}"
+    }
+
+    method Action_BroadcastList(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_BroadcastList\ax[${activate}] ${joAction~}"
+    }
+
     method Action_PopupText(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAction_PopupText\ax[${activate}] ${joAction~}"
+        echo "\ayAction_PopupText\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 

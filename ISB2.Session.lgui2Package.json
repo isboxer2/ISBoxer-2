@@ -168,15 +168,22 @@
                     "retarget":true
                 },
                 {
-                    "name":"broadcasting target",
-                    "handler":"Action_BroadcastingTarget",
+                    "name":"broadcast state",
+                    "handler":"Action_BroadcastTarget",
                     "variableProperties":["value"],
                     "activationState":true,
                     "retarget":true
                 },
                 {
-                    "name":"broadcasting list",
-                    "handler":"Action_BroadcastingList",
+                    "name":"broadcast target",
+                    "handler":"Action_BroadcastTarget",
+                    "variableProperties":["value"],
+                    "activationState":true,
+                    "retarget":true
+                },
+                {
+                    "name":"broadcast list",
+                    "handler":"Action_BroadcastList",
                     "activationState":true,
                     "retarget":true
                 },

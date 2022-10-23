@@ -1463,7 +1463,7 @@ objectdef isb2_importer
     {
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,broadcasting state]
+        joNew:SetString[type,broadcast state]
 
         if ${jo.Has[BlockLocal]}
             joNew:SetBool[blockLocal,${jo.GetBool[BlockLocal]}]
@@ -1649,7 +1649,7 @@ objectdef isb2_importer
     {
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,broadcasting target]
+        joNew:SetString[type,broadcast target]
 
         if ${jo.Has[RepeaterTarget]}
             joNew:SetString[value,"${jo.Get[RepeaterTarget]~}"]
@@ -1731,7 +1731,7 @@ objectdef isb2_importer
 
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,broadcasting list]        
+        joNew:SetString[type,broadcast list]        
         joNew:SetString[listType,"${jo.Get[WhiteOrBlackListType]~}"]
 
         variable jsonvalue ja="[]"

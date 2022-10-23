@@ -436,6 +436,32 @@ objectdef isb2_slotmanager
             StopTime:Set["${Script.RunningTime}"]
     }
 
+    member:bool AnyNotLive()
+    {
+        if !${Slots.Used}
+            return FALSE
+
+        variable jsonvalueref joQuery="$$>
+        {
+            "op":"!=",
+            "member":"State",
+            "value":5
+        }       
+        <$$"
+
+        if ${Slots.SelectKey[joQuery]}
+        {
+            return TRUE
+        }
+
+        return FALSE
+    }
+
+    member:bool Active()
+    {
+        return ${This.AnyNotLive}        
+    }
+
     member:float Duration()
     {
         variable float val
@@ -539,7 +565,9 @@ objectdef isb2_slotmanager
 
         if !${ISB2.Settings.GetBool[quickLaunch]}
             jo:SetBool[waitForMainSession,TRUE]
-        
+        else
+            jo:SetBool[waitForMainSession,FALSE]      
+
         joTeam.Get[slots]:ForEach["This:AddTeamLaunchSlot[ja,joTeam,\${ForEach.Key},ForEach.Value,jo]"]
 
         This:Prepare[ja]
@@ -634,6 +662,8 @@ objectdef isb2_slotmanager
 
         if !${LaunchingSlot.Value(exists)}
         {
+            if ${This.Active}
+                return TRUE
             This:Stop
             return FALSE
         }
@@ -645,6 +675,9 @@ objectdef isb2_slotmanager
 
             if !${LaunchingSlot:Next(exists)}
             {
+                if ${This.Active}
+                    return TRUE
+
                 This:Stop
                 return FALSE
             }

@@ -1149,6 +1149,13 @@ objectdef isb2_profileengine
         if !${keystroke.NotNULLOrEmpty}
             return
 
+        if ${joAction.Has[activationState]}
+        {
+            echo press -nomodifiers "${keystroke}"
+            press -nomodifiers "${keystroke}"
+            return
+        }
+
         if ${activate}
         {
             echo press -hold "${keystroke}"

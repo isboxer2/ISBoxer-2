@@ -422,6 +422,8 @@ objectdef isb2_slotmanager
         if !${LaunchingSlot:First(exists)}
             return FALSE
 
+        StopTime:Set[0]
+        StartTime:Set["${Script.RunningTime}"]
         Event[OnFrame]:AttachAtom[This:Pulse]
         LaunchingSlot.Value:Launch
         return TRUE
@@ -430,6 +432,23 @@ objectdef isb2_slotmanager
     method Stop()
     {
         Event[OnFrame]:DetachAtom[This:Pulse]
+        if !${StopTime}
+            StopTime:Set["${Script.RunningTime}"]
+    }
+
+    member:float Duration()
+    {
+        variable float val
+
+        if !${StartTime}
+            return 0
+
+        variable uint useStopTime=${StopTime}
+        if !${useStopTime}
+            useStopTime:Set["${Script.RunningTime}"]
+
+        val:Set["(${useStopTime}-${StartTime})/1000"]        
+        return ${val}
     }
 
     method Test(int numSlots=1)
@@ -518,7 +537,7 @@ objectdef isb2_slotmanager
         if ${profileName.NotNULLOrEmpty}
             jo:SetString["teamProfile","${profileName~}"]
 
-        if !${Settings.GetBool[quickLaunch]}
+        if !${ISB2.Settings.GetBool[quickLaunch]}
             jo:SetBool[waitForMainSession,TRUE]
         
         joTeam.Get[slots]:ForEach["This:AddTeamLaunchSlot[ja,joTeam,\${ForEach.Key},ForEach.Value,jo]"]
@@ -643,6 +662,8 @@ objectdef isb2_slotmanager
     variable iterator LaunchingSlot
     variable collection:isb2_managedSlot Slots
     variable weakref Launching
+    variable uint StartTime
+    variable uint StopTime
 }
 
 variable(global) isb2 ISB2

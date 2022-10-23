@@ -3,6 +3,8 @@ objectdef isb2_importer
 {
 
     variable jsonvalueref ISBProfile
+    
+    variable bool MappedKeyHoldState
 
 #region XML Transformers -- API Entry Points 
     method TransformXML(string filename)
@@ -690,9 +692,15 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
 
+        if ${jo.Has[hold]}
+            joNew:SetBool[hold,${jo.GetBool[hold]}]
+
+        if ${jo.Has[mode]}
+            joNew:SetString[mode,"${jo.Get[mode]~}"]
+
         variable jsonvalue ja="[]"
 
-        jo.Get[Mappings]:ForEach["This:ConvertMappedKeyAsMappableInto[ja,jo,ForEach.Value]"]
+        jo.Get[Mappings]:ForEach["This:ConvertMappedKeyAsMappableInto[ja,joNew,ForEach.Value]"]
 
         if !${ja.Used}
             return NULL
@@ -715,7 +723,7 @@ objectdef isb2_importer
 
         variable jsonvalue ja="[]"
 
-        jo.Get[Mappings]:ForEach["This:ConvertMappedKeyAsHotkeyInto[ja,jo,ForEach.Value]"]
+        jo.Get[Mappings]:ForEach["This:ConvertMappedKeyAsHotkeyInto[ja,joNew,ForEach.Value]"]
 
         if !${ja.Used}
             return NULL
@@ -946,7 +954,7 @@ objectdef isb2_importer
 
     method ConvertVariableKeystrokeInto(jsonvalueref ja, jsonvalueref jo)
     {
-;        echo ConvertMappedKeyAsHotkeyInto
+;        echo ConvertVariableKeystrokeInto
         variable jsonvalueref joNew="This.ConvertVariableKeystroke[jo]"
         if !${joNew.Reference(exists)}
             return
@@ -1191,17 +1199,17 @@ objectdef isb2_importer
 #endregion
 
 #region Mapped Key Conversion -- Fully implemented
-    method ConvertMappedKeyAsHotkeyInto(jsonvalueref ja, jsonvalueref joKeyMap, jsonvalueref jo)
+    method ConvertMappedKeyAsHotkeyInto(jsonvalueref ja, jsonvalueref joMappableSheet, jsonvalueref jo)
     {
 ;        echo ConvertMappedKeyAsHotkeyInto
-        variable jsonvalueref joNew="This.ConvertMappedKeyAsHotkey[joKeyMap,jo]"
+        variable jsonvalueref joNew="This.ConvertMappedKeyAsHotkey[joMappableSheet,jo]"
         if !${joNew.Reference(exists)}
             return
 
         ja:AddByRef[joNew]
     }
 
-    member:jsonvalueref ConvertMappedKeyAsHotkey(jsonvalueref joKeyMap, jsonvalueref jo)
+    member:jsonvalueref ConvertMappedKeyAsHotkey(jsonvalueref joMappableSheet, jsonvalueref jo)
     {
 ;        echo "ConvertMappedKeyAsHotkey ${jo~}"
 
@@ -1228,17 +1236,17 @@ objectdef isb2_importer
         return joNew
     }
 
-    method ConvertMappedKeyAsMappableInto(jsonvalueref ja, jsonvalueref joKeyMap, jsonvalueref jo)
+    method ConvertMappedKeyAsMappableInto(jsonvalueref ja, jsonvalueref joMappableSheet, jsonvalueref jo)
     {
 ;        echo ConvertMappedKeyAsMappableInto
-        variable jsonvalueref joNew="This.ConvertMappedKeyAsMappable[joKeyMap,jo]"
+        variable jsonvalueref joNew="This.ConvertMappedKeyAsMappable[joMappableSheet,jo]"
         if !${joNew.Reference(exists)}
             return
 
         ja:AddByRef[joNew]
     }
 
-    member:jsonvalueref ConvertMappedKeyAsMappable(jsonvalueref joKeyMap, jsonvalueref jo)
+    member:jsonvalueref ConvertMappedKeyAsMappable(jsonvalueref joMappableSheet, jsonvalueref jo)
     {
 ;        echo "ConvertMappedKeyAsMappable ${jo~}"
         variable jsonvalue joNew="{}"
@@ -1260,30 +1268,46 @@ objectdef isb2_importer
 
         variable jsonvalue jaSteps="[]"
 
-        jo.Get[Steps]:ForEach["jaSteps:AddByRef[\"This.ConvertMappedKeyStep[ForEach.Value]\"]"]
+        jo.Get[Steps]:ForEach["jaSteps:AddByRef[\"This.ConvertMappedKeyStep[joMappableSheet,joNew,ForEach.Value]\"]"]
 
         joNew:SetByRef[steps,jaSteps]
         return joNew
     }
 
-    member:jsonvalueref ConvertMappedKeyStep(jsonvalueref jo)
+    member:jsonvalueref ConvertMappedKeyStep(jsonvalueref joMappableSheet,jsonvalueref joMappable,jsonvalueref jo)
     {
 ;       echo "ConvertMappedKeyStep ${jo~}"        
         variable jsonvalue joNew="{}"
 
         variable jsonvalue jaActions="[]"
 
-        jo.Get[Actions]:ForEach["jaActions:AddByRef[\"This.ConvertAction[ForEach.Value]\"]"]
+        variable jsonvalue joState="{}"
+        joState:SetByRef[sheet,joMappableSheet]
+        joState:SetByRef[mappable,joMappable]
+        joState:SetByRef[step,jo]
+
+        if ${jo.Has[stick]}
+            joNew:SetNumber[stickyTime,"${jo.GetNumber[stick]}"]
+        if ${jo.Has[stop]}
+            joNew:SetNumber[stickyTime,"-1"]
+        if ${jo.Has[stump]}
+            joNew:SetBool[triggerOnce,"${jo.GetBool[stump]}"]
+        if ${jo.GetBool[disabled]}
+            joNew:SetBool[enable,0]
+
+        jo.Get[Actions]:ForEach["jaActions:AddByRef[\"This.ConvertAction[joState,ForEach.Value]\"]"]
 
         if ${jaActions.Used}
             joNew:SetByRef[actions,jaActions]
 
+
+;        joNew:SetByRef[original,jo]
         return joNew
     }
 #endregion
 
 #region Action conversion -- Fully implemented
-    member:jsonvalueref ConvertAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction ${jo~}"
 
@@ -1291,7 +1315,7 @@ objectdef isb2_importer
 
         if ${This(type).Member["ConvertAction_${jo.Get[type]~}"]}
         {
-            joNew:SetValue["${This.ConvertAction_${jo.Get[type]~}[jo]~}"]
+            joNew:SetValue["${This.ConvertAction_${jo.Get[type]~}[joState,jo]~}"]
 
             if ${jo.Has[Target]}
                 joNew:SetString[target,"${jo.Get[Target]~}"]
@@ -1327,7 +1351,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_MappedKeyExecuteAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MappedKeyExecuteAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_MappedKeyExecuteAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1343,7 +1367,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_MappedKeyStepAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MappedKeyStepAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_MappedKeyStepAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1359,7 +1383,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_MappedKeyStepStateAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MappedKeyStepStateAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_MappedKeyStepStateAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1387,7 +1411,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_KeyMapAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_KeyMapAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_KeyMapAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1405,7 +1429,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_MappedKeyStateAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MappedKeyStateAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_MappedKeyStateAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1424,7 +1448,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_Keystroke(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_Keystroke(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_Keystroke ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1434,10 +1458,19 @@ objectdef isb2_importer
         if ${jo.Has[combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
 
+        variable bool hold
+        if ${joState.Has[mappable,hold]}
+            hold:Set[${joState.GetBool[mappable,hold]}]
+        else
+            hold:Set[${joState.GetBool[sheet,hold]}]
+
+        if ${hold}
+            joNew:SetBool[hold,1]
+
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_KeyStringAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_KeyStringAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_Keystroke ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1453,7 +1486,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_ClickBarStateAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_ClickBarStateAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1477,7 +1510,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_MenuStateAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MenuStateAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1491,7 +1524,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_VariableKeystrokeAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_VariableKeystrokeAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1500,7 +1533,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_SyncCursorAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_SyncCursorAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1510,7 +1543,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_ClickBarButtonAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_ClickBarButtonAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1529,7 +1562,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_MappedKeyRewriteAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MappedKeyRewriteAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1549,7 +1582,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_RepeaterRegionsAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_RepeaterRegionsAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_RepeaterRegionsAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1564,7 +1597,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_RepeaterStateAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_RepeaterStateAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1609,7 +1642,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_SendNextClickAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_SendNextClickAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1638,7 +1671,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_TargetGroupAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_TargetGroupAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1651,7 +1684,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_WindowStateAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_WindowStateAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1670,7 +1703,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_WindowStyleAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_WindowStyleAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_WindowStyleAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1722,7 +1755,7 @@ objectdef isb2_importer
     }
 
 
-    member:jsonvalueref ConvertAction_WindowFocusAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_WindowFocusAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1738,7 +1771,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_WindowCloseAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_WindowCloseAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1750,7 +1783,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_RepeaterTargetAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_RepeaterTargetAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1767,7 +1800,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_MenuButtonAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MenuButtonAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1780,7 +1813,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_TimerPoolAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_TimerPoolAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1796,7 +1829,7 @@ objectdef isb2_importer
     }
 
 
-    member:jsonvalueref ConvertAction_PopupTextAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_PopupTextAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -1814,7 +1847,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_WoWMacroRefAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_WoWMacroRefAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_WoWMacroRefAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1830,7 +1863,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_RepeaterListAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_RepeaterListAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;        echo "ConvertAction_RepeaterListAction ${jo~}"
 
@@ -1849,7 +1882,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_InputDeviceKeySetAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_InputDeviceKeySetAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_InputDeviceKeySetAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1866,7 +1899,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-     member:jsonvalueref ConvertAction_ScreenshotAction(jsonvalueref jo)
+     member:jsonvalueref ConvertAction_ScreenshotAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_ScreenshotAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1900,7 +1933,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_DoMenuButtonAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_DoMenuButtonAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_DoMenuButtonAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1920,7 +1953,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_HotkeySetAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_HotkeySetAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_HotkeySetAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1946,7 +1979,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_MenuStyleAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_MenuStyleAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_MenuStyleAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1970,7 +2003,7 @@ objectdef isb2_importer
     }
 
 
-    member:jsonvalueref ConvertAction_LightAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_LightAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_LightAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -1989,7 +2022,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_SoundAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_SoundAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_SoundAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -2006,7 +2039,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_VolumeAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_VolumeAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_VolumeAction ${jo~}"     
         variable jsonvalue joNew="{}"
@@ -2024,7 +2057,7 @@ objectdef isb2_importer
         return joNew        
     }
 
-    member:jsonvalueref ConvertAction_SetVariableKeystrokeAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_SetVariableKeystrokeAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
 
@@ -2037,7 +2070,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertAction_VideoFeedsAction(jsonvalueref jo)
+    member:jsonvalueref ConvertAction_VideoFeedsAction(jsonvalueref joState,jsonvalueref jo)
     {
 ;       echo "ConvertAction_VideoFeedsAction ${jo~}"     
         variable jsonvalue joNew="{}"

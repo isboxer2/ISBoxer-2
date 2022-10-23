@@ -569,9 +569,9 @@ objectdef isb2_profileengine
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        VFXSheets:Erase["${name~}"]
+        VFXSheets:Erase["${jo.Get[name]~}"]
 
-        VFXSheets:Set["${name~}",jo]
+        VFXSheets:Set["${jo.Get[name]~}",jo]
     }
 
     method InstallVFXSheets(jsonvalueref ja)
@@ -585,7 +585,7 @@ objectdef isb2_profileengine
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        VFXSheets:Erase["${name~}"]
+        VFXSheets:Erase["${jo.Get[name]~}"]
     }
 
     method UninstallVFXSheets(jsonvalueref ja)
@@ -620,7 +620,10 @@ objectdef isb2_profileengine
             "y":${joVFX.GetInteger[y]},
             "width":${joVFX.GetInteger[width]},
             "height":${joVFX.GetInteger[height]},
-            "feedName":${joVFX.Get[feedName]~.AsJSON~}
+            "feedName":${joVFX.Get[feedName]~.AsJSON~},
+            "sendMouse":${joVFX.GetBool[sendMouse]},
+            "sendKeyboard":${joVFX.GetBool[sendKeyboard]},
+            "useLocalBindings":true
         }
         <$$"]
 
@@ -630,6 +633,34 @@ objectdef isb2_profileengine
     method UninstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
     {
         echo "\agUninnstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
+        LGUI2.Element["isb2.vfx.${sheet~}.${name~}"]:Destroy
+
+        joVFX:SetInteger["elementID",0]
+    }
+    
+    method InstallVFXSource(string sheet, string name, jsonvalueref joVFX)
+    {
+        echo "\agInstallVFXSource\ax ${sheet~} ${name~} ${joVFX~}"
+
+        variable jsonvalue joView
+        joView:SetValue["$$>
+        {
+            "name":"isb2.vfx.${sheet~}.${name~}",
+            "type":"videofeedsource",
+            "x":${joVFX.GetInteger[x]},
+            "y":${joVFX.GetInteger[y]},
+            "width":${joVFX.GetInteger[width]},
+            "height":${joVFX.GetInteger[height]},
+            "feedName":${joVFX.Get[feedName]~.AsJSON~}
+        }
+        <$$"]
+
+        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
+    }   
+
+    method UninstallVFXSource(string sheet, string name, jsonvalueref joVFX)
+    {
+        echo "\agUninnstallVFXSource\ax ${sheet~} ${name~} ${joVFX~}"
         LGUI2.Element["isb2.vfx.${sheet~}.${name~}"]:Destroy
 
         joVFX:SetInteger["elementID",0]
@@ -864,6 +895,9 @@ objectdef isb2_profileengine
         This:InstallSlotActivateHotkeys
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]
 
+;        echo "\atInstalling Slot vfxSheets\ax ${SlotRef.Get[vfxSheets]~}"
+        SlotRef.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
+
         This:ExecuteEventAction[SlotRef,onLoad]
     }
 
@@ -882,6 +916,8 @@ objectdef isb2_profileengine
         This:InstallVirtualFiles["Character.Get[virtualFiles]"]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
+
+        Character.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
         This:ExecuteEventAction[Character,onLoad]
 
@@ -938,6 +974,8 @@ objectdef isb2_profileengine
         TeamScope:SetReference["distributedscope.New[\"${dscopeDefinition.AsJSON~}\"]"]
 
         echo "ActivateTeam: TeamScope.active=${TeamScope.GetBool[active]}"
+
+        Team.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onTeamChanged]
 

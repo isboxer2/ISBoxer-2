@@ -1004,6 +1004,11 @@ objectdef isb2_vfxsheet
         This:FromJSON[jo]
     }
 
+    method Shutdown()
+    {
+        This:Disable
+    }
+
     method FromJSON(jsonvalueref jo)
     {
         if !${jo.Reference(exists)}
@@ -1049,14 +1054,20 @@ objectdef isb2_vfxsheet
     
     method Enable()
     {
+;        echo "\arisb2_vfxsheet:Enable\ax ${Name~}"
         Enabled:Set[1]
-        Outputs:ForEach["This:EnableVFX[ForEach.Value]"]
+        Outputs:ForEach["This:EnableOutput[ForEach.Value]"]
+        Sources:ForEach["This:EnableSource[ForEach.Value]"]
     }
 
     method Disable()
     {
+        if !${Enabled}
+            return
+;        echo "\arisb2_vfxsheet:Disable\ax ${Name~}"
         Enabled:Set[0]
-        Outputs:ForEach["This:DisableVFX[ForEach.Value]"]
+        Outputs:ForEach["This:DisableOutput[ForEach.Value]"]
+        Sources:ForEach["This:DisableSource[ForEach.Value]"]
     }
 
     method Toggle()
@@ -1067,7 +1078,7 @@ objectdef isb2_vfxsheet
             This:Enable
     }
 
-    method EnableVFX(jsonvalueref jo)
+    method EnableOutput(jsonvalueref jo)
     {
         if !${jo.Reference(exists)}
             return
@@ -1075,12 +1086,12 @@ objectdef isb2_vfxsheet
         if !${jo.Has[name]}
             return
 
-        ISB2:InstallVFX["${Name~}","${jo.Get[name]~}",jo]
+        ISB2:InstallVFXOutput["${Name~}","${jo.Get[name]~}",jo]
 
         jo:SetBool["enabled",1]
     }
 
-    method DisableVFX(jsonvalueref jo)
+    method DisableOutput(jsonvalueref jo)
     {
         if !${jo.Reference(exists)}
             return
@@ -1088,7 +1099,33 @@ objectdef isb2_vfxsheet
         if !${jo.Has[name]}
             return
         
-        ISB2:UninstallVFX["${Name~}","${jo.Get[name]~}",jo]
+        ISB2:UninstallVFXOutput["${Name~}","${jo.Get[name]~}",jo]
+
+        jo:SetBool["enabled",0]
+    }
+
+    method EnableSource(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if !${jo.Has[name]}
+            return
+
+        ISB2:InstallVFXSource["${Name~}","${jo.Get[name]~}",jo]
+
+        jo:SetBool["enabled",1]
+    }
+
+    method DisableSource(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if !${jo.Has[name]}
+            return
+        
+        ISB2:UninstallVFXSource["${Name~}","${jo.Get[name]~}",jo]
 
         jo:SetBool["enabled",0]
     }

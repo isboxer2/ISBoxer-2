@@ -598,7 +598,7 @@ objectdef isb2_importer
         return joNew
     }
 
-    method ConvertSlotVFX(jsonvalueref joSheet, jsonvalueref joVFX)
+    method ConvertSlotVFX(jsonvalueref joCharacterSet,jsonvalueref joSlot,jsonvalueref joSheet, jsonvalueref joVFX)
     {
         echo "ConvertSlotVFX ${joVFX~}"
         switch ${joVFX.Get[type]}
@@ -607,7 +607,11 @@ objectdef isb2_importer
                 if !${joSheet.Has[outputs]}
                     joSheet:Set[outputs,"[]"]
 
-;                joVFX:SetString[name,"${joVFX.Get[name]~}"]
+                if ${joVFX.Has[regionName]}
+                    joVFX:SetString[name,"${joVFX.Get[regionName]~}"]
+                else
+                    joVFX:SetString[name,"${joSlot.Get[character]~}.${joVFX.Get[name]~}"]
+
                 joVFX:SetString[feedName,"${joVFX.Get[feedOutput]~}"]
 
                 joVFX:Erase[feedOutput]
@@ -618,7 +622,11 @@ objectdef isb2_importer
                 if !${joSheet.Has[sources]}
                     joSheet:Set[sources,"[]"]
 
-;                joVFX:SetString[name,"${joVFX.Get[name]~}"]
+                if ${joVFX.Has[regionName]}
+                    joVFX:SetString[name,"${joVFX.Get[regionName]~}"]
+                else
+                    joVFX:SetString[name,"${joSlot.Get[character]~}.${joVFX.Get[name]~}"]
+
                 joVFX:SetString[feedName,"${joVFX.Get[feedSource]~}"]
 
                 joVFX:Erase[feedSource]
@@ -642,7 +650,7 @@ objectdef isb2_importer
             joSlot:SetByRef["vfxSheets",ja]
         }
 
-        joSheet.Get[vfx]:ForEach["This:ConvertSlotVFX[joNew,ForEach.Value]"]
+        joSheet.Get[vfx]:ForEach["This:ConvertSlotVFX[joCharacterSet,joSlot,joNew,ForEach.Value]"]
 
         ISBProfile.Get[vfxSheets]:AddByRef[joNew]        
     }

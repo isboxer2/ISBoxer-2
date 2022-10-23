@@ -1149,7 +1149,13 @@ objectdef isb2_profileengine
         if !${keystroke.NotNULLOrEmpty}
             return
 
-        if ${joAction.Has[activationState]}
+        variable bool hold
+        if ${joAction.Has[hold]}
+            hold:Set[${joAction.GetBool[hold]}]
+        else
+            hold:Set[${joState.GetBool[hold]}]
+
+        if !${hold} || ${joAction.Has[activationState]}
         {
             echo press -nomodifiers "${keystroke}"
             press -nomodifiers "${keystroke}"
@@ -1817,7 +1823,7 @@ objectdef isb2_profileengine
             return
 
         ; is step sticky?
-        if ${joRotator.GetNumber[steps,${numStep},stickyTime]}>0
+        if ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0
             return
 
 ;        echo Rotator_PostExecute calling Rotator_Advance

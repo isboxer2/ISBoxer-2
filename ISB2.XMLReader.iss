@@ -823,7 +823,7 @@ objectdef isb2_isb1transformer
 
         This:AutoTransform[joTransform,Actions]
 
-        This:TransformInteger[joTransform,Stick,stick]
+        This:TransformNumber[joTransform,Stick,stick]
         This:TransformBool[joTransform,Stop,stop]
         This:TransformBool[joTransform,Stump,stump]
         This:TransformBool[joTransform,Disabled,disabled]

@@ -164,7 +164,7 @@ objectdef isb2_isb1transformer
             joNew:SetString[borderColor,"${joTransform.Get[_bordercolor]~}"]
 
         if ${joTransform.Has[_opacity]}
-            joNew:SetInteger[opacity,"${joTransform.GetInteger[_opacity]}"]
+            joNew:SetNumber[alpha,"${Math.Calc[${joTransform.GetInteger[_opacity]}/255]}"]
 
         if ${joTransform.Get[_feedoutput]~.NotNULLOrEmpty}
             joNew:SetString[feedOutput,"${joTransform.Get[_feedoutput]~}"]
@@ -176,6 +176,12 @@ objectdef isb2_isb1transformer
         joNew:SetInteger[x,"${joTransform.GetInteger[_X]}"]
         joNew:SetInteger[y,"${joTransform.GetInteger[_Y]}"]
 
+        if ${joTransform.Has[_usekeyboard]}
+            joNew:SetBool[sendKeyboard,"${joTransform.GetBool[_usekeyboard]}"]
+        if ${joTransform.Has[_usemouse]}
+            joNew:SetBool[sendMouse,"${joTransform.GetBool[_usemouse]}"]
+
+;        joNew:SetByRef[original,joTransform]
         return joNew
     }
 

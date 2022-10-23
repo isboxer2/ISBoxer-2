@@ -135,6 +135,11 @@
                                 "type":"textblock",
                                 "_dock":"right",
                                 "verticalAlignment":"center",
+                                "margin":[0,0,10,0],
+                                "font":{
+                                    "heightFactor":2.0,
+                                    "bold":true
+                                },
                                 "text":"${ISB2.SlotManager.Duration.Centi}s"
                             }
                         ]

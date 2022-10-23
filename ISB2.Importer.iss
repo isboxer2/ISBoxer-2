@@ -1252,6 +1252,12 @@ objectdef isb2_importer
             joNew:SetNumber[resetTimer,"${jo.GetNumber[resetTimer]}"]
         }
 
+        if ${jo.Has[hold]}
+            joNew:SetBool[hold,${jo.GetBool[hold]}]
+
+        if ${jo.Has[mode]}
+            joNew:SetString[mode,"${jo.Get[mode]~}"]
+
         variable jsonvalue jaSteps="[]"
 
         jo.Get[Steps]:ForEach["jaSteps:AddByRef[\"This.ConvertMappedKeyStep[ForEach.Value]\"]"]

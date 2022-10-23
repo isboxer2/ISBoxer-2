@@ -1199,6 +1199,20 @@ objectdef isb2_profileengine
             return
         }
 
+
+        variable bool hold
+        if ${joAction.Has[hold]}
+            hold:Set[${joAction.GetBool[hold]}]
+        else
+            hold:Set[${joState.GetBool[hold]}]
+
+        if !${hold} || ${joAction.Has[activationState]}
+        {
+            echo press -nomodifiers "${keystroke}"
+            press -nomodifiers "${keystroke}"
+            return
+        }
+
         if ${activate}
         {
             echo press -hold "${keystroke}"

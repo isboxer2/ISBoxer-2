@@ -1228,7 +1228,7 @@ objectdef isb2_importer
         variable jsonvalue joInputMapping="{}"
 
         joInputMapping:SetString[type,mappable]
-        joInputMapping:SetString[sheet,"${joKeyMap.Get[Name]~}"]
+        joInputMapping:SetString[sheet,"${joMappableSheet.Get[name]~}"]
         joInputMapping:SetString[name,"${jo.Get[Name]~}"]
         
         joNew:SetByRef[inputMapping,joInputMapping]

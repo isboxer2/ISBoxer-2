@@ -148,10 +148,10 @@ objectdef isb2_isb1transformer
         if ${joTransform.GetBool[_BlockLocal]}
             joNew:SetBool[blockLocal,1]
 
-;        joNew:SetString[name,"${joTransform.Get[_Name]~}"]
+        joNew:SetString[name,"${joTransform.Get[_Name]~}"]
 
         if ${joTransform.Get[_regionname]~.NotNULLOrEmpty}
-            joNew:SetString[name,"${joTransform.Get[_regionname]~}"]
+            joNew:SetString[regionName,"${joTransform.Get[_regionname]~}"]
 
         if ${joTransform.Get[_mappedkey]~.NotNULLOrEmpty} && ${joTransform.Get[_keymap]~.NotNULLOrEmpty}
         {

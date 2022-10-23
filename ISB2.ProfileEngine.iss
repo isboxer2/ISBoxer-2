@@ -607,9 +607,9 @@ objectdef isb2_profileengine
         InputMappings:Erase["${name~}"]
     }
     
-    method InstallVFX(string sheet, string name, jsonvalueref joVFX)
+    method InstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
     {
-        echo "\agInstallVFX\ax ${sheet~} ${name~} ${joVFX~}"
+        echo "\agInstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
 
         variable jsonvalue joView
         joView:SetValue["$$>
@@ -627,9 +627,9 @@ objectdef isb2_profileengine
         joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
     }
 
-    method UninstallVFX(string sheet, string name, jsonvalueref joVFX)
+    method UninstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
     {
-        echo "\agUninnstallVFX\ax ${sheet~} ${name~} ${joVFX~}"
+        echo "\agUninnstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
         LGUI2.Element["isb2.vfx.${sheet~}.${name~}"]:Destroy
 
         joVFX:SetInteger["elementID",0]

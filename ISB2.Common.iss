@@ -996,7 +996,8 @@ objectdef isb2_vfxsheet
     variable string Name
     variable bool Enabled
 
-    variable jsonvalue VFX="{}"
+    variable jsonvalue Outputs="{}"
+    variable jsonvalue Sources="{}"
 
     method Initialize(jsonvalueref jo)
     {
@@ -1011,7 +1012,8 @@ objectdef isb2_vfxsheet
         if ${jo.Has[name]}
             Name:Set["${jo.Get[name]~}"]
 
-        jo.Get[vfx]:ForEach["This:Add[ForEach.Value]"]
+        jo.Get[outputs]:ForEach["This:AddOutput[ForEach.Value]"]
+        jo.Get[sources]:ForEach["This:AddSource[ForEach.Value]"]
 
 
         if ${jo.GetBool[enable]}
@@ -1026,28 +1028,35 @@ objectdef isb2_vfxsheet
         variable jsonvalue jo="{}"
         jo:SetString[name,"${Name~}"]
         jo:SetBool[enabled,${Enabled}]
-        jo:SetByRef[vfx,VFX]
+        jo:SetByRef[outputs,Outputs]
+        jo:SetByRef[sources,Sources]
         return jo
     }
 
-    method Add(jsonvalueref jo)
+    method AddOutput(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
             return FALSE
-        VFX:SetByRef["${jo.Get[name]~}",jo]
+        Outputs:SetByRef["${jo.Get[name]~}",jo]
     }
 
+    method AddSource(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+        Sources:SetByRef["${jo.Get[name]~}",jo]
+    }
     
     method Enable()
     {
         Enabled:Set[1]
-        VFX:ForEach["This:EnableVFX[ForEach.Value]"]
+        Outputs:ForEach["This:EnableVFX[ForEach.Value]"]
     }
 
     method Disable()
     {
         Enabled:Set[0]
-        VFX:ForEach["This:DisableVFX[ForEach.Value]"]
+        Outputs:ForEach["This:DisableVFX[ForEach.Value]"]
     }
 
     method Toggle()

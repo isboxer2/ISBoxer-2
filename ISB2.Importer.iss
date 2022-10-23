@@ -592,28 +592,62 @@ objectdef isb2_importer
         ; check for Video FX file
         This:ConvertSlotClickBars[joCharacterSet,joNew]
         This:ConvertSlotRepeaterRegions[joCharacterSet,joNew]
-        This:ConvertSlotVFX[joCharacterSet,joNew]
+        This:ConvertSlotVFXSheets[joCharacterSet,joNew]
 
 ;        joNew:SetByRef[original,jo]
         return joNew
     }
 
+    method ConvertSlotVFX(jsonvalueref joSheet, jsonvalueref joVFX)
+    {
+        echo "ConvertSlotVFX ${joVFX~}"
+        switch ${joVFX.Get[type]}
+        {
+            case feedoutput
+                if !${joSheet.Has[outputs]}
+                    joSheet:Set[outputs,"[]"]
+
+;                joVFX:SetString[name,"${joVFX.Get[name]~}"]
+                joVFX:SetString[feedName,"${joVFX.Get[feedOutput]~}"]
+
+                joVFX:Erase[feedOutput]
+                joVFX:Erase[type]
+                joSheet.Get[outputs]:AddByRef[joVFX]
+                break
+            case feedsource
+                if !${joSheet.Has[sources]}
+                    joSheet:Set[sources,"[]"]
+
+;                joVFX:SetString[name,"${joVFX.Get[name]~}"]
+                joVFX:SetString[feedName,"${joVFX.Get[feedSource]~}"]
+
+                joVFX:Erase[feedSource]
+                joVFX:Erase[type]
+                joSheet.Get[sources]:AddByRef[joVFX]
+                break
+        }
+    }
+
     method ConvertSlotVFXSheet(jsonvalueref joCharacterSet,jsonvalueref joSlot,jsonvalueref joSheet)
     {
         variable string name="${joSheet.Get[name]~}"
-        joSheet:SetString[name,"${joCharacterSet.Get[name]~}.${joSlot.Get[character]~}.${name~}"]
+        variable jsonvalueref joNew="{}"
+
+        joNew:SetString[name,"${joCharacterSet.Get[name]~}.${joSlot.Get[character]~}.${name~}"]
 
         if ${name.Equal[Auto]}
         {
             variable jsonvalue ja="[]"
-            ja:AddString["${joSheet.Get[name]~}"]
+            ja:AddString["${joNew.Get[name]~}"]
             joSlot:SetByRef["vfxSheets",ja]
         }
 
-        ISBProfile.Get[vfxSheets]:AddByRef[joSheet]        
+        joSheet.Get[vfx]:ForEach["This:ConvertSlotVFX[joNew,ForEach.Value]"]
+
+        ISBProfile.Get[vfxSheets]:AddByRef[joNew]        
     }
 
-    method ConvertSlotVFX(jsonvalueref joCharacterSet,jsonvalueref joSlot)
+    method ConvertSlotVFXSheets(jsonvalueref joCharacterSet,jsonvalueref joSlot)
     {
         variable jsonvalueref jo        
         variable filepath filename="${LavishScript.HomeDirectory~}/Scripts/ISBoxer.VideoFeeds.${joCharacterSet.Get[name]~}.${joSlot.Get[character]~}.XML"

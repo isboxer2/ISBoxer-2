@@ -1695,7 +1695,7 @@ objectdef isb2_profileengine
         variable int fromStep
         variable int stepCounter
 
-;        echo Rotator_Advance ${newState}
+;        echo "\ayRotator_Advance\ax ${newState} ${joRotator~}"
 
         fromStep:Set[${numStep}]
 
@@ -1759,18 +1759,24 @@ objectdef isb2_profileengine
         variable int timeNow=${Script.RunningTime}
         variable float stickyTime
 
+;        echo "\ayRotator_PreExecute\ax ${newState} ${numStep} ${joRotator~}"
+
         if ${newState}
         {
-            stickyTime:Set[${joRotator.GetNumber[step,${numStep},stickyTime]}]
+            stickyTime:Set[${joRotator.GetNumber[steps,${numStep},stickyTime]}]
             if ${stickyTime}
             {
                 if !${joRotator.GetInteger[stepTime]}
                     joRotator:SetInteger[stepTime,${timeNow}]
                 /* Pre-press advance check */
-                if ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${jo.GetInteger[stepTime]}
+                if ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${joRotator.GetInteger[stepTime]}
                 {
                     This:Rotator_Advance[joRotator,1]
                 }
+;                else
+;                {
+;                    echo "\arRotator_PreExecute\ax ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${joRotator.GetInteger[stepTime]}"
+;                }
             }
 
             if !${joRotator.GetInteger[firstPress]}
@@ -1825,7 +1831,7 @@ objectdef isb2_profileengine
     ; for any Rotator object, perform post-execution mechanics, depending on press/release state
     method Rotator_PostExecute(jsonvalueref joRotator,bool newState, int executedStep)
     {
-
+;        echo "\ayRotator_PostExecute\ax: ${newState} ${executedStep} ${joRotator~}"
 ; call advance if ALL of these conditions are met....
 ; 1. newState == FALSE
 ; 2. has not already advanced (current step == executed step)
@@ -1838,11 +1844,17 @@ objectdef isb2_profileengine
         numStep:Set[${This.Rotator_GetCurrentStep[joRotator]}]
 
         if ${numStep}!=${executedStep}
+        {
+;            echo "\arRotator_PostExecute\ax: numStep ${numStep}!=${executedStep}"
             return
+        }
 
         ; is step sticky?
         if ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0
+        {
+;            echo "\arRotator_PostExecute\ax: stickyTime ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0 ${joRotator~}"
             return
+        }
 
 ;        echo Rotator_PostExecute calling Rotator_Advance
         This:Rotator_Advance[joRotator,0]

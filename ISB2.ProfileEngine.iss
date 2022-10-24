@@ -893,6 +893,7 @@ objectdef isb2_profileengine
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
 
         This:InstallSlotActivateHotkeys
+        This:VirtualizeMappables["SlotRef.Get[virtualMappables]"]
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]
 
 ;        echo "\atInstalling Slot vfxSheets\ax ${SlotRef.Get[vfxSheets]~}"
@@ -914,6 +915,7 @@ objectdef isb2_profileengine
         This:ActivateWindowLayoutByName["${Team.Get["windowLayout"]~}"]
 
         This:InstallVirtualFiles["Character.Get[virtualFiles]"]
+        This:VirtualizeMappables["Character.Get[virtualMappables]"]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
 
@@ -956,6 +958,7 @@ objectdef isb2_profileengine
         This:ActivateProfilesByName["Team.Get[profiles]"]
 
         This:InstallVirtualFiles["Team.Get[virtualFiles]"]
+        This:VirtualizeMappables["Team.Get[virtualMappables]"]
 
         This:ActivateBroadcastProfileByName["${Team.Get["broadcastProfile"]~}"]
 
@@ -1438,6 +1441,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        This:VirtualizeMappable["joAction.Get[from]","joAction.Get[to]"]
     }
 
     method Action_InputMapping(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1894,18 +1898,146 @@ objectdef isb2_profileengine
         This:ExecuteInputMapping["joHotkey.Get[inputMapping]",${newState}]
     }
 
+    member:jsonvalueref GetMappable(string sheet, string name)
+    {
+        variable jsonvalueref joMappable
+        joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
+
+        return joMappable
+    }
+
+    member:weakref ResolveMappableSheet(string sheet)
+    {
+        variable weakref mappableSheet
+        mappableSheet:SetReference["MappableSheets.Get[${sheet.AsJSON~}]"]
+
+        if !${mappableSheet.Enabled}
+            return NULL
+
+        if ${mappableSheet.VirtualizeAs.NotNULLOrEmpty}
+        {
+            ; do we want to allow multiple virtualization layers? 
+            ; if yes ....
+
+            echo "\ayResolveMappableSheet\ax Virtualized from ${sheet.AsJSON~} to ${mappableSheet.VirtualizeAs.AsJSON~}"
+           return "This.ResolveMappableSheet[${mappableSheet.VirtualizeAs.AsJSON~}]"
+
+            ; if not...
+            /*
+            {
+                mappableSheet:SetReference["MappableSheets.Get[${mappableSheet.VirtualizeAs.AsJSON~}]"]
+                if !${mappableSheet.Enabled}
+                    return NULL
+                return mappableSheet
+            }
+            */
+        }
+        return mappableSheet
+    }
+
+    member:jsonvalueref ResolveMappable(string sheet, string name)    
+    {
+        variable string originalSheet
+        variable string originalName
+
+        variable weakref mappableSheet
+        mappableSheet:SetReference["This.ResolveMappableSheet[\"${sheet~}\"]"]
+
+        if !${mappableSheet.Reference(exists)}
+            return NULL
+
+        variable jsonvalueref joMappable
+        joMappable:SetReference["mappableSheet.Mappables.Get[${name.AsJSON~}]"]
+
+        variable bool specified
+        if ${joMappable.Has[virtualizeAs]}
+        {
+            originalSheet:Set["${sheet~}"]
+            originalName:Set["${name~}"]
+
+            if ${joMappable.Has[virtualizeAs,sheet]}
+            {
+                specified:Set[1]
+                sheet:Set["${joMappable.Get[virtualizeAs,sheet]~}"]
+            }
+            if ${joMappable.Has[virtualizeAs,name]}
+            {
+                specified:Set[1]
+                name:Set["${joMappable.Get[virtualizeAs,name]~}"]
+            }
+
+            if ${specified}
+            {
+                echo "\ayResolveMappable\ax Virtualized from [${originalSheet.AsJSON~},${originalName.AsJSON~}] to [${sheet.AsJSON~},${name.AsJSON~}]"
+                return "This.ResolveMappable[${sheet.AsJSON~},${name.AsJSON~}]"
+            }
+        }
+
+        return joMappable
+    }
+
+    method VirtualizeMappables(jsonvalueref ja)
+    {
+        echo "\ayVirtualizeMappables\ax ${ja~}"
+        ja:ForEach["This:VirtualizeMappable[\"ForEach.Value.Get[from]\",\"ForEach.Value.Get[to]\"]"]
+    }
+
+    method VirtualizeMappable(jsonvalueref joFrom, jsonvalueref joTo)
+    {
+        if !${joFrom.Type.Equal[object]}
+            return
+
+        variable string fromSheet
+        fromSheet:Set["${joFrom.Get[sheet]~}"]
+        if !${fromSheet.NotNULLOrEmpty}
+            return
+        
+        variable weakref mappableSheet
+        mappableSheet:SetReference["MappableSheets.Get[${fromSheet.AsJSON~}]"]
+        if !${mappableSheet.Reference(exists)}
+            return
+
+        variable string fromMappable
+        fromMappable:Set["${joFrom.Get[name]~}"]
+        if ${fromMappable.NotNULLOrEmpty}
+        {
+            ; virtualize specific mappable            
+            if ${joTo.Type.Equal[object]}
+                mappableSheet.Mappables.Get["${fromMappable~}"]:Set[virtualizeAs,"${joTo~}"]
+            else
+            {
+                joTo:SetReference[NULL]
+                mappableSheet.Mappables.Get["${fromMappable~}"]:Erase[virtualizeAs]
+            }
+            echo "\ayVirtualizeMappable\ax ${joFrom~} => ${joTo~}"
+        }
+        else
+        {            
+            ; virtualize mappable sheet
+            if ${joTo.Type.Equal[object]} && ${joTo.Has[sheet]}
+            {
+                mappableSheet.VirtualizeAs:Set["${joTo.Get[sheet]~}"]
+                echo "\ayVirtualizeMappable\ax Sheet ${fromSheet~} => ${joTo.Get[sheet]~}"
+            }
+            else
+            {
+                mappableSheet.VirtualizeAs:Set[""]
+                echo "\ayVirtualizeMappable\ax Sheet ${fromSheet~} => NULL"
+            }
+        }
+    }
+
     method ExecuteMappableByName(string sheet, string name, bool newState)
     {
         sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
-
-        if !${MappableSheets.Get["${sheet~}"].Enabled}
-            return
-
         name:Set["${This.ProcessVariables["${name~}"]~}"]
 
         variable jsonvalueref joMappable
-        joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
-        
+        joMappable:SetReference["This.ResolveMappable[${sheet.AsJSON~},${name.AsJSON~}]"]
+        if !${joMappable.Reference(exists)}
+            return
+
+
         This:ExecuteMappable["joMappable",${newState}]
     }
 

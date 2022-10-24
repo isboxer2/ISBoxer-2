@@ -847,6 +847,8 @@ objectdef isb2_mappablesheet
     variable jsonvalue Mappables="{}"
 
     variable bool Enabled
+    
+    variable string VirtualizeAs
 
     method Initialize(jsonvalueref jo)
     {
@@ -872,6 +874,8 @@ objectdef isb2_mappablesheet
     {
         variable jsonvalue jo="{}"
         jo:SetString[name,"${Name~}"]
+        if ${VirtualizeAs.NotNULLOrEmpty}
+            jo:SetString[virtualizeAs,"${VirtualizeAs~}"]
         jo:SetByRef[mappables,Mappables]
         return jo
     }

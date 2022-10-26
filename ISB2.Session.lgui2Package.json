@@ -281,7 +281,142 @@
                 }
             ]
         },
+        "isb2.rotatorView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "width":200,
+            "maxSize":[200,-1],
+            "padding":4,
+            "children":[
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "visibility":"collapsed",
+                    "textBinding":{
+                        "pullFormat":"${_CONTEXT_.Context}"
+                    }
+                },
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "textBinding":{
+                        "pullFormat":"Step: ${ISB2.Rotator_GetCurrentStepNum[_CONTEXT_.Parent.Context]}"
+                    }
+                },
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "textBinding":{
+                        "pullFormat":"Actions: ${Int[${ISB2.Rotator_GetCurrentStep[_CONTEXT_.Parent.Context].Get[actions].Used}]}"
+                    }
+                },
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "textBinding":{
+                        "pullFormat":"Remaining sticky: ${ISB2.Rotator_GetRemainingStickyTime[_CONTEXT_.Parent.Context].Centi}s"
+                    }
+                },
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "textBinding":{
+                        "pullFormat":"Sticky progress: ${ISB2.Rotator_GetStickyProgress[_CONTEXT_.Parent.Context].Centi} / 1.00"
+                    }
+                },                
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "textBinding":{
+                        "pullFormat":"Remaining reset: ${ISB2.Rotator_GetRemainingResetTime[_CONTEXT_.Parent.Context].Centi}s (${ISB2.Rotator_GetResetType[_CONTEXT_.Parent.Context]})"
+                    }
+                },
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "textBinding":{
+                        "pullFormat":"Reset progress: ${ISB2.Rotator_GetResetProgress[_CONTEXT_.Parent.Context].Centi} / 1.00"
+                    }
+                },                                
+                {
+                    "_dock":"top",
+                    "type":"textblock",
+                    "textBinding":{
+                        "pullFormat":"Advanced past count: ${ISB2.Rotator_GetCurrentStepCounter[_CONTEXT_.Parent.Context]}"
+                    }
+                },
+                {
+                    "_dock":"top",
+                    "jsonTemplate":"isb2.rotatorStepView",
+                    "visibility":"collapsed",
+                    "type":"dockpanel",
+                    "contextBinding":{
+                        "pullFormat":"${ISB2.Rotator_GetCurrentStep[_CONTEXT_.Parent.Context]}",
+                        "autoPull":true,
+                        "pullOnce":false
+                    }
+                }
+            ],
+            "borderBrush":{
+                "color":"#ff999999"
+            },
+            "borderThickness":[0,1,0,0]
+        },
+        "isb2.mappableListView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "jsonTemplate":"isb2.mappableView",
+                "contextBinding":{
+                    "pullFormat":"${This.Parent.Context.Data}"
+                }
+            }
+        },
         "isb2.mappableView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "padding":4,
+            "children":[
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[sheet]}"
+                    },
+                    "font":{
+                        "heightFactor":0.8
+                    }
+                },
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[name]}"
+                    },
+                    "font":{
+                        "heightFactor":1.4,
+                        "bold":true
+                    }
+                },
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "visibility":"collapsed",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.AsJSON[multiline]}"
+                    }
+                },
+                {
+                    "jsonTemplate":"isb2.rotatorView",
+                    "_dock":"top"
+                }
+            ],
+            "borderBrush":{
+                "color":"#ff999999"
+            },
+            "borderThickness":4,
+            "borderRounding":3
+        },
+        "isb2.mappableDetailsView":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
@@ -581,11 +716,26 @@
                                             "_dock":"top"
                                         },
                                         {
-                                            "jsonTemplate":"isb2.mappableView",
+                                            "type":"listbox",
+                                            "content":{
+                                                "jsonTemplate":"listbox.content",
+                                                "orientation":"horizontal"
+                                            },
                                             "_dock":"top",
-                                            "name":"isb2.viewingMappable",
-                                            "contextBinding":{
-                                                "pullFormat":"${ISB2.LastMappable}"
+                                            "minSize":[100,50],
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2.LastMappables}",
+                                                "pullHook":{
+                                                    "elementName": "isb2.events",
+                                                    "flags": "global",
+                                                    "event": "onLastMappablesUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.mappableListView"
+                                                }
                                             }
                                         }
                                     ]

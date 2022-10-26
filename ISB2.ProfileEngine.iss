@@ -39,7 +39,7 @@ objectdef isb2_profileengine
     ; reference to the last hotkey used
     variable jsonvalueref LastHotkey
     ; reference to the last mappable executed
-    variable jsonvalueref LastMappable
+    variable jsonvalueref LastMappables="[]"
 
     ; task manager used for hotkeys and such
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
@@ -1542,14 +1542,32 @@ objectdef isb2_profileengine
 
 #region Rotator Implementation
     ; for any Rotator object, gets the current `step` value (or 1 by default)
-    member:int Rotator_GetCurrentStep(jsonvalueref joRotator)
+    member:int Rotator_GetCurrentStepNum(jsonvalueref joRotator)
     {
+        if !${joRotator.Type.Equal[object]}
+            return 0
+
         variable int numStep
         numStep:Set[${joRotator.GetInteger[step]}]
         if !${numStep}
+        {
+            joRotator:SetInteger[step,1]
             return 1
+        }
         return ${numStep}
-    }    
+    }
+
+    member:jsonvalueref Rotator_GetCurrentStep(jsonvalueref joRotator)
+    {
+        if !${joRotator.Type.Equal[object]}
+        {
+        ;    echo "\arRotator_GetCurrentStep\ax ${joRotator~}"
+            return NULL
+        }
+        variable int numStep
+        numStep:Set[${This.Rotator_GetCurrentStepNum[joRotator]}]
+        return "joRotator.Get[steps,${numStep}]"
+    }
 
     method Rotator_SetStep(jsonvalueref joRotator, int numStep)
     {
@@ -1558,7 +1576,7 @@ objectdef isb2_profileengine
         if ${numStep}<1
 			numStep:Set[1]
 			
-		if ${This.Rotator_GetCurrentStep[joRotator]}==1
+		if ${This.Rotator_GetCurrentStepNum[joRotator]}==1
             joRotator:SetInteger[firstAdvance,${Script.RunningTime}]
 		
         ; increment step counter
@@ -1591,7 +1609,7 @@ objectdef isb2_profileengine
 			value:Set[1]            
 
         variable int numStep
-        numStep:Set[${This.Rotator_GetCurrentStep[joRotator]}]			
+        numStep:Set[${This.Rotator_GetCurrentStepNum[joRotator]}]			
 		if ${numStep}==1
             joRotator:SetInteger[firstAdvance,${Script.RunningTime}]
 		
@@ -1682,6 +1700,22 @@ objectdef isb2_profileengine
         joCountable:SetInteger[counterTime,${Script.RunningTime}]
     }
 
+    member:int64 Rotator_GetStepCounter(jsonvalueref joRotator,int numStep)
+    {
+        if !${joRotator.Type.Equal[object]}
+            return 0
+        return ${joRotator.GetInteger[steps,${numStep},counter]}
+    }
+
+    member:int64 Rotator_GetCurrentStepCounter(jsonvalueref joRotator)
+    {
+        if !${joRotator.Type.Equal[object]}
+            return 0
+        variable int numStep
+        numStep:Set[${This.Rotator_GetCurrentStepNum[joRotator]}]
+        return ${joRotator.GetInteger[steps,${numStep},counter]}
+    }
+
     ; for any Rotator object, increments the step counter for a specified step
     method Rotator_IncrementStepCounter(jsonvalueref joRotator,int numStep)
     {
@@ -1691,11 +1725,11 @@ objectdef isb2_profileengine
     ; for any Rotator object, attempts to advance to the next Step depending on the press/release state
     method Rotator_Advance(jsonvalueref joRotator,bool newState)
     {
-        variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
         variable int fromStep
         variable int stepCounter
 
-;        echo "\ayRotator_Advance\ax ${newState} ${joRotator~}"
+        echo "\ayRotator_Advance\ax ${newState} ${joRotator~}"
 
         fromStep:Set[${numStep}]
 
@@ -1752,32 +1786,161 @@ objectdef isb2_profileengine
 		}
     }
 
+    member:float Rotator_GetStickyProgress(jsonvalueref joRotator)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
+        variable float stickyTime = ${joRotator.GetNumber[steps,${numStep},stickyTime]} 
+        variable int timeNow
+        if ${stickyTime}==0
+            return 1
+
+        if ${stickyTime}<0
+            return 0
+
+        timeNow:Set[${Script.RunningTime}]
+
+        variable float progress        
+        
+        progress:Set[((${timeNow} - ${joRotator.GetInteger[stepTime]}) / 1000) / ${stickyTime}]
+
+        if ${progress}>1
+            return 1
+
+        return ${progress}
+    }
+
+
+    member:float Rotator_GetResetProgress(jsonvalueref joRotator)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
+        variable float resetTime = ${joRotator.GetNumber[resetTimer]}
+        variable float progress
+        variable int timeNow
+
+        if ${resetTime}==0
+            return 0
+
+        if ${numStep}<=1
+            return 0
+        timeNow:Set[${Script.RunningTime}]
+
+        /* Pre-press reset check */
+        switch ${joRotator.Get[resetType]~}
+        {
+        case firstPress
+            progress:Set[((${timeNow} - ${joRotator.GetInteger[firstPress]}) / 1000) / ${resetTime}]
+            break
+        case firstAdvance
+            progress:Set[((${timeNow} - ${joRotator.GetInteger[firstAdvance]}) / 1000) / ${resetTime}]
+            break
+        case lastPress
+            progress:Set[((${timeNow} - ${joRotator.GetInteger[lastPress]}) / 1000) / ${resetTime}]
+            break
+        default
+            return 0
+        }
+
+        if ${progress}>1
+            return 1
+        return ${progress}
+    }
+
+    member:string Rotator_GetResetType(jsonvalueref joRotator)
+    {
+        if ${joRotator.Has[resetType]}
+            return "${joRotator.Get[resetType]~}"
+        
+        return "never"
+    }
+
+    member:float Rotator_GetRemainingResetTime(jsonvalueref joRotator)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
+        variable float remaining
+        variable int timeNow
+
+        if ${numStep}<=1
+            return -1
+        timeNow:Set[${Script.RunningTime}]
+
+        /* Pre-press reset check */
+        switch ${joRotator.Get[resetType]~}
+        {
+        case firstPress
+            remaining:Set[((${joRotator.GetNumber[resetTimer]}*1000) + ${joRotator.GetInteger[firstPress]} - ${timeNow}) / 1000]
+            break
+        case firstAdvance
+            remaining:Set[((${joRotator.GetNumber[resetTimer]}*1000) + ${joRotator.GetInteger[firstAdvance]} - ${timeNow}) / 1000]
+            break
+        case lastPress
+            remaining:Set[((${joRotator.GetNumber[resetTimer]}*1000) + ${joRotator.GetInteger[lastPress]} - ${timeNow}) / 1000]
+            break
+        default
+            return -1
+        }
+
+        if ${remaining}<=0
+            return 0
+        return ${remaining}
+    }
+
+    member:float Rotator_GetRemainingStickyTime(jsonvalueref joRotator)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
+        variable float stickyTime = ${joRotator.GetNumber[steps,${numStep},stickyTime]} 
+        variable int timeNow
+        if ${stickyTime}==0
+            return
+        timeNow:Set[${Script.RunningTime}]
+
+        variable float remaining
+
+        remaining:Set[((${stickyTime}*1000) + ${joRotator.GetInteger[stepTime]} - ${timeNow}) / 1000]
+
+        if ${remaining}<=0
+            return 0
+
+        return ${remaining}
+    }
+
+    method Rotator_StickyAdvance(jsonvalueref joRotator)
+    {
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
+        variable float stickyTime = ${joRotator.GetNumber[steps,${numStep},stickyTime]} 
+        variable int timeNow
+        if ${stickyTime}<=0
+            return
+        timeNow:Set[${Script.RunningTime}]
+;        echo "\ayRotator_StickyAdvance\ax ${stickyTime}"
+
+        if !${joRotator.GetInteger[stepTime]}
+            joRotator:SetInteger[stepTime,${timeNow}]
+        
+        ; stepTime is the timestamp when we first used the step this cycle. 
+        ; we advance when that timestamp, plus the sticky time, is now in the past
+        if ${timeNow} >= (${stickyTime}*1000) + ${joRotator.GetInteger[stepTime]}
+        {
+            This:Rotator_Advance[joRotator,1]
+        }
+        else
+        {
+            ; echo "\arRotator_StickyAdvance\ax ${timeNow}>=(${stickyTime}*1000)+${joRotator.GetInteger[stepTime]}"
+        }
+
+    }
+
     ; for any Rotator object, perform pre-execution mechanics, depending on press/release state
     method Rotator_PreExecute(jsonvalueref joRotator,bool newState)
     {
-        variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
         variable int timeNow=${Script.RunningTime}
-        variable float stickyTime
 
-;        echo "\ayRotator_PreExecute\ax ${newState} ${numStep} ${joRotator~}"
+        echo "\ayRotator_PreExecute\ax ${newState} ${numStep} ${joRotator~}"
 
         if ${newState}
         {
-            stickyTime:Set[${joRotator.GetNumber[steps,${numStep},stickyTime]}]
-            if ${stickyTime}
-            {
-                if !${joRotator.GetInteger[stepTime]}
-                    joRotator:SetInteger[stepTime,${timeNow}]
-                /* Pre-press advance check */
-                if ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${joRotator.GetInteger[stepTime]}
-                {
-                    This:Rotator_Advance[joRotator,1]
-                }
-;                else
-;                {
-;                    echo "\arRotator_PreExecute\ax ${stickyTime}>0 && ${timeNow}>=(${stickyTime}*1000)+${joRotator.GetInteger[stepTime]}"
-;                }
-            }
+            This:Rotator_StickyAdvance[joRotator]
+            numStep:Set[${joRotator.GetInteger[step]}]
 
             if !${joRotator.GetInteger[firstPress]}
             {
@@ -1794,6 +1957,7 @@ objectdef isb2_profileengine
                     {
     ;						echo \agFromFirstPress ${timeNow}>=${ResetTimer}+${FirstPress}
                         This:Rotator_Reset[joRotator]
+                        numStep:Set[${joRotator.GetInteger[step]}]
                     }
     ;					else
     ;						echo \ayFromFirstPress ${timeNow}<${ResetTimer}+${FirstPress}
@@ -1802,11 +1966,17 @@ objectdef isb2_profileengine
     ;					echo FromFirstAdvance checking ${timeNow}>=${ResetTimer}+${FirstAdvance}
     ;					if ${timeNow}>=${ResetTimer}+${CurrentStepTimestamp}
                     if ${timeNow}>=(${joRotator.GetNumber[resetTimer]}*1000)+${joRotator.GetInteger[firstAdvance]}
+                    {
                         This:Rotator_Reset[joRotator]
+                        numStep:Set[${joRotator.GetInteger[step]}]
+                    }
                     break
                 case lastPress
                     if ${timeNow}>=(${joRotator.GetNumber[resetTimer]}*1000)+${joRotator.GetInteger[lastPress]}
+                    {
                         This:Rotator_Reset[joRotator]
+                        numStep:Set[${joRotator.GetInteger[step]}]
+                    }
                     break
                 }
 
@@ -1819,6 +1989,7 @@ objectdef isb2_profileengine
 		{
 ;            echo Rotator_PreExecute calling Rotator_Advance[0] due to step ${numStep} disabled
 			This:Rotator_Advance[joRotator,${newState}]
+            numStep:Set[${joRotator.GetInteger[step]}]
             if !${This.Rotator_IsStepEnabled[joRotator,${numStep}]}
 			{
 				return FALSE
@@ -1831,7 +2002,7 @@ objectdef isb2_profileengine
     ; for any Rotator object, perform post-execution mechanics, depending on press/release state
     method Rotator_PostExecute(jsonvalueref joRotator,bool newState, int executedStep)
     {
-;        echo "\ayRotator_PostExecute\ax: ${newState} ${executedStep} ${joRotator~}"
+        echo "\ayRotator_PostExecute\ax: ${newState} ${executedStep} ${joRotator~}"
 ; call advance if ALL of these conditions are met....
 ; 1. newState == FALSE
 ; 2. has not already advanced (current step == executed step)
@@ -1841,18 +2012,18 @@ objectdef isb2_profileengine
             return
         
         variable int numStep
-        numStep:Set[${This.Rotator_GetCurrentStep[joRotator]}]
+        numStep:Set[${This.Rotator_GetCurrentStepNum[joRotator]}]
 
         if ${numStep}!=${executedStep}
         {
-;            echo "\arRotator_PostExecute\ax: numStep ${numStep}!=${executedStep}"
+            echo "\arRotator_PostExecute\ax: numStep ${numStep}!=${executedStep}"
             return
         }
 
         ; is step sticky?
         if ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0
         {
-;            echo "\arRotator_PostExecute\ax: stickyTime ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0 ${joRotator~}"
+            echo "\arRotator_PostExecute\ax: stickyTime ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0 ${joRotator~}"
             return
         }
 
@@ -1863,7 +2034,7 @@ objectdef isb2_profileengine
     ; for any Rotator object, reset to the first step (often due to auto-reset mechanics)
     method Rotator_Reset(jsonvalueref joRotator)
     {
-        variable int numStep = ${This.Rotator_GetCurrentStep[joRotator]}
+        variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
         variable int timeNow=${Script.RunningTime}
 
         This:Rotator_IncrementStepCounter[joRotator,${numStep}]
@@ -2099,6 +2270,43 @@ objectdef isb2_profileengine
         This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
     }
 
+    method RemoveLastMappable(jsonvalueref joMappable)
+    {
+        variable int key
+        variable jsonvalue joQuery
+        joQuery:SetValue["$$>
+        {
+            "op":"&&",
+            "list":[
+                {
+                    "op":"==",
+                    "eval":"Select.Get[name\]",
+                    "value":${joMappable.Get[name].AsJSON~}
+                },
+                {
+                    "op":"==",
+                    "eval":"Select.Get[sheet\]",
+                    "value":${joMappable.Get[sheet].AsJSON~}
+                }
+            ]
+        }
+        <$$"]
+        key:Set[${LastMappables.SelectKey[joQuery]}]
+        if !${key}
+        {
+            echo "\arRemoveLastMappable\ax query failed ${joQuery~}"
+        }
+        LastMappables:Erase[${key}]
+    }
+
+    method SetLastMappable(jsonvalueref joMappable,bool newState)
+    {
+        This:RemoveLastMappable[joMappable]
+        LastMappables:InsertByRef[1,joMappable]
+        LastMappables:Erase[11]
+        LGUI2.Element[isb2.events]:FireEventHandler[onLastMappablesUpdated]
+    }
+
     method ExecuteMappableActivationState(jsonvalueref joMappable, bool newState)
     {
         ; get current step, then call This:ExecuteRotatorStep
@@ -2110,14 +2318,18 @@ objectdef isb2_profileengine
         variable int numStep=1
         This:Rotator_PreExecute[joMappable,${newState}]
 
-        numStep:Set[${This.Rotator_GetCurrentStep[joMappable]}]
+        numStep:Set[${This.Rotator_GetCurrentStepNum[joMappable]}]
         if ${numStep}>0
         {
             This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]",${newState}]
             This:Rotator_PostExecute[joMappable,${newState},${numStep}]
         }
+        else
+        {
+            echo "\arExecuteMappableActivationState\ax numStep=0"
+        }
 
-        LastMappable:SetReference[joMappable]
+        This:SetLastMappable[joMappable,${newState}]
     }
 
     method ExecuteMappable(jsonvalueref joMappable, bool newState)

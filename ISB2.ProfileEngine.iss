@@ -919,6 +919,7 @@ objectdef isb2_profileengine
 
         LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
 
+        Character.Get[clickBars]:ForEach["ClickBars.Get[\"\${ForEach.Value~}\"]:Enable"]
         Character.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
         This:ExecuteEventAction[Character,onLoad]
@@ -978,6 +979,7 @@ objectdef isb2_profileengine
 
         echo "ActivateTeam: TeamScope.active=${TeamScope.GetBool[active]}"
 
+        Team.Get[clickBars]:ForEach["ClickBars.Get[\"\${ForEach.Value~}\"]:Enable"]
         Team.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onTeamChanged]

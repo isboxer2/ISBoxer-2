@@ -356,6 +356,8 @@ objectdef isb2_isb1transformer
 
     method TransformBool(jsonvalueref joTransform,string oldProperty, string newProperty, bool defaultValue=0)
     {
+        if !${joTransform.Has["${oldProperty~}"]}
+            return
         if ${joTransform.GetBool["${oldProperty~}"]}!=${defaultValue}
             joTransform:SetBool["${newProperty~}",${joTransform.GetBool["${oldProperty~}"]}]
         joTransform:Erase["${oldProperty~}"]
@@ -363,6 +365,8 @@ objectdef isb2_isb1transformer
 
     method TransformInteger(jsonvalueref joTransform,string oldProperty, string newProperty, int64 defaultValue=0)
     {
+        if !${joTransform.Has["${oldProperty~}"]}
+            return
         if ${joTransform.GetInteger["${oldProperty~}"]}!=${defaultValue}
             joTransform:SetInteger["${newProperty~}",${joTransform.GetInteger["${oldProperty~}"]}]
         joTransform:Erase["${oldProperty~}"]
@@ -370,6 +374,8 @@ objectdef isb2_isb1transformer
 
     method TransformNumber(jsonvalueref joTransform,string oldProperty, string newProperty, float64 defaultValue=0)
     {
+        if !${joTransform.Has["${oldProperty~}"]}
+            return
         if ${joTransform.GetNumber["${oldProperty~}"]}!=${defaultValue}
             joTransform:SetNumber["${newProperty~}",${joTransform.GetNumber["${oldProperty~}"]}]
         joTransform:Erase["${oldProperty~}"]

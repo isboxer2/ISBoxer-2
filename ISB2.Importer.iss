@@ -739,6 +739,43 @@ objectdef isb2_importer
         return NULL
     }
 
+    member:jsonvalueref ConvertClickAction(jsonvalueref jo)
+    {
+        echo "\ayConvertClickAction\ax ${jo~}"
+
+        variable jsonvalue joNew="{}"
+        if ${jo.Get[LeftRight]~.Equal[Right]}
+            joNew:SetInteger[button,2]
+        else
+            joNew:SetInteger[button,1]
+
+        variable jsonvalue joModifiers="{}"
+        if ${jo.Has[modifiers]}
+        {
+            if ${jo.Get[modifiers]~.Find[Alt]}
+                joModifiers:SetBool[alt,1]
+            if ${jo.Get[modifiers]~.Find[Shift]}
+                joModifiers:SetBool[shift,1]
+            if ${jo.Get[modifiers]~.Find[Ctrl]}
+                joModifiers:SetBool[ctrl,1]
+
+            if ${joModifiers.Used}
+                joNew:SetByRef[modifiers,joModifiers]
+        }
+
+        variable jsonvalue joAction="{}"
+        joAction:SetString[type,mappable]
+        if ${jo.Has[action,Target]}
+            joAction:SetString[target,"${jo.Get[action,Target]~}"]
+        if ${jo.Has[action,MappedKeyString]}
+            joAction:SetString[name,"${jo.Get[action,MappedKeyString]~}"]
+        if ${jo.Has[action,KeyMapString]}
+            joAction:SetString[sheet,"${jo.Get[action,KeyMapString]~}"]
+
+        joNew:Set[inputMapping,"{\"type\":\"action\",\"action\":${joAction~}}"]
+        return joNew
+    }
+
     member:jsonvalueref ConvertClickBarButton(jsonvalueref jo)
     {
         echo "\arConvertClickBarButton\ax ${jo~}"
@@ -760,7 +797,7 @@ objectdef isb2_importer
         variable jsonvalue ja="[]"
         if ${jo.Has[ClickActions]}
         {
-            jo.Get[ClickActions]:ForEach["ja:AddByRef[\"This.ConvertClickAction[ForEach.Value]\"]"]            
+            jo.Get[ClickActions]:ForEach["ja:AddByRef[\"This.ConvertClickAction[ForEach.Value\]\"]"]            
 
             if ${ja.Used}
                 joNew:SetByRef[clicks,ja]    

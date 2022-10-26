@@ -884,6 +884,8 @@ objectdef isb2_mappablesheet
     {
         if !${jo.Type.Equal[object]}
             return FALSE
+
+        jo:SetString[sheet,"${Name~}"]
         Mappables:SetByRef["${jo.Get[name]~}",jo]
     }
 

@@ -1256,8 +1256,19 @@ objectdef isb2_importer
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
         if ${jo.Has[resetTimer]}
-        {
             joNew:SetNumber[resetTimer,"${jo.GetNumber[resetTimer]}"]
+
+        switch ${jo.Get[resetType]}
+        {
+            case FromFirstPress
+                joNew:SetString[resetType,firstPress]
+                break
+            case FromLastPress
+                joNew:SetString[resetType,lastPress]
+                break
+            case FromFirstAdvance
+                joNew:SetString[resetType,firstAdvance]
+                break
         }
 
         if ${jo.Has[hold]}

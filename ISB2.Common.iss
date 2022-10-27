@@ -525,7 +525,7 @@ objectdef isb2_clickbar
         if !${joButton.Has[mouseOver]}
             return
 
-        ISB2:ExecuteInputMapping["joButton.Get[mouseover]",1]
+        ISB2:ExecuteInputMapping["joButton.Get[mouseOver]",1]
     }
 
     method LostMouseOver()
@@ -543,18 +543,58 @@ objectdef isb2_clickbar
         if !${joButton.Has[mouseOver]}
             return
 
-        ISB2:ExecuteInputMapping["joButton.Get[mouseover]",0]
+        ISB2:ExecuteInputMapping["joButton.Get[mouseOver]",0]
     }
 
     member:bool ClickMatches(jsonvalueref joClick, jsonvalueref joMatch)
     {
-;        echo ClickMatches ${joClick~} ${joMatch~}
+;        echo "\ayClickMatches\ax ${joClick~} ${joMatch~}"
         if ${joClick.GetInteger[button]}!=${joMatch.GetInteger[controlID]}
             return FALSE
 
-        ; TODO: compare modifiers.
+        if ${joClick.Has[modifiers,ctrl]}
+        {
+            if ${joClick.GetBool[modifiers,ctrl]}
+            {
+                if !${joMatch.GetBool[lCtrl]} && !${joMatch.GetBool[rCtrl]}
+                    return FALSE
+            }
+            else
+            {
+                if ${joMatch.GetBool[lCtrl]} || ${joMatch.GetBool[rCtrl]}
+                    return FALSE
+            }
+        }
 
-;        echo ClickMatches \agTRUE\ax
+        if ${joClick.Has[modifiers,alt]}
+        {
+            if ${joClick.GetBool[modifiers,alt]}
+            {
+                if !${joMatch.GetBool[lAlt]} && !${joMatch.GetBool[rAlt]}
+                    return FALSE
+            }
+            else
+            {
+                if ${joMatch.GetBool[lAlt]} || ${joMatch.GetBool[rAlt]}
+                    return FALSE
+            }
+        }
+
+        if ${joClick.Has[modifiers,shift]}
+        {
+            if ${joClick.GetBool[modifiers,shift]}
+            {
+                if !${joMatch.GetBool[lShift]} && !${joMatch.GetBool[rShift]}
+                    return FALSE
+            }
+            else
+            {
+                if ${joMatch.GetBool[lShift]} || ${joMatch.GetBool[rShift]}
+                    return FALSE
+            }
+        }
+
+;        echo "ClickMatches \agTRUE\ax"
         return TRUE
     }
 
@@ -648,7 +688,27 @@ objectdef isb2_clickbar
             "jsonTemplate":"isb2.clickbarButton",
             "width":${This.GetButtonHeight},
             "height":${This.GetButtonWidth},
-            "_numButton":${Context.Args.Get[numButton]}
+            "_numButton":${Context.Args.Get[numButton]},
+            "tooltip":${Context.Args.Get[tooltip].AsJSON}
+            "content":{
+                "type":"panel",
+                "horizontalAlignment":"stretch",
+                "verticalAlignment":"stretch",
+                "children":[
+                    {
+                        "type":"imagebox",
+                        "horizontalAlignment":"stretch",
+                        "verticalAlignment":"stretch",
+                        "visibility":"collapsed"
+                    },
+                    {
+                        "type":"textblock",
+                        "text":${Context.Args.Get[text].AsJSON},
+                        "horizontalAlignment":"center",
+                        "verticalAlignment":"center",
+                    }
+                ]
+            }
         }
         <$$"]
 
@@ -1026,12 +1086,10 @@ objectdef isb2_vfxsheet
         jo.Get[outputs]:ForEach["This:AddOutput[ForEach.Value]"]
         jo.Get[sources]:ForEach["This:AddSource[ForEach.Value]"]
 
-
         if ${jo.GetBool[enable]}
         {
             This:Enable
         }
-
     }
 
     member:jsonvalueref AsJSON()
@@ -1060,7 +1118,7 @@ objectdef isb2_vfxsheet
     
     method Enable()
     {
-;        echo "\arisb2_vfxsheet:Enable\ax ${Name~}"
+        echo "\arisb2_vfxsheet:Enable\ax ${Name~}"
         Enabled:Set[1]
         Outputs:ForEach["This:EnableOutput[ForEach.Value]"]
         Sources:ForEach["This:EnableSource[ForEach.Value]"]
@@ -1070,7 +1128,7 @@ objectdef isb2_vfxsheet
     {
         if !${Enabled}
             return
-;        echo "\arisb2_vfxsheet:Disable\ax ${Name~}"
+        echo "\arisb2_vfxsheet:Disable\ax ${Name~}"
         Enabled:Set[0]
         Outputs:ForEach["This:DisableOutput[ForEach.Value]"]
         Sources:ForEach["This:DisableSource[ForEach.Value]"]

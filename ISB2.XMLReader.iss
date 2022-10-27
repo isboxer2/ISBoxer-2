@@ -871,7 +871,8 @@ objectdef isb2_isb1transformer
         This:TransformString[joTransform,Text,text]
         This:AutoTransform[joTransform,TextStyle,ClickBarButton]
 
-        This:TransformBool[joTransform,Enabled,enabled,1]
+        ; although this setting appears in the profile XML, it is completely unused....
+;        This:TransformBool[joTransform,Enabled,enabled,1]
         This:AutoTransform[joTransform,ClickActions,ClickBarButton]
         This:AutoTransform[joTransform,MouseOverAction,ClickBarButton]
 

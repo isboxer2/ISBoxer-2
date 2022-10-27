@@ -785,8 +785,10 @@ objectdef isb2_importer
             joNew:SetString[name,"${jo.Get[name]~}"]
         if ${jo.Has[text]}
             joNew:SetString[text,"${jo.Get[text]~}"]
-        if ${jo.Has[enabled]}
-            joNew:SetBool[enabled,"${jo.GetBool[enabled]~}"]
+
+        ; although this setting appears in the profile XML, it is completely unused
+;        if ${jo.Has[enabled]}
+;            joNew:SetBool[enabled,"${jo.GetBool[enabled]~}"]
 
         if ${jo.Has[backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]

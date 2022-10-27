@@ -15,6 +15,21 @@ objectdef isb2_isb1transformer
        return ISBProfile
     }
 
+    member:jsonvalueref TransformGlobalSettingsXML(string filename)
+    {
+        variable jsonvalueref joProfile
+        
+        variable isb2_xmlreader XMLReader
+        joProfile:SetReference["XMLReader.Read[\"${filename~}\",ISBoxerToolkitGlobalSettings,1]"]
+        if !${joProfile.Type.Equal[object]}
+        {
+            return NULL
+        }
+        This:TransformGlobalSettingsRoot[joProfile]
+
+       return joProfile
+    }
+
     member:jsonvalueref TransformRegionsXML(string filename)
     {
         variable jsonvalueref joProfile
@@ -123,6 +138,31 @@ objectdef isb2_isb1transformer
         joTransform:SetByRef[regionSheets,ja]
     }
 
+    method TransformGlobalSettingsRoot(jsonvalueref joTransform)
+    {
+        echo "\ayTransformGlobalSettingsRoot\ax ${joTransform~}"
+
+        This:TransformSingleToArray[joTransform,"Image"]
+        This:TransformSingleToArray[joTransform,"Game"]
+        This:TransformSingleToArray[joTransform,"CompatibilityFlags"]
+
+        This:AutoTransform[joTransform,Image,GlobalSettings]
+;        This:AutoTransform[joTransform,Game,GlobalSettings]
+;        This:AutoTransform[joTransform,CompatibilityFlags,GlobalSettings]
+
+        This:TransformFilename[joTransform,LastProfileFilename,lastProfileFilename]
+
+        This:TransformInteger[joTransform,LastMainSplitter,lastMainSplitter]
+        This:TransformInteger[joTransform,LastBottomSplitter,lastBottomSplitter]
+
+        This:TransformBool[joTransform,LastMultiplePCHelperState,lastMultiplePCHelperState]
+        This:TransformBool[joTransform,UseInnerSpace64,useInnerSpace64]
+
+        This:TransformBool[joTransform,NeverShowCPUThrottleForm,neverShowCPUThrottleForm]
+        This:TransformBool[joTransform,NeverShowCompatibilityForm,neverShowCompatibilityForm]
+        This:TransformBool[joTransform,NeverShowMultisamplingWarning,neverShowMultisamplingWarning]
+        This:TransformBool[joTransform,NeverShowDxNothingVFXWarning,neverShowDxNothingVFXWarning]
+    }
     
     member:jsonvalueref TransformVideoFXSet(jsonvalueref joTransform)
     {
@@ -390,6 +430,24 @@ objectdef isb2_isb1transformer
         joTransform:Erase["${oldProperty~}"]
     }    
 
+    method TransformFilename(jsonvalueref joTransform,string oldProperty, string newProperty)
+    {
+        variable filepath fname        
+
+        if ${joTransform.Has["${oldProperty~}"]}
+        {
+            fname:Set["${joTransform.Get["${oldProperty~}"]~}"]
+            if ${fname.StartsWith["${LavishScript.HomeDirectory}"]}
+            {
+                ; this will alter the filename to be relative to the current path
+                fname:Set["../..${fname.Right[-${LavishScript.HomeDirectory.Length}]}"]
+            }
+
+            joTransform:SetString["${newProperty~}","${fname~}"]
+            joTransform:Erase["${oldProperty~}"]
+        }
+    }
+
     method TransformNullableBool(jsonvalueref joTransform, string oldProperty, string newProperty)
     {
         if ${joTransform.Has["${oldProperty~}",Value]}
@@ -563,6 +621,17 @@ objectdef isb2_isb1transformer
                 echo "AutoTransform: jsonarray:ForEach"
             jVal:ForEach["This:${methodName~}[ForEach.Value]"]
         }
+    }
+
+    method AutoTransform_GlobalSettings_Image(jsonvalueref joTransform)
+    {
+        echo "\ayAutoTransform_GlobalSettings_Image\ax ${joTransform~}"
+        This:TransformColor[joTransform,ColorMask,colorMask]
+        This:TransformRect[joTransform,Crop,crop]
+        if ${joTransform.Get[crop,3]}==0 && ${joTransform.Get[crop,4]}==0        
+            joTransform:Erase[crop]
+        
+        This:TransformFilename[joTransform,Filename,filename]
     }
 
     method AutoTransform_EventAction(jsonvalueref joTransform)
@@ -876,12 +945,21 @@ objectdef isb2_isb1transformer
         This:AutoTransform[joTransform,ClickActions,ClickBarButton]
         This:AutoTransform[joTransform,MouseOverAction,ClickBarButton]
 
+
         if ${joTransform.Get[MouseOverAction].Used}==0
             joTransform:Erase[MouseOverAction]
+
+        This:TransformEventAction[joTransform,MouseOverAction,mouseoverAction]
 
         This:TransformBool[joTransform,ClickThrough,clickThrough]        
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
+
+        if ${joTransform.Has[BackgroundImage,ImageString]}
+        {
+            joTransform:SetString[backgroundImage,"${joTransform.Get[BackgroundImage,ImageString]~}"]
+            joTransform:Erase[BackgroundImage]
+        }
     }
 
     method AutoTransform_ClickBarButton_TextStyle(jsonvalueref joTransform)
@@ -1302,11 +1380,30 @@ objectdef isb2_xmlreader
         if ${AutoArray} && ${childTypes.Used}==1 && ${joAttributes.Used}==0 && ${jo.Get["${childTypes.FirstKey~}"](type)~.Equal[jsonarray]}
         {
             ; just contains an array
-            if ${_node.Text.Find["${childTypes.FirstKey~}"]} || ${childTypes.FirstKey.Equal[MappedKeyAction]} || ${childTypes.FirstKey.Equal[MappedKey]} || ${childTypes.FirstKey.Equal[MenuButton]} || ${childTypes.FirstKey.Equal[FullISKeyCombo]} || ${childTypes.FirstKey.Equal[ISKey]} || ${childTypes.FirstKey.Equal[UserScreen]} || ${childTypes.FirstKey.Equal[SwapGroup]} || ${childTypes.FirstKey.Equal[ClickAction]} || ${childTypes.FirstKey.Equal[unsignedInt]} || ${childTypes.FirstKey.Equal[FTLModifierEnum]} || ${childTypes.FirstKey.Equal[MenuInstance]} || ${childTypes.FirstKey.Equal[KeyMapLooseRef]}
+            if ${_node.Text.Find["${childTypes.FirstKey~}"]}
             {
 ;                echo "\ayConvertNodeToObject\ax ${_node.AsJSON~} giving ARRAY ${childTypes.FirstKey~}=${jo.Get["${childTypes.FirstKey~}"]}"
                 return "jo.Get[\"${childTypes.FirstKey~}\"]"
             }
+            switch ${childTypes.FirstKey}
+            {
+                case MappedKeyAction
+                case MappedKey
+                case MenuButton
+                case FullISKeyCombo
+                case ISKey
+                case UserScreen            
+                case SwapGroup
+                case ClickAction
+                case unsignedInt
+                case FTLModifierEnum
+                case MenuInstance
+                case KeyMapLooseRef
+                case CompatibilityFlagInfo
+                    return "jo.Get[\"${childTypes.FirstKey~}\"]"
+            }
+            
+
         }
         /**/
 

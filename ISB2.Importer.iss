@@ -100,6 +100,18 @@ objectdef isb2_importer
         return jo
     }
 
+    method TransformGlobalSettingsXML()
+    {
+        variable isb2_isb1transformer ISB1Transformer
+        variable jsonvalueref jo        
+
+        variable filepath filename="${LavishScript.HomeDirectory}/ISBoxerToolkitGlobalSettings.XML"
+
+        jo:SetReference["ISB1Transformer.TransformGlobalSettingsXML[\"${filename~}\"]"]
+        
+        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename.FilenameOnly~}.isb2.json",multiline]
+    }
+
     method TransformProfileXML(filepath filename)
     {
         variable jsonvalueref jo
@@ -786,15 +798,20 @@ objectdef isb2_importer
         if ${jo.Has[text]}
             joNew:SetString[text,"${jo.Get[text]~}"]
 
+        if ${jo.Has[Tooltip]}
+            joNew:SetString[tooltip,"${jo.Get[Tooltip]~}"]
+
         ; although this setting appears in the profile XML, it is completely unused
 ;        if ${jo.Has[enabled]}
 ;            joNew:SetBool[enabled,"${jo.GetBool[enabled]~}"]
 
         if ${jo.Has[backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
+        if ${jo.Has[backgroundImage]}
+            joNew:SetString[backgroundImage,"${jo.Get[backgroundImage]~}"]
 
         if ${jo.Has[clickThrough]}
-            joNew:SetbBool[clickThrough,"${jo.GetBool[clickThrough]}"]
+            joNew:SetBool[clickThrough,"${jo.GetBool[clickThrough]}"]
 
         variable jsonvalue ja="[]"
         if ${jo.Has[ClickActions]}
@@ -805,11 +822,23 @@ objectdef isb2_importer
                 joNew:SetByRef[clicks,ja]    
         }        
 
+        variable jsonvalue joAction="{}"
+        if ${jo.Has[mouseoverAction]}
+        {
+            joAction:SetString[type,mappable]
+            if ${jo.Has[mouseoverAction,Target]}
+                joAction:SetString[target,"${jo.Get[mouseoverAction,Target]~}"]
+            if ${jo.Has[mouseoverAction,MappedKeyString]}
+                joAction:SetString[name,"${jo.Get[mouseoverAction,MappedKeyString]~}"]
+            if ${jo.Has[mouseoverAction,KeyMapString]}
+                joAction:SetString[sheet,"${jo.Get[mouseoverAction,KeyMapString]~}"]
+
+            joNew:Set[mouseOver,"{\"type\":\"action\",\"action\":${joAction~}}"]
+        }
+
 /*
 ; TODO
         This:AutoTransform[joTransform,TextStyle,ClickBarButton]
-
-        This:AutoTransform[joTransform,MouseOverAction,ClickBarButton]
 */
         return joNew
     }

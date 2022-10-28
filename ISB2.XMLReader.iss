@@ -969,7 +969,7 @@ objectdef isb2_isb1transformer
         This:TransformString[joTransform,Face,face,Tahoma]
 
         This:TransformColor[joTransform,Color,color,"#ffffff"]
-        This:TransformInteger[joTransform,Size,size,12]
+        This:TransformInteger[joTransform,Size,height,12]
         This:TransformBool[joTransform,Bold,bold,FALSE]
     }
 

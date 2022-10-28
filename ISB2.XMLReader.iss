@@ -626,11 +626,13 @@ objectdef isb2_isb1transformer
     method AutoTransform_GlobalSettings_Image(jsonvalueref joTransform)
     {
         echo "\ayAutoTransform_GlobalSettings_Image\ax ${joTransform~}"
-        This:TransformColor[joTransform,ColorMask,colorMask]
+        This:TransformColor[joTransform,ColorMask,colorMask,"#ffffff"]
+        This:TransformColor[joTransform,ColorKey,colorKey]
         This:TransformRect[joTransform,Crop,crop]
         if ${joTransform.Get[crop,3]}==0 && ${joTransform.Get[crop,4]}==0        
             joTransform:Erase[crop]
-        
+
+        This:TransformInteger[joTransform,Border,border] 
         This:TransformFilename[joTransform,Filename,filename]
     }
 
@@ -1110,7 +1112,7 @@ objectdef isb2_isb1transformer
         This:TransformInteger[joTransform,CursorFeedAlpha,cursorFeedAlpha]
 
         This:TransformSingleToArray[joTransform,"WhiteOrBlackList"]
-        This:TransformColor[joTransform,CursorColorMask,cursorColorMask]
+        This:TransformColor[joTransform,CursorColorMask,cursorColorMask,"#ffffff"]
         
         This:TransformString[joTransform,MouseLight,mouseLight,None]
         This:TransformString[joTransform,KeyboardLight,keyboardLight,None]
@@ -1118,7 +1120,7 @@ objectdef isb2_isb1transformer
 
         This:TransformSize[joTransform,CursorFeedSourceSize,cursorFeedSourceSize]
         This:TransformSize[joTransform,CursorFeedOutputSize,cursorFeedOutputSize]
-        This:TransformColor[joTransform,CursorFeedBorder,cursorFeedBorder]
+        This:TransformColor[joTransform,CursorFeedBorder,cursorFeedBorder,"#ffffff"]
 
     }
 

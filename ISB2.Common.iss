@@ -24,6 +24,7 @@ objectdef isb2_profile
     variable jsonvalueref GameKeyBindings=[]
     variable jsonvalueref GameMacroSheets=[]
     variable jsonvalueref ClickBars=[]
+    variable jsonvalueref ImageSheets=[]
     variable jsonvalueref VFXSheets=[]
 
     method Initialize(jsonvalueref jo, uint priority, string localFilename)
@@ -72,6 +73,8 @@ objectdef isb2_profile
             MappableSheets:SetReference["jo.Get[mappableSheets]"]
         if ${jo.Has[vfxSheets]}
             VFXSheets:SetReference["jo.Get[vfxSheets]"]
+        if ${jo.Has[imageSheets]}
+            ImageSheets:SetReference["jo.Get[imageSheets]"]
         if ${jo.Has[clickBars]}
             ClickBars:SetReference["jo.Get[clickBars]"]
         if ${jo.Has[gameMacroSheets]}
@@ -119,6 +122,8 @@ objectdef isb2_profile
             jo:SetByRef["mappableSheets",MappableSheets]
         if ${VFXSheets.Used}
             jo:SetByRef["vfxSheets",VFXSheets]
+        if ${ImageSheets.Used}
+            jo:SetByRef["imageSheets",ImageSheets]
         if ${ClickBars.Used}
             jo:SetByRef["clickBars",ClickBars]
         if ${GameMacroSheets.Used}
@@ -694,25 +699,99 @@ objectdef isb2_clickbar
                 "type":"panel",
                 "horizontalAlignment":"stretch",
                 "verticalAlignment":"stretch",
-                "children":[
-                    {
-                        "type":"imagebox",
-                        "horizontalAlignment":"stretch",
-                        "verticalAlignment":"stretch",
-                        "visibility":"collapsed"
-                    },
-                    {
-                        "type":"textblock",
-                        "text":${Context.Args.Get[text].AsJSON},
-                        "horizontalAlignment":"center",
-                        "verticalAlignment":"center",
-                    }
-                ]
+                "children":[]
             }
         }
         <$$"]
 
+        variable jsonvalue joImagebox        
+        variable jsonvalue joTextblock
 
+        variable jsonvalueref joImage
+
+        joImagebox:SetValue["$$>
+        {
+            "type":"imagebox",
+            "name":"clickbarButton.imagebox",
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "scaleToFit":true
+        }
+        <$$"]
+
+        joTextblock:SetValue["$$>
+        {
+            "type":"textblock",
+            "name":"clickbarButton.buttontext",
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "strata":0.6
+        }
+        <$$"]
+
+        if ${Context.Args.Has[text]}
+            joTextblock:SetString[text,"${Context.Args.Get[text]~}"]
+        else
+            joTextblock:SetString[visibility,collapsed]
+
+        if ${Context.Args.Has[font]}
+        {
+            joButton:Set[font,"${Context.Args.Get[font]~}"]
+            if ${joButton.Has[font,color]}
+                joButton:SetString[color,"${joButton.Get[font,color]~}"]
+        }
+
+        if ${Context.Args.Has[backgroundColor]}
+            joButton:Set["backgroundBrush","{\"color\":\"${Context.Args.Get[backgroundColor]~}\"}"]
+
+        if ${Context.Args.Has[backgroundImage]}
+        {
+            ; sheet,name
+            joImage:SetReference["ISB2.ImageSheets.Get[\"${Context.Args.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Context.Args.Get[backgroundImage,name]~}\"]"]
+
+            if ${joImage.Reference(exists)}
+            {
+                variable jsonvalue joImageBrush
+                joImageBrush:SetValue["{}"]
+
+                if ${joImage.Has[filename]}
+                    joImageBrush:SetString[imageFile,"${joImage.Get[filename]~}"]
+                if ${joImage.Has[colorMask]}
+                    joImageBrush:SetString[color,"${joImage.Get[colorMask]~}"]
+                elseif ${joImage.Has[filename]}
+                    joImageBrush:SetString[color,"#ffffffff"]
+
+                if ${joImage.Has[colorKey]}
+                    joImageBrush:SetString[imageFileTransparencyKey,"${joImage.Get[colorKey]~}"]
+
+                echo "\ayimageBrush\ax ${joImage~} => ${joImageBrush~}"
+                joImagebox:SetByRef[imageBrush,joImageBrush]
+            }
+            else
+            {
+                ; image not found
+                echo "\arImageSheets.Get[\"${Context.Args.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Context.Args.Get[backgroundImage,name]~}\"]"
+                joImagebox:SetString[visibility,collapsed]    
+            }                        
+        }
+        else
+            joImagebox:SetString[visibility,collapsed]
+
+/*
+                    ,
+                    {
+                        "type":"textblock",
+                        "name":"clickbarButton.buttontext",
+                        "text":${Context.Args.Get[text].AsJSON},
+                        "horizontalAlignment":"center",
+                        "verticalAlignment":"center",
+                    }
+/**/
+
+        joButton.Get[content,children]:AddByRef[joImagebox]
+        joButton.Get[content,children]:AddByRef[joTextblock]
+
+        echo "\ayfinal\ax ${joButton.AsJSON~}"
         Context:SetView["${joButton.AsJSON~}"]
     }
 
@@ -1009,6 +1088,44 @@ objectdef isb2_gamemacrosheet
         if !${jo.Type.Equal[object]}
             return FALSE
         Macros:SetByRef["${jo.Get[name]~}",jo]
+    }
+}
+
+objectdef isb2_imagesheet
+{
+    variable string Name
+
+    variable jsonvalue Images="{}"
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        jo.Get[images]:ForEach["This:Add[ForEach.Value]"]
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+        jo:SetByRef[images,Images]
+        return jo
+    }
+
+    method Add(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+        Images:SetByRef["${jo.Get[name]~}",jo]
     }
 }
 

@@ -792,11 +792,35 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertClickBarButton(jsonvalueref jo)
+    member:jsonvalueref GetImageReference(string name)
     {
-        echo "\arConvertClickBarButton\ax ${jo~}"
+        echo "\arGetImageReference\ax ${name~}"
+        ; find image name and sheet name
+        variable jsonvalueref joImage
+        joImage:SetReference["This.FindInArray[\"ISBProfile.Get[globalSettings,Image]\",\"${name~}\"]"]
+
+        if !${joImage.Reference(exists)}
+        {
+            echo "\arGetImageReference\ax no reference"
+            return NULL
+        }
 
         variable jsonvalue joNew="{}"
+        joNew:SetString[name,"${name~}"]
+        if ${joImage.Has[ImageSet]}
+            joNew:SetString[sheet,"${joImage.Get[ImageSet]~}"]
+        else
+            joNew:SetString[sheet,"Default"]
+
+        return joNew
+    }
+
+    member:jsonvalueref ConvertClickBarButton(jsonvalueref jo)
+    {
+        echo "\ayConvertClickBarButton\ax ${jo~}"
+
+        variable jsonvalue joNew="{}"
+        variable jsonvalueref joRef
         if ${jo.Has[name]}
             joNew:SetString[name,"${jo.Get[name]~}"]
         if ${jo.Has[text]}
@@ -812,7 +836,11 @@ objectdef isb2_importer
         if ${jo.Has[backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
         if ${jo.Has[backgroundImage]}
-            joNew:SetString[backgroundImage,"${jo.Get[backgroundImage]~}"]
+        {
+            joRef:SetReference["This.GetImageReference[\"${jo.Get[backgroundImage]~}\"]"]
+            if ${joRef.Reference(exists)}
+                joNew:SetByRef[backgroundImage,joRef]             
+        }
 
         if ${jo.Has[clickThrough]}
             joNew:SetBool[clickThrough,"${jo.GetBool[clickThrough]}"]
@@ -838,6 +866,11 @@ objectdef isb2_importer
                 joAction:SetString[sheet,"${jo.Get[mouseoverAction,KeyMapString]~}"]
 
             joNew:Set[mouseOver,"{\"type\":\"action\",\"action\":${joAction~}}"]
+        }
+
+        if ${jo.Has[TextStyle]}
+        {
+            joNew:SetByRef[font,"jo.Get[TextStyle]"]
         }
 
 /*
@@ -887,7 +920,8 @@ objectdef isb2_importer
     {
         if !${joInto.Has[imageSheets]}
             joInto:Set[imageSheets,"[]"]
-        variable jsonvalueref ja="joInto.Get[imageSheets]"
+        variable jsonvalueref ja
+        ja:SetReference["joInto.Get[imageSheets]"]
 
         variable jsonvalueref joSheet
         joSheet:SetReference["This.FindInArray[ja,\"${name~}\",name]"]

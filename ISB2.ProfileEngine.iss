@@ -21,6 +21,7 @@ objectdef isb2_profileengine
     variable collection:isb2_vfxsheet VFXSheets
     variable collection:isb2_triggerchain TriggerChains
     variable collection:isb2_clickbar ClickBars
+    variable collection:isb2_imagesheet ImageSheets="{}"
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -497,6 +498,37 @@ objectdef isb2_profileengine
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:UninstallGameKeyBinding[ForEach.Value]"]
     }
+
+    method InstallImageSheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        ImageSheets:Erase["${jo.Get[name]~}"]
+
+        ImageSheets:Set["${jo.Get[name]~}",jo]
+    }
+
+    method InstallImageSheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallImageSheet[ForEach.Value]"]
+    }
+
+    method UninstallImageSheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        ImageSheets:Erase["${jo.Get[name]~}"]
+    }
+
+    method UninstallImageSheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallImageSheet[ForEach.Value]"]
+    }    
+
 
     method InstallProfiles(jsonvalueref ja)
     {
@@ -998,7 +1030,7 @@ objectdef isb2_profileengine
         Profiles:Add["${_profile.Name~}"]
 
         This:InstallProfiles[_profile.Profiles]
-
+        This:InstallImageSheets[_profile.ImageSheets]
         This:InstallVirtualFiles[_profile.VirtualFiles]
         This:InstallBroadcastProfiles[_profile.BroadcastProfiles]
         This:InstallWindowLayouts[_profile.WindowLayouts]

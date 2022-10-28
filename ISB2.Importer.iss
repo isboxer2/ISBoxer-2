@@ -26,6 +26,10 @@ objectdef isb2_importer
         
         This:WriteJSON["${filename~}.json"]
 
+        ISBProfile:SetByRef[globalSettings,"This.TransformGlobalSettingsXML"]
+
+        This:ConvertImagesToImageSheets["ISBProfile.Get[globalSettings,Image]",jo]
+
         jRef:SetReference[This.ConvertCharacters]        
         if ${jRef.Used}
         {
@@ -100,7 +104,7 @@ objectdef isb2_importer
         return jo
     }
 
-    method TransformGlobalSettingsXML()
+    member:jsonvalueref TransformGlobalSettingsXML()
     {
         variable isb2_isb1transformer ISB1Transformer
         variable jsonvalueref jo        
@@ -108,8 +112,10 @@ objectdef isb2_importer
         variable filepath filename="${LavishScript.HomeDirectory}/ISBoxerToolkitGlobalSettings.XML"
 
         jo:SetReference["ISB1Transformer.TransformGlobalSettingsXML[\"${filename~}\"]"]
-        
+
         jo:WriteFile["${LavishScript.HomeDirectory~}/${filename.FilenameOnly~}.isb2.json",multiline]
+        return jo
+        
     }
 
     method TransformProfileXML(filepath filename)
@@ -180,12 +186,10 @@ objectdef isb2_importer
         return ja
     }
 
-    member:jsonvalueref ConvertClickBarImages()
+    method ConvertImagesToImageSheets(jsonvalueref jaImages, jsonvalueref joInto)
     {
-        variable jsonvalue ja="[]"
-        ISBProfile.Get[ClickBarImage]:ForEach["ja:AddByRef[\"This.ConvertClickBarImage[ForEach.Value]\"]"]
-
-        return ja
+        ; echo "\agConvertImagesToImageSheets\ax ${jaImages~}"
+        jaImages:ForEach["This:ConvertImage[ForEach.Value,joInto]"]
     }
 
     member:jsonvalueref ConvertComputers()
@@ -879,11 +883,66 @@ objectdef isb2_importer
         return joNew
     }
 
-    member:jsonvalueref ConvertClickBarImage(jsonvalueref jo)
+    member:jsonvalueref GetImageSheet(jsonvalueref joInto, string name)
     {
-        echo "\arConvertClickBarImage\ax ${jo~}"
+        if !${joInto.Has[imageSheets]}
+            joInto:Set[imageSheets,"[]"]
+        variable jsonvalueref ja="joInto.Get[imageSheets]"
 
-        return NULL
+        variable jsonvalueref joSheet
+        joSheet:SetReference["This.FindInArray[ja,\"${name~}\",name]"]
+
+        if !${joSheet.Reference(exists)}
+        {
+            joSheet:SetReference["{\"name\":\"${name~}\",\"images\":[]}"]
+
+            ja:AddByRef[joSheet]
+        }
+
+        return joSheet
+    }
+
+    method ConvertImage(jsonvalueref jo, jsonvalueref joInto)
+    {
+        echo "\agConvertImage\ax ${jo~}"
+
+        variable jsonvalue joNew="{}"
+
+        variable string sheetName="Default"
+        variable jsonvalueref joSheet
+
+        variable string name="${jo.Get[Name]~}"
+
+        joNew:SetString[name,"${name~}"]
+
+        if ${jo.Has[filename]}
+            joNew:SetString[filename,"${jo.Get[filename]~}"]
+
+        if ${jo.Has[ImageSet]}
+            sheetName:Set["${jo.Get[ImageSet]~}"]
+
+        if ${jo.Has[colorMask]}
+            joNew:SetString[colorMask,"${jo.Get[colorMask]~}"]
+        elseif ${name.StartsWith["#"]}
+        {
+            if ${name.Length}==9 && ${name.StartsWith["#FF"]}
+                joNew:SetString[colorMask,"#${name.Right[-3].Lower~}"]
+            else
+                joNew:SetString[colorMask,"${name.Lower~}"]
+        }
+
+        if ${jo.Has[colorKey]}
+            joNew:SetString[colorKey,"${jo.Get[colorKey]~}"]
+
+        if ${jo.Has[crop]}
+            joNew:SetByRef[crop,"jo.Get[crop]"]
+
+        if ${jo.Has[border]}
+            joNew:SetInteger[border,"${jo.GetInteger[border]}"]
+    
+        joSheet:SetReference["This.GetImageSheet[joInto,\"${sheetName~}\"]"]
+
+        joSheet.Get[images]:AddByRef[joNew]
     }
 
     member:jsonvalueref ConvertUserScreen(jsonvalueref jo)

@@ -1416,14 +1416,7 @@ objectdef isb2_profileengine
         variable jsonvalue joStyle={}
         joStyle:SetString[text,"${joAction.Get[text]~}"]
 
-        if ${joAction.Has[color]}
-        {
-            joStyle:SetString[color,"${joAction.Get[color]~}"]
-        }
-        else
-        {
-            joStyle:SetString[color,"#ffffff"]
-        }
+        joStyle:SetString[color,"${joAction.Get[-default,"\"#ffffff\"",color]~}"]
 
         variable float duration=1
         if ${joAction.Has[duration]}
@@ -1898,10 +1891,7 @@ objectdef isb2_profileengine
 
     member:string Rotator_GetResetType(jsonvalueref joRotator)
     {
-        if ${joRotator.Has[resetType]}
-            return "${joRotator.Get[resetType]~}"
-        
-        return "never"
+        return ${joRotator.Get[-default,"\"never\"",resetType]}
     }
 
     member:float Rotator_GetRemainingResetTime(jsonvalueref joRotator)

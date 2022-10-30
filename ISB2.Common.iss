@@ -834,17 +834,12 @@ objectdef isb2_clickbar
 
     member:uint GetButtonHeight()
     {
-        if ${Data.Has[rowHeight]}
-            return ${Data.GetInteger[rowHeight]}
-        return 32
+        return ${Data.GetInteger[-default,32,rowHeight]}
     }
 
     member:uint GetButtonWidth()
     {
-        if ${Data.Has[columnWidth]}
-            return ${Data.GetInteger[columnWidth]}
-
-        return 32
+        return ${Data.GetInteger[-default,32,columnWidth]}
     }
 
     method GenerateButtonView()

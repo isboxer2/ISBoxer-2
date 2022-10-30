@@ -807,10 +807,8 @@ objectdef isb2_importer
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${name~}"]
-        if ${joImage.Has[ImageSet]}
-            joNew:SetString[sheet,"${joImage.Get[ImageSet]~}"]
-        else
-            joNew:SetString[sheet,"Default"]
+
+        joNew:SetString[sheet,"${joImage.Get[-default,"\"Default\"",ImageSet]~}"]
 
         return joNew
     }
@@ -1603,10 +1601,7 @@ objectdef isb2_importer
 
         joNew:SetString[name,"${jo.Get[keyMap]~}"]
 
-        if ${jo.Has[Value]}
-            joNew:SetString[value,"${jo.Get[Value]~}"]
-        else
-            joNew:SetString[value,"On"]
+        joNew:SetString[value,"${jo.Get[-default,"\"On\"",Value]~}"]
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew        
@@ -1623,10 +1618,7 @@ objectdef isb2_importer
         if ${jo.Has[keyMap]}
             joNew:SetString[sheet,"${jo.Get[keyMap]~}"]
 
-        if ${jo.Has[Value]}
-            joNew:SetString[value,"${jo.Get[Value]~}"]
-        else
-            joNew:SetString[value,"On"]
+        joNew:SetString[value,"${jo.Get[-default,"\"On\"",Value]~}"]
 
         return joNew        
     }
@@ -1791,17 +1783,11 @@ objectdef isb2_importer
         
         if ${jo.GetBool[UseMouseState]}
         {
-            if ${jo.Has[MouseState]}
-                joNew:SetString[mouseState,"${jo.Get[MouseState]~}"]
-            else
-                joNew:SetString[mouseState,"On"]
+            joNew:SetString[mouseState,"${jo.Get[-default,"\"On\"",MouseState]~}"]
         }
         if ${jo.GetBool[UseKeyboardState]}
         {
-            if ${jo.Has[KeyboardState]}
-               joNew:SetString[keyboardState,"${jo.Get[KeyboardState]~}"]
-            else
-                joNew:SetString[keyboardState,"On"]
+            joNew:SetString[keyboardState,"${jo.Get[-default,"\"On\"",KeyboardState]~}"]
         }
 
         if ${jo.Has[VideoFeed,Value]}
@@ -1972,10 +1958,7 @@ objectdef isb2_importer
 
         joNew:SetString[type,broadcast target]
 
-        if ${jo.Has[RepeaterTarget]}
-            joNew:SetString[value,"${jo.Get[RepeaterTarget]~}"]
-        else
-            joNew:SetString[value,"all other"]
+        joNew:SetString[value,"${jo.Get[-default,"\"all other\"",RepeaterTarget]~}"]
 
         if ${jo.GetBool[BlockLocal]}
             joNew:SetBool[blockLocal,1]

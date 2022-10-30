@@ -80,7 +80,7 @@ objectdef isb2_importer
         {
             jo:SetByRef[menuTemplates,jRef]
         }        
-        jRef:SetReference[This.ConvertMenuButtonLayouts]        
+        jRef:SetReference[This.ConvertMenuButtonSets]        
         if ${jRef.Used}
         {
             jo:SetByRef[menuButtonLayouts,jRef]
@@ -1798,7 +1798,7 @@ objectdef isb2_importer
         }
         if ${jo.GetBool[UseKeyboardState]}
         {
-            if ${jo.Has[keyboardState]}
+            if ${jo.Has[KeyboardState]}
                joNew:SetString[keyboardState,"${jo.Get[KeyboardState]~}"]
             else
                 joNew:SetString[keyboardState,"On"]

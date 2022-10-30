@@ -213,6 +213,11 @@
                     "type":"method",
                     "object":"This.Parent.Context",
                     "method":"OnMouseButtonMove"
+                },
+                "onVisualAttached":{
+                    "type":"method",
+                    "object":"This.Parent.Context",
+                    "method":"OnButtonLoaded"
                 }
             }
         },

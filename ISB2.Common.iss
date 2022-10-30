@@ -467,89 +467,140 @@ objectdef isb2_profileeditor
     }
 }
 
-objectdef isb2_clickbar
+objectdef isb2_clickbarButton
 {
-    variable string Name
-    
+    variable weakref ClickBar
+    variable int NumButton
     variable jsonvalueref Data
-    variable lgui2elementref Window
+    variable lgui2elementref Element
+    variable jsonvalue ActiveClicks="[null,null,null,null,null]"
 
-    method Initialize(jsonvalueref jo)
+    method Initialize(weakref _clickBar, int _numButton, jsonvalueref jo)
     {
-        This:FromJSON[jo]
+        ClickBar:SetReference[_clickBar]
+        NumButton:Set[${_numButton}]
+        Data:SetReference[jo]
     }
 
     method Shutdown()
     {
-        Window:Destroy
+        Element:Destroy
     }
 
-    method Disable()
+    member:jsonvalueref GenerateView()
     {
-        Window:Destroy
-    }
+        echo "isb2_clickbarButton:GenerateView ${Data~}"
+        ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
+        ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
-    method Enable()
-    {
-        if ${Window.Reference(exists)}
-            return
+        variable jsonvalue joButton
+        joButton:SetValue["$$>
+        {
+            "jsonTemplate":"isb2.clickbarButton",
+            "width":${ClickBar.GetButtonWidth},
+            "height":${ClickBar.GetButtonHeight},
+            "_numButton":${NumButton},
+            "tooltip":${Data.Get[tooltip].AsJSON}
+            "content":{
+                "type":"panel",
+                "horizontalAlignment":"stretch",
+                "verticalAlignment":"stretch",
+                "children":[]
+            }
+        }
+        <$$"]
 
-        This:CreateWindow
-    }
+        variable jsonvalue joImagebox        
+        variable jsonvalue joTextblock
 
-    method Toggle()
-    {
-        if ${Window.Reference(exists)}
-            This:Disable
+        variable jsonvalueref joImage
+
+        joImagebox:SetValue["$$>
+        {
+            "type":"imagebox",
+            "name":"clickbarButton.imagebox",
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "scaleToFit":true
+        }
+        <$$"]
+
+        joTextblock:SetValue["$$>
+        {
+            "type":"textblock",
+            "name":"clickbarButton.buttontext",
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "strata":0.6
+        }
+        <$$"]
+
+        if ${Data.Has[text]}
+            joTextblock:SetString[text,"${Data.Get[text]~}"]
         else
-            This:CreateWindow
+            joTextblock:SetString[visibility,collapsed]
+
+        if ${Data.Has[font]}
+        {
+            joButton:Set[font,"${Data.Get[font]~}"]
+            if ${joButton.Has[font,color]}
+                joButton:SetString[color,"${joButton.Get[font,color]~}"]
+        }
+
+        if ${Data.Has[backgroundColor]}
+            joButton:Set["backgroundBrush","{\"color\":\"${Data.Get[backgroundColor]~}\"}"]
+
+        if ${Data.Has[backgroundImage]}
+        {
+            ; sheet,name
+            joImage:SetReference["ISB2.ImageSheets.Get[\"${Data.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Data.Get[backgroundImage,name]~}\"]"]
+
+            if ${joImage.Reference(exists)}
+            {
+                variable jsonvalue joImageBrush
+                joImageBrush:SetValue["{}"]
+
+                if ${joImage.Has[filename]}
+                    joImageBrush:SetString[imageFile,"${joImage.Get[filename]~}"]
+                if ${joImage.Has[colorMask]}
+                    joImageBrush:SetString[color,"${joImage.Get[colorMask]~}"]
+                elseif ${joImage.Has[filename]}
+                    joImageBrush:SetString[color,"#ffffffff"]
+
+                if ${joImage.Has[colorKey]}
+                    joImageBrush:SetString[imageFileTransparencyKey,"${joImage.Get[colorKey]~}"]
+
+                echo "\ayimageBrush\ax ${joImage~} => ${joImageBrush~}"
+                joImagebox:SetByRef[imageBrush,joImageBrush]
+            }
+            else
+            {
+                ; image not found
+                echo "\arImageSheets.Get[\"${Data.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Data.Get[backgroundImage,name]~}\"]"
+                joImagebox:SetString[visibility,collapsed]    
+            }                        
+        }
+        else
+            joImagebox:SetString[visibility,collapsed]
+
+/*
+                    ,
+                    {
+                        "type":"textblock",
+                        "name":"clickbarButton.buttontext",
+                        "text":${Data.Get[text].AsJSON},
+                        "horizontalAlignment":"center",
+                        "verticalAlignment":"center",
+                    }
+/**/
+
+        joButton.Get[content,children]:AddByRef[joImagebox]
+        joButton.Get[content,children]:AddByRef[joTextblock]
+
+        echo "\ayfinal\ax ${joButton.AsJSON~}"
+        return joButton
     }
 
-    method GotMouseFocus()
-    {
-;        echo isb2_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
-    }
-
-    method LostMouseFocus()
-    {
-;        echo isb2_clickbar:LostMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
-    }
-
-    method GotMouseOver()
-    {
-        variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
-;        echo isb2_clickbar:GotMouseOver numButton=${numButton}
-
-        variable jsonvalueref joButton
-        joButton:SetReference["Data.Get[buttons,${numButton}]"]
-
-        if !${joButton.Reference(exists)}
-            return
-
-        ; get input mapping
-        if !${joButton.Has[mouseOver]}
-            return
-
-        ISB2:ExecuteInputMapping["joButton.Get[mouseOver]",1]
-    }
-
-    method LostMouseOver()
-    {
-        variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
-;        echo isb2_clickbar:LostMouseOver numButton=${numButton}
-
-        variable jsonvalueref joButton
-        joButton:SetReference["Data.Get[buttons,${numButton}]"]
-
-        if !${joButton.Reference(exists)}
-            return
-
-        ; get input mapping
-        if !${joButton.Has[mouseOver]}
-            return
-
-        ISB2:ExecuteInputMapping["joButton.Get[mouseOver]",0]
-    }
 
     member:bool ClickMatches(jsonvalueref joClick, jsonvalueref joMatch)
     {
@@ -617,36 +668,157 @@ objectdef isb2_clickbar
         return NULL
     }
 
-    method OnButtonPress(jsonvalueref joButton, jsonvalueref joData)
+    method OnButtonPress(jsonvalueref joData)
     {
-        echo onButtonPress ${joButton~} ${joData~}
+;        echo onButtonPress ${Data~} ${joData~}
         variable jsonvalueref joClick
-        joClick:SetReference["This.GetClick[\"joButton.Get[clicks]\",joData]"]
+        joClick:SetReference["This.GetClick[\"Data.Get[clicks]\",joData]"]
 
         if !${joClick.Reference(exists)}
             return
 
-        if !${joButton.Has[activeClicks]}
-            joButton:Set["activeClicks","[null,null,null,null,null]"]
-
-        joButton.Get[activeClicks]:Set[${joData.GetInteger[controlID]},"${joClick~}"]
+        ActiveClicks:Set[${joData.GetInteger[controlID]},"${joClick~}"]
 
         ISB2:ExecuteInputMapping["joClick.Get[inputMapping]",1]
     }
 
-    method OnButtonRelease(jsonvalueref joButton, jsonvalueref joData)
+    method OnButtonRelease(jsonvalueref joData)
     {
-        echo onButtonRelease ${joButton~} ${joData~}
+;        echo onButtonRelease ${Data~} ${joData~}
         variable uint mouseButton=${joData.GetInteger[controlID]}
         variable jsonvalueref joClick
-        joClick:SetReference["joButton.Get[activeClicks,${mouseButton}]"]
+        joClick:SetReference["ActiveClicks[${mouseButton}]"]
 
         if !${joClick.Reference.Type.Equal[object]}
             return
 
-        joButton.Get[activeClicks]:Set[${mouseButton},NULL]
+        ActiveClicks:Set[${mouseButton},NULL]
         ISB2:ExecuteInputMapping["joClick.Get[inputMapping]",0]
     }
+
+    
+    method GotMouseOver()
+    {
+        ; get input mapping
+        if !${Data.Has[mouseOver]}
+            return
+
+        ISB2:ExecuteInputMapping["Data.Get[mouseOver]",1]
+    }
+
+    method LostMouseOver()
+    {
+        ; get input mapping
+        if !${Data.Has[mouseOver]}
+            return
+
+        ISB2:ExecuteInputMapping["Data.Get[mouseOver]",0]
+    }
+
+    method OnLoad(weakref _element)
+    {
+        echo "isb2_clickbarButton:OnLoad ${_element.Reference(type)}"
+
+        Element:Set[${_element.ID}]
+    }
+}
+
+objectdef isb2_clickbar
+{
+    variable string Name
+    
+    variable jsonvalueref Data
+    variable lgui2elementref Window
+
+    variable index:isb2_clickbarButton Buttons
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]                            
+
+        Data:SetReference[jo]
+
+        if ${Data.Get[buttons].Used}
+        {
+            Data.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
+            Buttons:Resize[${Data.Get[buttons].Used}]
+            Data.Get[buttons]:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value]"]
+        }
+
+        if ${Data.GetBool[enable]}
+        {
+            This:CreateWindow
+        }
+    }
+
+    method Shutdown()
+    {
+        Window:Destroy
+    }
+
+    method Disable()
+    {
+        Window:Destroy
+    }
+
+    method Enable()
+    {
+        if ${Window.Reference(exists)}
+            return
+
+        This:CreateWindow
+    }
+
+    method Toggle()
+    {
+        if ${Window.Reference(exists)}
+            This:Disable
+        else
+            This:CreateWindow
+    }
+
+    method OnButtonLoaded()
+    {
+         variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
+        echo isb2_clickbar:OnButtonLoaded numButton=${numButton}
+
+        Buttons.Get[${numButton}]:OnLoad[Context.Source]
+    }
+
+    method GotMouseFocus()
+    {
+;        echo isb2_clickbar:GotMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+    }
+
+    method LostMouseFocus()
+    {
+;        echo isb2_clickbar:LostMouseFocus ${Context(type)} ${Context.Source} numButton=${Context.Source.Metadata.GetInteger[numButton]}
+    }
+
+    method GotMouseOver()
+    {
+        variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
+;        echo isb2_clickbar:GotMouseOver numButton=${numButton}
+
+        Buttons.Get[${numButton}]:GotMouseOver
+    }
+
+    method LostMouseOver()
+    {
+        variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
+;        echo isb2_clickbar:LostMouseOver numButton=${numButton}
+        Buttons.Get[${numButton}]:LostMouseOver
+    }
+
 
     method OnMouseButtonMove()
     {
@@ -654,16 +826,10 @@ objectdef isb2_clickbar
         variable bool pressed=${Context.Args.Get[position]}
         echo isb2_clickbar:OnMouseButtonMove numButton=${numButton} ${Context(type)} ${Context.Args} 
 
-        variable jsonvalueref joButton
-        joButton:SetReference["Data.Get[buttons,${numButton}]"]
-
-        if !${joButton.Reference(exists)}
-            return
-
         if ${pressed}
-            This:OnButtonPress[joButton,Context.Args]
+            Buttons.Get[${numButton}]:OnButtonPress[Context.Args]
         else
-            This:OnButtonRelease[joButton,Context.Args]
+            Buttons.Get[${numButton}]:OnButtonRelease[Context.Args]
     }
 
     member:uint GetButtonHeight()
@@ -687,112 +853,19 @@ objectdef isb2_clickbar
         ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
         ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
-        variable jsonvalue joButton
-        joButton:SetValue["$$>
+        variable int numButton
+        numButton:Set[${Context.Args.GetInteger[numButton]}]
+
+        variable jsonvalueref joButton
+        joButton:SetReference["Buttons.Get[${numButton}].GenerateView"]
+
+        if !${joButton.Reference(exists)}
         {
-            "jsonTemplate":"isb2.clickbarButton",
-            "width":${This.GetButtonHeight},
-            "height":${This.GetButtonWidth},
-            "_numButton":${Context.Args.Get[numButton]},
-            "tooltip":${Context.Args.Get[tooltip].AsJSON}
-            "content":{
-                "type":"panel",
-                "horizontalAlignment":"stretch",
-                "verticalAlignment":"stretch",
-                "children":[]
-            }
-        }
-        <$$"]
-
-        variable jsonvalue joImagebox        
-        variable jsonvalue joTextblock
-
-        variable jsonvalueref joImage
-
-        joImagebox:SetValue["$$>
-        {
-            "type":"imagebox",
-            "name":"clickbarButton.imagebox",
-            "horizontalAlignment":"center",
-            "verticalAlignment":"center",
-            "scaleToFit":true
-        }
-        <$$"]
-
-        joTextblock:SetValue["$$>
-        {
-            "type":"textblock",
-            "name":"clickbarButton.buttontext",
-            "horizontalAlignment":"center",
-            "verticalAlignment":"center",
-            "strata":0.6
-        }
-        <$$"]
-
-        if ${Context.Args.Has[text]}
-            joTextblock:SetString[text,"${Context.Args.Get[text]~}"]
-        else
-            joTextblock:SetString[visibility,collapsed]
-
-        if ${Context.Args.Has[font]}
-        {
-            joButton:Set[font,"${Context.Args.Get[font]~}"]
-            if ${joButton.Has[font,color]}
-                joButton:SetString[color,"${joButton.Get[font,color]~}"]
+            Context:SetError["Buttons.Get[${numButton}].GenerateView ??"]
+            return FALSE
         }
 
-        if ${Context.Args.Has[backgroundColor]}
-            joButton:Set["backgroundBrush","{\"color\":\"${Context.Args.Get[backgroundColor]~}\"}"]
-
-        if ${Context.Args.Has[backgroundImage]}
-        {
-            ; sheet,name
-            joImage:SetReference["ISB2.ImageSheets.Get[\"${Context.Args.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Context.Args.Get[backgroundImage,name]~}\"]"]
-
-            if ${joImage.Reference(exists)}
-            {
-                variable jsonvalue joImageBrush
-                joImageBrush:SetValue["{}"]
-
-                if ${joImage.Has[filename]}
-                    joImageBrush:SetString[imageFile,"${joImage.Get[filename]~}"]
-                if ${joImage.Has[colorMask]}
-                    joImageBrush:SetString[color,"${joImage.Get[colorMask]~}"]
-                elseif ${joImage.Has[filename]}
-                    joImageBrush:SetString[color,"#ffffffff"]
-
-                if ${joImage.Has[colorKey]}
-                    joImageBrush:SetString[imageFileTransparencyKey,"${joImage.Get[colorKey]~}"]
-
-                echo "\ayimageBrush\ax ${joImage~} => ${joImageBrush~}"
-                joImagebox:SetByRef[imageBrush,joImageBrush]
-            }
-            else
-            {
-                ; image not found
-                echo "\arImageSheets.Get[\"${Context.Args.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Context.Args.Get[backgroundImage,name]~}\"]"
-                joImagebox:SetString[visibility,collapsed]    
-            }                        
-        }
-        else
-            joImagebox:SetString[visibility,collapsed]
-
-/*
-                    ,
-                    {
-                        "type":"textblock",
-                        "name":"clickbarButton.buttontext",
-                        "text":${Context.Args.Get[text].AsJSON},
-                        "horizontalAlignment":"center",
-                        "verticalAlignment":"center",
-                    }
-/**/
-
-        joButton.Get[content,children]:AddByRef[joImagebox]
-        joButton.Get[content,children]:AddByRef[joTextblock]
-
-        echo "\ayfinal\ax ${joButton.AsJSON~}"
-        Context:SetView["${joButton.AsJSON~}"]
+        Context:SetView["${joButton~}"]
     }
 
     method CreateWindow()
@@ -820,23 +893,7 @@ objectdef isb2_clickbar
         LGUI2:PopSkin["ISBoxer 2"]
     }
 
-    method FromJSON(jsonvalueref jo)
-    {
-        if !${jo.Type.Equal[object]}
-            return
-
-        if ${jo.Has[name]}
-            Name:Set["${jo.Get[name]~}"]                            
-
-        Data:SetReference[jo]
-
-        Data.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
-
-        if ${Data.GetBool[enable]}
-        {
-            This:CreateWindow
-        }
-    }
+    
 
 }
 

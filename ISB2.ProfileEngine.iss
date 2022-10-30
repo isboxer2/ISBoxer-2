@@ -1378,16 +1378,33 @@ objectdef isb2_profileengine
     method Action_BroadcastState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\arAction_BroadcastState\ax[${activate}] ${joAction~}"
+        ISB2BroadcastMode:ApplyState[joAction]
+
     }
 
     method Action_BroadcastTarget(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAction_BroadcasTarget\ax[${activate}] ${joAction~}"
+        echo "\agAction_BroadcasTarget\ax[${activate}] ${joAction~}"
+        ISB2BroadcastMode:SetTarget["${joAction.Get[value]~}"]
     }
 
     method Action_BroadcastList(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\arAction_BroadcastList\ax[${activate}] ${joAction~}"
+        /*
+                  "listType":"WhiteList",
+                  "list":[
+                    {
+                      "Key":"1",
+                      "code":2
+                    },
+                    {
+                      "Key":"2",
+                      "code":3
+                    },
+        */
+
+
     }
 
     method Action_PopupText(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1763,7 +1780,7 @@ objectdef isb2_profileengine
         variable int fromStep
         variable int stepCounter
 
-        echo "\ayRotator_Advance\ax ${newState} ${joRotator~}"
+;        echo "\ayRotator_Advance\ax ${newState} ${joRotator~}"
 
         fromStep:Set[${numStep}]
 
@@ -1969,7 +1986,7 @@ objectdef isb2_profileengine
         variable int numStep = ${This.Rotator_GetCurrentStepNum[joRotator]}
         variable int timeNow=${Script.RunningTime}
 
-        echo "\ayRotator_PreExecute\ax ${newState} ${numStep} ${joRotator~}"
+;        echo "\ayRotator_PreExecute\ax ${newState} ${numStep} ${joRotator~}"
 
         if ${newState}
         {
@@ -2036,7 +2053,8 @@ objectdef isb2_profileengine
     ; for any Rotator object, perform post-execution mechanics, depending on press/release state
     method Rotator_PostExecute(jsonvalueref joRotator,bool newState, int executedStep)
     {
-        echo "\ayRotator_PostExecute\ax: ${newState} ${executedStep} ${joRotator~}"
+;        echo "\ayRotator_PostExecute\ax: ${newState} ${executedStep} ${joRotator~}"
+
 ; call advance if ALL of these conditions are met....
 ; 1. newState == FALSE
 ; 2. has not already advanced (current step == executed step)

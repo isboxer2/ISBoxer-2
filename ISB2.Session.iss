@@ -3,8 +3,6 @@
 #include "ISB2.ProfileEngine.iss"
 #include "ISB2.WindowLayoutEngine.iss"
 
-; run "ISBoxer 2/ISB2.Session"
-
 objectdef isb2session inherits isb2_profileengine
 {
     variable bool ValidSession
@@ -19,9 +17,9 @@ objectdef isb2session inherits isb2_profileengine
             return
         }
 
-        if ${InnerSpace.Build} < 7037
+        if ${InnerSpace.Build} < 7041
         {
-            echo "ISBoxer 2 inactive; Inner Space build 7037 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2 inactive; Inner Space build 7041 or later required (currently ${InnerSpace.Build})"
             return
         }
 
@@ -34,6 +32,7 @@ objectdef isb2session inherits isb2_profileengine
         
             This:StripInnerSpaceDefaults
             LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]
+            ISB2BroadcastMode:LateInitialize
             This:InstallDefaultActionTypes
 
             This:InstallFromSessionMetadata[ISSession.Metadata]

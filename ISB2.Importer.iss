@@ -887,28 +887,37 @@ objectdef isb2_importer
         if ${jo.Has[enable]}
             joNew:SetBool[enable,"${jo.GetBool[enable]}"]
 
-        if ${jo.Has[alpha]}
-            joNew:SetInteger[alpha,"${jo.GetInteger[alpha]}"]
+        variable jsonvalue joTemplate="{}"
+
         if ${jo.Has[x]}
             joNew:SetInteger[x,"${jo.GetInteger[x]}"]
         if ${jo.Has[y]}
             joNew:SetInteger[y,"${jo.GetInteger[y]}"]
+        if ${jo.Has[alpha]}
+            joTemplate:SetInteger[alpha,"${jo.GetInteger[alpha]}"]
         if ${jo.Has[rows]}
-            joNew:SetInteger[rows,"${jo.GetInteger[rows]}"]
+            joTemplate:SetInteger[rows,"${jo.GetInteger[rows]}"]
         if ${jo.Has[columns]}
-            joNew:SetInteger[columns,"${jo.GetInteger[columns]}"]
+            joTemplate:SetInteger[columns,"${jo.GetInteger[columns]}"]
         if ${jo.Has[rowHeight]}
-            joNew:SetInteger[rowHeight,"${jo.GetInteger[rowHeight]}"]
+            joTemplate:SetInteger[rowHeight,"${jo.GetInteger[rowHeight]}"]
         if ${jo.Has[columnWidth]}
-            joNew:SetInteger[columnWidth,"${jo.GetInteger[columnWidth]}"]
+            joTemplate:SetInteger[columnWidth,"${jo.GetInteger[columnWidth]}"]
 
+        if ${joTemplate.Used}
+            joNew:SetByRef[template,joTemplate]
+
+        variable jsonvalue joButtonLayout="{}"
         variable jsonvalue ja="[]"
         if ${jo.Has[Buttons]}
         {
             jo.Get[Buttons]:ForEach["ja:AddByRef[\"This.ConvertClickBarButton[ForEach.Value]\"]"]            
 
             if ${ja.Used}
-                joNew:SetByRef[buttons,ja]    
+            {                
+                joButtonLayout:SetByRef[buttons,ja]    
+                joNew:SetByRef[buttonLayout,joButtonLayout]
+            }
         }        
 
         return joNew

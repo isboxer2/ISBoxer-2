@@ -232,7 +232,7 @@
                     "orientation":"horizontal"
                 },
                 "itemsBinding":{
-                    "pullFormat":"${This.Context.Data.Get[buttons]}"
+                    "pullFormat":"${This.Context.ButtonLayout.Get[buttons]}"
                 },
                 "itemViewGenerators": {
                     "default":{

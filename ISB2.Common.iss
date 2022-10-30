@@ -728,6 +728,9 @@ objectdef isb2_clickbar
     variable string Name
     
     variable jsonvalueref Data
+    variable jsonvalueref Template
+    variable jsonvalueref ButtonLayout
+
     variable lgui2elementref Window
 
     variable index:isb2_clickbarButton Buttons
@@ -747,11 +750,14 @@ objectdef isb2_clickbar
 
         Data:SetReference[jo]
 
-        if ${Data.Get[buttons].Used}
+        Template:SetReference["Data.Get[template]"]
+        ButtonLayout:SetReference["Data.Get[buttonLayout]"]
+
+        if ${ButtonLayout.Get[buttons].Used}
         {
-            Data.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
-            Buttons:Resize[${Data.Get[buttons].Used}]
-            Data.Get[buttons]:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value]"]
+            ButtonLayout.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
+            Buttons:Resize[${ButtonLayout.Get[buttons].Used}]
+            ButtonLayout.Get[buttons]:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value]"]
         }
 
         if ${Data.GetBool[enable]}
@@ -834,12 +840,12 @@ objectdef isb2_clickbar
 
     member:uint GetButtonHeight()
     {
-        return ${Data.GetInteger[-default,32,rowHeight]}
+        return ${Template.GetInteger[-default,32,rowHeight]}
     }
 
     member:uint GetButtonWidth()
     {
-        return ${Data.GetInteger[-default,32,columnWidth]}
+        return ${Template.GetInteger[-default,32,columnWidth]}
     }
 
     method GenerateButtonView()
@@ -878,8 +884,8 @@ objectdef isb2_clickbar
             "jsonTemplate":"isb2.clickbar",
             "name":${useName.AsJSON~},
             "title":${Name.AsJSON~},
-            "x":${Data.GetInteger[x]},
-            "y":${Data.GetInteger[y]},
+            "x":${Data.GetInteger[-default,0,x]},
+            "y":${Data.GetInteger[-default,0,y]},
         }
         <$$"]
 

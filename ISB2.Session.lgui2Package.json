@@ -169,7 +169,7 @@
                 },
                 {
                     "name":"broadcast state",
-                    "handler":"Action_BroadcastTarget",
+                    "handler":"Action_BroadcastState",
                     "variableProperties":["value"],
                     "activationState":true,
                     "retarget":true

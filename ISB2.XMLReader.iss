@@ -1017,7 +1017,7 @@ objectdef isb2_isb1transformer
 ;        echo "AutoTransform_MenuButtonSet_Buttons ${joTransform~}"
         This:TransformSingleToArray[joTransform,Actions]
 
-        This:TransformInteger[joTransform,Alpha,alpha,-1]
+        This:TransformNumber[joTransform,Alpha,alpha,-1]
         This:TransformInteger[joTransform,Border,border,-1]
         This:TransformInteger[joTransform,FontBold,fontBold,-1]
         This:TransformInteger[joTransform,FontSize,fontSize,-1]

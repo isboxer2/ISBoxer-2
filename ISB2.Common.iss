@@ -24,6 +24,8 @@ objectdef isb2_profile
     variable jsonvalueref GameKeyBindings=[]
     variable jsonvalueref GameMacroSheets=[]
     variable jsonvalueref ClickBars=[]
+    variable jsonvalueref ClickBarTemplates=[]
+    variable jsonvalueref ClickBarButtonLayouts=[]
     variable jsonvalueref ImageSheets=[]
     variable jsonvalueref VFXSheets=[]
 
@@ -77,6 +79,10 @@ objectdef isb2_profile
             ImageSheets:SetReference["jo.Get[imageSheets]"]
         if ${jo.Has[clickBars]}
             ClickBars:SetReference["jo.Get[clickBars]"]
+        if ${jo.Has[clickBarTemplates]}
+            ClickBarTemplates:SetReference["jo.Get[clickBarTemplates]"]
+        if ${jo.Has[clickBarButtonLayouts]}
+            ClickBarButtonLayouts:SetReference["jo.Get[clickBarButtonLayouts]"]
         if ${jo.Has[gameMacroSheets]}
             GameMacroSheets:SetReference["jo.Get[gameMacroSheets]"]
     }
@@ -126,6 +132,10 @@ objectdef isb2_profile
             jo:SetByRef["imageSheets",ImageSheets]
         if ${ClickBars.Used}
             jo:SetByRef["clickBars",ClickBars]
+        if ${ClickBarTemplates.Used}
+            jo:SetByRef["clickBarTemplates",ClickBarTemplates]
+        if ${ClickBarButtonLayouts.Used}
+            jo:SetByRef["clickBarButtonLayouts",ClickBarButtonLayouts]
         if ${GameMacroSheets.Used}
             jo:SetByRef["gameMacroSheets","GameMacroSheets"]
         return jo
@@ -550,10 +560,10 @@ objectdef isb2_clickbarButton
         if ${Data.Has[backgroundColor]}
             joButton:Set["backgroundBrush","{\"color\":\"${Data.Get[backgroundColor]~}\"}"]
 
-        if ${Data.Has[backgroundImage]}
+        if ${Data.Has[image]}
         {
             ; sheet,name
-            joImage:SetReference["ISB2.ImageSheets.Get[\"${Data.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Data.Get[backgroundImage,name]~}\"]"]
+            joImage:SetReference["ISB2.ImageSheets.Get[\"${Data.Get[image,sheet]~}\"].Images.Get[\"${Data.Get[image,name]~}\"]"]
 
             if ${joImage.Reference(exists)}
             {
@@ -576,7 +586,7 @@ objectdef isb2_clickbarButton
             else
             {
                 ; image not found
-                echo "\arImageSheets.Get[\"${Data.Get[backgroundImage,sheet]~}\"].Images.Get[\"${Data.Get[backgroundImage,name]~}\"]"
+                echo "\arImageSheets.Get[\"${Data.Get[image,sheet]~}\"].Images.Get[\"${Data.Get[image,name]~}\"]"
                 joImagebox:SetString[visibility,collapsed]    
             }                        
         }
@@ -750,8 +760,23 @@ objectdef isb2_clickbar
 
         Data:SetReference[jo]
 
-        Template:SetReference["Data.Get[template]"]
-        ButtonLayout:SetReference["Data.Get[buttonLayout]"]
+        if ${Data.GetType[template].Equal[string]}
+        {
+            ; get click bar template from profile
+            Template:SetReference["ISB2.ClickBarTemplates.Get[\"${Data.Get[template]~}\"]"]
+            echo "\auisb2_clickbar.Template\ax ${Template~}"
+        }
+        else
+            Template:SetReference["Data.Get[template]"]
+
+        if ${Data.GetType[buttonLayout].Equal[string]}
+        {
+            ; get click bar button layout from profile
+            ButtonLayout:SetReference["ISB2.ClickBarButtonLayouts.Get[\"${Data.Get[buttonLayout]~}\"]"]
+            echo "\auisb2_clickbar.ButtonLayout\ax ${ButtonLayout~}"
+        }
+        else
+            ButtonLayout:SetReference["Data.Get[buttonLayout]"]
 
         if ${ButtonLayout.Get[buttons].Used}
         {
@@ -840,12 +865,12 @@ objectdef isb2_clickbar
 
     member:uint GetButtonHeight()
     {
-        return ${Template.GetInteger[-default,32,rowHeight]}
+        return ${Template.GetInteger[-default,32,buttonHeight]}
     }
 
     member:uint GetButtonWidth()
     {
-        return ${Template.GetInteger[-default,32,columnWidth]}
+        return ${Template.GetInteger[-default,32,buttonWidth]}
     }
 
     method GenerateButtonView()

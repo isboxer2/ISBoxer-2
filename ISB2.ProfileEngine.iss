@@ -28,6 +28,8 @@ objectdef isb2_profileengine
     variable jsonvalue ActionTypes="{}"
 
     variable jsonvalue Characters="{}"
+    variable jsonvalue ClickBarTemplates="{}"
+    variable jsonvalue ClickBarButtonLayouts="{}"
     variable jsonvalue Teams="{}"
     variable jsonvalue WindowLayouts="{}"
     variable jsonvalue BroadcastProfiles="{}"
@@ -554,6 +556,12 @@ objectdef isb2_profileengine
             ja:ForEach["This:UninstallVirtualFile[ForEach.Value]"]
     }
 
+    method UninstallVirtualFile(string name)
+    {
+        VirtualFiles:Erase["${name~}"]
+    }
+
+
     method InstallBroadcastProfile(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -573,6 +581,64 @@ objectdef isb2_profileengine
     {
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:UninstallBroadcastProfile[ForEach.Value]"]
+    }
+
+    method UninstallBroadcastProfile(string name)
+    {
+        BroadcastProfiles:Erase["${name~}"]
+    }
+
+    
+    method InstallClickBarTemplate(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+;        echo InstallClickBarTemplate: ClickBarTemplates:SetByRef["${jo.Get[name]~}",jo] 
+        ClickBarTemplates:SetByRef["${jo.Get[name]~}",jo]
+    }
+
+    method InstallClickBarTemplates(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallClickBarTemplate[ForEach.Value]"]
+    }
+
+    method UninstallClickBarTemplates(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallClickBarTemplate[ForEach.Value]"]
+    }
+
+    method UninstallClickBarTemplate(string name)
+    {
+        ClickBarTemplates:Erase["${name~}"]
+    }
+
+     method InstallClickBarButtonLayout(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+;        echo InstallClickBarButtonLayout: ClickBarButtonLayouts:SetByRef["${jo.Get[name]~}",jo] 
+        ClickBarButtonLayouts:SetByRef["${jo.Get[name]~}",jo]
+    }
+
+    method InstallClickBarButtonLayouts(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallClickBarButtonLayout[ForEach.Value]"]
+    }
+
+    method UninstallClickBarButtonLayouts(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallClickBarButtonLayout[ForEach.Value]"]
+    }
+
+    method UninstallClickBarButtonLayout(string name)
+    {
+        ClickBarButtonLayouts:Erase["${name~}"]
     }
 
     method InstallWindowLayout(jsonvalueref jo)
@@ -1038,6 +1104,8 @@ objectdef isb2_profileengine
         This:InstallHotkeySheets[_profile.HotkeySheets]
         This:InstallGameKeyBindings[_profile.GameKeyBindings]
         This:InstallMappableSheets[_profile.MappableSheets]
+        This:InstallClickBarTemplates[_profile.ClickBarTemplates]
+        This:InstallClickBarButtonLayouts[_profile.ClickBarButtonLayouts]
         This:InstallClickBars[_profile.ClickBars]
         This:InstallVFXSheets[_profile.VFXSheets]
 
@@ -1069,6 +1137,8 @@ objectdef isb2_profileengine
         This:UninstallGameKeyBindings[_profile.GameKeyBindings]
         This:UninstallMappableSheets[_profile.MappableSheets]
         This:UninstallClickBars[_profile.ClickBars]
+        This:UninstallClickBarTemplates[_profile.ClickBarTemplates]
+        This:UninstallClickBarButtonLayouts[_profile.ClickBarButtonLayouts]
         This:UninstallVFXSheets[_profile.VFXSheets]
 
         This:UninstallCharacters[_profile.Characters]

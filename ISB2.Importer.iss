@@ -73,17 +73,17 @@ objectdef isb2_importer
         jRef:SetReference[This.ConvertMenus]        
         if ${jRef.Used}
         {
-            jo:SetByRef[menus,jRef]
+            jRef:ForEach["jo.Get[clickBars]:AddByRef[ForEach.Value]"]
         }
         jRef:SetReference[This.ConvertMenuTemplates]        
         if ${jRef.Used}
         {
-            jo:SetByRef[menuTemplates,jRef]
+            jo:SetByRef[clickBarTemplates,jRef]
         }        
         jRef:SetReference[This.ConvertMenuButtonSets]        
         if ${jRef.Used}
         {
-            jo:SetByRef[menuButtonLayouts,jRef]
+            jo:SetByRef[clickBarButtonLayouts,jRef]
         }        
         
         jRef:SetReference[This.ConvertRepeaterProfiles]        
@@ -387,10 +387,13 @@ objectdef isb2_importer
 
         if ${jo.Has[MenuInstances]}
         {
-            ja:SetValue["[]"]
+            if ${joNew.Has[clickBars]}
+                ja:SetValue["${joNew.Get[clickBars]~}"]
+            else
+                ja:SetValue["[]"]
             jo.Get[MenuInstances]:ForEach["ja:AddString[\"\${ForEach.Value.Get[MenuString]}\"]"]
 
-            joNew:SetByRef[menus,ja]
+            joNew:SetByRef[clickBars,ja]
         }
 
         variable jsonvalue joGLI="{}"
@@ -479,11 +482,14 @@ objectdef isb2_importer
 
         if ${jo.Has[MenuInstances]}
         {
-            ja:SetValue["[]"]
+            if ${joNew.Has[clickBars]}
+                ja:SetValue["${joNew.Get[clickBars]~}"]
+            else
+                ja:SetValue["[]"]
             jo.Get[MenuInstances]:ForEach["ja:AddString[\"\${ForEach.Value.Get[MenuString]}\"]"]
 
-            joNew:SetByRef[menus,ja]
-        }      
+            joNew:SetByRef[clickBars,ja]
+        }
 
         if ${jo.Has[guiToggleCombo,Combo]}
             joNew:SetString[guiToggleCombo,"${jo.Get[guiToggleCombo,Combo]~}"]
@@ -837,7 +843,7 @@ objectdef isb2_importer
         {
             joRef:SetReference["This.GetImageReference[\"${jo.Get[backgroundImage]~}\"]"]
             if ${joRef.Reference(exists)}
-                joNew:SetByRef[backgroundImage,joRef]             
+                joNew:SetByRef[image,joRef]             
         }
 
         if ${jo.Has[clickThrough]}
@@ -900,9 +906,9 @@ objectdef isb2_importer
         if ${jo.Has[columns]}
             joTemplate:SetInteger[columns,"${jo.GetInteger[columns]}"]
         if ${jo.Has[rowHeight]}
-            joTemplate:SetInteger[rowHeight,"${jo.GetInteger[rowHeight]}"]
+            joTemplate:SetInteger[buttonHeight,"${jo.GetInteger[rowHeight]}"]
         if ${jo.Has[columnWidth]}
-            joTemplate:SetInteger[columnWidth,"${jo.GetInteger[columnWidth]}"]
+            joTemplate:SetInteger[buttonWidth,"${jo.GetInteger[columnWidth]}"]
 
         if ${joTemplate.Used}
             joNew:SetByRef[template,joTemplate]
@@ -1348,21 +1354,196 @@ objectdef isb2_importer
     {
         echo "\arConvertMenuHotkeySet\ax ${jo~}"
 
+        ; building a mappable sheet
+
         return NULL
     }
 
     member:jsonvalueref ConvertMenuTemplate(jsonvalueref jo)
     {
-        echo "\arConvertMenuTemplate\ax ${jo~}"
+        echo "\ayConvertMenuTemplate\ax ${jo~}"
 
-        return NULL
+        ; mostly implemented
+
+        ; building a click bar template
+        variable jsonvalue joNew="{}"
+
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+
+        if ${jo.Has[Description]}
+            joNew:SetString[description,"${jo.Get[Description]~}"]
+
+        variable jsonvalue joFont="{}"
+
+        if ${jo.Has[buttonFontName]}
+            joFont:SetString[face,"${jo.Get[buttonFontName]~}"]
+
+        if ${jo.Has[buttonFontBold]}
+            joFont:SetBool[bold,"${jo.GetInteger[buttonFontBold]}"]
+
+        if ${jo.Has[buttonFontSize]}
+            joFont:SetInteger[height,"${jo.GetInteger[buttonFontSize]}"]
+
+        if ${jo.Has[buttonFontColor]}
+            joFont:SetString[color,"${jo.Get[buttonFontColor]~}"]
+
+        if ${joFont.Used}
+            joNew:SetByRef[buttonFont,joFont]
+
+        if ${jo.Has[buttonSize,Width]}
+            joNew:SetInteger[buttonWidth,"${jo.GetInteger[buttonSize,Width]}"]
+        if ${jo.Has[buttonSize,Height]}
+            joNew:SetInteger[buttonHeight,"${jo.GetInteger[buttonSize,Height]}"]
+
+        if ${jo.Has[frameSize]}
+            joNew:Set[frameSize,"[${jo.GetInteger[frameSize,Width]},${jo.GetInteger[frameSize,Height]}]"]
+
+        if ${jo.Has[Grid_Size]}
+        {
+            joNew:Set[columns,"${jo.GetInteger[Grid_Size,Width]}"]
+            joNew:Set[rows,"${jo.GetInteger[Grid_Size,Height]}"]
+        }
+
+        if ${jo.Has[Grid_buttonMargin]}
+        {
+            joNew:Set[buttonMargin,"[${jo.Get[Grid_buttonMargin,Width]},${jo.Get[Grid_buttonMargin,Height]}]"]
+        }
+
+        if ${jo.Has[backgroundColor]}
+            joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]   
+
+        if ${jo.Has[borderColor]}
+            joNew:SetString[borderColor,"${jo.Get[borderColor]~}"]   
+
+        if ${jo.Has[numButtons]}
+            joNew:SetInteger[numButtons,"${jo.GetInteger[numButtons]}"]
+
+;        joNew:SetByRef[original,jo]
+        return joNew
     }
 
     member:jsonvalueref ConvertMenuButtonSet(jsonvalueref jo)
     {
-        echo "\arConvertMenuButtonSet\ax ${jo~}"
+        echo "\agConvertMenuButtonSet\ax ${jo~}"
 
-        return NULL
+        ; building a click bar button layout
+        variable jsonvalue joNew="{}"
+        joNew:SetString[name,"${jo.Get[Name]~}"]
+
+        if ${jo.Has[Description]}
+            joNew:SetString[description,"${jo.Get[Description]~}"]
+
+        variable jsonvalue ja="[]"
+
+        if ${jo.Has[Buttons]}
+        {
+            jo.Get[Buttons]:ForEach["This:ConvertMenuButtonInto[ja,ForEach.Value]"]
+            joNew:SetByRef[buttons,ja]
+        }
+
+        return joNew
+    }
+
+    method ConvertMenuButtonInto(jsonvalueref ja,jsonvalueref jo)
+    {
+        variable jsonvalueref joNew="This.ConvertMenuButton[jo]"
+        if !${joNew.Reference(exists)}
+            return
+
+        ja:AddByRef[joNew]
+    }
+
+    member:jsonvalueref ConvertMenuButton(jsonvalueref jo)
+    {
+        echo "\agConvertMenuButton\ax ${jo~}"
+
+        variable jsonvalue joNew="{}"
+        variable jsonvalueref joRef
+
+        if ${jo.Has[DisplayText]}
+            joNew:SetString[displayText,"${jo.Get[DisplayText]~}"]
+
+        if ${jo.GetBool[useImages]}
+        {
+            joNew:SetBool[useImages,1]
+
+            if ${jo.Has[Image,ImageString]}
+            {
+                joRef:SetReference["This.GetImageReference[\"${jo.Get[Image,ImageString]~}\"]"]
+                if ${joRef.Reference(exists)}
+                    joNew:SetByRef[image,joRef]             
+            }
+
+            if ${jo.Has[ImagePressed,ImageString]}
+            {
+                joRef:SetReference["This.GetImageReference[\"${jo.Get[ImagePressed,ImageString]~}\"]"]
+                if ${joRef.Reference(exists)}
+                    joNew:SetByRef[imagePressed,joRef]             
+            }
+
+            if ${jo.Has[ImageHover,ImageString]}
+            {
+                joRef:SetReference["This.GetImageReference[\"${jo.Get[ImageHover,ImageString]~}\"]"]
+                if ${joRef.Reference(exists)}
+                    joNew:SetByRef[imageHover,joRef]             
+            }
+        }
+
+        variable jsonvalue joFont="{}"
+
+        if ${jo.Has[FontName]}
+            joFont:SetString[face,"${jo.Get[FontName]~}"]
+
+        if ${jo.Has[fontBold]}
+            joFont:SetBool[bold,"${jo.GetInteger[fontBold]}"]
+
+        if ${jo.Has[fontSize]}
+            joFont:SetInteger[height,"${jo.GetInteger[fontSize]}"]
+
+        if ${jo.Has[fontColor]}
+            joFont:SetString[color,"${jo.Get[fontColor]~}"]
+
+        if ${joFont.Used}
+            joNew:SetByRef[font,joFont]
+
+
+        if ${jo.Has[backgroundColor]}
+            joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
+        
+        if ${jo.Has[borderColor]}
+            joNew:SetString[borderColor,"${jo.Get[borderColor]~}"]
+
+        if ${jo.Has[alpha]}
+            joNew:SetNumber[alpha,"${jo.GetNumber[alpha]}"]
+
+        if ${jo.Has[border]}
+            joNew:SetInteger[border,"${jo.GetInteger[border]}"]
+
+        variable jsonvalue jaClicks
+        variable jsonvalueref jaActions
+        
+        if ${jo.Has[Actions]}
+        {
+            jaActions:SetReference["jo.Get[Actions]"]
+
+            jaClicks:SetValue["$$>
+                [
+                    {
+                        "button":1,
+                        "inputMapping":{
+                            "type":"actions"
+                        }
+                    }
+                ]            
+            <$$"]
+
+            jaClicks.Get[1,inputMapping]:SetByRef[actions,jaActions]
+
+            joNew:SetByRef[clicks,jaClicks]
+        }
+
+;        joNew:SetByRef[original,jo]
+        return joNew
     }
 #endregion
 
@@ -1700,7 +1881,7 @@ objectdef isb2_importer
 
         joNew:SetString[type,click bar state]
         if ${jo.Get[Menu,MenuString]~.NotNULLOrEmpty}
-            joNew:SetString[name,"menu_${jo.Get[Menu,MenuString]~}"]
+            joNew:SetString[name,"${jo.Get[Menu,MenuString]~}"]
 ;        joNew:SetString[value,"${jo.Get[Value]~}"]
         joNew:SetString[action,"${jo.Get[ActionType]~}"]
 

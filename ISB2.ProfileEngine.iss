@@ -243,6 +243,11 @@ objectdef isb2_profileengine
 
         ; echo InstallActionType: ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo] 
         ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo]
+
+        if !${This(type).Method["${jo.Get[handler]~}"]}
+        {
+            echo "\arAction Type Missing Handler:\ax ${jo.Get[handler]~}"
+        }
     }
 
     method InstallVirtualFile(jsonvalueref jo)
@@ -769,7 +774,7 @@ objectdef isb2_profileengine
         name:Set["${This.ProcessVariables["${name~}"]~}"]
         sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
 
-        echo "\agInstallHotkey\ax[${sheet~},${name~}] ${joHotkey~}"
+;        echo "\agInstallHotkey\ax[${sheet~},${name~}] ${joHotkey~}"
         variable jsonvalue joBinding
         ; initialize a LGUI2 input binding object with JSON
         variable string fullName="isb2.hks.${sheet~}.${name~}"
@@ -847,7 +852,7 @@ objectdef isb2_profileengine
 
     method UninstallHotkeyEx(string name)
     {
-        echo "\agUninstallHotkeyEx\ax[${name~}]"
+;        echo "\agUninstallHotkeyEx\ax[${name~}]"
         LGUI2:RemoveBinding["${name~}"]
         Hotkeys:Remove["${name~}"]
     }
@@ -1651,7 +1656,73 @@ objectdef isb2_profileengine
         joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
 
         joMappable:SetBool["${joAction.GetBool[value]}"]
+    }    
+
+    
+    method Action_GameMacro(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_GameMacro\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
     }
+
+    method Action_KeyString(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_KeyString\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_TargetGroup(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_TargetGroup\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_SyncCursor(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_SyncCursor\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_MappableStepState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAAction_MappableStepState\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_SetClickBarButton(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_SetClickBarButton\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_AddTrigger(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_AddTrigger\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_RemoveTrigger(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_RemoveTrigger\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
 #endregion
 
 #region Rotator Implementation
@@ -2449,7 +2520,7 @@ objectdef isb2_profileengine
         if !${joMappable.Type.Equal[object]}
             return
 
-        echo "\agExecuteMappable\ax[${newState}] ${joMappable~}"
+;        echo "\agExecuteMappable\ax[${newState}] ${joMappable~}"
 
         ; make sure it's not disabled. to be disabled requires "enable":false
         if ${joMappable.GetBool[enable].Equal[FALSE]}
@@ -2494,7 +2565,7 @@ objectdef isb2_profileengine
         if !${joStep.Type.Equal[object]}
             return
 
-        echo "\agExecuteRotatorStep\ax[${newState}] ${joStep~}"
+;        echo "\agExecuteRotatorStep\ax[${newState}] ${joStep~}"
 
         ; if the step is disabled, don't execute it.
         if ${joStep.GetBool[enable].Equal[FALSE]}
@@ -2536,7 +2607,7 @@ objectdef isb2_profileengine
         if !${jaList.Type.Equal[array]}
             return
 
-        echo "\agExecuteActionList\ax[${newState}] ${jaList~}"
+;        echo "\agExecuteActionList\ax[${newState}] ${jaList~}"
         jaList:ForEach["This:ExecuteAction[joState,ForEach.Value,${newState}]"]
     }
 

@@ -497,9 +497,50 @@ objectdef isb2_clickbarButton
         Element:Destroy
     }
 
+    member:jsonvalueref GetImageBrush(jsonvalueref joImage)
+    {
+        if !${joImage.Type.Equal[object]}
+            return NULL
+
+        variable jsonvalue joImageBrush="{}"
+
+        if ${joImage.Has[filename]}
+            joImageBrush:SetString[imageFile,"${joImage.Get[filename]~}"]
+        if ${joImage.Has[colorMask]}
+            joImageBrush:SetString[color,"${joImage.Get[colorMask]~}"]
+        elseif ${joImage.Has[filename]}
+            joImageBrush:SetString[color,"#ffffffff"]
+
+        if ${joImage.Has[colorKey]}
+            joImageBrush:SetString[imageFileTransparencyKey,"${joImage.Get[colorKey]~}"]
+
+        return joImageBrush
+    }
+
+    member:jsonvalueref GetBackgroundBrush(string backgroundColor, string useImage, string useImageOverride, string colorMask="#ffffffff")
+    {
+;        echo "\ayGetBackgroundBrush\ax ${backgroundColor~} ${useImage~} ${useImageOverride~}"
+        variable jsonvalue joBrush="{}"
+
+        if ${useImageOverride.NotNULLOrEmpty}
+        {
+            joBrush:SetString[color,"#${LGUI2.Skin[ISBoxer 2].Brush["${useImageOverride~}"].Color.Hex}"]
+            joBrush:SetString[imageBrush,"${useImageOverride~}"]
+        }
+        elseif ${useImage.NotNULLOrEmpty}
+        {
+            joBrush:SetString[color,"#${LGUI2.Skin[ISBoxer 2].Brush["${useImage~}"].Color.Hex}"]
+            joBrush:SetString[imageBrush,"${useImage~}"]
+        }
+        elseif ${backgroundColor.NotNULLOrEmpty}
+            joBrush:SetString[color,"${backgroundColor~}"]
+
+        return joBrush
+    }
+
     member:jsonvalueref GenerateView()
     {
-        echo "isb2_clickbarButton:GenerateView ${Data~}"
+;        echo "isb2_clickbarButton:GenerateView ${Data~}"
         ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
         ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
@@ -516,15 +557,25 @@ objectdef isb2_clickbarButton
                 "horizontalAlignment":"stretch",
                 "verticalAlignment":"stretch",
                 "children":[]
+            },
+            "styles":{
+                "onVisualPress": {
+                },
+                "onVisualRelease": {
+                },
+                "gotMouseOver": {
+                },
+                "lostMouseOver": {
+                }
             }
         }
         <$$"]
 
-        variable jsonvalue joImagebox        
+;        variable jsonvalue joImagebox        
         variable jsonvalue joTextblock
 
         variable jsonvalueref joImage
-
+/*
         joImagebox:SetValue["$$>
         {
             "type":"imagebox",
@@ -534,6 +585,7 @@ objectdef isb2_clickbarButton
             "scaleToFit":true
         }
         <$$"]
+/**/
 
         joTextblock:SetValue["$$>
         {
@@ -560,54 +612,73 @@ objectdef isb2_clickbarButton
         if ${Data.Has[backgroundColor]}
             joButton:Set["backgroundBrush","{\"color\":\"${Data.Get[backgroundColor]~}\"}"]
 
+        variable string backgroundColor
+        variable string useImage
+        variable string useImageHover
+        variable string useImagePressed
+
+        if ${Data.Has[backgroundColor]}
+            backgroundColor:Set["${Data.Get[backgroundColor]~}"]
+
         if ${Data.Has[image]}
-        {
-            ; sheet,name
-            joImage:SetReference["ISB2.ImageSheets.Get[\"${Data.Get[image,sheet]~}\"].Images.Get[\"${Data.Get[image,name]~}\"]"]
+            useImage:Set["${Data.Get[image,sheet]~}.${Data.Get[image,name]~}"]
+        if ${Data.Has[imageHover]}
+            useImageHover:Set["${Data.Get[imageHover,sheet]~}.${Data.Get[imageHover,name]~}"]
+        if ${Data.Has[imagePressed]}
+            useImagePressed:Set["${Data.Get[imagePressed,sheet]~}.${Data.Get[imagePressed,name]~}"]
 
-            if ${joImage.Reference(exists)}
-            {
-                variable jsonvalue joImageBrush
-                joImageBrush:SetValue["{}"]
 
-                if ${joImage.Has[filename]}
-                    joImageBrush:SetString[imageFile,"${joImage.Get[filename]~}"]
-                if ${joImage.Has[colorMask]}
-                    joImageBrush:SetString[color,"${joImage.Get[colorMask]~}"]
-                elseif ${joImage.Has[filename]}
-                    joImageBrush:SetString[color,"#ffffffff"]
-
-                if ${joImage.Has[colorKey]}
-                    joImageBrush:SetString[imageFileTransparencyKey,"${joImage.Get[colorKey]~}"]
-
-                echo "\ayimageBrush\ax ${joImage~} => ${joImageBrush~}"
-                joImagebox:SetByRef[imageBrush,joImageBrush]
-            }
-            else
-            {
-                ; image not found
-                echo "\arImageSheets.Get[\"${Data.Get[image,sheet]~}\"].Images.Get[\"${Data.Get[image,name]~}\"]"
-                joImagebox:SetString[visibility,collapsed]    
-            }                        
+        variable jsonvalueref joRef
+        joRef:SetReference["This.GetBackgroundBrush[\"${backgroundColor~}\",\"${useImage~}\"]"]
+        if ${joRef.Reference(exists)}
+        {            
+            joButton.Get[styles,lostMouseOver]:SetByRef[backgroundBrush,joRef]
+            joButton.Get[styles,onVisualRelease]:SetByRef[backgroundBrush,joRef]
+            joButton:SetByRef[backgroundBrush,joRef]
         }
-        else
-            joImagebox:SetString[visibility,collapsed]
+
+        joRef:SetReference["This.GetBackgroundBrush[\"${backgroundColor~}\",\"${useImage~}\",\"${useImageHover~}\"]"]
+        if ${joRef.Reference(exists)}
+            joButton.Get[styles,gotMouseOver]:SetByRef[backgroundBrush,joRef]
+
+        joRef:SetReference["This.GetBackgroundBrush[\"${backgroundColor~}\",\"${useImage~}\",\"${useImagePressed~}\"]"]
+        if ${joRef.Reference(exists)}
+            joButton.Get[styles,onVisualPress]:SetByRef[backgroundBrush,joRef]
 
 /*
-                    ,
-                    {
-                        "type":"textblock",
-                        "name":"clickbarButton.buttontext",
-                        "text":${Data.Get[text].AsJSON},
-                        "horizontalAlignment":"center",
-                        "verticalAlignment":"center",
-                    }
-/**/
+      "styles": {
+        "onVisualPress": {
+          "backgroundBrush": {
+            "imageBrush":"ImagePressed",
+            "color":"#ffffffff"
+          }          
+        },
+        "onVisualRelease": {
+          "backgroundBrush": {
+            "imageBrush":"Image",
+            "color":"#ffffffff"
+          }          
+        },
+        "gotMouseOver": {
+          "backgroundBrush": {
+            "imageBrush":"ImageHover",
+            "color":"#ffffffff"
+          }          
+        },
+        "lostMouseOver": {
+          "backgroundBrush": {
+            "imageBrush":"Image",
+            "color":"#ffffffff"
+          }          
+        }
+      }
+*/
 
-        joButton.Get[content,children]:AddByRef[joImagebox]
+
+;        joButton.Get[content,children]:AddByRef[joImagebox]
         joButton.Get[content,children]:AddByRef[joTextblock]
 
-        echo "\ayfinal\ax ${joButton.AsJSON~}"
+;        echo "\ayfinal\ax ${joButton.AsJSON~}"
         return joButton
     }
 
@@ -727,7 +798,7 @@ objectdef isb2_clickbarButton
 
     method OnLoad(weakref _element)
     {
-        echo "isb2_clickbarButton:OnLoad ${_element.Reference(type)}"
+;        echo "isb2_clickbarButton:OnLoad ${_element.Reference(type)}"
 
         Element:Set[${_element.ID}]
     }
@@ -764,7 +835,7 @@ objectdef isb2_clickbar
         {
             ; get click bar template from profile
             Template:SetReference["ISB2.ClickBarTemplates.Get[\"${Data.Get[template]~}\"]"]
-            echo "\auisb2_clickbar.Template\ax ${Template~}"
+;            echo "\auisb2_clickbar.Template\ax ${Template~}"
         }
         else
             Template:SetReference["Data.Get[template]"]
@@ -773,7 +844,7 @@ objectdef isb2_clickbar
         {
             ; get click bar button layout from profile
             ButtonLayout:SetReference["ISB2.ClickBarButtonLayouts.Get[\"${Data.Get[buttonLayout]~}\"]"]
-            echo "\auisb2_clickbar.ButtonLayout\ax ${ButtonLayout~}"
+;            echo "\auisb2_clickbar.ButtonLayout\ax ${ButtonLayout~}"
         }
         else
             ButtonLayout:SetReference["Data.Get[buttonLayout]"]
@@ -820,7 +891,7 @@ objectdef isb2_clickbar
     method OnButtonLoaded()
     {
          variable uint numButton=${Context.Source.Metadata.GetInteger[numButton]}
-        echo isb2_clickbar:OnButtonLoaded numButton=${numButton}
+;        echo isb2_clickbar:OnButtonLoaded numButton=${numButton}
 
         Buttons.Get[${numButton}]:OnLoad[Context.Source]
     }
@@ -875,7 +946,7 @@ objectdef isb2_clickbar
 
     method GenerateButtonView()
     {
-        echo isb2_clickbar:GenerateButtonView ${Context(type)} ${Context.Args}
+;        echo isb2_clickbar:GenerateButtonView ${Context(type)} ${Context.Args}
         ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
         ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
@@ -1209,6 +1280,20 @@ objectdef isb2_imagesheet
         if !${jo.Type.Equal[object]}
             return FALSE
         Images:SetByRef["${jo.Get[name]~}",jo]
+
+        variable jsonvalue joImageBrush="{}"
+
+        if ${jo.Has[filename]}
+            joImageBrush:SetString[imageFile,"${jo.Get[filename]~}"]
+        if ${jo.Has[colorMask]}
+            joImageBrush:SetString[color,"${jo.Get[colorMask]~}"]
+        elseif ${jo.Has[filename]}
+            joImageBrush:SetString[color,"#ffffffff"]
+
+        if ${jo.Has[colorKey]}
+            joImageBrush:SetString[imageFileTransparencyKey,"${jo.Get[colorKey]~}"]
+
+        LGUI2.Skin["ISBoxer 2"]:SetBrush["${Name~}.${jo.Get[name]~}",joImageBrush]
     }
 }
 

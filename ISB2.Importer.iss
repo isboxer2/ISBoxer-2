@@ -1520,11 +1520,14 @@ objectdef isb2_importer
             joNew:SetInteger[border,"${jo.GetInteger[border]}"]
 
         variable jsonvalue jaClicks
-        variable jsonvalueref jaActions
+        variable jsonvalueref jaActions="[]"
         
         if ${jo.Has[Actions]}
         {
-            jaActions:SetReference["jo.Get[Actions]"]
+            variable jsonvalue joState="{}"
+            joState:SetByRef[menuButton,jo]
+
+            jo.Get[Actions]:ForEach["jaActions:AddByRef[\"This.ConvertAction[joState,ForEach.Value]\"]"]
 
             jaClicks:SetValue["$$>
                 [

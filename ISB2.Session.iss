@@ -17,9 +17,15 @@ objectdef isb2session inherits isb2_profileengine
             return
         }
 
-        if ${InnerSpace.Build} < 7042
+        if !${agent.Get[ISBoxer 2](exists)}
         {
-            echo "ISBoxer 2 inactive; Inner Space build 7042 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2 inactive; Inner Space build 7038 or later required (currently ${InnerSpace.Build})"
+            return
+        }
+
+        if ${InnerSpace.Build} < ${agent.Get[ISBoxer 2].MinimumBuild}
+        {
+            echo "ISBoxer 2 inactive; Inner Space build ${agent.Get[ISBoxer 2].MinimumBuild} or later required (currently ${InnerSpace.Build})"
             return
         }
 

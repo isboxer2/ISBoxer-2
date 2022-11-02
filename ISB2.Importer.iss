@@ -30,6 +30,11 @@ objectdef isb2_importer
 
         This:ConvertImagesToImageSheets["ISBProfile.Get[globalSettings,Image]",jo]
 
+        jRef:SetReference[This.ConvertClickBars]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[clickBars,jRef]
+        }
         jRef:SetReference[This.ConvertCharacters]        
         if ${jRef.Used}
         {
@@ -64,11 +69,6 @@ objectdef isb2_importer
         if ${jRef.Used}
         {
             jo:SetByRef[computers,jRef]
-        }
-        jRef:SetReference[This.ConvertClickBars]        
-        if ${jRef.Used}
-        {
-            jo:SetByRef[clickBars,jRef]
         }
         jRef:SetReference[This.ConvertMenus]        
         if ${jRef.Used}
@@ -763,7 +763,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertClickAction(jsonvalueref jo)
     {
-        echo "\ayConvertClickAction\ax ${jo~}"
+;        echo "\agConvertClickAction\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
         if ${jo.Get[LeftRight]~.Equal[Right]}
@@ -800,7 +800,7 @@ objectdef isb2_importer
 
     member:jsonvalueref GetImageReference(string name)
     {
-        echo "\arGetImageReference\ax ${name~}"
+;        echo "\agGetImageReference\ax ${name~}"
         ; find image name and sheet name
         variable jsonvalueref joImage
         joImage:SetReference["This.FindInArray[\"ISBProfile.Get[globalSettings,Image]\",\"${name~}\"]"]
@@ -821,7 +821,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertClickBarButton(jsonvalueref jo)
     {
-        echo "\ayConvertClickBarButton\ax ${jo~}"
+;        echo "\agConvertClickBarButton\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
         variable jsonvalueref joRef
@@ -877,16 +877,12 @@ objectdef isb2_importer
             joNew:SetByRef[font,"jo.Get[TextStyle]"]
         }
 
-/*
-; TODO
-        This:AutoTransform[joTransform,TextStyle,ClickBarButton]
-*/
         return joNew
     }
 
     member:jsonvalueref ConvertClickBar(jsonvalueref jo)
     {
-        echo "\agConvertClickBar\ax ${jo~}"
+;        echo "\agConvertClickBar\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -951,7 +947,7 @@ objectdef isb2_importer
 
     method ConvertImage(jsonvalueref jo, jsonvalueref joInto)
     {
-        echo "\agConvertImage\ax ${jo~}"
+;        echo "\agConvertImage\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
 
@@ -1055,7 +1051,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertRepeaterProfile(jsonvalueref jo)
     {
-        echo "\agConvertRepeaterProfile\ax ${jo~}"
+;        echo "\agConvertRepeaterProfile\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -1331,7 +1327,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertMenu(jsonvalueref jo)
     {
-        echo "\agConvertMenu\ax ${jo~}"
+;        echo "\agConvertMenu\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
@@ -1424,7 +1420,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertMenuButtonSet(jsonvalueref jo)
     {
-        echo "\agConvertMenuButtonSet\ax ${jo~}"
+;        echo "\agConvertMenuButtonSet\ax ${jo~}"
 
         ; building a click bar button layout
         variable jsonvalue joNew="{}"
@@ -1455,7 +1451,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertMenuButton(jsonvalueref jo)
     {
-        echo "\agConvertMenuButton\ax ${jo~}"
+;        echo "\agConvertMenuButton\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
         variable jsonvalueref joRef
@@ -1917,16 +1913,29 @@ objectdef isb2_importer
 
         joNew:SetString[type,set click bar button]
 
+        if ${jo.Has[ClickBarButton,ClickBarString]}
+            joNew:SetString[clickBar,"${jo.Get[ClickBarButton,ClickBarString]~}"]
+        if ${jo.Has[ClickBarButton,ClickBarButtonString]}
+        {
+            ; we have the NAME of a button, and we WANT a button number.
+            joNew:SetInteger[numButton,"${This.GetClickBarButton["${jo.Get[ClickBarButton,ClickBarString]~}","${jo.Get[ClickBarButton,ClickBarButtonString]~}"]}"]
+        }
+
+        variable jsonvalue joChanges="{}"
+
         if ${jo.Has[Text]}
-            joNew:SetString[text,"${jo.Get[Text]~}"]
+            joChanges:SetString[text,"${jo.Get[Text]~}"]
 
         if ${jo.Has[backgroundColor]}
-            joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
+            joChanges:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
 
         if ${jo.Has[Image,ImageString]}
-            joNew:SetString[image,"${jo.Get[Image,ImageString]~}"]
+            joChanges:SetString[image,"${jo.Get[Image,ImageString]~}"]
 
-;        joNew:Set[originalAction,"${jo~}"]
+        if ${joChanges.Used}
+            joNew:SetByRef[changes,joChanges]
+
+        joNew:SetByRef[originalAction,jo]
         return joNew
     }
 
@@ -2162,13 +2171,32 @@ objectdef isb2_importer
     member:jsonvalueref ConvertAction_MenuButtonAction(jsonvalueref joState,jsonvalueref jo)
     {
         variable jsonvalue joNew="{}"
+;        variable jsonvalue joChanges="{}"
+
+        variable jsonvalueref joOriginalChanges="jo.Get[ButtonChanges]"
+        variable int numButton
 
         joNew:SetString[type,set click bar button]
 
-        
+         ; grab the menu button(s). it might be from a menu, or a button set
+        ; numButton less than 0 has special meaning
+        numButton:Set[${jo.GetInteger[MenuButton,NumButton]}]
+        if ${numButton} >= 0
+        {
+            numButton:Inc
+            joNew:SetInteger[numButton,${numButton}]
+        }
 
+        if ${jo.Has[MenuButton,MenuButtonSetString]}
+            joNew:SetString["buttonLayout","${jo.Get[MenuButton,MenuButtonSetString]~}"]
+        elseif ${jo.Has[MenuButton,MenuString]}
+            joNew:SetString["clickBar","${jo.Get[MenuButton,MenuString]~}"]        
+            
+        if ${joOriginalChanges.Type.Equal[object]}
+        {
+            joNew:SetByRef[changes,"This.ConvertMenuButton[joOriginalChanges]"]
+        }
 
-        joNew:Set[originalAction,"${jo~}"]
         return joNew
     }
 
@@ -2504,9 +2532,38 @@ objectdef isb2_importer
         return "ja.SelectValue[joQuery]"
     }
 
+    member:int FindKeyInArray(jsonvalueref ja, string name, string fieldName="Name")
+    {
+        if !${ja.Type.Equal[array]}
+            return NULL
+
+/*
+    {
+        "eval":"Select.Get[\"${fieldName~}\"]",
+        "op":"==",
+        "value":"${name~}"
+    }
+/**/
+
+        variable jsonvalue joQuery="{}"
+        joQuery:SetString[eval,"Select.Get[\"${fieldName~}\"]"]
+        joQuery:SetString[op,"=="]
+        joQuery:SetString[value,"${name~}"]
+
+;        echo "\arFindKeyInArray\ax ${joQuery~}"
+        return "${ja.SelectKey[joQuery]}"
+    }
+
     member:jsonvalueref GetWoWMacroSet(string name)
     {
         variable jsonvalueref ja="ISBProfile.Get[WoWMacroSet]"
+
+        return "This.FindInArray[ja,\"${name~}\"]"
+    }
+
+    member:jsonvalueref GetClickBar(string name)
+    {
+        variable jsonvalueref ja="ISBProfile.Get[ClickBar]"
 
         return "This.FindInArray[ja,\"${name~}\"]"
     }
@@ -2529,6 +2586,26 @@ objectdef isb2_importer
 
 ;        echo "GetWoWMacro checking for ${name~} in ${ja~}"
         return "This.FindInArray[ja,\"${name~}\",ColloquialName]"
+    }
+
+    member:int GetClickBarButton(string barName, string name)
+    {
+        variable jsonvalueref jo="This.GetClickBar[\"${barName~}\"]"
+        if !${jo.Type.Equal[object]}
+        {
+            echo "\arGetClickBarButton\ax: Click Bar ${barName~} not found ${jo~}"
+            return 0
+        }
+        variable jsonvalueref ja
+        ja:SetReference["jo.Get[Buttons]"]
+        if !${ja.Type.Equal[array]}
+        {
+            echo "\arGetClickBarButton\ax: Set ${setName~} missing Buttons"
+            return 0
+        }
+
+;        echo "\arGetClickBarButton\ax checking for ${name~} in ${ja~}"
+        return "${This.FindKeyInArray[ja,"${name~}",name]}"
     }
 
     member:jsonvalueref ConvertISKey(jsonvalueref jo)

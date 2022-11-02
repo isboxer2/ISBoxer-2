@@ -140,7 +140,7 @@ objectdef isb2_isb1transformer
 
     method TransformGlobalSettingsRoot(jsonvalueref joTransform)
     {
-        echo "\ayTransformGlobalSettingsRoot\ax ${joTransform~}"
+;        echo "\agTransformGlobalSettingsRoot\ax ${joTransform~}"
 
         This:TransformSingleToArray[joTransform,"Image"]
         This:TransformSingleToArray[joTransform,"Game"]
@@ -625,7 +625,7 @@ objectdef isb2_isb1transformer
 
     method AutoTransform_GlobalSettings_Image(jsonvalueref joTransform)
     {
-        echo "\ayAutoTransform_GlobalSettings_Image\ax ${joTransform~}"
+;        echo "\agAutoTransform_GlobalSettings_Image\ax ${joTransform~}"
         This:TransformColor[joTransform,ColorMask,colorMask,"#ffffff"]
         This:TransformColor[joTransform,ColorKey,colorKey]
         This:TransformRect[joTransform,Crop,crop]

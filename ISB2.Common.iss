@@ -544,6 +544,8 @@ objectdef isb2_clickbarButton
         ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
         ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
+        variable jsonvalueref Template="ClickBar.Template"
+
         variable jsonvalue joButton
         joButton:SetValue["$$>
         {
@@ -602,15 +604,26 @@ objectdef isb2_clickbarButton
         else
             joTextblock:SetString[visibility,collapsed]
 
+        variable jsonvalueref joFont
+        if ${Template.Has[font]}
+            joFont:SetReference["Template.Get[font]"]
+        else
+            joFont:SetReference["{}"]
+
         if ${Data.Has[font]}
         {
-            joButton:Set[font,"${Data.Get[font]~}"]
-            if ${joButton.Has[font,color]}
+            joFont:Merge["Data.Get[font]"]
+
+            if ${joFont.Has[font,color]}
                 joButton:SetString[color,"${joButton.Get[font,color]~}"]
+            
+            joButton:SetByRef[font,joFont]
         }
 
         if ${Data.Has[backgroundColor]}
             joButton:Set["backgroundBrush","{\"color\":\"${Data.Get[backgroundColor]~}\"}"]
+        elseif ${Template.Has[backgroundColor]}
+            joButton:Set["backgroundBrush","{\"color\":\"${Template.Get[backgroundColor]~}\"}"]
 
         variable string backgroundColor
         variable string useImage
@@ -619,13 +632,23 @@ objectdef isb2_clickbarButton
 
         if ${Data.Has[backgroundColor]}
             backgroundColor:Set["${Data.Get[backgroundColor]~}"]
+        elseif ${Template.Has[backgroundColor]}
+            backgroundColor:Set["${Template.Get[backgroundColor]~}"]
 
         if ${Data.Has[image]}
             useImage:Set["${Data.Get[image,sheet]~}.${Data.Get[image,name]~}"]
+        elseif ${Template.Has[image]}
+            useImage:Set["${Template.Get[image,sheet]~}.${Template.Get[image,name]~}"]
+
         if ${Data.Has[imageHover]}
             useImageHover:Set["${Data.Get[imageHover,sheet]~}.${Data.Get[imageHover,name]~}"]
+        elseif ${Template.Has[imageHover]}
+            useImageHover:Set["${Template.Get[imageHover,sheet]~}.${Template.Get[imageHover,name]~}"]
+
         if ${Data.Has[imagePressed]}
             useImagePressed:Set["${Data.Get[imagePressed,sheet]~}.${Data.Get[imagePressed,name]~}"]
+        elseif ${Template.Has[imagePressed]}
+            useImagePressed:Set["${Template.Get[imagePressed,sheet]~}.${Template.Get[imagePressed,name]~}"]
 
 
         variable jsonvalueref joRef
@@ -645,40 +668,16 @@ objectdef isb2_clickbarButton
         if ${joRef.Reference(exists)}
             joButton.Get[styles,onVisualPress]:SetByRef[backgroundBrush,joRef]
 
-/*
-      "styles": {
-        "onVisualPress": {
-          "backgroundBrush": {
-            "imageBrush":"ImagePressed",
-            "color":"#ffffffff"
-          }          
-        },
-        "onVisualRelease": {
-          "backgroundBrush": {
-            "imageBrush":"Image",
-            "color":"#ffffffff"
-          }          
-        },
-        "gotMouseOver": {
-          "backgroundBrush": {
-            "imageBrush":"ImageHover",
-            "color":"#ffffffff"
-          }          
-        },
-        "lostMouseOver": {
-          "backgroundBrush": {
-            "imageBrush":"Image",
-            "color":"#ffffffff"
-          }          
-        }
-      }
-*/
+        if ${Data.Has[buttonMargin]}
+            joButton:Set[margin,"[${Data.GetNumber[buttonMargin,1].Div[2]},${Data.GetNumber[buttonMargin,2].Div[2]}]"]
+        elseif ${Template.Has[buttonMargin]}
+            joButton:Set[margin,"[${Template.GetNumber[buttonMargin,1].Div[2]},${Data.GetNumber[buttonMargin,2].Div[2]}]"]
 
 
 ;        joButton.Get[content,children]:AddByRef[joImagebox]
         joButton.Get[content,children]:AddByRef[joTextblock]
 
-;        echo "\ayfinal\ax ${joButton.AsJSON~}"
+        echo "\ayfinal\ax ${joButton.AsJSON~}"
         return joButton
     }
 
@@ -981,9 +980,15 @@ objectdef isb2_clickbar
             "name":${useName.AsJSON~},
             "title":${Name.AsJSON~},
             "x":${Data.GetInteger[-default,0,x]},
-            "y":${Data.GetInteger[-default,0,y]},
+            "y":${Data.GetInteger[-default,0,y]}
         }
         <$$"]
+
+        if ${Template.Has[backgroundColor]}
+            joWindow:Set[backgroundBrush,"{\"color\":\"${Template.Get[backgroundColor]~}\"}"]
+
+        if ${Template.Has[borderColor]}
+            joWindow:Set[borderBrush,"{\"color\":\"${Template.Get[borderColor]~}\"}"]
 
         LGUI2:PushSkin["ISBoxer 2"]
         Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]

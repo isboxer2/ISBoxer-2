@@ -1215,15 +1215,15 @@ objectdef isb2_profileengine
     }
 
 
-    method RemoteAction(jsonvalue joActionState)
-    {
-        echo "\ayRemoteAction\ax[${joActionState~}]"
-        variable jsonvalueref joState="joActionState.Get[state]"
-        variable jsonvalueref joAction="joActionState.Get[action]"
+    method RemoteAction()
+    {        
+        echo "\ayRemoteAction\ax ${Context~}"
+        variable jsonvalueref joState="Context.Get[state]"
+        variable jsonvalueref joAction="Context.Get[action]"
 
         joAction:Erase[target]
 
-        This:ExecuteAction[joState,joAction,${joActionState.GetBool[activate]}]
+        This:ExecuteAction[joState,joAction,${Context.GetBool[activate]}]
     }
 
     method RetargetAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1244,7 +1244,11 @@ objectdef isb2_profileengine
         joActionState:SetByRef[state,joState]
         joActionState:SetBool[activate,${activate}]
 
-        relay "${useTarget~}" -noredirect "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
+        variable jsonvalue joRelay="{\"object\":\"ISB2\",\"method\":\"RemoteAction\"}"
+        joRelay:SetString[target,"${useTarget~}"]
+        joRelay:SetByRef[actionState,joActionState]
+        InnerSpace:Relay["${joRelay~}"]
+
 ;        echo relay "${useTarget~}" "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
         return TRUE
     }
@@ -2455,6 +2459,11 @@ objectdef isb2_profileengine
 
     method RemoveLastMappable(jsonvalueref joMappable)
     {
+        if !${joMappable.Type.Equal[object]}
+        {
+            echo "\arRemoveLastMappable\ax: joMappable.Type is not object: ${joMappable~}"
+            return FALSE
+        }
         variable int key
         variable jsonvalue joQuery
         joQuery:SetValue["$$>
@@ -2484,6 +2493,7 @@ objectdef isb2_profileengine
 
     method SetLastMappable(jsonvalueref joMappable,bool newState)
     {
+;        echo "\arSetLastMappable\ax ${joMappable~}"
         This:RemoveLastMappable[joMappable]
         LastMappables:InsertByRef[1,joMappable]
         LastMappables:Erase[11]

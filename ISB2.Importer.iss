@@ -1515,6 +1515,28 @@ objectdef isb2_importer
         if ${jo.Has[border]}
             joNew:SetInteger[border,"${jo.GetInteger[border]}"]
 
+        variable int numButton
+        if ${jo.Has[PullFrom,MenuString]}
+        {
+            joRef:SetReference["{}"]
+            joRef:SetString[clickBar,"${jo.Get[PullFrom,MenuString]~}"]
+
+            numButton:Set[${joRef.GetInteger[PullFrom,NumButton]}]
+            joRef:SetInteger[numButton,${numButton.Inc}]
+
+            joNew:SetByRef[pullFrom,joRef]
+        }
+        elseif ${jo.Has[PullFrom,MenuButtonSetString]}
+        {
+            joRef:SetReference["{}"]
+            joRef:SetString[buttonLayout,"${jo.Get[PullFrom,MenuButtonSetString]~}"]            
+
+            numButton:Set[${joRef.GetInteger[PullFrom,NumButton]}]
+            joRef:SetInteger[numButton,${numButton.Inc}]
+
+            joNew:SetByRef[pullFrom,joRef]
+        }
+
         variable jsonvalue jaClicks
         variable jsonvalueref jaActions="[]"
         
@@ -1935,7 +1957,7 @@ objectdef isb2_importer
         if ${joChanges.Used}
             joNew:SetByRef[changes,joChanges]
 
-        joNew:SetByRef[originalAction,jo]
+;        joNew:SetByRef[originalAction,jo]
         return joNew
     }
 

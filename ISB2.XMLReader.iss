@@ -1156,6 +1156,11 @@ objectdef isb2_isb1transformer
             This:AutoTransform_Color[joTransform,color,255,255,255]
         }
 
+        if ${joTransform.Has[ButtonChanges]}
+        {
+            This:AutoTransform_MenuButtonSet_Buttons["joTransform.Get[ButtonChanges]"]
+        }
+
         This:TransformString[joTransform,"_xsi:type","type"]
     }
 

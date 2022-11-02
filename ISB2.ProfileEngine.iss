@@ -21,7 +21,8 @@ objectdef isb2_profileengine
     variable collection:isb2_vfxsheet VFXSheets
     variable collection:isb2_triggerchain TriggerChains
     variable collection:isb2_clickbar ClickBars
-    variable collection:isb2_imagesheet ImageSheets="{}"
+    variable collection:isb2_clickbarButtonLayout ClickBarButtonLayouts
+    variable collection:isb2_imagesheet ImageSheets
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -29,7 +30,6 @@ objectdef isb2_profileengine
 
     variable jsonvalue Characters="{}"
     variable jsonvalue ClickBarTemplates="{}"
-    variable jsonvalue ClickBarButtonLayouts="{}"
     variable jsonvalue Teams="{}"
     variable jsonvalue WindowLayouts="{}"
     variable jsonvalue BroadcastProfiles="{}"
@@ -625,8 +625,10 @@ objectdef isb2_profileengine
         if !${jo.Type.Equal[object]}
             return FALSE
 
-;        echo InstallClickBarButtonLayout: ClickBarButtonLayouts:SetByRef["${jo.Get[name]~}",jo] 
-        ClickBarButtonLayouts:SetByRef["${jo.Get[name]~}",jo]
+        echo "\apInstallClickBarButtonLayout\ax ${jo~}"
+        ClickBarButtonLayouts:Erase["${jo.Get[name]~}"]
+
+        ClickBarButtonLayouts:Set["${jo.Get[name]~}",jo]
     }
 
     method InstallClickBarButtonLayouts(jsonvalueref ja)
@@ -1217,13 +1219,14 @@ objectdef isb2_profileengine
 
     method RemoteAction()
     {        
-        echo "\ayRemoteAction\ax ${Context~}"
-        variable jsonvalueref joState="Context.Get[state]"
-        variable jsonvalueref joAction="Context.Get[action]"
+        variable jsonvalueref joState="Context.Get[actionState,state]"
+        variable jsonvalueref joAction="Context.Get[actionState,action]"
+
+;        echo "\ayRemoteAction\ax \apstate\ax=${joState~} \apaction\ax=${joAction~}"
 
         joAction:Erase[target]
 
-        This:ExecuteAction[joState,joAction,${Context.GetBool[activate]}]
+        This:ExecuteAction[joState,joAction,${Context.GetBool[actionState,activate]}]
     }
 
     method RetargetAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1709,6 +1712,14 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        if ${joAction.Has[buttonLayout]}
+        {            
+            ClickBarButtonLayouts.Get["${joAction.Get[buttonLayout]~}"]:ApplyChanges[${joAction.Get[numButton]},"joAction.Get[changes]"]
+        }
+        elseif ${joAction.Has[clickBar]}
+        {
+            ClickBars.Get["${joAction.Get[clickBar]~}"]:ApplyChanges[${joAction.Get[numButton]},"joAction.Get[changes]"]
+        }
     }
 
     method Action_AddTrigger(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2433,13 +2444,13 @@ objectdef isb2_profileengine
 
         if ${newState}
         {
-            echo press -hold "${keystroke}"
-            press -hold "${keystroke}"
+            echo "\aupress -hold \"${keystroke~}\"\ax"
+            press -hold "${keystroke~}"
         }
         else
         {
-            echo press -release "${keystroke}"
-            press -release "${keystroke}"
+            echo "\aupress -release \"${keystroke~}\"\ax"
+            press -release "${keystroke~}"
         }
     }
 
@@ -2484,10 +2495,10 @@ objectdef isb2_profileengine
         }
         <$$"]
         key:Set[${LastMappables.SelectKey[joQuery]}]
-        if !${key}
-        {
-            echo "\arRemoveLastMappable\ax query failed ${joQuery~}"
-        }
+;        if !${key}
+;        {
+;            echo "\arRemoveLastMappable\ax query failed ${joQuery~}"
+;        }
         LastMappables:Erase[${key}]
     }
 
@@ -2713,7 +2724,7 @@ objectdef isb2_profileengine
 
     method ExecuteInputMapping(jsonvalueref joMapping, bool newState)
     {
-        echo "ExecuteInputMapping[${newState}] ${joMapping~}"
+        echo "\ayExecuteInputMapping\ax[${newState}] ${joMapping~}"
 
         variable string targetName
 

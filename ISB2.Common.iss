@@ -538,9 +538,18 @@ objectdef isb2_clickbarButton
         return joBrush
     }
 
+    method ApplyChanges(jsonvalueref jo)
+    {
+        echo "\ayisb2_clickbarButton:ApplyChanges\ax ${jo~}"
+
+        Data:Merge[jo]
+
+        Element:ApplyStyleJSON[This.GenerateView]
+    }
+
     member:jsonvalueref GenerateView()
     {
-;        echo "isb2_clickbarButton:GenerateView ${Data~}"
+        echo "\ayisb2_clickbarButton:GenerateView\ax ${Data~}"
         ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
         ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
@@ -671,13 +680,13 @@ objectdef isb2_clickbarButton
         if ${Data.Has[buttonMargin]}
             joButton:Set[margin,"[${Data.GetNumber[buttonMargin,1].Div[2]},${Data.GetNumber[buttonMargin,2].Div[2]}]"]
         elseif ${Template.Has[buttonMargin]}
-            joButton:Set[margin,"[${Template.GetNumber[buttonMargin,1].Div[2]},${Data.GetNumber[buttonMargin,2].Div[2]}]"]
+            joButton:Set[margin,"[${Template.GetNumber[buttonMargin,1].Div[2]},${Template.GetNumber[buttonMargin,2].Div[2]}]"]
 
 
 ;        joButton.Get[content,children]:AddByRef[joImagebox]
         joButton.Get[content,children]:AddByRef[joTextblock]
 
-        echo "\ayfinal\ax ${joButton.AsJSON~}"
+;        echo "\ayfinal\ax ${joButton.AsJSON~}"
         return joButton
     }
 
@@ -803,13 +812,50 @@ objectdef isb2_clickbarButton
     }
 }
 
+objectdef isb2_clickbarButtonLayout
+{
+    variable string Name
+
+;    variable jsonvalueref Data
+    variable index:isb2_clickbarButton Buttons
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        echo "\apisb2_clickbarButtonLayout\ax:FromJSON ${jo~}"
+        if !${jo.Type.Equal[object]}
+            return
+
+        Data:SetReference[jo]
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        if ${jo.Get[buttons].Used}
+        {
+            jo.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
+            Buttons:Resize[${jo.Get[buttons].Used}]
+            jo.Get[buttons]:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value]"]
+        }            
+    }
+
+    method ApplyChanges(int numButton, jsonvalueref joChanges)
+    {
+        echo "\apisb2_clickbarButtonLayout\ax:ApplyChanges[${numButton}] ${joChanges~}"
+    }
+}
+
 objectdef isb2_clickbar
 {
     variable string Name
     
-    variable jsonvalueref Data
+;    variable jsonvalueref Data
     variable jsonvalueref Template
-    variable jsonvalueref ButtonLayout
+;    variable jsonvalueref ButtonLayout
 
     variable lgui2elementref Window
 
@@ -828,34 +874,52 @@ objectdef isb2_clickbar
         if ${jo.Has[name]}
             Name:Set["${jo.Get[name]~}"]                            
 
-        Data:SetReference[jo]
+;        Data:SetReference[jo]
 
-        if ${Data.GetType[template].Equal[string]}
+        if ${jo.Has[template]}
         {
-            ; get click bar template from profile
-            Template:SetReference["ISB2.ClickBarTemplates.Get[\"${Data.Get[template]~}\"]"]
-;            echo "\auisb2_clickbar.Template\ax ${Template~}"
+            if ${jo.GetType[template].Equal[string]}
+            {
+                ; get click bar template from profile
+                Template:SetReference["ISB2.ClickBarTemplates.Get[\"${jo.Get[template]~}\"]"]
+    ;            echo "\auisb2_clickbar.Template\ax ${Template~}"
+            }
+            else
+                Template:SetReference["jo.Get[template]"]
         }
-        else
-            Template:SetReference["Data.Get[template]"]
+        variable weakref ButtonLayout
+        variable jsonvalueref joButtonLayout
 
-        if ${Data.GetType[buttonLayout].Equal[string]}
+        if ${jo.GetType[buttonLayout].Equal[string]}
         {
+            ;echo "\apUsing Named Button Layout\ax"
             ; get click bar button layout from profile
-            ButtonLayout:SetReference["ISB2.ClickBarButtonLayouts.Get[\"${Data.Get[buttonLayout]~}\"]"]
-;            echo "\auisb2_clickbar.ButtonLayout\ax ${ButtonLayout~}"
+            ButtonLayout:SetReference["ISB2.ClickBarButtonLayouts.Get[\"${jo.Get[buttonLayout]~}\"]"]
+            if !${ButtonLayout.Reference(exists)}
+            {
+                echo "\arButtonLayout not found\ax ${jo.Get[buttonLayout]~}"
+            }
+            if ${ButtonLayout.Buttons.Used}
+            {
+;                joButtonLayout.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
+                Buttons:Resize[${ButtonLayout.Buttons.Used}]
+                
+                ButtonLayout.Buttons:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value.Data]"]
+            }            
         }
         else
-            ButtonLayout:SetReference["Data.Get[buttonLayout]"]
-
-        if ${ButtonLayout.Get[buttons].Used}
         {
-            ButtonLayout.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
-            Buttons:Resize[${ButtonLayout.Get[buttons].Used}]
-            ButtonLayout.Get[buttons]:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value]"]
+            ;echo "\apUsing Nested Button Layout\ax"
+            joButtonLayout:SetReference["jo.Get[buttonLayout]"]
+            if ${joButtonLayout.Get[buttons].Used}
+            {
+                joButtonLayout.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
+                Buttons:Resize[${joButtonLayout.Get[buttons].Used}]
+                joButtonLayout.Get[buttons]:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value]"]
+            }
         }
 
-        if ${Data.GetBool[enable]}
+        if ${jo.GetBool[enable]}
         {
             This:CreateWindow
         }
@@ -941,6 +1005,25 @@ objectdef isb2_clickbar
     member:uint GetButtonWidth()
     {
         return ${Template.GetInteger[-default,32,buttonWidth]}
+    }
+
+    member:jsonvalueref GetButtons()
+    {
+        variable jsonvalue ja="[]"
+
+        Buttons:ForEach["ja:Add[{\"numButton\":\${ForEach.Key}}]"]
+
+        return ja
+    }
+
+    method ApplyChanges(int numButton, jsonvalueref joChanges)
+    {
+        echo "\apisb2_clickbar\ax:ApplyChanges[${numButton}] ${joChanges~}"
+
+        if ${numButton}
+        {
+            Buttons.Get[${numButton}]:ApplyChanges[joChanges]
+        }
     }
 
     method GenerateButtonView()

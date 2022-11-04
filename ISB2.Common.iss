@@ -485,16 +485,54 @@ objectdef isb2_clickbarButton
     variable lgui2elementref Element
     variable jsonvalue ActiveClicks="[null,null,null,null,null]"
 
+    ; propagation
+    variable weakref Source
+    variable anonevent OnPropagate
+
     method Initialize(weakref _clickBar, int _numButton, jsonvalueref jo)
     {
         ClickBar:SetReference[_clickBar]
         NumButton:Set[${_numButton}]
         Data:SetReference[jo]
+        if !${Data.Reference(exists)}
+            Data:SetReference["{}"]
     }
 
     method Shutdown()
     {
         Element:Destroy
+    }
+
+    method Push()
+    {
+        OnPropagate:Execute
+    }
+
+    method Pull()
+    {
+        if !${Source.Reference(exists)}
+            return
+        
+        This:ApplyChanges[Source.Data]
+    }
+
+    method PullFrom(weakref newSource)
+    {
+;        echo "\ayPullFrom\ax ${newSource.Data~}"
+        if ${Source.Reference(exists)}
+            Source.OnPropagate:DetachAtom[This:OnSourcePush]
+
+        Source:SetReference[newSource]
+        if ${Source.Reference(exists)}
+        {
+            This:ApplyChanges[Source.Data]
+            Source.OnPropagate:AttachAtom[This:OnSourcePush]
+        }
+    }
+
+    method OnSourcePush()
+    {
+        This:ApplyChanges[Source.Data]
     }
 
     member:jsonvalueref GetImageBrush(jsonvalueref joImage)
@@ -538,18 +576,25 @@ objectdef isb2_clickbarButton
         return joBrush
     }
 
-    method ApplyChanges(jsonvalueref jo)
+    method ApplyChanges(jsonvalueref jo, bool shouldPush=1)
     {
-        echo "\ayisb2_clickbarButton:ApplyChanges\ax ${jo~}"
-
+;        echo "\ayisb2_clickbarButton:ApplyChanges\ax ${jo~}"
+        jo:SetReference[jo.Duplicate]
+        jo:Erase[numButton]
+        jo:Erase[pullFrom]
         Data:Merge[jo]
 
+ ;       echo "\arApplyChanges\ax post-merge: ${Data~}"
+
         Element:ApplyStyleJSON[This.GenerateView]
+
+        if ${shouldPush}
+            This:Push
     }
 
     member:jsonvalueref GenerateView()
     {
-        echo "\ayisb2_clickbarButton:GenerateView\ax ${Data~}"
+;        echo "\ayisb2_clickbarButton:GenerateView\ax ${Data~}"
         ;isb2_clickbar:GenerateButtonView lgui2itemviewgeneratorargs 
         ; {"name":"Button 2","clicks":[{"button":1,"inputMapping":{"type":"action","action":{"type":"keystroke","keyCombo":"2"}}}]}
 
@@ -843,9 +888,26 @@ objectdef isb2_clickbarButtonLayout
         }            
     }
 
+    method AddButtonToClickBar(weakref clickBar, uint numButton, weakref _Button)
+    {
+;       echo "\ayAddButtonToClickBar\ax ${numButton} ${_Button.Data~}"
+        clickBar.Buttons:Set[${numButton},clickBar,${numButton}]
+        clickBar.Buttons.Get[${numButton}]:PullFrom[_Button]
+    }
+
+    method AddButtonsToClickBar(weakref clickBar)
+    {
+        Buttons:ForEach["This:AddButtonToClickBar[clickBar,\${ForEach.Key},ForEach.Value]"]
+    }
+
     method ApplyChanges(int numButton, jsonvalueref joChanges)
     {
-        echo "\apisb2_clickbarButtonLayout\ax:ApplyChanges[${numButton}] ${joChanges~}"
+;        echo "\apisb2_clickbarButtonLayout\ax:ApplyChanges[${numButton}] ${joChanges~}"
+
+        if ${numButton}
+        {
+            Buttons.Get[${numButton}]:ApplyChanges[joChanges]
+        }        
     }
 }
 
@@ -904,7 +966,7 @@ objectdef isb2_clickbar
 ;                joButtonLayout.Get[buttons]:ForEach["ForEach.Value:SetInteger[numButton,\${ForEach.Key}]"]
                 Buttons:Resize[${ButtonLayout.Buttons.Used}]
                 
-                ButtonLayout.Buttons:ForEach["Buttons:Set[\${ForEach.Key},This,\${ForEach.Key},ForEach.Value.Data]"]
+               ButtonLayout:AddButtonsToClickBar[This]
             }            
         }
         else
@@ -1018,7 +1080,7 @@ objectdef isb2_clickbar
 
     method ApplyChanges(int numButton, jsonvalueref joChanges)
     {
-        echo "\apisb2_clickbar\ax:ApplyChanges[${numButton}] ${joChanges~}"
+;        echo "\apisb2_clickbar\ax:ApplyChanges[${numButton}] ${joChanges~}"
 
         if ${numButton}
         {

@@ -73,6 +73,8 @@ objectdef isb2_importer
         jRef:SetReference[This.ConvertMenus]        
         if ${jRef.Used}
         {
+            if !${jo.Has[clickBars]}
+                jo:Set[clickBars,"[]"]
             jRef:ForEach["jo.Get[clickBars]:AddByRef[ForEach.Value]"]
         }
         jRef:SetReference[This.ConvertMenuTemplates]        

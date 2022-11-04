@@ -266,6 +266,9 @@ objectdef isb2_managedSlot
 
     method OnSessionAdded()
     {
+        if ${State}==5
+            return FALSE
+            
         State:Set[4]
         echo "isb2_managedSlot[${NumSlot}]:OnSessionAdded"
     }

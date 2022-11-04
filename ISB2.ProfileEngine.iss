@@ -929,7 +929,7 @@ objectdef isb2_profileengine
     method InstallSlotActivateHotkey(uint numSlot, jsonvalueref joSlot)
     {
         if ${joSlot.Has[switchToCombo]}
-            bind is${numSlot}_key "${joSlot.Get[switchToCombo]~}" "focus is${numSlot};relay is${numSlot} -noredirect ISB2ProfileEngine:OnSwitchTo"
+            bind is${numSlot}_key "${joSlot.Get[switchToCombo]~}" "uplink focus is${numSlot};relay is${numSlot} -noredirect ISB2ProfileEngine:OnSwitchTo"
     }
 
     method InstallSlotActivateHotkeys()

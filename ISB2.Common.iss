@@ -999,7 +999,7 @@ objectdef isb2_clickbar
 
     method Enable()
     {
-        if ${Window.Reference(exists)}
+        if ${Window.Element(exists)}
             return
 
         This:CreateWindow
@@ -1007,7 +1007,7 @@ objectdef isb2_clickbar
 
     method Toggle()
     {
-        if ${Window.Reference(exists)}
+        if ${Window.Element(exists)}
             This:Disable
         else
             This:CreateWindow
@@ -1112,7 +1112,7 @@ objectdef isb2_clickbar
     method CreateWindow()
     {
         echo isb2_clickbar:CreateWindow
-        if ${Window.Reference(exists)}
+        if ${Window.Element(exists)}
             return
 
         variable string useName="isb2.cb.${Name~}"        

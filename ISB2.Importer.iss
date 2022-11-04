@@ -1951,8 +1951,13 @@ objectdef isb2_importer
         if ${jo.Has[backgroundColor]}
             joChanges:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
 
+        variable jsonvalueref joRef
         if ${jo.Has[Image,ImageString]}
-            joChanges:SetString[image,"${jo.Get[Image,ImageString]~}"]
+        {
+            joRef:SetReference["This.GetImageReference[\"${jo.Get[Image,ImageString]~}\"]"]
+            if ${joRef.Reference(exists)}
+                joNew:SetByRef[image,joRef]             
+        }
 
         if ${joChanges.Used}
             joNew:SetByRef[changes,joChanges]

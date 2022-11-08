@@ -7,7 +7,7 @@
                 "jsonTemplate": "isb2.headerBackground"
             },
             "window.backgroundBrush":{
-                "jsonTemplate":"isb2.background1"
+                "color": [ 0.75, 0.05, 0.1, 0.05 ]
             },
             "window.borderBrush":{
                 "jsonTemplate":"isb2.background1border"
@@ -23,10 +23,30 @@
             "isb2.background1border": {
                 "color": [ 0.1, 0.2, 0.1 ]
             },
+            "window.adjustments":{
+                "x":-3,
+                "y":-3,
+                "width":6,
+                "height":25
+            },
             "window": {
                 "jsonTemplate":"default:window",
                 "borderBrush": "window.borderBrush",
-                "backgroundBrush": "window.backgroundBrush"
+                "backgroundBrush": "window.backgroundBrush",
+                "styles": {
+                    "onHideTitleBar": {
+                      "borderBrush": {
+                        "color": [ 0.0, 0.0, 0.0, 0.0 ]
+                      },
+                      "backgroundBrush": {
+                        "color": [ 0.0, 0.0, 0.0, 0.0 ]
+                      }
+                    },
+                    "onShowTitleBar": {
+                        "borderBrush": "window.borderBrush",
+                        "backgroundBrush": "window.backgroundBrush"
+                      }
+                  }          
             }
         }
     }

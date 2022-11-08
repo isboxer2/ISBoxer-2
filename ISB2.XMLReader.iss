@@ -361,8 +361,16 @@ objectdef isb2_isb1transformer
         }
 
         variable jsonvalue ja="[]"
-        if ${joEntry.Used} == 1        
-            joEntry:ForEach["ja:AddByRef[ForEach.Value]"]
+
+        variable jsonvalueref joSubValue
+        if ${joEntry.Used} == 1
+        {
+            joSubValue:SetReference["joEntry.SelectValue[{}]"]
+            if ${joSubValue.Reference.Type.Equal[object]}
+                ja:AddByRef[joSubValue]
+            else
+                ja:AddByRef[joEntry]
+        }
         else
             ja:AddByRef[joEntry]
 ;        echo Transformed ${property~}
@@ -568,6 +576,20 @@ objectdef isb2_isb1transformer
             return
 
         This:AutoTransform_EventAction[jo]
+
+        if ${jo.Used}
+            joTransform:SetByRef["${newProperty~}",jo]
+        joTransform:Erase["${oldProperty~}"]
+    }
+
+    method TransformActionTimer(jsonvalueref joTransform, string oldProperty, string newProperty)
+    {
+        variable jsonvalueref jo
+        jo:SetReference["joTransform.Get[\"${oldProperty~}\"]"]
+        if !${jo.Type.Equal[object]}
+            return
+
+        This:AutoTransform_ActionTimer[jo]
 
         if ${jo.Used}
             joTransform:SetByRef["${newProperty~}",jo]
@@ -1151,6 +1173,8 @@ objectdef isb2_isb1transformer
         This:TransformSize[joTransform,VideoOutputSize,videoOutputSize]
         This:TransformColor[joTransform,VideoOutputBorder,videoOutputBorder]
 
+        This:TransformActionTimer[joTransform,"ActionTimer",timer]
+
         if ${joTransform.Has[Red]} || ${joTransform.Has[Green]} || ${joTransform.Has[Blue]}
         {
             This:AutoTransform_Color[joTransform,color,255,255,255]
@@ -1162,6 +1186,22 @@ objectdef isb2_isb1transformer
         }
 
         This:TransformString[joTransform,"_xsi:type","type"]
+    }
+
+    method AutoTransform_ActionTimer(jsonvalueref joTransform)
+    {
+        This:TransformString[joTransform,PoolName,name]
+        This:TransformNumber[joTransform,Seconds,time]
+        This:TransformBool[joTransform,AutoRecurring,recur]
+        This:TransformBool[joTransform,Enabled,enabled]
+    }
+
+    method AutoTransform_ActionTimerPool(jsonvalueref joTransform)
+    {
+        This:TransformString[joTransform,Name,name]
+        This:TransformString[joTransform,Descrpition,description]
+        This:TransformInteger[joTransform,MaxTimers,maxTimers]
+        This:TransformBool[joTransform,BackEndRemoval,backEndRemoval]
     }
 
     method AutoTransform_Action_UseCustomModifiers(jsonvalueref joTransform)

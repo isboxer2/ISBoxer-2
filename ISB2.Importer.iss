@@ -98,6 +98,11 @@ objectdef isb2_importer
         {
             jo:SetByRef[windowLayouts,jRef]
         }
+        jRef:SetReference[This.ConvertActionTimerPools]        
+        if ${jRef.Used}
+        {
+            jo:SetByRef[timerPools,jRef]
+        }
 
         jo:SetByRef[vfxSheets,"ISBProfile.Get[vfxSheets]"]
 
@@ -760,7 +765,7 @@ objectdef isb2_importer
     {
         echo "\arConvertActionTimerPool\ax ${jo~}"
 
-        return NULL
+        return jo
     }
 
     member:jsonvalueref ConvertClickAction(jsonvalueref jo)
@@ -1716,9 +1721,11 @@ objectdef isb2_importer
             if ${jo.Has[RoundRobin]}
                 joNew:SetBool[roundRobin,"${jo.GetBool[RoundRobin]}"]
 
-            if ${jo.Has[ActionTimer]}
-                joNew:SetByRef[actionTimer,"This.ConvertActionTimer[\"jo.Get[ActionTimer]\"]"]
-
+            if ${jo.GetBool[timer,enabled]}
+            {
+                jo.Get[timer]:Erase[enabled]
+                joNew:SetByRef[timer,"jo.Get[timer]"]
+            }
             return joNew
         }
 
@@ -1726,23 +1733,6 @@ objectdef isb2_importer
         jo:SetString[originalActionType,"${jo.Get[type]~}"]
         jo:Erase[type]
         return jo
-    }
-
-    member:jsonvalueref ConvertActionTimer(jsonvalueref jo)
-    {
-        variable jsonvalue joNew="{}"
-
-        joNew:SetString[pool,"${jo.Get[PoolName]~}"]
-
-        joNew:SetBool[enabled,${jo.GetBool[Enabled]}]
-
-        if ${jo.GetBool[AutoRecurring]}
-            jo:SetBool[autoRecurring,1]
-        
-        joNew:SetNumber[seconds,"${jo.GetNumber[Seconds]~}"]      
-
-;        joNew:Set[originalAction,"${jo~}"]
-        return joNew        
     }
 
     member:jsonvalueref ConvertAction_MappedKeyExecuteAction(jsonvalueref joState,jsonvalueref jo)

@@ -39,6 +39,8 @@ objectdef isb2_profileengine
     variable jsonvalueref SlotRef
     variable uint Slot
 
+    variable bool GUIMode=1
+
     ; reference to the last hotkey used
     variable jsonvalueref LastHotkey
     ; reference to the last mappable executed
@@ -712,64 +714,6 @@ objectdef isb2_profileengine
         InputMappings:Erase["${name~}"]
     }
     
-    method InstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agInstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
-
-        variable jsonvalue joView
-        joView:SetValue["$$>
-        {
-            "name":"isb2.vfx.${sheet~}.${name~}",
-            "type":"videofeed",
-            "x":${joVFX.GetInteger[x]},
-            "y":${joVFX.GetInteger[y]},
-            "width":${joVFX.GetInteger[width]},
-            "height":${joVFX.GetInteger[height]},
-            "feedName":${joVFX.Get[feedName]~.AsJSON~},
-            "sendMouse":${joVFX.GetBool[sendMouse]},
-            "sendKeyboard":${joVFX.GetBool[sendKeyboard]},
-            "useLocalBindings":true
-        }
-        <$$"]
-
-        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
-    }
-
-    method UninstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agUninnstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["isb2.vfx.${sheet~}.${name~}"]:Destroy
-
-        joVFX:SetInteger["elementID",0]
-    }
-    
-    method InstallVFXSource(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agInstallVFXSource\ax ${sheet~} ${name~} ${joVFX~}"
-
-        variable jsonvalue joView
-        joView:SetValue["$$>
-        {
-            "name":"isb2.vfx.${sheet~}.${name~}",
-            "type":"videofeedsource",
-            "x":${joVFX.GetInteger[x]},
-            "y":${joVFX.GetInteger[y]},
-            "width":${joVFX.GetInteger[width]},
-            "height":${joVFX.GetInteger[height]},
-            "feedName":${joVFX.Get[feedName]~.AsJSON~}
-        }
-        <$$"]
-
-        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
-    }   
-
-    method UninstallVFXSource(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agUninnstallVFXSource\ax ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["isb2.vfx.${sheet~}.${name~}"]:Destroy
-
-        joVFX:SetInteger["elementID",0]
-    }
     
     method InstallHotkey(string sheet, string name, jsonvalueref joHotkey)
     {
@@ -807,7 +751,7 @@ objectdef isb2_profileengine
         Hotkeys:Add["${fullName~}"]
     }
 
-    ; Installs a Hotkey, given a name, a key combination, and LavishScript code to execute on PRESS
+    ; Installs a Hotkey, given a name, a key combination, and LavishScript code to execute
     method InstallHotkeyEx(string name, string keyCombo, string onPress, string onRelease)
     {
         name:Set["${This.ProcessVariables["${name~}"]~}"]
@@ -1005,6 +949,8 @@ objectdef isb2_profileengine
         SlotRef.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
         This:ExecuteEventAction[SlotRef,onLoad]
+
+        echo "\agActivateSlot complete\ax"
     }
 
     method ActivateCharacter(jsonvalueref jo)
@@ -1027,12 +973,16 @@ objectdef isb2_profileengine
         Character.Get[clickBars]:ForEach["ClickBars.Get[\"\${ForEach.Value~}\"]:Enable"]
         Character.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
+        This:SetGUIMode[0]
+
         This:ExecuteEventAction[Character,onLoad]
 
         if ${Slot} == ${Team.Get[slots].Used}
         {
             This:ExecuteEventAction[Team,onLastSlotLoaded]
         }
+
+        echo "\agActivateCharacter complete\ax"
     }
 
     method DeactivateTeam()
@@ -1068,6 +1018,11 @@ objectdef isb2_profileengine
 
         This:ActivateBroadcastProfileByName["${Team.Get["broadcastProfile"]~}"]
 
+        if ${jo.Has[guiToggleCombo]}
+        {
+            This:InstallHotkeyEx[guiToggle,"${jo.Get[guiToggleCombo]}","ISB2:ToggleGUIMode"]
+        }        
+
         variable jsonvalue dscopeDefinition
         dscopeDefinition:SetValue["$$>
         {
@@ -1090,6 +1045,8 @@ objectdef isb2_profileengine
         LGUI2.Element[isb2.events]:FireEventHandler[onTeamChanged]
 
         This:ExecuteEventAction[Team,onLoad]
+
+        echo "\agActivateTeam complete\ax"
     }
 
     method ActivateProfile(weakref _profile)
@@ -2764,4 +2721,73 @@ objectdef isb2_profileengine
         return FALSE
     }
 #endregion
+
+    method ShowTitleBar(bool show, lgui2elementref element)
+    {
+        if !${element.Element(exists)}
+            return
+
+        if !${element.ElementType.Name.Equal[window]}
+            return
+
+        if ${element.Metadata.GetBool[keepTitleBar]}
+            return
+
+        if ${show}
+        {
+            element.Locate[titlebar]:SetVisibility["Visible"]
+			element:ApplyStyle["onShowTitleBar"]
+			element:FireEventHandler["onShowTitleBar"]
+        }
+        else
+        {
+            element.Locate[titlebar]:SetVisibility["Hidden"]
+			element:ApplyStyle["onHideTitleBar"]
+			element:FireEventHandler["onHideTitleBar"]
+        }     
+    }
+
+    method ShowTitleBars(bool show=1)
+    {
+        variable(static) jsonvalueref joQuery="$$>
+        {
+            "eval":"Select.Metadata.Has[isboxer2]"
+        }<$$"
+
+        LGUI2.Screen:ForEachChild["This:ShowTitleBar[${show},\"\${ForEach.Key}\"]",joQuery]
+    }
+
+    method SetGUIMode(bool newValue)
+    {
+        if ${newValue} == ${GUIMode}
+            return
+        GUIMode:Set[${newValue}]
+        if ${newValue}
+        {
+            LGUI2.Element[isb2.mainWindow]:SetVisibility[Visible]
+            This:ShowTitleBars[1]
+        }
+        else
+        {
+            LGUI2.Element[isb2.mainWindow]:SetVisibility[Hidden]
+            This:ShowTitleBars[0]
+        }
+        
+        LGUI2.Element[isb2.events]:FireEventHandler[onGUIModeChanged]
+    }
+
+    method ToggleGUIMode()
+    {
+        This:SetGUIMode["${GUIMode.Not}"]
+    }
+
 }
+
+
+
+
+
+
+
+
+

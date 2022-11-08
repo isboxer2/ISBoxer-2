@@ -425,6 +425,7 @@ objectdef isb2_slotmanager
         if !${LaunchingSlot:First(exists)}
             return FALSE
 
+        LGUI2.Element[isb2.launching]:SetVisibility[Visible]
         StopTime:Set[0]
         StartTime:Set["${Script.RunningTime}"]
         Event[OnFrame]:AttachAtom[This:Pulse]
@@ -434,6 +435,7 @@ objectdef isb2_slotmanager
 
     method Stop()
     {
+        echo "\arisb2_slotmanager:Stop\ax"
         Event[OnFrame]:DetachAtom[This:Pulse]
         if !${StopTime}
             StopTime:Set["${Script.RunningTime}"]

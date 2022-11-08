@@ -89,9 +89,10 @@
         },
         {
             "type":"window",
-            "visibility":"visible",
+            "visibility":"hidden",
             "name":"isb2.launching",
-            "hideOnClose":true,
+            "strata":0.6,
+            "hideOnClose":true,            
             "title":"ISBoxer 2: Launching",
             "horizontalAlignment":"center",
             "verticalAlignment":"center",

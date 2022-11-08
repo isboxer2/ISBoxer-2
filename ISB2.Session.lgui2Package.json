@@ -243,6 +243,33 @@
                 }
             }
         },
+        "isb2.vfx":{
+            "type":"window",
+            "jsonTemplate":"window",
+            "backgroundBrush":{
+                "color":"#00000000"
+            },
+            "contentContainer":{
+                "jsonTemplate":"window.contentContainer",
+                "padding":0
+            },
+            "styles": {
+                "onHideTitleBar": {
+                  "borderBrush": {
+                    "color": [ 0.0, 0.0, 0.0, 0.0 ]
+                  },
+                  "backgroundBrush": {
+                    "color": [ 0.0, 0.0, 0.0, 0.0 ]
+                  }
+                },
+                "onShowTitleBar": {
+                    "borderBrush": "window.borderBrush",
+                    "backgroundBrush":{
+                        "color":"#00000000"
+                    }
+                  }
+              }          
+        },
         "isb2.rotatorStepView":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
@@ -557,6 +584,7 @@
         {
             "type":"window",
             "name":"isb2.MainWindow",
+            "_keepTitleBar":true,
             "hideOnClose":true,
             "title":"ISBoxer 2",
             "width":750,

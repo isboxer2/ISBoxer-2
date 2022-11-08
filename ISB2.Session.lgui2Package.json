@@ -12,186 +12,214 @@
                 {
                     "name":"keystroke",
                     "handler":"Action_Keystroke",
-                    "retarget":true
+                    "retarget":true,
+                    "timer":false
                 },
                 {
                     "name":"game key binding",
                     "handler":"Action_GameKeyBinding",
                     "retarget":true,
-                    "variableProperties":["name"]
+                    "variableProperties":["name"],
+                    "timer":false
                 },
                 {
                     "name":"game macro",
                     "handler":"Action_GameMacro",
                     "retarget":true,
-                    "variableProperties":["name","sheet"]
+                    "variableProperties":["name","sheet"],
+                    "timer":false
                 },
                 {
                     "name":"keystring",
                     "handler":"Action_KeyString",
                     "retarget":true,
                     "activationState":true,
-                    "variableProperties":["text"]
+                    "variableProperties":["text"],
+                    "timer":false
                 },
                 {
                     "name":"target group",
                     "handler":"Action_TargetGroup",
                     "retarget":true,
                     "activationState":true,
-                    "variableProperties":["name"]
+                    "variableProperties":["name"],
+                    "timer":true
                 },
                 {
                     "name":"sync cursor",
                     "handler":"Action_SyncCursor",
-                    "activationState":true
+                    "activationState":true,
+                    "timer":false
                 },
                 {
                     "name":"set game key binding",
                     "handler":"Action_SetGameKeyBinding",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"hotkey sheet state",
                     "handler":"Action_HotkeySheetState",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"vfx sheet state",
                     "handler":"Action_VFXSheetState",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"window focus",
                     "handler":"Action_WindowFocus",
                     "activationState":true,
-                    "variableProperties":["window","computer","filterTarget"]
+                    "variableProperties":["window","computer","filterTarget"],
+                    "timer":false
                 },
                 {
                     "name":"window close",
                     "handler":"Action_WindowClose",
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":false
                 },
                 {
                     "name":"mappable",
                     "handler":"Action_Mappable",
                     "variableProperties":["name","sheet"],
-                    "retarget":true
+                    "retarget":true,
+                    "timer":false
                 },
                 {
                     "name":"input mapping",
                     "handler":"Action_InputMapping",
                     "variableProperties":["name"],
-                    "retarget":true
+                    "retarget":true,
+                    "timer":false
                 },
                 {
                     "name":"set input mapping",
                     "handler":"Action_SetInputMapping",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"mappable step",
                     "handler":"Action_MappableStep",
                     "variableProperties":["name","sheet"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"mappable step state",
                     "handler":"Action_MappableStepState",
                     "variableProperties":["name","sheet"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"mappable state",
                     "handler":"Action_MappableState",
                     "variableProperties":["name","sheet"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"mappable sheet state",
                     "handler":"Action_MappableSheetState",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"key map state",
                     "handler":"Action_KeyMapState",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"virtualize mappable",
                     "handler":"Action_VirtualizeMappable",
                     "variableProperties":["fromSheet","toSheet","fromName","toName"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"click bar state",
                     "handler":"Action_ClickBarState",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"set click bar button",
                     "handler":"Action_SetClickBarButton",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"add trigger",
                     "handler":"Action_AddTrigger",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"remove trigger",
                     "handler":"Action_RemoveTrigger",
                     "variableProperties":["name"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"broadcast state",
                     "handler":"Action_BroadcastState",
                     "variableProperties":["value"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"broadcast target",
                     "handler":"Action_BroadcastTarget",
                     "variableProperties":["value"],
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"broadcast list",
                     "handler":"Action_BroadcastList",
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 },
                 {
                     "name":"popup text",
                     "handler":"Action_PopupText",
                     "activationState":true,
-                    "retarget":true
+                    "retarget":true,
+                    "timer":true
                 }
             ]
         },

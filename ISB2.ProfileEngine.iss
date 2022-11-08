@@ -23,6 +23,7 @@ objectdef isb2_profileengine
     variable collection:isb2_clickbar ClickBars
     variable collection:isb2_clickbarButtonLayout ClickBarButtonLayouts
     variable collection:isb2_imagesheet ImageSheets
+    variable collection:isb2_timerpool TimerPools
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -538,6 +539,35 @@ objectdef isb2_profileengine
             ja:ForEach["This:UninstallImageSheet[ForEach.Value]"]
     }    
 
+    method InstallTimerPool(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        TimerPools:Erase["${jo.Get[name]~}"]
+
+        TimerPools:Set["${jo.Get[name]~}",jo]
+    }
+
+    method InstallTimerPools(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallTimerPool[ForEach.Value]"]
+    }
+
+    method UninstallTimerPool(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        TimerPools:Erase["${jo.Get[name]~}"]
+    }
+
+    method UninstallTimerPools(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallTimerPool[ForEach.Value]"]
+    }    
 
     method InstallProfiles(jsonvalueref ja)
     {
@@ -1072,6 +1102,7 @@ objectdef isb2_profileengine
         This:InstallClickBarButtonLayouts[_profile.ClickBarButtonLayouts]
         This:InstallClickBars[_profile.ClickBars]
         This:InstallVFXSheets[_profile.VFXSheets]
+        This:InstallTimerPools[_profile.TimerPools]
 
         This:InstallCharacters[_profile.Characters]
         This:InstallTeams[_profile.Teams]
@@ -1104,6 +1135,7 @@ objectdef isb2_profileengine
         This:UninstallClickBarTemplates[_profile.ClickBarTemplates]
         This:UninstallClickBarButtonLayouts[_profile.ClickBarButtonLayouts]
         This:UninstallVFXSheets[_profile.VFXSheets]
+        This:UninstallTimerPools[_profile.TimerPools]
 
         This:UninstallCharacters[_profile.Characters]
         This:UninstallTeams[_profile.Teams]
@@ -1197,7 +1229,10 @@ objectdef isb2_profileengine
             return FALSE
 
         if ${useTarget.Equal[${Int64[${useTarget~}]}]}
+        {
+            ; TODO: Team-based Slot number is not necessarily the session name
             useTarget:Set["is${useTarget~}"]
+        }
 
         variable jsonvalue joActionState="{}"
         joActionState:SetByRef[action,joAction]
@@ -1211,6 +1246,23 @@ objectdef isb2_profileengine
 
 ;        echo relay "${useTarget~}" "noop \${ISB2:RemoteAction[\"${joActionState~}\"]}"
         return TRUE
+    }
+
+    method RetimeAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        variable jsonvalueref joTimer="joAction.Get[timer]"
+        if ${!joTimer.Reference(exists)}
+            return FALSE
+
+        variable string name
+        name:Set["${joTimer.Get[name]~}"]
+        if !${name.NotNULLOrEmpty}
+            return FALSE
+
+        echo "\ayRetimeAction\ax pool=${joTimer.Get[name]}"
+
+        joAction:Erase[timer]
+        return ${TimerPools.Get["${name~}"]:RetimeAction[joTimer,joState,joAction,${activate}](exists)}        
     }
 
 #region Action Types
@@ -2649,11 +2701,24 @@ objectdef isb2_profileengine
             return TRUE
         }
 
-        variable jsonvalue joAction
-        joAction:SetValue["${_joAction~}"]
+        variable jsonvalueref joAction
+        ; we will use a copy of the action, so as to not modify the original action for the next execution
+        joAction:SetReference[_joAction.Duplicate]
         
         ; process any variableProperties
         This:ProcessActionVariables[joActionType,joAction]
+
+        ; see if the action type supports action timers
+        if ${joActionType.GetBool[timer]}
+        {
+            ; yeah see if we should retime the action
+            if ${This:RetimeAction[joState,joAction,${activate}](exists)}
+            {
+;                echo "Action retimed"
+                return TRUE
+            }
+            ; we didn't retime the action
+        }
 
         ; see if the action type supports retargeting 
         if ${joActionType.GetBool[retarget]}

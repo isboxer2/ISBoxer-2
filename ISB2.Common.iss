@@ -28,6 +28,7 @@ objectdef isb2_profile
     variable jsonvalueref ClickBarButtonLayouts=[]
     variable jsonvalueref ImageSheets=[]
     variable jsonvalueref VFXSheets=[]
+    variable jsonvalueref TimerPools=[]
 
     method Initialize(jsonvalueref jo, uint priority, string localFilename)
     {
@@ -85,6 +86,8 @@ objectdef isb2_profile
             ClickBarButtonLayouts:SetReference["jo.Get[clickBarButtonLayouts]"]
         if ${jo.Has[gameMacroSheets]}
             GameMacroSheets:SetReference["jo.Get[gameMacroSheets]"]
+        if ${jo.Has[timerPools]}
+            TimerPools:SetReference["jo.Get[timerPools]"]
     }
 
     member:jsonvalueref AsJSON()
@@ -138,6 +141,8 @@ objectdef isb2_profile
             jo:SetByRef["clickBarButtonLayouts",ClickBarButtonLayouts]
         if ${GameMacroSheets.Used}
             jo:SetByRef["gameMacroSheets","GameMacroSheets"]
+        if ${TimerPools.Used}
+            jo:SetByRef["timerPools","TimerPools"]
         return jo
     }
 
@@ -1749,4 +1754,176 @@ objectdef isb2_vfxsheet
 
         joVFX:SetInteger["elementID",0]
     }    
+}
+
+objectdef isb2_timerpool
+{
+    variable string Name
+    variable string Description
+    variable uint MaxTimers
+    variable bool BackEndRemoval
+
+    variable jsonvalue ActiveTimers="[]"
+    variable bool Attached
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method Shutdown()
+    {
+        This:Detach
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+        if ${jo.Has[description]}
+            Description:Set["${jo.Get[description]~}"]
+        MaxTimers:Set[${jo.GetInteger[-default,0,maxTimers]}]
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+
+        if ${Description.NotNULLOrEmpty}
+            jo:SetString[description,"${Description~}"]
+
+        if ${MaxTimers}
+            jo:SetInteger[maxTimers,${maxTimers}]
+
+        if ${BackEndRemoval}
+            jo:SetBool[backEndRemoval,${BackEndRemoval}]
+
+        return jo
+    }    
+
+    method Attach()
+    {
+        if ${Attached}
+            return
+
+        Event[OnFrame]:AttachAtom[This:OnFrame]
+        Attached:Set[1]
+    }
+
+    method Detach()
+    {
+        if !${Attached}
+            return
+
+        Event[OnFrame]:DetachAtom[This:OnFrame]
+        Attached:Set[0]
+    }
+
+    member:uint FindInsertPosition(uint timestamp)
+    {
+        if !${ActionTimers.Used}
+            return 0
+
+        variable jsonvalue joQuery="$$>
+        {
+            "eval":"Select.GetInteger[time]",
+            "op":">",
+            "value":${timestamp}
+        }
+        <$$"
+
+        ; we are guaranteed to have a timer in the pool
+        ; if the query finds no match ("time" field > timestamp), then this returns 0
+        ; and we add to the end of ActionTimers
+        return ${ActionTimers.SelectKey[joQuery]}        
+    }
+
+    method RetimeAction(jsonvalueref joTimer, jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+		; make room if we're supposed to...
+		if ${ActiveTimers.Size}>=${MaxTimers} && ${MaxTimers}
+		{
+			if ${This.BackEndRemoval}
+			{
+				; ignore new timer, this one's on the back end. sorry!
+				return TRUE
+			}
+		}
+
+        ; calculate end time
+        variable uint EndTime
+        EndTime:Set[${Script.RunningTime}+(${joTimer.GetNumber[time]}*1000)]
+        
+        variable jsonvalue joActiveTimer
+        joActiveTimer:SetValue["{}"]
+
+        joActiveTimer:SetByRef[state,joState]
+        joActiveTimer:SetByRef[action,joAction]
+        joActiveTimer:SetByRef[timer,joTimer]
+        joActiveTimer:SetBool[activate,${activate}]
+        joActiveTimer:SetInteger[time,${EndTime}]
+        if ${joTimer.GetBool[recur]}
+            joActiveTimer:SetBool[recur,1]
+
+        ; insert into position by time
+        variable uint pos
+        pos:Set[${This.FindInsertPosition[${timestamp}]}]
+        if ${pos}
+            ActiveTimers:InsertByRef[${pos},joActiveTimer]
+        else
+            ActiveTimers:AddByRef[joActiveTimer]
+
+;        echo "action retimed ${joActiveTimer~}"
+        This:Attach
+        return TRUE
+    }
+
+    method OnFrame()
+    {
+        variable jsonvalueref joTimer
+        variable uint EndTime
+		variable uint pos
+
+        while 1
+		{
+			if !${ActiveTimers.Used}
+			{
+                This:Detach
+				return
+			}
+
+            joTimer:SetReference["ActiveTimers.Get[1]"]
+
+			if ${joTimer.GetInteger[time]}>${Script.RunningTime}
+			{
+;				echo ${Name~}: ${joTimer.GetInteger[time]}>${Script.RunningTime}
+				return
+			}
+
+            ActiveTimers:Erase[1]
+
+;            echo "Executing timed action ${joTimer~}"
+            ; execute the action as intended
+            ISB2:ExecuteAction["joTimer.Get[state]","joTimer.Get[action]","${joTimer.GetBool[activate]}"]
+    
+			; check if auto-recurring
+			if ${joTimer.GetBool[recur]}
+			{
+				; generate the new timestamp, using a consistent interval
+                EndTime:Set[${joTimer.GetInteger[time]}+(${joTimer.GetNumber[timer,time]}*1000)]
+
+				; insert again
+				pos:Set[${This.FindInsertPosition[${EndTime}]}]
+
+                if ${pos}
+                    ActiveTimers:InsertByRef[${pos},joActiveTimer]
+                else
+                    ActiveTimers:AddByRef[joActiveTimer]
+			}
+		}		
+    }
 }

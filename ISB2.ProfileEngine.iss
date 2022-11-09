@@ -1704,7 +1704,7 @@ objectdef isb2_profileengine
         variable jsonvalueref joMappable
         joMappable:SetReference["MappableSheets.Get[${sheet.AsJSON~}].Mappables.Get[${name.AsJSON~}]"]
 
-        joMappable:SetBool["${joAction.GetBool[value]}"]
+        joMappable:SetBool[enable,"${joAction.GetBool[value]}"]
     }    
 
     method Action_GameMacro(jsonvalueref joState, jsonvalueref joAction, bool activate)

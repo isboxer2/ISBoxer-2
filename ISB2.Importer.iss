@@ -1634,6 +1634,9 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
 
+        if ${jo.GetBool[manualLoad]}
+            joNew:SetBool[enable,0]
+
         if ${jo.Get[Description].NotNULLOrEmpty}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 

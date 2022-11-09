@@ -539,6 +539,38 @@ objectdef isb2_profileengine
             ja:ForEach["This:UninstallImageSheet[ForEach.Value]"]
     }    
 
+    method InstallGameMacroSheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        echo "\ayInstallGameMacroSheet\ax ${jo~}"
+        GameMacroSheets:Erase["${jo.Get[name]~}"]
+
+        GameMacroSheets:Set["${jo.Get[name]~}",jo]
+    }
+
+    method InstallGameMacroSheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallGameMacroSheet[ForEach.Value]"]
+    }
+
+    method UninstallGameMacroSheet(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        GameMacroSheets:Erase["${jo.Get[name]~}"]
+    }
+
+    method UninstallGameMacroSheets(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallGameMacroSheet[ForEach.Value]"]
+    }    
+
+
     method InstallTimerPool(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
@@ -1091,6 +1123,7 @@ objectdef isb2_profileengine
 
         This:InstallProfiles[_profile.Profiles]
         This:InstallImageSheets[_profile.ImageSheets]
+        This:InstallGameMacroSheets[_profile.GameMacroSheets]
         This:InstallVirtualFiles[_profile.VirtualFiles]
         This:InstallBroadcastProfiles[_profile.BroadcastProfiles]
         This:InstallWindowLayouts[_profile.WindowLayouts]
@@ -1124,7 +1157,7 @@ objectdef isb2_profileengine
         Profiles:Remove["${_profile.Name~}"]
 
         This:UninstallProfiles[_profile.Profiles]
-
+        This:UninstallGameMacroSheets[_profile.GameMacroSheets]
         This:UninstallVirtualFiles[_profile.VirtualFiles]
         This:UninstallWindowLayouts[_profile.WindowLayouts]
         This:UninstallTriggers[_profile.Triggers]
@@ -1674,13 +1707,46 @@ objectdef isb2_profileengine
         joMappable:SetBool["${joAction.GetBool[value]}"]
     }    
 
-    
     method Action_GameMacro(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAction_GameMacro\ax[${activate}] ${joAction~}"
+        echo "\ayAction_GameMacro\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
+        variable string keystroke
+
+        ; "name":"Click-to-Move ON","sheet":"Quick Setup 42","type":"game macro"
+
+        keystroke:Set["${GameMacroSheets.Get["${joAction.Get[sheet]~}"].Macros.Get["${joAction.Get[name]~}",keyCombo]~}"]
+        if !${keystroke.NotNULLOrEmpty}
+        {
+            echo "\argame macro not found\ax: \"${joAction.Get[sheet]~}\" \"${joAction.Get[name]~}\""
+            return
+        }
+
+        variable bool hold
+        if ${joAction.Has[hold]}
+            hold:Set[${joAction.GetBool[hold]}]
+        else
+            hold:Set[${joState.GetBool[hold]}]
+
+        if !${hold} || ${joAction.Has[activationState]}
+        {
+            echo press -nomodifiers "${keystroke}"
+            press -nomodifiers "${keystroke}"
+            return
+        }
+
+        if ${activate}
+        {
+            echo press -hold "${keystroke}"
+            press -hold "${keystroke}"
+        }
+        else
+        {
+            echo press -release "${keystroke}"
+            press -release "${keystroke}"
+        }
     }
 
     method Action_KeyString(jsonvalueref joState, jsonvalueref joAction, bool activate)

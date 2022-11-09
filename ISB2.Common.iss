@@ -1360,12 +1360,12 @@ objectdef isb2_mappablesheet
 objectdef isb2_gamemacrosheet
 {
     variable string Name
-    variable string Game
+    variable string GameName
 
     variable jsonvalue Macros="{}"
 
     method Initialize(jsonvalueref jo)
-    {
+    {        
         This:FromJSON[jo]
     }
 
@@ -1378,7 +1378,7 @@ objectdef isb2_gamemacrosheet
             Name:Set["${jo.Get[name]~}"]
 
         if ${jo.Has[game]}
-            Game:Set["${jo.Get[game]~}"]
+            GameName:Set["${jo.Get[game]~}"]
 
         jo.Get[macros]:ForEach["This:Add[ForEach.Value]"]
     }
@@ -1387,7 +1387,7 @@ objectdef isb2_gamemacrosheet
     {
         variable jsonvalue jo="{}"
         jo:SetString[name,"${Name~}"]
-        jo:SetString[game,"${Game~}"]
+        jo:SetString[game,"${GameName~}"]
         jo:SetByRef[macros,Macros]
         return jo
     }
@@ -1396,7 +1396,7 @@ objectdef isb2_gamemacrosheet
     {
         if !${jo.Type.Equal[object]}
             return FALSE
-        Macros:SetByRef["${jo.Get[name]~}",jo]
+        Macros:SetByRef["${jo.Get[colloquialName]~}",jo]
     }
 }
 

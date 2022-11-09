@@ -271,7 +271,6 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertWoWMacroSets()
     {
-        echo "\ayConvertWoWMacroSets\ax"
         variable jsonvalue ja="[]"
         ISBProfile.Get[WoWMacroSet]:ForEach["ja:AddByRef[\"This.ConvertWoWMacroSet[ForEach.Value]\"]"]
         return ja
@@ -764,7 +763,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertActionTimerPool(jsonvalueref jo)
     {
-        echo "\arConvertActionTimerPool\ax ${jo~}"
+;        echo "\agConvertActionTimerPool\ax ${jo~}"
 
         return jo
     }
@@ -1793,7 +1792,8 @@ objectdef isb2_importer
         if ${jo.GetInteger[TriggerOnce]}>=0
             joNew:SetInteger[triggerOnce,"${jo.GetInteger[TriggerOnce]}"]
 
-        joNew:SetInteger[stickyTime,"${jo.GetInteger[StickyTime]}"]
+        joNew:SetNumber[stickyTime,${Math.Calc[${jo.GetInteger[StickyTime]}/1000]}]
+
 
 
 

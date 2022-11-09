@@ -1790,15 +1790,30 @@ objectdef isb2_profileengine
 
     method Action_MappableStepState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAAction_MappableStepState\ax[${activate}] ${joAction~}"
+        echo "\ayAction_MappableStepState\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
+        variable jsonvalueref joStep
+        joStep:SetReference["MappableSheets.Get[\"${joAction.Get[sheet]~}\"].Mappables.Get[\"${joAction.Get[name]~}\",${joAction.GetInteger[step]}]"]
+
+        if !${joStep.Reference(exists)}
+        {
+            echo "\arMappable Step not found\ax"
+            return
+        }
+
+        if ${joAction.Has[enable]}
+            joStep:SetBool[enable,${joAction.GetBool[enable]}]
+        if ${joAction.Has[triggerOnce]}
+            joStep:SetBool[triggerOnce,${joAction.GetBool[triggerOnce]}]
+        if ${joAction.Has[stickyTime]}
+            joStep:SetNumber[stickyTime,${joAction.GetNumber[stickyTime]}]
     }
 
     method Action_SetClickBarButton(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAction_SetClickBarButton\ax[${activate}] ${joAction~}"
+        echo "\agAction_SetClickBarButton\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 

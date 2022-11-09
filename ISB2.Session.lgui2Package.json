@@ -90,6 +90,20 @@
                     "timer":false
                 },
                 {
+                    "name":"window style",
+                    "handler":"Action_WindowStyle",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":false
+                },
+                {
+                    "name":"window state",
+                    "handler":"Action_WindowState",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":false
+                },
+                {
                     "name":"mappable",
                     "handler":"Action_Mappable",
                     "variableProperties":["name","sheet"],
@@ -168,6 +182,22 @@
                     "timer":true
                 },
                 {
+                    "name":"click bar style",
+                    "handler":"Action_ClickBarStyle",
+                    "variableProperties":["name"],
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"click bar hotkey sheet",
+                    "handler":"Action_ClickBarHotkeySheet",
+                    "variableProperties":["name"],
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
                     "name":"set click bar button",
                     "handler":"Action_SetClickBarButton",
                     "variableProperties":["name"],
@@ -217,6 +247,76 @@
                 {
                     "name":"popup text",
                     "handler":"Action_PopupText",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"sound",
+                    "handler":"Action_Sound",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"light",
+                    "handler":"Action_Light",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"volume",
+                    "handler":"Action_Volume",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"vfx",
+                    "handler":"Action_VFX",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"screenshot",
+                    "handler":"Action_Screenshot",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"input device key set",
+                    "handler":"Action_InputDeviceKeySet",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"timer pool",
+                    "handler":"Action_TimerPool",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"vfx",
+                    "handler":"Action_VFX",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"send next click",
+                    "handler":"Action_SendNextClick",
+                    "activationState":true,
+                    "retarget":false,
+                    "timer":false
+                },
+                {
+                    "name":"region sheet state",
+                    "handler":"Action_RegionSheetState",
                     "activationState":true,
                     "retarget":true,
                     "timer":true

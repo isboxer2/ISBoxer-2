@@ -814,7 +814,7 @@ objectdef isb2_importer
 
         if !${joImage.Reference(exists)}
         {
-            echo "\arGetImageReference\ax no reference"
+            echo "\arGetImageReference\ax no reference for ${name~}"
             return NULL
         }
 
@@ -2489,7 +2489,7 @@ objectdef isb2_importer
 ;       echo "ConvertAction_VideoFeedsAction ${jo~}"     
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,video fx]        
+        joNew:SetString[type,vfx]        
             
         if ${jo.Get[Name]~.NotNULLOrEmpty}
             joNew:SetString[name,"${jo.Get[Name]~}"]

@@ -2075,7 +2075,7 @@ objectdef isb2_importer
 
         joNew:SetString[type,target group]
 
-        joNew:SetString[action,"${jo.Get[Action]~}"]
+        joNew:SetBool[enable,"${jo.Get[Action]~.Equal[Join]}"]
         joNew:SetString[name,"${jo.Get[RelayGroupString]~}"]        
 
 ;        joNew:Set[originalAction,"${jo~}"]

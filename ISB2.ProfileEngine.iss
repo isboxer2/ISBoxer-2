@@ -11,6 +11,9 @@ objectdef isb2_profileengine
     ; a list of active Hotkeys
     variable set Hotkeys
 
+    ; a list of active Relay Groups
+    variable set RelayGroups
+
     ; a distributed scope which shares data with the Team
     variable weakref TeamScope
 
@@ -64,6 +67,7 @@ objectdef isb2_profileengine
         This:DeactivateCharacter
         This:UninstallVFXs
         This:UninstallHotkeys
+        This:UninstallRelayGroups
         TaskManager:Destroy
         ISB2ProfileEngine:SetReference[NULL]
     }
@@ -875,6 +879,11 @@ objectdef isb2_profileengine
         echo "\agUninstallHotkeys\ax"
         Hotkeys:ForEach["This:UninstallHotkeyEx[\"\${ForEach.Value~}\"]"]
     }
+
+    method UninstallRelayGroups()
+    {
+        RelayGroups:ForEach["This:SetRelayGroup[\"${ForEach.Value~}\",0]"]
+    }
 #endregion
 
 #region Object Activators/Deactivators
@@ -929,6 +938,7 @@ objectdef isb2_profileengine
         if !${Character.Type.Equal[object]}
             return
 
+        This:SetRelayGroups["Character.Get[targetGroups]",0]
         Character:SetReference[NULL]
     }
 
@@ -984,6 +994,7 @@ objectdef isb2_profileengine
         if !${SlotRef.Type.Equal[object]}
             return
 
+        This:SetRelayGroups["SlotRef.Get[targetGroups]",0]
         This:UninstallSlotActivateHotkeys
         SlotRef:SetReference[NULL]
     }
@@ -1004,6 +1015,7 @@ objectdef isb2_profileengine
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
 
         This:InstallSlotActivateHotkeys
+        This:SetRelayGroups["SlotRef.Get[targetGroups]",1]
         This:VirtualizeMappables["SlotRef.Get[virtualMappables]"]
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]
 
@@ -1027,6 +1039,7 @@ objectdef isb2_profileengine
 
         This:ActivateWindowLayoutByName["${Team.Get["windowLayout"]~}"]
 
+        This:SetRelayGroups["Character.Get[targetGroups]",1]
         This:InstallVirtualFiles["Character.Get[virtualFiles]"]
         This:VirtualizeMappables["Character.Get[virtualMappables]"]
 
@@ -1054,8 +1067,8 @@ objectdef isb2_profileengine
 
         variable string qualifiedName
         qualifiedName:Set["isb2team_${Team.Get[name]~}"]
-        uplink relaygroup -leave "${qualifiedName~}"
-
+        This:SetRelayGroup["${qualifiedName~}",0]
+        This:SetRelayGroups["Team.Get[targetGroups]",0]
         TeamScope:Remove
 
         Team:SetReference[NULL]
@@ -1071,10 +1084,11 @@ objectdef isb2_profileengine
 
         variable string qualifiedName
         qualifiedName:Set["isb2team_${Team.Get[name]~}"]
-        uplink relaygroup -join "${qualifiedName~}"
-
+        This:SetRelayGroup["${qualifiedName~}",1]
+        
         This:ActivateProfilesByName["Team.Get[profiles]"]
 
+        This:SetRelayGroups["Team.Get[targetGroups]",1]
         This:InstallVirtualFiles["Team.Get[virtualFiles]"]
         This:VirtualizeMappables["Team.Get[virtualMappables]"]
 
@@ -1778,6 +1792,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        This:SetRelayGroup["${joAction.Get[name]~}",${joAction.GetBool[enable]}]
     }
 
     method Action_SyncCursor(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2942,6 +2957,33 @@ objectdef isb2_profileengine
         This:SetGUIMode["${GUIMode.Not}"]
     }
 
+    method SetRelayGroup(string name, bool newState)
+    {
+        if !${name.NotNULLOrEmpty}
+            return FALSE
+
+        if ${newState}
+        {
+            RelayGroups:Add["${name~}"]
+            uplink relaygroup -join "${name~}"
+        }
+        else
+        {
+            RelayGroups:Erase["${name~}"]
+            uplink relaygroup -leave "${name~}"
+        }
+        return TRUE
+    }
+
+    method SetRelayGroups(jsonvalueref ja, bool newState)
+    {
+        if !${ja.Type.Equal[array]}
+            return FALSE
+
+        ja:ForEach["This:SetRelayGroup[\"\${ForEach.Value~}\",${newState}]"]
+
+        return TRUE
+    }
 }
 
 

@@ -301,13 +301,6 @@
                     "timer":true
                 },
                 {
-                    "name":"vfx",
-                    "handler":"Action_VFX",
-                    "activationState":true,
-                    "retarget":true,
-                    "timer":true
-                },
-                {
                     "name":"send next click",
                     "handler":"Action_SendNextClick",
                     "activationState":true,

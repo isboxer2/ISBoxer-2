@@ -1784,6 +1784,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        ; text
     }
 
     method Action_TargetGroup(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1801,6 +1802,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        ; target
     }
 
     method Action_MappableStepState(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1840,6 +1842,109 @@ objectdef isb2_profileengine
         {
             ClickBars.Get["${joAction.Get[clickBar]~}"]:ApplyChanges[${joAction.Get[numButton]},"joAction.Get[changes]"]
         }
+    }
+
+    method Action_WindowStyle(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_WindowStyle\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_WindowState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_WindowState\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+    }
+
+    method Action_ClickBarStyle(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_ClickBarStyle\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_ClickBarHotkeySheet(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_ClickBarHotkeySheet\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_Sound(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_Sound\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_Light(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_Light\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_Volume(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_Volume\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_VFX(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_VFX\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_Screenshot(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_Screenshot\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_InputDeviceKeySet(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_InputDeviceKeySet\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_TimerPool(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_TimerPool\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_SendNextClick(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_SendNextClick\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+    }
+
+    method Action_RegionSheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_RegionSheetState\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
     }
 
     method Action_AddTrigger(jsonvalueref joState, jsonvalueref joAction, bool activate)

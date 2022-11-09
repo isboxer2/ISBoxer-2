@@ -271,6 +271,7 @@ objectdef isb2_importer
 
     member:jsonvalueref ConvertWoWMacroSets()
     {
+        echo "\ayConvertWoWMacroSets\ax"
         variable jsonvalue ja="[]"
         ISBProfile.Get[WoWMacroSet]:ForEach["ja:AddByRef[\"This.ConvertWoWMacroSet[ForEach.Value]\"]"]
         return ja
@@ -1296,7 +1297,7 @@ objectdef isb2_importer
 
         variable jsonvalue ja="[]"
 
-        jo.Get[WoWMacroSet]:ForEach["This:ConvertWoWMacroInto[ja,ForEach.Value]"]
+        jo.Get[WoWMacros]:ForEach["This:ConvertWoWMacroInto[ja,ForEach.Value]"]
 
         if !${ja.Used}
             return NULL
@@ -1310,8 +1311,12 @@ objectdef isb2_importer
 ;        echo "\agConvertWoWMacroInto\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
-        joNew:SetString[name,"${jo.Get[Name]~}"]
-        joNew:SetString[colloquialName,"${jo.Get[ColloquialName]~}"]
+        if ${jo.Has[Name]}
+            joNew:SetString[name,"${jo.Get[Name]~}"]
+        else
+            joNew:SetString[name,"${jo.Get[ColloquialName]~}"]
+
+        joNew:SetString[displayName,"${jo.Get[ColloquialName]~}"]
         joNew:SetString[description,"${jo.Get[Description]~}"]
         joNew:SetString[commands,"${jo.Get[MacroCommands]~}"]
         joNew:SetBool[useFTLModifiers,"${jo.GetBool[useFTLModifiers]}"]

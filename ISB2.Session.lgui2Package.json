@@ -515,6 +515,63 @@
             },
             "borderThickness":[0,1,0,0]
         },
+        "isb2.lastinputListView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "jsonTemplate":"isb2.lastinputView",
+                "contextBinding":{
+                    "pullFormat":"${This.Parent.Context.Data}"
+                }
+            }
+        },
+        "isb2.lastinputView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "padding":4,
+            "children":[              
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${If[${This.Context.GetBool[state]},\"press\",\"release\"]}"
+                    },
+                    "font":{
+                        "heightFactor":0.8
+                    }
+                }, 
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[keyCombo]}"
+                    },
+                    "font":{
+                        "heightFactor":1.4,
+                        "bold":true
+                    }
+                },
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"Timestamp: ${This.Context.Get[time]}"
+                    }
+                },                          
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "visibility":"collapsed",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.AsJSON[multiline]}"
+                    }
+                }
+            ],
+            "borderBrush":{
+                "color":"#ff999999"
+            },
+            "borderThickness":4,
+            "borderRounding":3
+        },
         "isb2.actionListView":{
             "jsonTemplate":"listboxitem",
             "content":{
@@ -1049,6 +1106,29 @@
                                                 "default":{
                                                     "type":"template",
                                                     "template":"isb2.actionListView"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type":"listbox",
+                                            "content":{
+                                                "jsonTemplate":"listbox.content",
+                                                "orientation":"horizontal"
+                                            },
+                                            "_dock":"top",
+                                            "minSize":[100,50],
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2.LastInputs}",
+                                                "pullHook":{
+                                                    "elementName": "isb2.events",
+                                                    "flags": "global",
+                                                    "event": "onLastInputsUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.lastinputListView"
                                                 }
                                             }
                                         }

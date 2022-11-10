@@ -52,6 +52,8 @@ objectdef isb2_profileengine
     ; reference to the last actions executed
     variable jsonvalueref LastActions="[]"
 
+    variable jsonvalueref LastInputs="[]"
+
     ; task manager used for hotkeys and such
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
 
@@ -1334,20 +1336,24 @@ objectdef isb2_profileengine
 
         if !${hold} || ${joAction.Has[activationState]}
         {
-            echo press -nomodifiers "${keystroke}"
-            press -nomodifiers "${keystroke}"
+            echo press -nomodifiers "${keystroke~}"
+            press -nomodifiers "${keystroke~}"
+            This:SetLastInput["${keystroke~}",1]
+            This:SetLastInput["${keystroke~}",0]
             return
         }
 
         if ${activate}
         {
-            echo press -hold "${keystroke}"
-            press -hold "${keystroke}"
+            echo press -hold "${keystroke~}"
+            press -hold "${keystroke~}"
+            This:SetLastInput["${keystroke~}",1]
         }
         else
         {
-            echo press -release "${keystroke}"
-            press -release "${keystroke}"
+            echo press -release "${keystroke~}"
+            press -release "${keystroke~}"
+            This:SetLastInput["${keystroke~}",0]
         }
     }
 
@@ -1385,20 +1391,24 @@ objectdef isb2_profileengine
 
         if !${hold} || ${joAction.Has[activationState]}
         {
-            echo press -nomodifiers "${keystroke}"
-            press -nomodifiers "${keystroke}"
+            echo press -nomodifiers "${keystroke~}"
+            press -nomodifiers "${keystroke~}"
+            This:SetLastInput["${keystroke~}",1]
+            This:SetLastInput["${keystroke~}",0]
             return
         }
 
         if ${activate}
         {
-            echo press -hold "${keystroke}"
-            press -hold "${keystroke}"
+            echo press -hold "${keystroke~}"
+            press -hold "${keystroke~}"
+            This:SetLastInput["${keystroke~}",1]
         }
         else
         {
-            echo press -release "${keystroke}"
-            press -release "${keystroke}"
+            echo press -release "${keystroke~}"
+            press -release "${keystroke~}"
+            This:SetLastInput["${keystroke~}",0]
         }
     }
 
@@ -2773,6 +2783,40 @@ objectdef isb2_profileengine
         LastMappables:Erase[${key}]
     }
 
+    method RemoveLastInput(jsonvalueref joInput)
+    {
+        if !${joInput.Type.Equal[object]}
+        {
+            echo "\arRemoveLastInput\ax: joInput.Type is not object: ${joInput~}"
+            return FALSE
+        }
+        variable int key
+        variable jsonvalue joQuery
+        joQuery:SetValue["$$>
+        {
+            "op":"&&",
+            "list":[
+                {
+                    "op":"==",
+                    "eval":"Select.Get[state\]",
+                    "value":${joInput.Get[state].AsJSON~}
+                },
+                {
+                    "op":"==",
+                    "eval":"Select.Get[keyCombo\]",
+                    "value":${joInput.Get[keyCombo].AsJSON~}
+                }
+            ]
+        }
+        <$$"]
+        key:Set[${LastInputs.SelectKey[joQuery]}]
+;        if !${key}
+;        {
+;            echo "\arRemoveLastInput\ax query failed ${joQuery~}"
+;        }
+        LastInputs:Erase[${key}]
+    }
+
     method SetLastAction(jsonvalueref joAction,string newState)
     {
         variable int counter
@@ -2789,6 +2833,20 @@ objectdef isb2_profileengine
         LastActions:InsertByRef[1,joActionRef]
         LastActions:Erase[11]
         LGUI2.Element[isb2.events]:FireEventHandler[onLastActionsUpdated]        
+    }
+
+    method SetLastInput(string keyCombo, bool newState)
+    {
+        variable jsonvalue joInputRef="{}"
+        joInputRef:SetString[keyCombo,"${keyCombo~}"]
+        joInputRef:SetBool[state,${newState}]
+        joInputRef:SetInteger[time,${Script.RunningTime}]
+
+;        This:RemoveLastInput[joInputRef]
+        LastInputs:InsertByRef[1,joInputRef]
+        LastInputs:Erase[11]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onLastInputsUpdated]
     }
 
     method SetLastMappable(jsonvalueref joMappable,bool newState)

@@ -1232,6 +1232,8 @@ objectdef isb2_hotkeysheet
     {
         if !${jo.Type.Equal[object]}
             return FALSE
+
+        jo:SetString[sheet,"${Name~}"]
         Hotkeys:SetByRef["${jo.Get[name]~}",jo]
     }
 

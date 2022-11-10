@@ -45,9 +45,9 @@ objectdef isb2_profileengine
 
     variable bool GUIMode=1
 
-    ; reference to the last hotkey used
-    variable jsonvalueref LastHotkey
-    ; reference to the last mappable executed
+    ; reference to the last hotkeys used
+    variable jsonvalueref LastHotkeys="[]"
+    ; reference to the last mappables executed
     variable jsonvalueref LastMappables="[]"
 
     ; task manager used for hotkeys and such
@@ -1409,7 +1409,7 @@ objectdef isb2_profileengine
 
         variable string name
         name:Set["${joAction.Get[name].Lower~}"]
-        if !${name.NotNULLOrEmpty}
+        if !${name.NotNULLOrEmpty}        
             return
 
         GameKeyBindings.Get["${name~}"]:Set["keyCombo","${joAction.Get[keyCombo].AsJSON~}"]
@@ -2501,6 +2501,7 @@ objectdef isb2_profileengine
             This:IncrementCounter[joHotkey]
         }
 
+        This:SetLastHotkey[joHotkey,${newState}]
         This:ExecuteInputMapping["joHotkey.Get[inputMapping]",${newState}]
     }
 
@@ -2692,6 +2693,49 @@ objectdef isb2_profileengine
             return
         This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
     }
+
+    method RemoveLastHotkey(jsonvalueref joHotkey)
+    {
+        if !${joHotkey.Type.Equal[object]}
+        {
+            echo "\arRemoveLastHotkey\ax: joHotkey.Type is not object: ${joHotkey~}"
+            return FALSE
+        }
+        variable int key
+        variable jsonvalue joQuery
+        joQuery:SetValue["$$>
+        {
+            "op":"&&",
+            "list":[
+                {
+                    "op":"==",
+                    "eval":"Select.Get[name\]",
+                    "value":${joHotkey.Get[name].AsJSON~}
+                },
+                {
+                    "op":"==",
+                    "eval":"Select.Get[sheet\]",
+                    "value":${joHotkey.Get[sheet].AsJSON~}
+                }
+            ]
+        }
+        <$$"]
+        key:Set[${LastHotkeys.SelectKey[joQuery]}]
+;        if !${key}
+;        {
+;            echo "\arRemoveLastHotkey\ax query failed ${joQuery~}"
+;        }
+        LastHotkeys:Erase[${key}]
+    }
+
+    method SetLastHotkey(jsonvalueref joHotkey,bool newState)
+    {
+;        echo "\arSetLastHotkey\ax ${joHotkey~}"
+        This:RemoveLastHotkey[joHotkey]
+        LastHotkeys:InsertByRef[1,joHotkey]
+        LastHotkeys:Erase[11]
+        LGUI2.Element[isb2.events]:FireEventHandler[onLastHotkeysUpdated]
+    }    
 
     method RemoveLastMappable(jsonvalueref joMappable)
     {

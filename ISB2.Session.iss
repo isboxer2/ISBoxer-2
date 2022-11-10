@@ -35,6 +35,7 @@ objectdef isb2session inherits isb2_profileengine
         {
             echo "\agISBoxer 2 Activating\ax"
             ValidSession:Set[1]
+            ISSession:SetFlashWindow[0]
         
             This:StripInnerSpaceDefaults
             LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]

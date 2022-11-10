@@ -515,6 +515,56 @@
             },
             "borderThickness":[0,1,0,0]
         },
+        "isb2.actionListView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "jsonTemplate":"isb2.actionView",
+                "contextBinding":{
+                    "pullFormat":"${This.Parent.Context.Data}"
+                }
+            }
+        },
+        "isb2.actionView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "padding":4,
+            "children":[              
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[state]}"
+                    },
+                    "font":{
+                        "heightFactor":0.8
+                    }
+                }, 
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[action,type]}"
+                    },
+                    "font":{
+                        "heightFactor":1.4,
+                        "bold":true
+                    }
+                },                          
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "visibility":"visible",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[action].AsJSON[multiline]}"
+                    }
+                }
+            ],
+            "borderBrush":{
+                "color":"#ff999999"
+            },
+            "borderThickness":4,
+            "borderRounding":3
+        },
         "isb2.hotkeyListView":{
             "jsonTemplate":"listboxitem",
             "content":{
@@ -976,6 +1026,29 @@
                                                 "default":{
                                                     "type":"template",
                                                     "template":"isb2.mappableListView"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type":"listbox",
+                                            "content":{
+                                                "jsonTemplate":"listbox.content",
+                                                "orientation":"horizontal"
+                                            },
+                                            "_dock":"top",
+                                            "minSize":[100,50],
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2.LastActions}",
+                                                "pullHook":{
+                                                    "elementName": "isb2.events",
+                                                    "flags": "global",
+                                                    "event": "onLastActionsUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.actionListView"
                                                 }
                                             }
                                         }

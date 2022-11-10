@@ -515,6 +515,70 @@
             },
             "borderThickness":[0,1,0,0]
         },
+        "isb2.hotkeyListView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "jsonTemplate":"isb2.hotkeyView",
+                "contextBinding":{
+                    "pullFormat":"${This.Parent.Context.Data}"
+                }
+            }
+        },
+        "isb2.hotkeyView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "padding":4,
+            "children":[
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[sheet]}"
+                    },
+                    "font":{
+                        "heightFactor":0.8
+                    }
+                },
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[name]}"
+                    },
+                    "font":{
+                        "heightFactor":1.4,
+                        "bold":true
+                    }
+                },
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"Hotkey: ${This.Context.Get[keyCombo]}"
+                    }
+                },
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"Count: ${This.Context.Get[counter]}"
+                    }
+                },                
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "visibility":"collapsed",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.AsJSON[multiline]}"
+                    }
+                }
+            ],
+            "borderBrush":{
+                "color":"#ff999999"
+            },
+            "borderThickness":4,
+            "borderRounding":3
+        },
         "isb2.mappableListView":{
             "jsonTemplate":"listboxitem",
             "content":{
@@ -868,6 +932,29 @@
                                             "type":"textblock",
                                             "text":"Mappable Sheets: ${ISB2.MappableSheets.Used}",
                                             "_dock":"top"
+                                        },
+                                        {
+                                            "type":"listbox",
+                                            "content":{
+                                                "jsonTemplate":"listbox.content",
+                                                "orientation":"horizontal"
+                                            },
+                                            "_dock":"top",
+                                            "minSize":[100,50],
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2.LastHotkeys}",
+                                                "pullHook":{
+                                                    "elementName": "isb2.events",
+                                                    "flags": "global",
+                                                    "event": "onLastHotkeysUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.hotkeyListView"
+                                                }
+                                            }
                                         },
                                         {
                                             "type":"listbox",

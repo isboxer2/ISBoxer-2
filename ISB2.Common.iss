@@ -1297,6 +1297,9 @@ objectdef isb2_mappablesheet
     variable jsonvalue Mappables="{}"
 
     variable bool Enabled
+
+    variable bool Hold
+    variable string Mode="OnRelease"
     
     variable string VirtualizeAs
 
@@ -1316,6 +1319,12 @@ objectdef isb2_mappablesheet
 
         if ${jo.Has[enable]}
             Enabled:Set[${jo.GetBool[enable]}]
+
+        if ${jo.Has[hold]}
+            Hold:Set[${jo.GetBool[hold]}]
+
+        if ${jo.Has[mode]}
+            Mode:Set["${jo.Get[mode]~}"]
 
         jo.Get[mappables]:ForEach["This:Add[ForEach.Value]"]
     }

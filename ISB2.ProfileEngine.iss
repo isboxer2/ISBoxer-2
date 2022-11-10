@@ -1334,7 +1334,7 @@ objectdef isb2_profileengine
         else
             hold:Set[${joState.GetBool[hold]}]
 
-        if !${hold} || ${joAction.Has[activationState]}
+        if /*!${hold} ||/**/ ${joAction.Has[activationState]}
         {
             echo press -nomodifiers "${keystroke~}"
             press -nomodifiers "${keystroke~}"
@@ -1389,7 +1389,7 @@ objectdef isb2_profileengine
         else
             hold:Set[${joState.GetBool[hold]}]
 
-        if !${hold} || ${joAction.Has[activationState]}
+        if /*!${hold} ||*/ ${joAction.Has[activationState]}
         {
             echo press -nomodifiers "${keystroke~}"
             press -nomodifiers "${keystroke~}"
@@ -2894,7 +2894,16 @@ objectdef isb2_profileengine
         if ${joMappable.GetBool[enable].Equal[FALSE]}
             return
 
-
+        variable weakref mappableSheet
+        mappableSheet:SetReference["MappableSheets.Get[\"${joMappable.Get[sheet]~}\"]"]
+        if ${joMappable.GetBool[hold]}
+        {
+;            echo "\ayExecuteMappable\ax: Hold"
+            This:ExecuteMappableActivationState[joMappable,${newState}]
+            return
+        }
+        
+        ; the onPress/onRelease state might be specified by the sheet instead of the mappable
         if ${newState}
         {
             ; if we have "onPress", fire both press/release mechanics now
@@ -2903,9 +2912,29 @@ objectdef isb2_profileengine
                 if !${joMappable.GetBool[onPress]}
                     return
 
+;                echo "\ayExecuteMappable\ax: onPress"
                 This:ExecuteMappableActivationState[joMappable,1]
                 This:ExecuteMappableActivationState[joMappable,0]
                 return
+            }
+
+            if ${mappableSheet.Reference(exists)}
+            {
+                if !${mappableSheet.Hold}
+                {
+                    switch ${mappableSheet.Mode}
+                    {
+                        case OnRelease
+                            return
+                        case OnPress
+                        case OnPressAndRelease
+;                            echo "\ayExecuteMappable\ax: ${mappableSheet.Mode} (sheet)"
+                            This:ExecuteMappableActivationState[joMappable,1]
+                            This:ExecuteMappableActivationState[joMappable,0]
+                            return
+                    }
+;                    echo "\ayExecuteMappable\ax: ${newState} ${mappableSheet.Mode} post-check"
+                }
             }
         }
         else
@@ -2916,12 +2945,33 @@ objectdef isb2_profileengine
                 if !${joMappable.GetBool[onRelease]}
                     return
 
+;                echo "\ayExecuteMappable\ax: onRelease"
                 This:ExecuteMappableActivationState[joMappable,1]
                 This:ExecuteMappableActivationState[joMappable,0]
                 return
             }
+
+            if ${mappableSheet.Reference(exists)}
+            {
+                if !${mappableSheet.Hold}
+                {
+                    switch ${mappableSheet.Mode}
+                    {
+                        case OnRelease
+                        case OnPressAndRelease
+                            echo "\ayExecuteMappable\ax: ${mappableSheet.Mode} (sheet)"
+                            This:ExecuteMappableActivationState[joMappable,1]
+                            This:ExecuteMappableActivationState[joMappable,0]
+                            return
+                        case OnPress
+                            return
+                    }
+;                    echo "\ayExecuteMappable\ax: ${newState} ${mappableSheet.Mode} post-check"
+                }
+            }
         }
         
+;        echo "\ayExecuteMappable\ax: Split ${mappableSheet.Name~} ${mappableSheet.Mode~} ${mappableSheet.Hold}"
         This:ExecuteMappableActivationState[joMappable,${newState}]
     }
 

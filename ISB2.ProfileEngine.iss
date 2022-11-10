@@ -49,6 +49,8 @@ objectdef isb2_profileengine
     variable jsonvalueref LastHotkeys="[]"
     ; reference to the last mappables executed
     variable jsonvalueref LastMappables="[]"
+    ; reference to the last actions executed
+    variable jsonvalueref LastActions="[]"
 
     ; task manager used for hotkeys and such
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
@@ -2771,6 +2773,24 @@ objectdef isb2_profileengine
         LastMappables:Erase[${key}]
     }
 
+    method SetLastAction(jsonvalueref joAction,string newState)
+    {
+        variable int counter
+        counter:Set[${joAction.GetInteger["${newState~}.counter"]}+1]
+        joAction:SetInteger["${newState~}.counter",${counter}]
+        joAction:SetInteger["${newState~}.counterTime",${Script.RunningTime}]
+
+
+
+        variable jsonvalue joActionRef="{}"
+        joActionRef:SetByRef[action,joAction]
+        joActionRef:SetString[state,"${newState~}"]
+
+        LastActions:InsertByRef[1,joActionRef]
+        LastActions:Erase[11]
+        LGUI2.Element[isb2.events]:FireEventHandler[onLastActionsUpdated]        
+    }
+
     method SetLastMappable(jsonvalueref joMappable,bool newState)
     {
 ;        echo "\arSetLastMappable\ax ${joMappable~}"
@@ -2974,6 +2994,7 @@ objectdef isb2_profileengine
             ; yeah see if we should retime the action
             if ${This:RetimeAction[joState,joAction,${activate}](exists)}
             {
+                This:SetLastAction[joAction,retime]
 ;                echo "Action retimed"
                 return TRUE
             }
@@ -2986,6 +3007,7 @@ objectdef isb2_profileengine
             ; yeah see if we should retarget the action
             if ${This:RetargetAction[joState,joAction,${activate}](exists)}
             {
+                This:SetLastAction[joAction,retarget]
 ;                echo "Action retargeted"
                 return TRUE
             }
@@ -2998,6 +3020,11 @@ objectdef isb2_profileengine
  ;       echo "ExecuteAction[${actionType~}]=${actionMethod~}"
         if ${actionMethod.NotNULLOrEmpty}
         {
+            if ${activate}
+                This:SetLastAction[joAction,press]
+            else
+                This:SetLastAction[joAction,release]
+
             execute "This:${actionMethod}[joState,joAction,${activate}]"
             return TRUE
         }

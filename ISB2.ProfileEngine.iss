@@ -3129,9 +3129,9 @@ objectdef isb2_profileengine
         if ${actionMethod.NotNULLOrEmpty}
         {
             if ${activate}
-                This:SetLastAction[joAction,press]
+                This:SetLastAction[_joAction,press]
             else
-                This:SetLastAction[joAction,release]
+                This:SetLastAction[_joAction,release]
 
             execute "This:${actionMethod}[joState,joAction,${activate}]"
             return TRUE

@@ -54,6 +54,8 @@ objectdef isb2_profileengine
 
     variable jsonvalueref LastInputs="[]"
 
+    variable jsonvalueref Inputs="{}"
+
     ; task manager used for hotkeys and such
     variable taskmanager TaskManager=${LMAC.NewTaskManager["profileEngine"]}
 
@@ -1338,8 +1340,8 @@ objectdef isb2_profileengine
         {
             echo press -nomodifiers "${keystroke~}"
             press -nomodifiers "${keystroke~}"
-            This:SetLastInput["${keystroke~}",1]
-            This:SetLastInput["${keystroke~}",0]
+            This:OnInput["${keystroke~}",1]
+            This:OnInput["${keystroke~}",0]
             return
         }
 
@@ -1347,13 +1349,13 @@ objectdef isb2_profileengine
         {
             echo press -hold "${keystroke~}"
             press -hold "${keystroke~}"
-            This:SetLastInput["${keystroke~}",1]
+            This:OnInput["${keystroke~}",1]
         }
         else
         {
             echo press -release "${keystroke~}"
             press -release "${keystroke~}"
-            This:SetLastInput["${keystroke~}",0]
+            This:OnInput["${keystroke~}",0]
         }
     }
 
@@ -1393,8 +1395,8 @@ objectdef isb2_profileengine
         {
             echo press -nomodifiers "${keystroke~}"
             press -nomodifiers "${keystroke~}"
-            This:SetLastInput["${keystroke~}",1]
-            This:SetLastInput["${keystroke~}",0]
+            This:OnInput["${keystroke~}",1]
+            This:OnInput["${keystroke~}",0]
             return
         }
 
@@ -1402,13 +1404,13 @@ objectdef isb2_profileengine
         {
             echo press -hold "${keystroke~}"
             press -hold "${keystroke~}"
-            This:SetLastInput["${keystroke~}",1]
+            This:OnInput["${keystroke~}",1]
         }
         else
         {
             echo press -release "${keystroke~}"
             press -release "${keystroke~}"
-            This:SetLastInput["${keystroke~}",0]
+            This:OnInput["${keystroke~}",0]
         }
     }
 
@@ -2835,12 +2837,44 @@ objectdef isb2_profileengine
         LGUI2.Element[isb2.events]:FireEventHandler[onLastActionsUpdated]        
     }
 
-    method SetLastInput(string keyCombo, bool newState)
+    method OnInput(string keyCombo, bool newState)
+    {
+        variable jsonvalueref jo="Inputs.Get[\"${keyCombo~}\"]"
+        if !${jo.Reference(exists)}
+        {
+            echo "OnInput: new ${keyCombo~}"
+            jo:SetReference["{}"]
+            jo:SetString[keyCombo,"${keyCombo~}"]
+
+            Inputs:SetByRef["${keyCombo~}",jo]
+        }
+        else
+        {
+            echo "OnInput: existing ${keyCombo~}"
+        }
+
+        variable int counter
+        variable string sState
+        if ${newState}
+            sState:Set[press]
+        else
+            sState:Set[release]
+
+        counter:Set[${jo.GetInteger["${sState~}.counter"]}+1]
+        jo:SetInteger["${sState~}.counter",${counter}]
+        jo:SetInteger["${sState~}.counterTime",${Script.RunningTime}]
+
+        This:SetLastInput[jo,${newState}]
+    }
+
+    method SetLastInput(jsonvalueref joInput, bool newState)
     {
         variable jsonvalue joInputRef="{}"
-        joInputRef:SetString[keyCombo,"${keyCombo~}"]
+        joInputRef:SetByRef[input,joInput]
         joInputRef:SetBool[state,${newState}]
         joInputRef:SetInteger[time,${Script.RunningTime}]
+        joInputRef:SetInteger[press.counter,${joInput.GetInteger[press.counter]}]
+        joInputRef:SetInteger[release.counter,${joInput.GetInteger[release.counter]}]
 
 ;        This:RemoveLastInput[joInputRef]
         LastInputs:InsertByRef[1,joInputRef]

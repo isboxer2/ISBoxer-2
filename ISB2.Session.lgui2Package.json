@@ -543,7 +543,7 @@
                     "type":"textblock",
                     "_dock":"top",
                     "textBinding":{
-                        "pullFormat":"${This.Context.Get[keyCombo]}"
+                        "pullFormat":"${This.Context.Get[input,keyCombo]}"
                     },
                     "font":{
                         "heightFactor":1.4,
@@ -560,9 +560,23 @@
                 {
                     "type":"textblock",
                     "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"Presses: ${This.Context.Get[press.counter]}"
+                    }
+                },                          
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"Releases: ${This.Context.Get[release.counter]}"
+                    }
+                },                          
+                {
+                    "type":"textblock",
+                    "_dock":"top",
                     "visibility":"collapsed",
                     "textBinding":{
-                        "pullFormat":"${This.Context.AsJSON[multiline]}"
+                        "pullFormat":"${This.Context.Get[input].AsJSON[multiline]}"
                     }
                 }
             ],

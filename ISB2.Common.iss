@@ -1407,7 +1407,7 @@ objectdef isb2_gamemacrosheet
     {
         if !${jo.Type.Equal[object]}
             return FALSE
-        Macros:SetByRef["${jo.Get[colloquialName]~}",jo]
+        Macros:SetByRef["${jo.Get[displayName]~}",jo]
     }
 }
 

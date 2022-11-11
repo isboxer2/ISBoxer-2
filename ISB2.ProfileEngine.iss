@@ -1321,7 +1321,7 @@ objectdef isb2_profileengine
 #region Action Types
     method Action_Keystroke(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\agAction_Keystroke\ax[${activate}] ${joAction~}"
+        echo "\agAction_Keystroke\ax[${activate}] ${joAction~} ${joState~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -1333,10 +1333,12 @@ objectdef isb2_profileengine
         variable bool hold
         if ${joAction.Has[hold]}
             hold:Set[${joAction.GetBool[hold]}]
-        else
+        elseif ${joState.Has[hold]}
             hold:Set[${joState.GetBool[hold]}]
+        elseif ${joState.Has[sheet]}
+            hold:Set[${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}]
 
-        if /*!${hold} ||/**/ ${joAction.Has[activationState]}
+        if !${hold} || ${joAction.Has[activationState]}
         {
             echo press -nomodifiers "${keystroke~}"
             press -nomodifiers "${keystroke~}"
@@ -1388,10 +1390,12 @@ objectdef isb2_profileengine
         variable bool hold
         if ${joAction.Has[hold]}
             hold:Set[${joAction.GetBool[hold]}]
-        else
+        elseif ${joState.Has[hold]}
             hold:Set[${joState.GetBool[hold]}]
+        elseif ${joState.Has[sheet]}
+            hold:Set[${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}]
 
-        if /*!${hold} ||*/ ${joAction.Has[activationState]}
+        if !${hold} || ${joAction.Has[activationState]}
         {
             echo press -nomodifiers "${keystroke~}"
             press -nomodifiers "${keystroke~}"
@@ -1770,10 +1774,12 @@ objectdef isb2_profileengine
         variable bool hold
         if ${joAction.Has[hold]}
             hold:Set[${joAction.GetBool[hold]}]
-        else
+        elseif ${joState.Has[hold]}
             hold:Set[${joState.GetBool[hold]}]
+        elseif ${joState.Has[sheet]}
+            hold:Set[${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}]
 
-        if /*!${hold} ||*/ ${joAction.Has[activationState]}
+        if !${hold} || ${joAction.Has[activationState]}
         {
             echo press -nomodifiers "${keystroke}"
             press -nomodifiers "${keystroke}"
@@ -2846,7 +2852,7 @@ objectdef isb2_profileengine
         variable jsonvalueref jo="Inputs.Get[\"${keyCombo~}\"]"
         if !${jo.Reference(exists)}
         {
-            echo "OnInput: new ${keyCombo~}"
+;            echo "OnInput: new ${keyCombo~}"
             jo:SetReference["{}"]
             jo:SetString[keyCombo,"${keyCombo~}"]
 
@@ -2854,7 +2860,7 @@ objectdef isb2_profileengine
         }
         else
         {
-            echo "OnInput: existing ${keyCombo~}"
+;            echo "OnInput: existing ${keyCombo~}"
         }
 
         variable int counter
@@ -3054,7 +3060,7 @@ objectdef isb2_profileengine
             }
         }
         
-        This:ExecuteActionList[joStep,"joStep.Get[actions]",${newState}]        
+        This:ExecuteActionList[joRotator,"joStep.Get[actions]",${newState}]        
     }
 
     ; for any Action List, execute all actions depending on press/release state

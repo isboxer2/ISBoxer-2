@@ -1773,10 +1773,12 @@ objectdef isb2_profileengine
         else
             hold:Set[${joState.GetBool[hold]}]
 
-        if !${hold} || ${joAction.Has[activationState]}
+        if /*!${hold} ||*/ ${joAction.Has[activationState]}
         {
             echo press -nomodifiers "${keystroke}"
             press -nomodifiers "${keystroke}"
+            This:OnInput["${keystroke~}",1]
+            This:OnInput["${keystroke~}",0]
             return
         }
 
@@ -1784,11 +1786,13 @@ objectdef isb2_profileengine
         {
             echo press -hold "${keystroke}"
             press -hold "${keystroke}"
+            This:OnInput["${keystroke~}",1]
         }
         else
         {
             echo press -release "${keystroke}"
             press -release "${keystroke}"
+            This:OnInput["${keystroke~}",0]
         }
     }
 

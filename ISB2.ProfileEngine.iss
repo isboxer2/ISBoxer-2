@@ -1318,6 +1318,40 @@ objectdef isb2_profileengine
         return ${TimerPools.Get["${name~}"]:RetimeAction[joTimer,joState,joAction,${activate}](exists)}        
     }
 
+    member:jsonvalueref ActionStateFromMappable(jsonvalueref joMappable, bool hold)
+    {
+        variable jsonvalueref joState="{}"
+
+        joState:SetByRef[mappable,joMappable]
+        joState:SetString[sheet,"${joMappable.Get[sheet]~}"]
+        if ${hold}
+            joState:SetBool[hold,${hold}]
+        return joState
+    }
+
+    member:jsonvalueref ActionStateFromOwner(jsonvalueref joOwner, bool hold)
+    {
+        variable jsonvalueref joState="{}"
+        joState:SetByRef[owner,joOwner]
+        if ${hold}
+            joState:SetBool[hold,${hold}]
+        return joState
+    }
+
+    member:bool ActionHoldState(jsonvalueref joState, jsonvalueref joAction)
+    {
+        if ${joAction.Has[hold]}
+            return ${joAction.GetBool[hold]}
+        
+        if ${joState.Has[hold]}
+            return ${joState.GetBool[hold]}
+
+        if ${joState.Has[sheet]}
+            return ${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}
+
+        return FALSE
+    }
+
 #region Action Types
     method Action_Keystroke(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
@@ -1331,12 +1365,7 @@ objectdef isb2_profileengine
             return
 
         variable bool hold
-        if ${joAction.Has[hold]}
-            hold:Set[${joAction.GetBool[hold]}]
-        elseif ${joState.Has[hold]}
-            hold:Set[${joState.GetBool[hold]}]
-        elseif ${joState.Has[sheet]}
-            hold:Set[${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}]
+        hold:Set[${This.ActionHoldState[joState,joAction]}]
 
         if !${hold} || ${joAction.Has[activationState]}
         {
@@ -1388,12 +1417,7 @@ objectdef isb2_profileengine
 
 
         variable bool hold
-        if ${joAction.Has[hold]}
-            hold:Set[${joAction.GetBool[hold]}]
-        elseif ${joState.Has[hold]}
-            hold:Set[${joState.GetBool[hold]}]
-        elseif ${joState.Has[sheet]}
-            hold:Set[${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}]
+        hold:Set[${This.ActionHoldState[joState,joAction]}]
 
         if !${hold} || ${joAction.Has[activationState]}
         {
@@ -1632,6 +1656,16 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        variable bool hold
+        hold:Set[${This.ActionHoldState[joState,joAction]}]
+
+        if !${hold} || ${joAction.Has[activationState]}
+        {
+            This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",1]
+            This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",0]
+            return
+        }
+
         This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",${activate}]
     }
 
@@ -1649,6 +1683,16 @@ objectdef isb2_profileengine
         echo "\agAction_InputMapping\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
+
+        variable bool hold
+        hold:Set[${This.ActionHoldState[joState,joAction]}]
+
+        if !${hold} || ${joAction.Has[activationState]}
+        {
+            This:ExecuteInputMappingByName["${joAction.Get[name]~}",1]
+            This:ExecuteInputMappingByName["${joAction.Get[name]~}",0]
+            return
+        }        
 
         This:ExecuteInputMappingByName["${joAction.Get[name]~}",${activate}]
     }
@@ -1772,12 +1816,7 @@ objectdef isb2_profileengine
         }
 
         variable bool hold
-        if ${joAction.Has[hold]}
-            hold:Set[${joAction.GetBool[hold]}]
-        elseif ${joState.Has[hold]}
-            hold:Set[${joState.GetBool[hold]}]
-        elseif ${joState.Has[sheet]}
-            hold:Set[${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}]
+        hold:Set[${This.ActionHoldState[joState,joAction]}]
 
         if !${hold} || ${joAction.Has[activationState]}
         {
@@ -2916,7 +2955,7 @@ objectdef isb2_profileengine
         numStep:Set[${This.Rotator_GetCurrentStepNum[joMappable]}]
         if ${numStep}>0
         {
-            This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]",${newState}]
+            This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]","This.ActionStateFromMappable[joMappable]",${newState}]
             This:Rotator_PostExecute[joMappable,${newState},${numStep}]
         }
         else
@@ -3020,7 +3059,7 @@ objectdef isb2_profileengine
     }
 
     ; for any Rotate object, execute a given step, depending on press/release state
-    method ExecuteRotatorStep(jsonvalueref joRotator, jsonvalueref joStep, bool newState)
+    method ExecuteRotatorStep(jsonvalueref joRotator, jsonvalueref joStep, jsonvalueref joState, bool newState)
     {
         if !${joRotator.Type.Equal[object]}
             return
@@ -3060,7 +3099,7 @@ objectdef isb2_profileengine
             }
         }
         
-        This:ExecuteActionList[joRotator,"joStep.Get[actions]",${newState}]        
+        This:ExecuteActionList[joState,"joStep.Get[actions]",${newState}]        
     }
 
     ; for any Action List, execute all actions depending on press/release state
@@ -3103,8 +3142,10 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return FALSE
 
-        This:ExecuteAction[joOwner,joAction,1]
-        This:ExecuteAction[joOwner,joAction,0]
+        variable jsonvalueref joState
+        joState:SetReference["This.ActionStateFromOwner[joOwner]"]        
+        This:ExecuteAction[joState,joAction,1]
+        This:ExecuteAction[joState,joAction,0]
     }
     
     method ExecuteAction(jsonvalueref joState, jsonvalueref _joAction, bool activate)
@@ -3217,9 +3258,9 @@ objectdef isb2_profileengine
                     return FALSE
                 return ${This:ExecuteTriggerByName["${targetName~}",${newState}](exists)}
             case action
-                return ${This:ExecuteAction[joMapping,"joMapping.Get[action]",${newState}](exists)}
+                return ${This:ExecuteAction["This.ActionStateFromOwner[joMapping]","joMapping.Get[action]",${newState}](exists)}
             case actions
-                return ${This:ExecuteActionList[joMapping,"joMapping.Get[actions]",${newState}](exists)}
+                return ${This:ExecuteActionList["This.ActionStateFromOwner[joMapping]","joMapping.Get[actions]",${newState}](exists)}
         }
 
         return FALSE

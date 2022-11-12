@@ -13,20 +13,23 @@
                     "name":"keystroke",
                     "handler":"Action_Keystroke",
                     "retarget":true,
-                    "timer":false
+                    "timer":false,
+                    "activationState":true
                 },
                 {
                     "name":"game key binding",
                     "handler":"Action_GameKeyBinding",
                     "retarget":true,
                     "variableProperties":["name"],
-                    "timer":false
+                    "timer":false,
+                    "activationState":true
                 },
                 {
                     "name":"game macro",
                     "handler":"Action_GameMacro",
                     "retarget":true,
                     "variableProperties":["name","sheet"],
+                    "activationState":true,
                     "timer":false
                 },
                 {
@@ -107,6 +110,7 @@
                     "name":"mappable",
                     "handler":"Action_Mappable",
                     "variableProperties":["name","sheet"],
+                    "activationState":true,
                     "retarget":true,
                     "timer":false
                 },
@@ -114,6 +118,7 @@
                     "name":"input mapping",
                     "handler":"Action_InputMapping",
                     "variableProperties":["name"],
+                    "activationState":true,
                     "retarget":true,
                     "timer":false
                 },

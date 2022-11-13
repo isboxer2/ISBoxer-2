@@ -350,6 +350,8 @@ objectdef isb2_importer
         if ${jo.Has[ClickBarStrings]}
             joNew:SetByRef[clickBars,"jo.Get[ClickBarStrings]"]
 
+        if ${jo.Has[wowMacroSets]}
+            joNew:SetByRef[gameMacroSheets,"jo.Get[wowMacroSets]"]
 
         if ${jo.Has[executeOnLoad]}
         {
@@ -457,6 +459,9 @@ objectdef isb2_importer
 
         if ${jo.Has[ClickBarStrings]}
             joNew:SetByRef[clickBars,"jo.Get[ClickBarStrings]"]
+
+        if ${jo.Has[wowMacroSets]}
+            joNew:SetByRef[gameMacroSheets,"jo.Get[wowMacroSets]"]
 
         if ${jo.Has[LaunchCharacterSetStrings]}
             joNew:SetByRef[alsoLaunch,"jo.Get[LaunchCharacterSetStrings]"]

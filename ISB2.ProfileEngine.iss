@@ -184,6 +184,10 @@ objectdef isb2_profileengine
 		
 		fileredirect "ISBoxer_Character_Set.lua" "ISBoxer_Character_Set-${Team.Get[name]~}.lua"
 		fileredirect "ISBoxer_Character.lua" "ISBoxer_Character-${Character.Get[name]~}.lua"
+
+		fileredirect "ISBoxer_2_Team.lua" "ISBoxer_2_Team-${WoWAddon.Sanitize["${Team.Get[name]~}"]~}.lua"
+		fileredirect "ISBoxer_2_Character.lua" "ISBoxer_2_Character-${WoWAddon.Sanitize["${Character.Get[name]~}"]~}.lua"
+
     }
 
     method InstallDefaultActionTypes()
@@ -1841,15 +1845,6 @@ objectdef isb2_profileengine
         }
     }
 
-    method Action_KeyString(jsonvalueref joState, jsonvalueref joAction, bool activate)
-    {
-        echo "\arAction_KeyString\ax[${activate}] ${joAction~}"
-        if !${joAction.Type.Equal[object]}
-            return
-
-        ; text
-    }
-
     method Action_TargetGroup(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\arAction_TargetGroup\ax[${activate}] ${joAction~}"
@@ -1857,15 +1852,6 @@ objectdef isb2_profileengine
             return
 
         This:SetRelayGroup["${joAction.Get[name]~}",${joAction.GetBool[enable]}]
-    }
-
-    method Action_SyncCursor(jsonvalueref joState, jsonvalueref joAction, bool activate)
-    {
-        echo "\arAction_SyncCursor\ax[${activate}] ${joAction~}"
-        if !${joAction.Type.Equal[object]}
-            return
-
-        ; target
     }
 
     method Action_MappableStepState(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -1905,6 +1891,24 @@ objectdef isb2_profileengine
         {
             ClickBars.Get["${joAction.Get[clickBar]~}"]:ApplyChanges[${joAction.Get[numButton]},"joAction.Get[changes]"]
         }
+    }
+
+    method Action_KeyString(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_KeyString\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        ; text
+    }
+
+    method Action_SyncCursor(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_SyncCursor\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        ; target
     }
 
     method Action_WindowStyle(jsonvalueref joState, jsonvalueref joAction, bool activate)

@@ -2,12 +2,14 @@
 #include "ISB2.BroadcastMode.iss"
 #include "ISB2.ProfileEngine.iss"
 #include "ISB2.WindowLayoutEngine.iss"
+#include "ISB2.WoWAddon.iss"
 
 objectdef isb2session inherits isb2_profileengine
 {
     variable bool ValidSession
 
     variable isb2_profilecollection ProfileDB
+    variable isb2_wowaddon WoWAddon
 
     method Initialize()
     {
@@ -45,6 +47,7 @@ objectdef isb2session inherits isb2_profileengine
             This:InstallFromSessionMetadata[ISSession.Metadata]
 
             This:InstallDefaultVirtualFiles
+            WoWAddon:Generate
 
             ISSession.OnStartupCompleted:AttachAtom[This:Event_OnStartupCompleted]
             echo "\agISBoxer 2 activated.\ax"

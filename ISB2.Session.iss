@@ -21,7 +21,7 @@ objectdef isb2session inherits isb2_profileengine
 
         if !${agent.Get[ISBoxer 2](exists)}
         {
-            echo "ISBoxer 2 inactive; Inner Space build 7038 or later required (currently ${InnerSpace.Build})"
+            echo "ISBoxer 2 inactive; Agent not found..."
             return
         }
 

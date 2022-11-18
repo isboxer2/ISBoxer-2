@@ -379,6 +379,7 @@
                 "jsonTemplate":"window.contentContainer",
                 "padding":0
             },
+            "acceptsMouseFocus":true,
             "styles": {
                 "onHideTitleBar": {
                   "borderBrush": {
@@ -386,13 +387,15 @@
                   },
                   "backgroundBrush": {
                     "color": [ 0.0, 0.0, 0.0, 0.0 ]
-                  }
+                  },
+                  "acceptsMouseFocus":false
                 },
                 "onShowTitleBar": {
                     "borderBrush": "window.borderBrush",
                     "backgroundBrush":{
                         "color":"#00000000"
-                    }
+                    },
+                    "acceptsMouseFocus":true
                   }
               }          
         },

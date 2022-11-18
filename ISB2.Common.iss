@@ -919,6 +919,8 @@ objectdef isb2_clickbarButtonLayout
 objectdef isb2_clickbar
 {
     variable string Name
+    variable int X
+    variable int Y
     
 ;    variable jsonvalueref Data
     variable jsonvalueref Template
@@ -940,6 +942,11 @@ objectdef isb2_clickbar
 
         if ${jo.Has[name]}
             Name:Set["${jo.Get[name]~}"]                            
+
+        if ${jo.Has[x]}
+            X:Set["${jo.GetInteger[x]}"]
+        if ${jo.Has[y]}
+            Y:Set["${jo.GetInteger[y]}"]
 
 ;        Data:SetReference[jo]
 
@@ -1129,8 +1136,8 @@ objectdef isb2_clickbar
             "jsonTemplate":"isb2.clickbar",
             "name":${useName.AsJSON~},
             "title":${Name.AsJSON~},
-            "x":${Data.GetInteger[-default,0,x]},
-            "y":${Data.GetInteger[-default,0,y]}
+            "x":${X},
+            "y":${Y}
         }
         <$$"]
 

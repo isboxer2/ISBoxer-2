@@ -949,6 +949,7 @@ objectdef isb2_profileengine
             return
 
         This:SetRelayGroups["Character.Get[targetGroups]",0]
+        This:SetRelayGroup["${Character.Get[name]~}",1]
         Character:SetReference[NULL]
     }
 
@@ -1049,6 +1050,7 @@ objectdef isb2_profileengine
 
         This:ActivateWindowLayoutByName["${Team.Get["windowLayout"]~}"]
 
+        This:SetRelayGroup["${Character.Get[name]~}",1]
         This:SetRelayGroups["Character.Get[targetGroups]",1]
         This:InstallVirtualFiles["Character.Get[virtualFiles]"]
         This:VirtualizeMappables["Character.Get[virtualMappables]"]

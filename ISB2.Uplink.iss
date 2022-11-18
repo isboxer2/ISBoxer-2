@@ -439,6 +439,8 @@ objectdef isb2_slotmanager
         Event[OnFrame]:DetachAtom[This:Pulse]
         if !${StopTime}
             StopTime:Set["${Script.RunningTime}"]
+
+        relay is1 "ISB2:ResetTaskbarTab[1]"
     }
 
     member:bool AnyNotLive()

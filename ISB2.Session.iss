@@ -198,6 +198,17 @@ objectdef isb2session inherits isb2_profileengine
         Script:End
     }
 
+	method ResetTaskbarTab(bool callNextSlot)
+	{
+		Display.Window:SetTaskbarTabVisible[0]
+		timedcommand 1 Display.Window:SetTaskbarTabVisible[1]		
+
+		if ${callNextSlot}
+		{
+			timedcommand 2 relay "is${Slot.Inc}" "ISB2:ResetTaskbarTab[1]"
+		}
+	}
+
 }
 
 variable(global) isb2session ISB2

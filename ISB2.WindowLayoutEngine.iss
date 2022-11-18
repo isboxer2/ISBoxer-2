@@ -397,20 +397,16 @@ objectdef isb2_windowlayoutengine
     method Event_OnSlotActivate()
     {
         echo "isb2_windowlayoutengine:Event_OnSlotActivate"
-
-        if !${Settings.GetBool[swapOnSlotActivate]} && !${Settings.GetBool[refreshOnSlotActivate]} 
-        {
-            echo "isb2_windowlayoutengine:Event_OnSlotActivate: Ignoring"
-            return
-        }
-
-        if !${This:SetActiveStatus[1,OnSlotActivate](exists)}
-        {
-            echo "isb2_windowlayoutengine:Event_OnSlotActivate: SetActiveStatus=FALSE"
-            return
-        }
-
         if ${Settings.GetBool[swapOnSlotActivate]}
+        {
+            if !${This:SetActiveStatus[1,OnSlotActivate](exists)}
+            {
+                echo "isb2_windowlayoutengine:Event_OnSlotActivate: SetActiveStatus=FALSE"
+                return
+            }
+        }
+
+        if ${Settings.GetBool[-default,1,refreshOnSlotActivate]}
         {
             echo "isb2_windowlayoutengine: Applying."
             This:Apply
@@ -421,17 +417,15 @@ objectdef isb2_windowlayoutengine
     {
         echo "isb2_windowlayoutengine:Event_OnInternalActivate"
 
-        if !${Settings.GetBool[swapOnInternalActivate]} && !${Settings.GetBool[refreshOnInternalActivate]} 
-        {
-            return
-        }
-
-        if !${This:RefreshActiveStatus[OnInternalActivate](exists)}
-        {
-            return
-        }
-
         if ${Settings.GetBool[swapOnInternalActivate]} && !${Settings.GetBool[focusFollowsMouse]}
+        {
+            if !${This:RefreshActiveStatus[OnInternalActivate](exists)}
+            {
+                return
+            }
+        }
+
+        if ${Settings.GetBool[-default,1,refreshOnInternalActivate]}
         {
             echo "isb2_windowlayoutengine: Applying."
             This:Apply
@@ -442,17 +436,15 @@ objectdef isb2_windowlayoutengine
     {
         echo "isb2_windowlayoutengine:Event_OnActivate"
 
-        if !${Settings.GetBool[swapOnActivate]} && !${Settings.GetBool[refreshOnActivate]} 
+        if ${Settings.GetBool[swapOnActivate]}
         {
-            return
+            if !${This:RefreshActiveStatus[OnActivate](exists)}
+            {
+                return
+            }
         }
 
-        if !${This:RefreshActiveStatus[OnActivate](exists)}
-        {
-            return
-        }
-
-        if ${Settings.GetBool[swapOnActivate]} && !${Settings.GetBool[focusFollowsMouse]}
+        if ${Settings.GetBool[-default,1,refreshOnActivate]} && !${Settings.GetBool[focusFollowsMouse]}
         {
             echo "isb2_windowlayoutengine: Applying."
             This:Apply
@@ -463,17 +455,15 @@ objectdef isb2_windowlayoutengine
     {
         echo "isb2_windowlayoutengine:Event_OnDeactivate"
 
-        if !${Settings.GetBool[swapOnDeactivate]} && !${Settings.GetBool[refreshOnDeactivate]} 
+        if ${Settings.GetBool[swapOnDeactivate]}
         {
-            return
+            if !${This:RefreshActiveStatus[OnDeactivate](exists)}
+            {
+                return
+            }
         }
 
-        if !${This:RefreshActiveStatus[OnDeactivate](exists)}
-        {
-            return
-        }
-
-        if ${Settings.GetBool[swapOnDeactivate]} && !${Settings.GetBool[focusFollowsMouse]}
+        if ${Settings.GetBool[-default,1,refreshOnDeactivate]} && !${Settings.GetBool[focusFollowsMouse]}
         {
             echo "isb2_windowlayoutengine: Applying."
             This:Apply
@@ -483,11 +473,20 @@ objectdef isb2_windowlayoutengine
     method Event_OnHotkeyFocused()
     {
         echo "isb2_windowlayoutengine:Event_OnHotkeyFocused"
-        if !${Settings.GetBool[swapOnHotkeyFocused]}
-            return
+        if ${Settings.GetBool[swapOnHotkeyFocused]}
+        {
+            if !${This:RefreshActiveStatus[OnHotkeyFocused](exists)}
+            {
+                return
+            }
+            
+        }
 
-        if ${This:RefreshActiveStatus(exists)}
+        if ${Settings.GetBool[-default,1,refreshOnHotkeyFocused]}
+        {
+            echo "isb2_windowlayoutengine: Applying."
             This:Apply
+        }
     }
 
     method Event_OnWindowPosition()

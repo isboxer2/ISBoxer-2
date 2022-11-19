@@ -1605,8 +1605,11 @@ objectdef isb2_profileengine
         joStyle:SetString[color,"${joAction.Get[-default,"\"#ffffff\"",color]~}"]
 
         variable float duration=1
+        variable float fadeDuration=0.25
         if ${joAction.Has[duration]}
             duration:Set[${joAction.GetNumber[duration]}]
+        if ${joAction.Has[fadeDuration]}
+            fadeDuration:Set[${joAction.GetNumber[fadeDuration]}]
 
         variable jsonvalue joAnimation="$$>
         {
@@ -1628,7 +1631,7 @@ objectdef isb2_profileengine
                     "type":"fade",
                     "name":"fadeOut",
                     "opacity":0.0,
-                    "duration":0.25
+                    "duration":${fadeDuration}
                 }
             ]
         }

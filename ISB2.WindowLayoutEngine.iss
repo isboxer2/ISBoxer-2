@@ -22,6 +22,8 @@ objectdef isb2_windowlayoutengine
 
     variable jsonvalueref CurrentRegion
 
+    variable string LastApplied
+
     variable uint Group
 
     variable bool Roaming
@@ -36,8 +38,9 @@ objectdef isb2_windowlayoutengine
     variable uint NumInactiveRegion=2
 
     variable bool Active=FALSE
-    variable bool Resetting=FALSE
 
+    variable bool Attached
+    
     method Initialize()
     {
         ISB2WindowLayout:SetReference[This]
@@ -191,15 +194,22 @@ objectdef isb2_windowlayoutengine
     method Apply(bool forceReset=FALSE)
     {
         ; we're either going to apply ResetRegion or CurrentRegion.
+        if !${Display.AppWindowed}
+        {
+            ; window not available, do at earliest convenience
+            ;echo "isb2_windowlayoutengine:Apply: \ayWindow not available\ax"        
+            This:Attach
+            return FALSE
+        }
 
         if ${ResetRegion.Reference(exists)}
         {
             if !${This.RenderSizeMatchesReset} || ${forceReset}
             {
                 echo "isb2_windowlayoutengine:Apply applying Reset Region"
-                Resetting:Set[1]
+                LastApplied:Set[ResetRegion]
                 This:ApplyRegion[ResetRegion]
-                return
+                return TRUE
             }
         }
 
@@ -207,8 +217,40 @@ objectdef isb2_windowlayoutengine
         {
             Script:SetLastError["\arisb2_windowlayoutengine:Apply\ax: No CurrentRegion"]
         }
+        LastApplied:Set[CurrentRegion]
         This:ApplyRegion[CurrentRegion]
         ; WindowCharacteristics ${stealthFlag}-pos -viewable ${useX},${mainHeight} -size -viewable ${smallWidth}x${smallHeight} -frame none
+
+        return TRUE
+    }
+
+    method Attach()
+    {
+        if ${Attached}
+            return
+
+        Event[OnFrame]:AttachAtom[This:Event_OnFrame]
+        Attached:Set[1]
+    }
+
+    method Detach()
+    {
+        if !${Attached}
+            return
+
+        Event[OnFrame]:DetachAtom[This:Event_OnFrame]
+        Attached:Set[0]
+    }
+
+    method Event_OnFrame()
+    {
+        if ${LastApplied.Equal[CurrentRegion]}
+        {
+            This:Detach
+            return
+        }
+
+        This:Apply
     }
 
     method SetCurrentRegion(jsonvalueref useRegion)
@@ -548,18 +590,15 @@ objectdef isb2_windowlayoutengine
     method Event_On3DReset()
     {
         echo "isb2_windowlayoutengine:On3DReset"
-        if ${Resetting}
+        if !${LastApplied.NotNULLOrEmpty} || ${LastApplied.Equal[ResetRegion]}
         {
-            ;This:ApplyRegion[CurrentRegion]
             This:Apply
-            Resetting:Set[0]
         }
     }
 
     method Event_OnWindowCaptured()
     {
         echo "isb2_windowlayoutengine:Event_OnWindowCaptured, applying..."
-        Resetting:Set[1]        
         This:Apply
     }
 #endregion

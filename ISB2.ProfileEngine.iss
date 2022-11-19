@@ -3236,6 +3236,12 @@ objectdef isb2_profileengine
 
     member:bool ShouldExecuteAction(jsonvalueref joState, jsonvalueref joActionType, jsonvalueref joAction, bool activate)
     {
+        ; hold is enabled, need both states
+        if ${This.ActionHoldState[joState,joAction]}
+        {
+            return TRUE
+        }
+
         ; action-specific activationState
         if ${joAction.Has[activationState]}
         {

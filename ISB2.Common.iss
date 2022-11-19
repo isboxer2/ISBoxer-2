@@ -1893,6 +1893,9 @@ objectdef isb2_timerpool
             Name:Set["${jo.Get[name]~}"]
         if ${jo.Has[description]}
             Description:Set["${jo.Get[description]~}"]
+        if ${jo.Has[backEndRemoval]}
+            BackEndRemoval:Set[${jo.GetBool[backEndRemoval]}]
+        
         MaxTimers:Set[${jo.GetInteger[-default,0,maxTimers]}]
     }
 

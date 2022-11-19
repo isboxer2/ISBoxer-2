@@ -1205,6 +1205,8 @@ objectdef isb2_triggerchain
 objectdef isb2_hotkeysheet
 {
     variable string Name
+
+    variable bool Enable
     variable bool Enabled
 
     variable jsonvalue Hotkeys="{}"
@@ -1229,10 +1231,8 @@ objectdef isb2_hotkeysheet
 
         jo.Get[hotkeys]:ForEach["This:Add[ForEach.Value]"]
 
-        if ${jo.GetBool[enable]}
-        {
-            This:Enable
-        }
+        if ${jo.GetBool[-default,true,enable]}
+            Enable:Set[1]
     }
 
     method Add(jsonvalueref jo)
@@ -1244,8 +1244,23 @@ objectdef isb2_hotkeysheet
         Hotkeys:SetByRef["${jo.Get[name]~}",jo]
     }
 
+    method Activate()
+    {
+        if !${Enable}
+            return FALSE
+
+        This:Enable
+        return TRUE
+    }
+
     method Enable()
     {
+        if ${Enabled}
+            return TRUE
+        
+        if !${ISB2.AllowHotkeySheet["${Name~}"]}
+            return FALSE
+
         Enabled:Set[1]
 
         variable jsonvalue joQuery="{}"
@@ -1253,12 +1268,18 @@ objectdef isb2_hotkeysheet
         joQuery:SetBool[value,0]
         joQuery:SetString[eval,"Select.GetBool[enable]"]
         Hotkeys:ForEach["This:EnableHotkey[ForEach.Value]",joQuery]
+
+        return TRUE
     }
 
     method Disable()
     {
+        if !${Enabled}
+            return TRUE
         Enabled:Set[0]
         Hotkeys:ForEach["This:DisableHotkey[ForEach.Value]"]
+
+        return TRUE
     }
 
     method Toggle()
@@ -1303,6 +1324,7 @@ objectdef isb2_mappablesheet
 
     variable jsonvalue Mappables="{}"
 
+    variable bool Enable
     variable bool Enabled
 
     variable bool Hold
@@ -1312,7 +1334,7 @@ objectdef isb2_mappablesheet
 
     method Initialize(jsonvalueref jo)
     {
-        Enabled:Set[1]
+;        Enabled:Set[1]
         This:FromJSON[jo]
     }
 
@@ -1324,8 +1346,8 @@ objectdef isb2_mappablesheet
         if ${jo.Has[name]}
             Name:Set["${jo.Get[name]~}"]
 
-        if ${jo.Has[enable]}
-            Enabled:Set[${jo.GetBool[enable]}]
+        if ${jo.GetBool[-default,true,enable]}
+            Enable:Set[1]
 
         if ${jo.Has[hold]}
             Hold:Set[${jo.GetBool[hold]}]
@@ -1355,15 +1377,33 @@ objectdef isb2_mappablesheet
         Mappables:SetByRef["${jo.Get[name]~}",jo]
     }
 
+    method Activate()
+    {
+        if !${Enable}
+        {
+;            echo "isb2_mappablesheet[${Name~}]:Activate: enable=false"
+            return FALSE
+        }
+
+        This:Enable
+        return TRUE
+    }
 
     method Enable()
     {
+        if ${Enabled}
+            return TRUE
+        if !${ISB2.AllowMappableSheet["${Name~}"]}
+            return FALSE
+
         Enabled:Set[1]
+        return TRUE
     }
 
     method Disable()
     {
         Enabled:Set[0]
+        return TRUE
     }
 
     method Toggle()

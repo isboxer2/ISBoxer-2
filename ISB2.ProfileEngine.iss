@@ -14,6 +14,14 @@ objectdef isb2_profileengine
     ; a list of active Relay Groups
     variable set RelayGroups
 
+    variable set MappableSheetBlackList
+    variable set MappableSheetWhiteList
+    variable bool MappableSheetListExclusive
+
+    variable set HotkeySheetBlackList
+    variable set HotkeySheetWhiteList
+    variable bool HotkeySheetListExclusive
+
     ; a distributed scope which shares data with the Team
     variable weakref TeamScope
 
@@ -246,6 +254,36 @@ objectdef isb2_profileengine
         OnSlotActivate:Execute
     }
 
+    member:bool AllowHotkeySheet(string name)
+    {
+        if ${HotkeySheetWhiteList.Contains["${name~}"]}
+            return TRUE
+        if ${HotkeySheetBlackList.Contains["${name~}"]}
+            return FALSE
+
+        if ${HotkeySheetListExclusive}
+            return FALSE
+        return TRUE
+    }
+
+    member:bool AllowMappableSheet(string name)
+    {
+        if ${HotkeySheetWhiteList.Contains["${name~}"]}
+            return TRUE
+        if ${HotkeySheetBlackList.Contains["${name~}"]}
+        {
+;            echo "AllowMappableSheet[${name~}]: \arBlackListed\ax"
+            return FALSE
+        }
+
+        if ${HotkeySheetListExclusive}
+        {
+;            echo "AllowMappableSheet[${name~}]: \rExclusive\ax"
+            return FALSE
+        }
+        return TRUE
+    }
+
 #region Object Installers/Uninstallers
     method InstallActionTypes(jsonvalueref ja)
     {
@@ -424,6 +462,32 @@ objectdef isb2_profileengine
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:UninstallClickBar[ForEach.Value]"]
     }    
+
+    method InstallMappableSheetList(bool whiteList, jsonvalueref ja)
+    {
+        if ${whiteList}
+        {
+            ja:ForEach["MappableSheetWhiteList:Add[\"\${ForEach.Value~}\"]"]            
+        }
+        else
+        {
+            ja:ForEach["MappableSheetBlackList:Add[\"\${ForEach.Value~}\"]"]
+        }
+        ;MappableSheetListExclusive:Set[1]
+    }
+
+    method InstallHotkeySheetList(bool whiteList, jsonvalueref ja)
+    {
+        if ${whiteList}
+        {
+            ja:ForEach["HotkeySheetWhiteList:Add[\"\${ForEach.Value~}\"]"]            
+        }
+        else
+        {
+            ja:ForEach["HotkeySheetBlackList:Add[\"\${ForEach.Value~}\"]"]
+        }
+        ;HotkeySheetListExclusive:Set[1]
+    }
 
     method InstallHotkeySheet(jsonvalueref jo)
     {
@@ -1048,6 +1112,27 @@ objectdef isb2_profileengine
         This:ActivateSlot["${This.GetCharacterSlot["${Character.Get[name]~}"]}"]
         This:ActivateProfilesByName["Character.Get[profiles]"]
 
+        ; white/black lists
+        switch ${jo.Get[mappableSheetWhiteOrBlackListType]}
+        {
+            case BlackList
+                This:InstallMappableSheetList[FALSE,"jo.Get[mappableSheetWhiteOrBlackList]"]
+                break
+            case WhiteList
+                This:InstallMappableSheetList[TRUE,"jo.Get[mappableSheetWhiteOrBlackList]"]
+                break
+        }
+
+        switch ${jo.Get[hotkeySheetWhiteOrBlackListType]}
+        {
+            case BlackList
+                This:InstallHotkeySheetList[FALSE,"jo.Get[hotkeySheetWhiteOrBlackList]"]
+                break
+            case WhiteList
+                This:InstallHotkeySheetList[TRUE,"jo.Get[hotkeySheetWhiteOrBlackList]"]
+                break
+        }
+
         This:ActivateWindowLayoutByName["${Team.Get["windowLayout"]~}"]
 
         This:SetRelayGroup["${Character.Get[name]~}",1]
@@ -1059,6 +1144,11 @@ objectdef isb2_profileengine
 
         Character.Get[clickBars]:ForEach["ClickBars.Get[\"\${ForEach.Value~}\"]:Enable"]
         Character.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
+
+        Character.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Activate"]
+        Character.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Activate"]
+        Team.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Activate"]
+        Team.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Activate"]
 
         This:SetGUIMode[0]
 
@@ -1099,6 +1189,27 @@ objectdef isb2_profileengine
         This:SetRelayGroup["${qualifiedName~}",1]
         
         This:ActivateProfilesByName["Team.Get[profiles]"]
+
+        ; white/black lists
+        switch ${jo.Get[mappableSheetWhiteOrBlackListType]}
+        {
+            case BlackList
+                This:InstallMappableSheetList[FALSE,"jo.Get[mappableSheetWhiteOrBlackList]"]
+                break
+            case WhiteList
+                This:InstallMappableSheetList[TRUE,"jo.Get[mappableSheetWhiteOrBlackList]"]
+                break
+        }
+
+        switch ${jo.Get[hotkeySheetWhiteOrBlackListType]}
+        {
+            case BlackList
+                This:InstallHotkeySheetList[FALSE,"jo.Get[hotkeySheetWhiteOrBlackList]"]
+                break
+            case WhiteList
+                This:InstallHotkeySheetList[TRUE,"jo.Get[hotkeySheetWhiteOrBlackList]"]
+                break
+        }
 
         This:SetRelayGroups["Team.Get[targetGroups]",1]
         This:InstallVirtualFiles["Team.Get[virtualFiles]"]

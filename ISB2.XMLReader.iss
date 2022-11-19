@@ -371,8 +371,13 @@ objectdef isb2_isb1transformer
             else
                 ja:AddByRef[joEntry]
         }
-        else
+        elseif ${joEntry.Used}
             ja:AddByRef[joEntry]
+        else
+        {
+            joTransform:Erase["${property~}"]
+            return
+        }
 ;        echo Transformed ${property~}
         joTransform:SetByRef["${property~}",ja]
     }
@@ -396,8 +401,13 @@ objectdef isb2_isb1transformer
         variable jsonvalue ja="[]"
         if ${joEntry.Used} == 1        
             joEntry:ForEach["ja:Add[\"\${ForEach.Value.AsJSON~}\"]"]
-        else
+        elseif ${joEntry.Used}
             ja:AddByRef[joEntry]
+        else
+        {
+            joTransform:Erase["${property~}"]
+            return
+        }
 ;        echo "Transformed ${property~}: ${ja~}"
         joTransform:SetByRef["${property~}",ja]
     }
@@ -1331,7 +1341,7 @@ objectdef isb2_xmlreader
 
         if !${_node.Child(exists)}
         {                        
-            jv:SetValue[""]
+            jv:SetValue["{}"]
             return jv
         }
 

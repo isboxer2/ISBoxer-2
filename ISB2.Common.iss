@@ -501,11 +501,61 @@ objectdef isb2_clickbarButton
         Data:SetReference[jo]
         if !${Data.Reference(exists)}
             Data:SetReference["{}"]
+
+        This:SortClicks
     }
 
     method Shutdown()
     {
         Element:Destroy
+    }
+
+    
+    member:uint FindInsertPosition(jsonvalueref ja, jsonvalueref jo)
+    {
+        ; return 0 to add to the end
+        if !${ja.Used}
+            return 0
+
+        variable uint numModifiers
+        numModifiers:Set[${jo.Get[modifiers].Used}]
+
+        ; no modifiers? always at the end.
+        if !${numModifiers}
+            return 0
+
+        variable jsonvalue joQuery
+        joQuery:SetValue["$$>
+        {
+            "eval":"Select.Get[modifiers].Used",
+            "op":"<=",
+            "value":${numModifiers}
+        }
+        <$$"]
+
+        ; if the query finds no match ("modifiers" count <= numModifiers), then this returns 0
+        ; and we add to the end of ActionTimers
+        return ${ja.SelectKey[joQuery]}        
+    }
+
+    method SortedInsert(jsonvalueref ja, jsonvalueref jo)
+    {
+        variable uint pos=${This.FindInsertPosition[ja,jo]}
+
+        if ${pos}
+            ja:InsertByRef[${pos},jo]
+        else
+            ja:AddByRef[jo]
+    }
+
+    method SortClicks()
+    {
+        variable jsonvalueref jaClicks="Data.Get[clicks]"
+
+        variable jsonvalue jaNew="[]"
+        jaClicks:ForEach["This:SortedInsert[jaNew,ForEach.Value]"]
+
+        Data:SetByRef[clicks,jaNew]
     }
 
     method Push()

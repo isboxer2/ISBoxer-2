@@ -24,6 +24,9 @@ objectdef isb2_windowlayoutengine
 
     variable uint Group
 
+    variable bool Roaming
+    variable uint RoamingSlot
+
     variable jsonvalueref ResetRegion
     variable uint NumResetRegion
 
@@ -278,9 +281,20 @@ objectdef isb2_windowlayoutengine
 
     method Remote_ActiveStatusChanged(string sessionName, uint numGroup, bool newValue, ewindowlayoutreason reason=0)
     {
-        echo "isb2_windowlayoutengine:Remote_ActiveStatusChanged \"${sessionName~}\" ${numGroup} ${newValue} ${reason}"
+        echo "isb2_windowlayoutengine:\ayRemote_ActiveStatusChanged\ax \"${sessionName~}\" ${numGroup} ${newValue} ${reason}"
         if ${numGroup}==${Group}
         {
+            ; roaming slot?
+            if ${newValue} && ${Roaming}
+            {
+                ; take the inactive region
+                This:SelectInactiveRegion["${This.GetInactiveRegionForSlot["${sessionName.Right[-2]}"]}"]                    
+                echo "Roaming: Inactive Region now ${This.NumInactiveRegion}"
+                This:SetActiveStatus[0,Remote]
+                This:Apply
+                return
+            }
+
             if ${Settings.GetBool[swapOnActivate]} 
             {
                 if !${Settings.GetBool[focusFollowsMouse]}
@@ -307,18 +321,24 @@ objectdef isb2_windowlayoutengine
         variable bool oldValue=${Active}
         variable bool fireEvent
         Active:Set[${newValue}]
-        echo "isb2_windowlayoutengine:SetActiveStatus[${newValue}] oldValue=${oldValue}"
+        echo "isb2_windowlayoutengine:\agSetActiveStatus\ax[${newValue}] oldValue=${oldValue}"
 
         if !${CurrentRegion.Reference(exists)}
             fireEvent:Set[1]
 
         if ${Active}
+        {
             CurrentRegion:SetReference[ActiveRegion]
+
+            if ${Roaming}
+                This:SelectInactiveRegion[0]
+        }
         else
             CurrentRegion:SetReference[InactiveRegion]
 
         if ${fireEvent} || ${oldValue} != ${Active}
         {
+;            echo "firing \atRemote_ActiveStatusChanged\ax"
             relay "all other local" -noredirect "ISB2WindowLayout:Remote_ActiveStatusChanged[\"${Session~}\",${Group},${Active},${reason.Value}]"
             LGUI2.Element["windowLayoutEngine.events"]:FireEventHandler[activeStatusChanged]
             return TRUE
@@ -330,8 +350,10 @@ objectdef isb2_windowlayoutengine
     method RefreshActiveStatus(ewindowlayoutreason reason=0,bool forceUpdate=FALSE)
     {
         variable bool newValue=${Display.Window.IsForeground}
-        if ${forceUpdate} || ${newValue}!=${Active}       
+        if ${forceUpdate} || ${newValue}!=${Active}
+        {
             return ${This:SetActiveStatus[${newValue},${reason.Value}](exists)}
+        }
         return FALSE
     }
 
@@ -367,21 +389,32 @@ objectdef isb2_windowlayoutengine
 
         if ${Settings.Has[resetRegion]}
             NumResetRegion:Set["${Settings.GetInteger[resetRegion]}"]
-
-        NumInactiveRegion:Set[${This.GetInactiveRegionForSlot[${ISB2.Slot}]}]
-
-        variable jsonvalueref joInactiveRegion
-        joInactiveRegion:SetReference["Regions.Get[joInactiveRegion]"]
         
-        variable uint numSwapGroup
-        numSwapGroup:Set["${joInactiveRegion.GetInteger[swapGroup]}+1"]
-        SwapGroup:SetReference["${jo.Get[swapGroups,${numSwapGroup}]}"]
+        Group:Set["${joInactiveRegion.GetInteger[swapGroup]}+1"]
+        SwapGroup:SetReference["${jo.Get[swapGroups,${Group}]}"]
         if ${SwapGroup.Type.Equal[object]}
         {
             NumActiveRegion:Set["${SwapGroup.GetInteger[active]}"]
             NumResetRegion:Set["${SwapGroup.GetInteger[reset]}"]
+            RoamingSlot:Set["${SwapGroup.GetInteger[roamingSlot]}"]                    
+            Roaming:Set[${RoamingSlot.Equal[${ISB2.Slot}]}]            
         }
-        
+        else
+        {
+            NumActiveRegion:Set[1]
+            NumResetRegion:Set[1]
+            RoamingSlot:Set[0]
+            Roaming:Set[0]
+        }
+
+        if ${Roaming}
+            NumInactiveRegion:Set[0]
+        else
+            NumInactiveRegion:Set[${This.GetInactiveRegionForSlot[${ISB2.Slot}]}]
+
+        variable jsonvalueref joInactiveRegion
+        joInactiveRegion:SetReference["Regions.Get[joInactiveRegion]"]
+
         echo active=${NumActiveRegion} inactive=${NumInactiveRegion} reset=${NumResetRegion}
         This:SelectRegions[${NumActiveRegion},${NumInactiveRegion}]
         This:SelectResetRegion[${NumResetRegion}]
@@ -399,6 +432,7 @@ objectdef isb2_windowlayoutengine
         echo "isb2_windowlayoutengine:Event_OnSlotActivate"
         if ${Settings.GetBool[swapOnSlotActivate]}
         {
+;            echo calling This:SetActiveStatus[1,OnSlotActivate]
             if !${This:SetActiveStatus[1,OnSlotActivate](exists)}
             {
                 echo "isb2_windowlayoutengine:Event_OnSlotActivate: SetActiveStatus=FALSE"
@@ -438,6 +472,7 @@ objectdef isb2_windowlayoutengine
 
         if ${Settings.GetBool[swapOnActivate]}
         {
+;            echo calling This:RefreshActiveStatus[OnSlotActivate]
             if !${This:RefreshActiveStatus[OnActivate](exists)}
             {
                 return

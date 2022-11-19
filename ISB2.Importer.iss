@@ -1228,8 +1228,19 @@ objectdef isb2_importer
         ; all ISB1 window layouts default to no frame
         joSettings:SetString[frame,none]
 
-        joSettings:SetBool[focusFollowsMouse,"${jo.GetBool[focusFollowsMouse]}"]
+        if ${jo.GetBool[focusFollowsMouse]}
+            joSettings:SetBool[focusFollowsMouse,1]
         joSettings:SetBool[instantSwap,"${jo.GetBool[instantSwap]}"]
+
+        switch ${jo.Get[focusClickMode]}
+        {
+            case Ignore
+                joSettings:SetBool[focusClick,0]
+                break
+            case Click
+                joSettings:SetBool[focusClick,1]
+                break
+        }
 
         if ${jo.Has[swapMode]}
         {

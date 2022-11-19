@@ -449,6 +449,27 @@ objectdef isb2_windowlayoutengine
             Roaming:Set[0]
         }
 
+        switch ${Settings.GetBool[focusClick]}
+        {
+            case FALSE
+                FocusClick eat
+                break
+            case TRUE
+                FocusClick click
+                break
+            default
+                FocusClick application
+                break
+        }
+
+        switch ${Settings.Get[swapMode]}
+        {
+            case Always
+            case AlwaysForGames
+                FocusClick eat
+                break
+        }
+
         if ${Roaming}
             NumInactiveRegion:Set[0]
         else

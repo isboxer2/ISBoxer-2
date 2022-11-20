@@ -347,26 +347,36 @@
                 }
             }
         },
+        "isb2.clickbar.listbox":{
+            "jsonTemplate":"listbox",
+            "type":"listbox",
+            "borderThickness":0,
+            "content":{
+                "jsonTemplate": "listbox.content",
+                "type": "wrappanel",
+                "orientation":"horizontal",
+                "childSize":[32,32]      
+            },
+            "contentContainer": {
+                "jsonTemplate": "listbox.contentContainerFitWidth",
+                "horizontalScroll": "fit"
+            },        
+            "itemsBinding":{
+                "pullFormat":"${This.Context.GetButtons}"
+            },
+            "itemViewGenerators": {
+                "default":{
+                    "type":"method",
+                    "object":"This.Parent.Context",
+                    "method":"GenerateButtonView"
+                }
+            }
+        },
         "isb2.clickbar":{
             "type":"window",
             "jsonTemplate":"window",
             "content":{
-                "type":"listbox",
-                "borderThickness":0,
-                "content":{
-                    "jsonTemplate": "listbox.content",
-                    "orientation":"horizontal"
-                },
-                "itemsBinding":{
-                    "pullFormat":"${This.Context.GetButtons}"
-                },
-                "itemViewGenerators": {
-                    "default":{
-                        "type":"method",
-                        "object":"This.Parent.Context",
-                        "method":"GenerateButtonView"
-                    }
-                }
+                "jsonTemplate":"isb2.clickbar.listbox"
             }
         },
         "isb2.vfx":{

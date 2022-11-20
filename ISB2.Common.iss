@@ -786,7 +786,7 @@ objectdef isb2_clickbarButton
 ;        joButton.Get[content,children]:AddByRef[joImagebox]
         joButton.Get[content,children]:AddByRef[joTextblock]
 
-;        echo "\ayfinal\ax ${joButton.AsJSON~}"
+;        echo "\aybutton final\ax ${joButton.AsJSON~}"
         return joButton
     }
 
@@ -1187,9 +1187,25 @@ objectdef isb2_clickbar
             "name":${useName.AsJSON~},
             "title":${Name.AsJSON~},
             "x":${X},
-            "y":${Y}
+            "y":${Y},
+            "content":{
+                "jsonTemplate":"isb2.clickbar.listbox",
+                "content":{
+                    "jsonTemplate": "listbox.content",
+                    "type": "wrappanel",
+                    "uniform":false,
+                    "orientation":"horizontal",
+                    "childSize":[${Template.GetInteger[buttonWidth].Inc[${Template.GetInteger[buttonMargin,1]}]},${Template.GetInteger[buttonHeight].Inc[${Template.GetInteger[buttonMargin,2]}]}]      
+                }
+            }
         }
         <$$"]
+
+        if ${Template.Has[frameSize]}
+        {
+            joWindow.Get[content]:SetInteger[width,${Template.GetInteger[frameSize,1]}]
+            joWindow.Get[content]:SetInteger[height,${Template.GetInteger[frameSize,2]}]
+        }
 
         if ${Template.Has[backgroundColor]}
             joWindow:Set[backgroundBrush,"{\"color\":\"${Template.Get[backgroundColor]~}\"}"]
@@ -1197,6 +1213,7 @@ objectdef isb2_clickbar
         if ${Template.Has[borderColor]}
             joWindow:Set[borderBrush,"{\"color\":\"${Template.Get[borderColor]~}\"}"]
 
+;        echo "\ayCreateWindow final\ax ${joWindow~}"
         LGUI2:PushSkin["ISBoxer 2"]
         Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
         LGUI2:PopSkin["ISBoxer 2"]

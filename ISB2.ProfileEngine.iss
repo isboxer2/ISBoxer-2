@@ -1097,6 +1097,9 @@ objectdef isb2_profileengine
 ;        echo "\atInstalling Slot vfxSheets\ax ${SlotRef.Get[vfxSheets]~}"
         SlotRef.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
+        if ${SlotRef.Has[windowTitle]}
+            windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
+
         This:ExecuteEventAction[SlotRef,onLoad]
 
         echo "\agActivateSlot complete\ax"

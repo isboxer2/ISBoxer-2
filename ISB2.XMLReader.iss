@@ -443,6 +443,13 @@ objectdef isb2_isb1transformer
     {
         if !${joTransform.Has["${oldProperty~}"]}
             return
+        switch ${joTransform.GetType["${oldProperty~}"]}
+        {
+            case object
+            case array
+                joTransform:Erase["${oldProperty~}"]
+                return
+        }
         if !${joTransform.Assert["${oldProperty~}","${defaultValue.AsJSON~}"]}
             joTransform:SetString["${newProperty~}","${joTransform.Get["${oldProperty~}"]~}"]
         joTransform:Erase["${oldProperty~}"]
@@ -972,6 +979,7 @@ objectdef isb2_isb1transformer
 
         This:TransformString[joTransform,Name,name]
         This:TransformString[joTransform,Text,text]
+        This:TransformString[joTransform,Tooltip,tooltip]
         This:AutoTransform[joTransform,TextStyle,ClickBarButton]
 
         ; although this setting appears in the profile XML, it is completely unused....

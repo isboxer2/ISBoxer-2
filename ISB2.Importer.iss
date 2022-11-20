@@ -842,8 +842,8 @@ objectdef isb2_importer
         if ${jo.Has[text]}
             joNew:SetString[text,"${jo.Get[text]~}"]
 
-        if ${jo.Has[Tooltip]}
-            joNew:SetString[tooltip,"${jo.Get[Tooltip]~}"]
+        if ${jo.Has[tooltip]}
+            joNew:SetString[tooltip,"${jo.Get[tooltip]~}"]
 
         ; although this setting appears in the profile XML, it is completely unused
 ;        if ${jo.Has[enabled]}

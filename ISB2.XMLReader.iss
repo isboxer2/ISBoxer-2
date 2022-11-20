@@ -455,7 +455,7 @@ objectdef isb2_isb1transformer
         if ${joTransform.Has["${oldProperty~}"]}
         {
             fname:Set["${joTransform.Get["${oldProperty~}"]~}"]
-            if ${fname.StartsWith["${LavishScript.HomeDirectory}"]}
+            if ${fname.StartsWith["${LavishScript.HomeDirectory}/"]}
             {
                 ; this will alter the filename to be relative to the current path
                 fname:Set["../..${fname.Right[-${LavishScript.HomeDirectory.Length}]}"]

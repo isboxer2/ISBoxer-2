@@ -73,7 +73,7 @@ objectdef isb2_importer
         jRef:SetReference[This.ConvertMenus]        
         if ${jRef.Used}
         {
-            if !${jo.Has[clickBars]}
+            if !${jo.Has[-notnull,clickBars]}
                 jo:Set[clickBars,"[]"]
             jRef:ForEach["jo.Get[clickBars]:AddByRef[ForEach.Value]"]
         }
@@ -307,17 +307,17 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
-        if ${jo.Has[ActualName]}
+        if ${jo.Has[-notnull,ActualName]}
             joNew:SetString[actualName,"${jo.Get[ActualName]~}"]
 
-        if ${jo.Has[SubAccountName]}
+        if ${jo.Has[-notnull,SubAccountName]}
         {
-            if ${jo.Has[AccountName]}
+            if ${jo.Has[-notnull,AccountName]}
                 joNew:SetString[email,"${jo.Get[AccountName]~}"]
 
             joNew:SetString[accountName,"${jo.Get[SubAccountName]~}"]
         }
-        elseif ${jo.Has[AccountName]}
+        elseif ${jo.Has[-notnull,AccountName]}
         {
             variable string accountName
             accountName:Set["${jo.Get[AccountName]~}"]
@@ -327,37 +327,37 @@ objectdef isb2_importer
                 joNew:SetString[accountName,"${accountName~}"]
         }
 
-        if ${jo.Has[muteBroadcasts]}
+        if ${jo.Has[-notnull,muteBroadcasts]}
             joNew:SetBool[muteBroadcasts,${jo.GetBool[muteBroadcasts]}]
-        if ${jo.Has[videoFeedViewersPermanent]}
+        if ${jo.Has[-notnull,videoFeedViewersPermanent]}
             joNew:SetBool[vfxViewersPermanent,${jo.GetBool[videoFeedViewersPermanent]}]
 
-        if ${jo.Has[ServerName]}
+        if ${jo.Has[-notnull,ServerName]}
             joNew:SetString[gameServer,"${jo.Get[ServerName]~}"]
 
-        if ${jo.Has[VirtualFileTargets]}
+        if ${jo.Has[-notnull,VirtualFileTargets]}
             joNew:SetByRef["virtualFiles","jo.Get[VirtualFileTargets]"]
 
-        if ${jo.Has[RelayGroupStrings]}
+        if ${jo.Has[-notnull,RelayGroupStrings]}
             joNew:SetByRef[targetGroups,"jo.Get[RelayGroupStrings]"]
 
-        if ${jo.Has[KeyMapStrings]}
+        if ${jo.Has[-notnull,KeyMapStrings]}
         {
             joNew:SetByRef[hotkeySheets,"jo.Get[KeyMapStrings]"]
             joNew:SetByRef[mappableSheets,"jo.Get[KeyMapStrings]"]
         }
 
-        if ${jo.Has[ClickBarStrings]}
+        if ${jo.Has[-notnull,ClickBarStrings]}
             joNew:SetByRef[clickBars,"jo.Get[ClickBarStrings]"]
 
-        if ${jo.Has[wowMacroSets]}
+        if ${jo.Has[-notnull,wowMacroSets]}
             joNew:SetByRef[gameMacroSheets,"jo.Get[wowMacroSets]"]
 
-        if ${jo.Has[executeOnLoad]}
+        if ${jo.Has[-notnull,executeOnLoad]}
         {
             variable jsonvalue joAction="{}"
             joAction:SetString[type,mappable]
-            if ${jo.Has[executeOnLoad,Target]}
+            if ${jo.Has[-notnull,executeOnLoad,Target]}
                 joAction:SetString[target,"${jo.Get[executeOnLoad,Target]~}"]
 
             joAction:SetString[sheet,"${jo.Get[executeOnLoad,KeyMapString]~}"]
@@ -369,19 +369,19 @@ objectdef isb2_importer
         joNew:SetString[game,"${jo.Get[KnownGame]~}"]
 
         variable jsonvalue ja
-        if ${jo.Has[VariableKeystrokeInstances]}
+        if ${jo.Has[-notnull,VariableKeystrokeInstances]}
         {
             ja:SetValue["[]"]
             jo.Get[VariableKeystrokeInstances]:ForEach["This:ConvertVariableKeystrokeInto[ja,ForEach.Value]"]
             joNew:SetByRef[gameKeyBindings,ja]
         }        
 
-        if ${jo.Has[KeyMapWhiteOrBlackListType]} && ${jo.Get[KeyMapWhiteOrBlackListType]~.NotEqual[Ignore]}
+        if ${jo.Has[-notnull,KeyMapWhiteOrBlackListType]} && ${jo.Get[KeyMapWhiteOrBlackListType]~.NotEqual[Ignore]}
         {
             joNew:SetString[mappableSheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
             joNew:SetString[hotkeySheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
 
-            if ${jo.Has[KeyMapWhiteOrBlackList]}
+            if ${jo.Has[-notnull,KeyMapWhiteOrBlackList]}
             {
                 ja:SetValue["[]"]
                 jo.Get[KeyMapWhiteOrBlackList]:ForEach["ja:AddString[\"\${ForEach.Value.Get[KeyMapString]}\"]"]
@@ -391,12 +391,12 @@ objectdef isb2_importer
             }
         }
 
-        if ${jo.Has[VirtualMappedKeys]}
+        if ${jo.Has[-notnull,VirtualMappedKeys]}
             joNew:SetByRef[virtualMappables,"jo.Get[VirtualMappedKeys]"]
 
-        if ${jo.Has[MenuInstances]}
+        if ${jo.Has[-notnull,MenuInstances]}
         {
-            if ${joNew.Has[clickBars]}
+            if ${joNew.Has[-notnull,clickBars]}
                 ja:SetValue["${joNew.Get[clickBars]~}"]
             else
                 ja:SetValue["[]"]
@@ -409,7 +409,7 @@ objectdef isb2_importer
         joGLI:SetString[game,"${jo.Get[Game]~}"]
         joGLI:SetString[gameProfile,"${jo.Get[GameProfile]~}"]
 
-        if ${jo.Has[AppendParameters]}
+        if ${jo.Has[-notnull,AppendParameters]}
             joGLI:SetString[appendParameters,"${jo.Get[AppendParameters]~}"]
 
         joNew:SetByRef[gameLaunchInfo,joGLI]
@@ -423,10 +423,10 @@ objectdef isb2_importer
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
 
-        if ${jo.Has[Description]}
+        if ${jo.Has[-notnull,Description]}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
-        if ${jo.Has[CursorClippingMode]}
+        if ${jo.Has[-notnull,CursorClippingMode]}
         {
             switch ${jo.Get[CursorClippingMode]~}
             {
@@ -439,47 +439,47 @@ objectdef isb2_importer
             }
         }
 
-        if ${jo.Has[ComputerString]}
+        if ${jo.Has[-notnull,ComputerString]}
             joNew:SetString[computer,"${jo.Get[ComputerString]~}"]
 
-        if ${jo.Has[RepeaterProfile]}
+        if ${jo.Has[-notnull,RepeaterProfile]}
             joNew:SetString[broadcastProfile,"${jo.Get[RepeaterProfile]~}"]
 
         if ${jo.Get[WindowLayout,WindowLayoutString].NotNULLOrEmpty}
             joNew:SetString[windowLayout,"${jo.Get[WindowLayout,WindowLayoutString]~}"]
 
-        if ${jo.Has[VirtualFileTargets]}
+        if ${jo.Has[-notnull,VirtualFileTargets]}
             joNew:SetByRef["virtualFiles","jo.Get[VirtualFileTargets]"]
 
-        if ${jo.Has[KeyMapStrings]}
+        if ${jo.Has[-notnull,KeyMapStrings]}
         {
             joNew:SetByRef[hotkeySheets,"jo.Get[KeyMapStrings]"]
             joNew:SetByRef[mappableSheets,"jo.Get[KeyMapStrings]"]
         }
 
-        if ${jo.Has[ClickBarStrings]}
+        if ${jo.Has[-notnull,ClickBarStrings]}
             joNew:SetByRef[clickBars,"jo.Get[ClickBarStrings]"]
 
-        if ${jo.Has[wowMacroSets]}
+        if ${jo.Has[-notnull,wowMacroSets]}
             joNew:SetByRef[gameMacroSheets,"jo.Get[wowMacroSets]"]
 
-        if ${jo.Has[LaunchCharacterSetStrings]}
+        if ${jo.Has[-notnull,LaunchCharacterSetStrings]}
             joNew:SetByRef[alsoLaunch,"jo.Get[LaunchCharacterSetStrings]"]
 
         variable jsonvalue ja
-        if ${jo.Has[VariableKeystrokeInstances]}
+        if ${jo.Has[-notnull,VariableKeystrokeInstances]}
         {
             ja:SetValue["[]"]
             jo.Get[VariableKeystrokeInstances]:ForEach["This:ConvertVariableKeystrokeInto[ja,ForEach.Value]"]
             joNew:SetByRef[gameKeyBindings,ja]
         }        
 
-        if ${jo.Has[KeyMapWhiteOrBlackListType]} && ${jo.Get[KeyMapWhiteOrBlackListType]~.NotEqual[Ignore]}
+        if ${jo.Has[-notnull,KeyMapWhiteOrBlackListType]} && ${jo.Get[KeyMapWhiteOrBlackListType]~.NotEqual[Ignore]}
         {
             joNew:SetString[mappableSheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
             joNew:SetString[hotkeySheetWhiteOrBlackListType,"${jo.Get[KeyMapWhiteOrBlackListType]~}"]
 
-            if ${jo.Has[KeyMapWhiteOrBlackList]}
+            if ${jo.Has[-notnull,KeyMapWhiteOrBlackList]}
             {
                 ja:SetValue["[]"]
                 jo.Get[KeyMapWhiteOrBlackList]:ForEach["ja:AddString[\"\${ForEach.Value.Get[KeyMapString]}\"]"]
@@ -489,12 +489,12 @@ objectdef isb2_importer
             }
         }
 
-        if ${jo.Has[VirtualMappedKeys]}
+        if ${jo.Has[-notnull,VirtualMappedKeys]}
             joNew:SetByRef[virtualMappables,"jo.Get[VirtualMappedKeys]"]
 
-        if ${jo.Has[MenuInstances]}
+        if ${jo.Has[-notnull,MenuInstances]}
         {
-            if ${joNew.Has[clickBars]}
+            if ${joNew.Has[-notnull,clickBars]}
                 ja:SetValue["${joNew.Get[clickBars]~}"]
             else
                 ja:SetValue["[]"]
@@ -503,56 +503,58 @@ objectdef isb2_importer
             joNew:SetByRef[clickBars,ja]
         }
 
-        if ${jo.Has[guiToggleCombo,Combo]}
+        if ${jo.Has[-notnull,guiToggleCombo,Combo]}
             joNew:SetString[guiToggleCombo,"${jo.Get[guiToggleCombo,Combo]~}"]
 
-        if !${jo.Has[useConsoleToggleCombo]} || ${jo.GetBool[useConsoleToggleCombo]}
+        if !${jo.Has[-notnull,useConsoleToggleCombo]} || ${jo.GetBool[useConsoleToggleCombo]}
         {
-            if ${jo.Has[consoleToggleCombo,Combo]}
+            if ${jo.Has[-notnull,consoleToggleCombo,Combo]}
                 joNew:SetString[consoleToggleCombo,"${jo.Get[consoleToggleCombo,Combo]~}"]
         }
-        if ${jo.Has[videoFXFocusCombo,Combo]}
+        if ${jo.Has[-notnull,videoFXFocusCombo,Combo]}
             joNew:SetString[vfxFocusCombo,"${jo.Get[videoFXFocusCombo,Combo]~}"]
 
-        if ${jo.Has[executeOnLoad]}
+        if ${jo.Has[-notnull,executeOnLoad,MappedKeyString]}
         {
             variable jsonvalue joAction="{}"
             joAction:SetString[type,mappable]
-            if ${jo.Has[executeOnLoad,Target]}
+            if ${jo.Has[-notnull,executeOnLoad,Target]}
                 joAction:SetString[target,"${jo.Get[executeOnLoad,Target]~}"]
 
-            joAction:SetString[sheet,"${jo.Get[executeOnLoad,KeyMapString]~}"]
+            if ${jo.Has[-notnull,executeOnLoad,KeyMapString]}
+                joAction:SetString[sheet,"${jo.Get[executeOnLoad,KeyMapString]~}"]
+                
             joAction:SetString[name,"${jo.Get[executeOnLoad,MappedKeyString]~}"]
 
             joNew:SetByRef[onLastSlotLoaded,joAction]
         }
 
-        if ${jo.Has[launchDelay]} && ${jo.GetNumber[launchDelay]}
+        if ${jo.Has[-notnull,launchDelay]} && ${jo.GetNumber[launchDelay]}
             joNew:SetNumber[launchDelay,"${jo.GetNumber[launchDelay]}"]
 
-        if ${jo.Has[dynamicLaunchMode]}
+        if ${jo.Has[-notnull,dynamicLaunchMode]}
             joNew:SetBool[dynamicLaunchMode,"${jo.GetBool[dynamicLaunchMode]}"]
 
 ; unused setting
-;        if ${jo.Has[lockWindow]}
+;        if ${jo.Has[-notnull,lockWindow]}
 ;            joNew:SetBool[lockWindow,"${jo.GetBool[lockWindow]}"]
 
-        if ${jo.Has[lockForeground]}
+        if ${jo.Has[-notnull,lockForeground]}
             joNew:SetBool[lockForeground,"${jo.GetBool[lockForeground]}"]
 
-        if ${jo.Has[disableJambaTeamManagement]}
+        if ${jo.Has[-notnull,disableJambaTeamManagement]}
             joNew:SetBool[disableJambaTeamManagement,"${jo.GetBool[disableJambaTeamManagement]}"]
 
-        if ${jo.Has[disableFPSIndicator]}
+        if ${jo.Has[-notnull,disableFPSIndicator]}
             joNew:SetBool[disableFPSIndicator,"${jo.GetBool[disableFPSIndicator]}"]
 
-        if ${jo.Has[disableForceWindowed]}
+        if ${jo.Has[-notnull,disableForceWindowed]}
             joNew:SetBool[disableForceWindowed,"${jo.GetBool[disableForceWindowed]}"]
 
-        if ${jo.Has[autoMuteBackground]}
+        if ${jo.Has[-notnull,autoMuteBackground]}
             joNew:SetBool[autoMuteBackground,"${jo.GetBool[autoMuteBackground]}"]
 
-        if ${jo.Has[enforceSingleWindowControl]} && ${jo.GetBool[enforceSingleWindowControlTested]}
+        if ${jo.Has[-notnull,enforceSingleWindowControl]} && ${jo.GetBool[enforceSingleWindowControlTested]}
             joNew:SetBool[enforceSingleWindowControl,"${jo.GetBool[enforceSingleWindowControl]}"]
 
 
@@ -568,24 +570,24 @@ objectdef isb2_importer
 ;        echo "\agConvertCharacterSetSlot\ax ${jo~}"
         variable jsonvalue joNew="{}"
 
-        if ${jo.Has[CharacterString]}
+        if ${jo.Has[-notnull,CharacterString]}
             joNew:SetString[character,"${jo.Get[CharacterString]~}"]
-        if ${jo.Has[foregroundMaxFPS]}
+        if ${jo.Has[-notnull,foregroundMaxFPS]}
             joNew:SetInteger[foregroundFPS,"${jo.GetInteger[foregroundMaxFPS]~}"]
-        if ${jo.Has[backgroundMaxFPS]}
+        if ${jo.Has[-notnull,backgroundMaxFPS]}
             joNew:SetInteger[backgroundFPS,"${jo.GetInteger[backgroundMaxFPS]~}"]
 
-        if ${jo.Has[switchToCombo,Combo]}
+        if ${jo.Has[-notnull,switchToCombo,Combo]}
             joNew:SetString[switchToCombo,"${jo.Get[switchToCombo,Combo]~}"]
 
-        if ${jo.Has[switchToComboIsGlobal]}
+        if ${jo.Has[-notnull,switchToComboIsGlobal]}
             joNew:SetBool[switchToComboIsGlobal,"${jo.GetBool[switchToComboIsGlobal]}"]
 
-        if ${jo.Has[effectType]}
+        if ${jo.Has[-notnull,effectType]}
             joNew:SetString[switchToEffectType,"${jo.Get[effectType]~}"]
 
         variable jsonvalue joAction="{}"
-        if ${jo.Has[switchToEffect,Combo]}
+        if ${jo.Has[-notnull,switchToEffect,Combo]}
         {
             joAction:SetString["type","keystroke"]
             joAction:SetString["target","all other"]
@@ -593,7 +595,7 @@ objectdef isb2_importer
 
             joNew:SetByRef[onSwitchTo,joAction]
         }
-        elseif ${jo.Has[SwitchToKeyMapString]}
+        elseif ${jo.Has[-notnull,SwitchToKeyMapString]}
         {
             joAction:SetString["type","mappable"]
             joAction:SetString["sheet","${jo.Get[SwitchToKeyMapString]~}"]
@@ -602,20 +604,20 @@ objectdef isb2_importer
             joNew:SetByRef[onSwitchTo,joAction]
         }
         
-        if ${jo.Has[WindowTitle]}
+        if ${jo.Has[-notnull,WindowTitle]}
             joNew:SetString[windowTitle,"${jo.Get[WindowTitle]~}"]
 
-        if ${jo.Has[FTLModifiers]}
+        if ${jo.Has[-notnull,FTLModifiers]}
             joNew:SetByRef[ftlModifiers,"jo.Get[FTLModifiers]"]
 
         variable jsonvalue ja="[]"
-        if ${jo.Has[VariableKeystrokeInstances]}
+        if ${jo.Has[-notnull,VariableKeystrokeInstances]}
         {
             jo.Get[VariableKeystrokeInstances]:ForEach["This:ConvertVariableKeystrokeInto[ja,ForEach.Value]"]
             joNew:SetByRef[gameKeyBindings,ja]
         }
 
-        if ${jo.Has[CPUCores]}
+        if ${jo.Has[-notnull,CPUCores]}
         {
             ja:SetValue["[]"]
             jo.Get[CPUCores]:ForEach["ja:AddInteger[\"\${ForEach.Value~}\"]"]
@@ -640,10 +642,10 @@ objectdef isb2_importer
         switch ${joVFX.Get[type]}
         {
             case feedoutput
-                if !${joSheet.Has[outputs]}
+                if !${joSheet.Has[-notnull,outputs]}
                     joSheet:Set[outputs,"[]"]
 
-                if ${joVFX.Has[regionName]}
+                if ${joVFX.Has[-notnull,regionName]}
                     joVFX:SetString[name,"${joVFX.Get[regionName]~}"]
                 else
                     joVFX:SetString[name,"${joSlot.Get[character]~}.${joVFX.Get[name]~}"]
@@ -655,10 +657,10 @@ objectdef isb2_importer
                 joSheet.Get[outputs]:AddByRef[joVFX]
                 break
             case feedsource
-                if !${joSheet.Has[sources]}
+                if !${joSheet.Has[-notnull,sources]}
                     joSheet:Set[sources,"[]"]
 
-                if ${joVFX.Has[regionName]}
+                if ${joVFX.Has[-notnull,regionName]}
                     joVFX:SetString[name,"${joVFX.Get[regionName]~}"]
                 else
                     joVFX:SetString[name,"${joSlot.Get[character]~}.${joVFX.Get[name]~}"]
@@ -708,7 +710,7 @@ objectdef isb2_importer
         if !${jo.Get[vfxSheets].Used}
             return
 
-        if !${ISBProfile.Has[vfxSheets]}
+        if !${ISBProfile.Has[-notnull,vfxSheets]}
             ISBProfile:Set[vfxSheets,"[]"]
 
         ; we have multiple sheets, which we need to alter the name for
@@ -726,10 +728,10 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
 
-        if ${jo.Has[hold]}
+        if ${jo.Has[-notnull,hold]}
             joNew:SetBool[hold,${jo.GetBool[hold]}]
 
-        if ${jo.Has[mode]}
+        if ${jo.Has[-notnull,mode]}
             joNew:SetString[mode,"${jo.Get[mode]~}"]
 
         variable jsonvalue ja="[]"
@@ -784,7 +786,7 @@ objectdef isb2_importer
             joNew:SetInteger[button,1]
 
         variable jsonvalue joModifiers="{}"
-        if ${jo.Has[modifiers]}
+        if ${jo.Has[-notnull,modifiers]}
         {
             if ${jo.Get[modifiers]~.Find[Alt]}
                 joModifiers:SetBool[alt,1]
@@ -799,11 +801,11 @@ objectdef isb2_importer
 
         variable jsonvalue joAction="{}"
         joAction:SetString[type,mappable]
-        if ${jo.Has[action,Target]}
+        if ${jo.Has[-notnull,action,Target]}
             joAction:SetString[target,"${jo.Get[action,Target]~}"]
-        if ${jo.Has[action,MappedKeyString]}
+        if ${jo.Has[-notnull,action,MappedKeyString]}
             joAction:SetString[name,"${jo.Get[action,MappedKeyString]~}"]
-        if ${jo.Has[action,KeyMapString]}
+        if ${jo.Has[-notnull,action,KeyMapString]}
             joAction:SetString[sheet,"${jo.Get[action,KeyMapString]~}"]
 
         joNew:Set[inputMapping,"{\"type\":\"action\",\"action\":${joAction~}}"]
@@ -837,32 +839,32 @@ objectdef isb2_importer
 
         variable jsonvalue joNew="{}"
         variable jsonvalueref joRef
-        if ${jo.Has[name]}
+        if ${jo.Has[-notnull,name]}
             joNew:SetString[name,"${jo.Get[name]~}"]
-        if ${jo.Has[text]}
+        if ${jo.Has[-notnull,text]}
             joNew:SetString[text,"${jo.Get[text]~}"]
 
-        if ${jo.Has[tooltip]}
+        if ${jo.Has[-notnull,tooltip]}
             joNew:SetString[tooltip,"${jo.Get[tooltip]~}"]
 
         ; although this setting appears in the profile XML, it is completely unused
-;        if ${jo.Has[enabled]}
+;        if ${jo.Has[-notnull,enabled]}
 ;            joNew:SetBool[enabled,"${jo.GetBool[enabled]~}"]
 
-        if ${jo.Has[backgroundColor]}
+        if ${jo.Has[-notnull,backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
-        if ${jo.Has[backgroundImage]}
+        if ${jo.Has[-notnull,backgroundImage]}
         {
             joRef:SetReference["This.GetImageReference[\"${jo.Get[backgroundImage]~}\"]"]
             if ${joRef.Reference(exists)}
                 joNew:SetByRef[image,joRef]             
         }
 
-        if ${jo.Has[clickThrough]}
+        if ${jo.Has[-notnull,clickThrough]}
             joNew:SetBool[clickThrough,"${jo.GetBool[clickThrough]}"]
 
         variable jsonvalue ja="[]"
-        if ${jo.Has[ClickActions]}
+        if ${jo.Has[-notnull,ClickActions]}
         {
             jo.Get[ClickActions]:ForEach["ja:AddByRef[\"This.ConvertClickAction[ForEach.Value\]\"]"]            
 
@@ -871,20 +873,20 @@ objectdef isb2_importer
         }        
 
         variable jsonvalue joAction="{}"
-        if ${jo.Has[mouseoverAction]}
+        if ${jo.Has[-notnull,mouseoverAction,MappedKeyString]}
         {
             joAction:SetString[type,mappable]
-            if ${jo.Has[mouseoverAction,Target]}
+            if ${jo.Has[-notnull,mouseoverAction,Target]}
                 joAction:SetString[target,"${jo.Get[mouseoverAction,Target]~}"]
-            if ${jo.Has[mouseoverAction,MappedKeyString]}
+            if ${jo.Has[-notnull,mouseoverAction,MappedKeyString]}
                 joAction:SetString[name,"${jo.Get[mouseoverAction,MappedKeyString]~}"]
-            if ${jo.Has[mouseoverAction,KeyMapString]}
+            if ${jo.Has[-notnull,mouseoverAction,KeyMapString]}
                 joAction:SetString[sheet,"${jo.Get[mouseoverAction,KeyMapString]~}"]
 
             joNew:Set[mouseOver,"{\"type\":\"action\",\"action\":${joAction~}}"]
         }
 
-        if ${jo.Has[TextStyle]}
+        if ${jo.Has[-notnull,TextStyle]}
         {
             joNew:SetByRef[font,"jo.Get[TextStyle]"]
         }
@@ -898,24 +900,24 @@ objectdef isb2_importer
 
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
-        if ${jo.Has[enable]}
+        if ${jo.Has[-notnull,enable]}
             joNew:SetBool[enable,"${jo.GetBool[enable]}"]
 
         variable jsonvalue joTemplate="{}"
 
-        if ${jo.Has[x]}
+        if ${jo.Has[-notnull,x]}
             joNew:SetInteger[x,"${jo.GetInteger[x]}"]
-        if ${jo.Has[y]}
+        if ${jo.Has[-notnull,y]}
             joNew:SetInteger[y,"${jo.GetInteger[y]}"]
-        if ${jo.Has[alpha]}
+        if ${jo.Has[-notnull,alpha]}
             joTemplate:SetInteger[alpha,"${jo.GetInteger[alpha]}"]
-        if ${jo.Has[rows]}
+        if ${jo.Has[-notnull,rows]}
             joTemplate:SetInteger[rows,"${jo.GetInteger[rows]}"]
-        if ${jo.Has[columns]}
+        if ${jo.Has[-notnull,columns]}
             joTemplate:SetInteger[columns,"${jo.GetInteger[columns]}"]
-        if ${jo.Has[rowHeight]}
+        if ${jo.Has[-notnull,rowHeight]}
             joTemplate:SetInteger[buttonHeight,"${jo.GetInteger[rowHeight]}"]
-        if ${jo.Has[columnWidth]}
+        if ${jo.Has[-notnull,columnWidth]}
             joTemplate:SetInteger[buttonWidth,"${jo.GetInteger[columnWidth]}"]
 
         if ${joTemplate.Used}
@@ -923,7 +925,7 @@ objectdef isb2_importer
 
         variable jsonvalue joButtonLayout="{}"
         variable jsonvalue ja="[]"
-        if ${jo.Has[Buttons]}
+        if ${jo.Has[-notnull,Buttons]}
         {
             jo.Get[Buttons]:ForEach["ja:AddByRef[\"This.ConvertClickBarButton[ForEach.Value]\"]"]            
 
@@ -939,7 +941,7 @@ objectdef isb2_importer
 
     member:jsonvalueref GetImageSheet(jsonvalueref joInto, string name)
     {
-        if !${joInto.Has[imageSheets]}
+        if !${joInto.Has[-notnull,imageSheets]}
             joInto:Set[imageSheets,"[]"]
         variable jsonvalueref ja
         ja:SetReference["joInto.Get[imageSheets]"]
@@ -970,13 +972,13 @@ objectdef isb2_importer
 
         joNew:SetString[name,"${name~}"]
 
-        if ${jo.Has[filename]}
+        if ${jo.Has[-notnull,filename]}
             joNew:SetString[filename,"${jo.Get[filename]~}"]
 
-        if ${jo.Has[ImageSet]}
+        if ${jo.Has[-notnull,ImageSet]}
             sheetName:Set["${jo.Get[ImageSet]~}"]
 
-        if ${jo.Has[colorMask]}
+        if ${jo.Has[-notnull,colorMask]}
             joNew:SetString[colorMask,"${jo.Get[colorMask]~}"]
         elseif ${name.StartsWith["#"]}
         {
@@ -986,13 +988,13 @@ objectdef isb2_importer
                 joNew:SetString[colorMask,"${name.Lower~}"]
         }
 
-        if ${jo.Has[colorKey]}
+        if ${jo.Has[-notnull,colorKey]}
             joNew:SetString[colorKey,"${jo.Get[colorKey]~}"]
 
-        if ${jo.Has[crop]}
+        if ${jo.Has[-notnull,crop]}
             joNew:SetByRef[crop,"jo.Get[crop]"]
 
-        if ${jo.Has[border]}
+        if ${jo.Has[-notnull,border]}
             joNew:SetInteger[border,"${jo.GetInteger[border]}"]
     
         joSheet:SetReference["This.GetImageSheet[joInto,\"${sheetName~}\"]"]
@@ -1008,12 +1010,12 @@ objectdef isb2_importer
 
         joNew:SetString[deviceName,"${jo.Get[deviceName]~}"]
 
-        if ${jo.Has[primary]}
+        if ${jo.Has[-notnull,primary]}
             joNew:SetBool[primary,${jo.GetBool[primary]}]
 
-        if ${jo.Has[bounds]}
+        if ${jo.Has[-notnull,bounds]}
             joNew:Set[bounds,"${jo.Get[bounds]~}"]
-        if ${jo.Has[workingArea]}
+        if ${jo.Has[-notnull,workingArea]}
             joNew:Set[workingArea,"${jo.Get[workingArea]~}"]
 
         return joNew
@@ -1025,11 +1027,11 @@ objectdef isb2_importer
 
         variable jsonvalue joNew="{}"
 
-        if ${jo.Has[name]}
+        if ${jo.Has[-notnull,name]}
             joNew:SetString[name,"${jo.Get[name]~}"]
         
         variable jsonvalue ja="[]"
-        if ${jo.Has[AllScreens]}
+        if ${jo.Has[-notnull,AllScreens]}
         {
             jo.Get[AllScreens]:ForEach["ja:AddByRef[\"This.ConvertUserScreen[ForEach.Value]\"]"]            
 
@@ -1046,14 +1048,14 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[name]~}"]
-        if ${jo.Has[host]}
+        if ${jo.Has[-notnull,host]}
             joNew:SetString[host,"${jo.Get[host]~}"]
-        if ${jo.Has[port]}
+        if ${jo.Has[-notnull,port]}
             joNew:SetInteger[port,"${jo.GetInteger[port]}"]
-        if ${jo.Has[processorCount]}
+        if ${jo.Has[-notnull,processorCount]}
             joNew:SetInteger[cpuCount,"${jo.GetInteger[processorCount]}"]
 
-        if ${jo.Has[ScreenSet]}
+        if ${jo.Has[-notnull,ScreenSet]}
         {
             joNew:SetByRef["screenSet","This.ConvertUserScreenSet[\"jo.Get[ScreenSet]\"]"]
         }
@@ -1067,61 +1069,61 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
-        if ${jo.Has[Description]}
+        if ${jo.Has[-notnull,Description]}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
-        if ${jo.Has[WhiteOrBlackListType]} && !${jo.Assert[WhiteOrBlackListType,"\"Ignore\""]}
+        if ${jo.Has[-notnull,WhiteOrBlackListType]} && !${jo.Assert[WhiteOrBlackListType,"\"Ignore\""]}
             joNew:SetString[whiteOrBlackListType,"${jo.Get[WhiteOrBlackListType]~}"]
 
-        if ${jo.Has[cursorColorMask]} && !${jo.Assert[cursorColorMask,"\"#ffffff\""]}
+        if ${jo.Has[-notnull,cursorColorMask]} && !${jo.Assert[cursorColorMask,"\"#ffffff\""]}
             joNew:SetString[cursorColorMask,"${jo.Get[cursorColorMask]~}"]
 
-        if ${jo.Has[cursorFeedBorder]} && !${jo.Assert[cursorFeedBorder,"\"#ffffff\""]}
+        if ${jo.Has[-notnull,cursorFeedBorder]} && !${jo.Assert[cursorFeedBorder,"\"#ffffff\""]}
             joNew:SetString[cursorFeedBorder,"${jo.Get[cursorFeedBorder]~}"]
 
-        if ${jo.Has[cursorFeedSourceSize]} && ${jo.GetInteger[cursorFeedSourceSize,Width]} && ${jo.GetInteger[cursorFeedSourceSize,Height]}
+        if ${jo.Has[-notnull,cursorFeedSourceSize]} && ${jo.GetInteger[cursorFeedSourceSize,Width]} && ${jo.GetInteger[cursorFeedSourceSize,Height]}
             joNew:Set[cursorFeedSourceSize,"[${jo.GetInteger[cursorFeedSourceSize,Width]},${jo.GetInteger[cursorFeedSourceSize,Height]}]"]
 
-        if ${jo.Has[cursorFeedOutputSize]} && ${jo.GetInteger[cursorFeedOutputSize,Width]} && ${jo.GetInteger[cursorFeedOutputSize,Height]}
+        if ${jo.Has[-notnull,cursorFeedOutputSize]} && ${jo.GetInteger[cursorFeedOutputSize,Width]} && ${jo.GetInteger[cursorFeedOutputSize,Height]}
             joNew:Set[cursorFeedOutputSize,"[${jo.GetInteger[cursorFeedOutputSize,Width]},${jo.GetInteger[cursorFeedOutputSize,Height]}]"]
 
-        if ${jo.Has[cursorFeedAlpha]}
+        if ${jo.Has[-notnull,cursorFeedAlpha]}
             joNew:SetInteger[cursorFeedAlpha,"${jo.GetInteger[cursorFeedAlpha]~}"]
 
-        if ${jo.Has[RepeaterTarget]}
+        if ${jo.Has[-notnull,RepeaterTarget]}
             joNew:SetString[broadcastTarget,"${jo.Get[RepeaterTarget]~}"]
 
-        if ${jo.Has[mouseTransformMode]}
+        if ${jo.Has[-notnull,mouseTransformMode]}
             joNew:SetString[mouseTransformMode,"${jo.Get[mouseTransformMode]~}"]
 
-        if ${jo.Has[mouseLight]}
+        if ${jo.Has[-notnull,mouseLight]}
             joNew:SetString[mouseLight,"${jo.Get[mouseLight]~}"]
 
-        if ${jo.Has[keyboardLight]}
+        if ${jo.Has[-notnull,keyboardLight]}
             joNew:SetString[keyboardLight,"${jo.Get[keyboardLight]~}"]
 
-        if ${jo.Has[blockLocal]}
+        if ${jo.Has[-notnull,blockLocal]}
             joNew:SetBool[blockLocal,${jo.GetBool[blockLocal]}]
 
-        if ${jo.Has[muteCursorWhenForeground]}
+        if ${jo.Has[-notnull,muteCursorWhenForeground]}
             joNew:SetBool[muteCursorWhenForeground,${jo.GetBool[muteCursorWhenForeground]}]
 
-        if ${jo.Has[videoFXAlwaysAffectsBroadcasting]}
+        if ${jo.Has[-notnull,videoFXAlwaysAffectsBroadcasting]}
             joNew:SetBool[videoFXAlwaysAffectsBroadcasting,${jo.GetBool[videoFXAlwaysAffectsBroadcasting]}]
 
-        if ${jo.Has[keyRepeatEnabled]}
+        if ${jo.Has[-notnull,keyRepeatEnabled]}
             joNew:SetBool[keyBroadcastEnabled,${jo.GetBool[keyBroadcastEnabled]}]
 
-        if ${jo.Has[mouseRepeatEnabled]}
+        if ${jo.Has[-notnull,mouseRepeatEnabled]}
             joNew:SetBool[mouseBroadcastEnabled,${jo.GetBool[mouseBroadcastEnabled]}]
 
-        if ${jo.Has[falseCursor]}
+        if ${jo.Has[-notnull,falseCursor]}
             joNew:SetBool[falseCursor,${jo.GetBool[falseCursor]}]
 
-        if ${jo.Has[cursorFeed]}
+        if ${jo.Has[-notnull,cursorFeed]}
             joNew:SetBool[cursorFeed,${jo.GetBool[cursorFeed]}]
 
-        if ${jo.Has[WhiteOrBlackList]}
+        if ${jo.Has[-notnull,WhiteOrBlackList]}
         {
                 variable jsonvalue ja="[]"
 
@@ -1151,17 +1153,17 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
-        if ${jo.Has[Description]}
+        if ${jo.Has[-notnull,Description]}
             joNew:SetString[description,"${jo.Get[Description]~}"]
-        if ${jo.Has[Category]}
+        if ${jo.Has[-notnull,Category]}
             joNew:SetString[category,"${jo.Get[Category]~}"]
         ; applies to globally defined variable keystrokes
-        if ${jo.Has[defaultValue,Combo]}
+        if ${jo.Has[-notnull,defaultValue,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[defaultValue,Combo]~}"]
         ; applies to overrides (e.g. per slot)
-        if ${jo.Has[combo,Combo]}
+        if ${jo.Has[-notnull,combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
-        if ${jo.Has[Combo,Combo]}
+        if ${jo.Has[-notnull,Combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[Combo,Combo]~}"]
 
         return joNew
@@ -1173,10 +1175,10 @@ objectdef isb2_importer
 
         joNew:Set[bounds,"${jo.Get[rect]~}"]
 
-        if ${jo.Has[characterSetSlot]}
+        if ${jo.Has[-notnull,characterSetSlot]}
             joNew:SetInteger[slot,"${jo.Get[characterSetSlot]}"]
 
-        if ${jo.Has[borderStyle]}
+        if ${jo.Has[-notnull,borderStyle]}
             joNew:SetString[frame,"${jo.Get[borderStyle]~}"]
 
         joNew:Erase[rect]
@@ -1197,10 +1199,10 @@ objectdef isb2_importer
         joNew:SetInteger["reset",${resetRegion}]
         joNew:SetInteger["active",${activeRegion}]
 
-        if ${jo.Has[deactivateSwapGroup]}
+        if ${jo.Has[-notnull,deactivateSwapGroup]}
             joNew:SetInteger[deactivateSwapGroup,"${jo.GetInteger[deactivateSwapGroup]}"]
 
-        if ${jo.Has[pipSqueakSlot]}
+        if ${jo.Has[-notnull,pipSqueakSlot]}
             joNew:SetInteger[roamingSlot,"${jo.GetInteger[pipSqueakSlot]}"]
 
         jaSwapGroups:AddByRef[joNew]
@@ -1242,7 +1244,7 @@ objectdef isb2_importer
                 break
         }
 
-        if ${jo.Has[swapMode]}
+        if ${jo.Has[-notnull,swapMode]}
         {
             switch ${jo.Get[swapMode]}
             {
@@ -1307,7 +1309,7 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
         joNew:SetString[game,"World of Warcraft"]
-        if ${jo.Has[Description]}
+        if ${jo.Has[-notnull,Description]}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
         variable jsonvalue ja="[]"
@@ -1326,7 +1328,7 @@ objectdef isb2_importer
 ;        echo "\agConvertWoWMacroInto\ax ${jo~}"
 
         variable jsonvalue joNew="{}"
-        if ${jo.Has[Name]}
+        if ${jo.Has[-notnull,Name]}
             joNew:SetString[name,"${jo.Get[Name]~}"]
         else
             joNew:SetString[name,"${jo.Get[ColloquialName]~}"]
@@ -1336,10 +1338,10 @@ objectdef isb2_importer
         joNew:SetString[commands,"${jo.Get[MacroCommands]~}"]
         joNew:SetBool[useFTLModifiers,"${jo.GetBool[useFTLModifiers]}"]
 
-        if ${jo.Has[AllowCustomModifiers]}
+        if ${jo.Has[-notnull,AllowCustomModifiers]}
             joNew:SetByRef[allowCustomModifiers,"jo.Get[AllowCustomModifiers]"]
 
-        if ${jo.Has[combo,Combo]}
+        if ${jo.Has[-notnull,combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
 
         ja:AddByRef[joNew]
@@ -1358,16 +1360,16 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
-        if ${jo.Has[Template]}
+        if ${jo.Has[-notnull,Template]}
             joNew:SetString[template,"${jo.Get[Template]~}"]
-        if ${jo.Has[ButtonLayout]}
+        if ${jo.Has[-notnull,ButtonLayout]}
             joNew:SetString[buttonLayout,"${jo.Get[ButtonLayout]~}"]
-        if ${jo.Has[HotkeyLayout]}
+        if ${jo.Has[-notnull,HotkeyLayout]}
             joNew:SetString[hotkeyLayout,"${jo.Get[HotkeyLayout]~}"]
 
-        if ${jo.Has[x]}
+        if ${jo.Has[-notnull,x]}
             joNew:SetInteger[x,${jo.GetInteger[x]}]
-        if ${jo.Has[y]}
+        if ${jo.Has[-notnull,y]}
             joNew:SetInteger[y,${jo.GetInteger[y]}]
 
         return joNew
@@ -1393,52 +1395,52 @@ objectdef isb2_importer
 
         joNew:SetString[name,"${jo.Get[Name]~}"]
 
-        if ${jo.Has[Description]}
+        if ${jo.Has[-notnull,Description]}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
         variable jsonvalue joFont="{}"
 
-        if ${jo.Has[buttonFontName]}
+        if ${jo.Has[-notnull,buttonFontName]}
             joFont:SetString[face,"${jo.Get[buttonFontName]~}"]
 
-        if ${jo.Has[buttonFontBold]}
+        if ${jo.Has[-notnull,buttonFontBold]}
             joFont:SetBool[bold,"${jo.GetInteger[buttonFontBold]}"]
 
-        if ${jo.Has[buttonFontSize]}
+        if ${jo.Has[-notnull,buttonFontSize]}
             joFont:SetInteger[height,"${jo.GetInteger[buttonFontSize]}"]
 
-        if ${jo.Has[buttonFontColor]}
+        if ${jo.Has[-notnull,buttonFontColor]}
             joFont:SetString[color,"${jo.Get[buttonFontColor]~}"]
 
         if ${joFont.Used}
             joNew:SetByRef[buttonFont,joFont]
 
-        if ${jo.Has[buttonSize,Width]}
+        if ${jo.Has[-notnull,buttonSize,Width]}
             joNew:SetInteger[buttonWidth,"${jo.GetInteger[buttonSize,Width]}"]
-        if ${jo.Has[buttonSize,Height]}
+        if ${jo.Has[-notnull,buttonSize,Height]}
             joNew:SetInteger[buttonHeight,"${jo.GetInteger[buttonSize,Height]}"]
 
-        if ${jo.Has[frameSize]}
+        if ${jo.Has[-notnull,frameSize]}
             joNew:Set[frameSize,"[${jo.GetInteger[frameSize,Width]},${jo.GetInteger[frameSize,Height]}]"]
 
-        if ${jo.Has[Grid_Size]}
+        if ${jo.Has[-notnull,Grid_Size]}
         {
             joNew:Set[columns,"${jo.GetInteger[Grid_Size,Width]}"]
             joNew:Set[rows,"${jo.GetInteger[Grid_Size,Height]}"]
         }
 
-        if ${jo.Has[Grid_buttonMargin]}
+        if ${jo.Has[-notnull,Grid_buttonMargin]}
         {
             joNew:Set[buttonMargin,"[${jo.Get[Grid_buttonMargin,Width]},${jo.Get[Grid_buttonMargin,Height]}]"]
         }
 
-        if ${jo.Has[backgroundColor]}
+        if ${jo.Has[-notnull,backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]   
 
-        if ${jo.Has[borderColor]}
+        if ${jo.Has[-notnull,borderColor]}
             joNew:SetString[borderColor,"${jo.Get[borderColor]~}"]   
 
-        if ${jo.Has[numButtons]}
+        if ${jo.Has[-notnull,numButtons]}
             joNew:SetInteger[numButtons,"${jo.GetInteger[numButtons]}"]
 
 ;        joNew:SetByRef[original,jo]
@@ -1453,12 +1455,12 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
         joNew:SetString[name,"${jo.Get[Name]~}"]
 
-        if ${jo.Has[Description]}
+        if ${jo.Has[-notnull,Description]}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
         variable jsonvalue ja="[]"
 
-        if ${jo.Has[Buttons]}
+        if ${jo.Has[-notnull,Buttons]}
         {
             jo.Get[Buttons]:ForEach["This:ConvertMenuButtonInto[ja,ForEach.Value]"]
             joNew:SetByRef[buttons,ja]
@@ -1483,28 +1485,28 @@ objectdef isb2_importer
         variable jsonvalue joNew="{}"
         variable jsonvalueref joRef
 
-        if ${jo.Has[DisplayText]}
+        if ${jo.Has[-notnull,DisplayText]}
             joNew:SetString[displayText,"${jo.Get[DisplayText]~}"]
 
         if ${jo.GetBool[useImages]}
         {
             joNew:SetBool[useImages,1]
 
-            if ${jo.Has[Image,ImageString]}
+            if ${jo.Has[-notnull,Image,ImageString]}
             {
                 joRef:SetReference["This.GetImageReference[\"${jo.Get[Image,ImageString]~}\"]"]
                 if ${joRef.Reference(exists)}
                     joNew:SetByRef[image,joRef]             
             }
 
-            if ${jo.Has[ImagePressed,ImageString]}
+            if ${jo.Has[-notnull,ImagePressed,ImageString]}
             {
                 joRef:SetReference["This.GetImageReference[\"${jo.Get[ImagePressed,ImageString]~}\"]"]
                 if ${joRef.Reference(exists)}
                     joNew:SetByRef[imagePressed,joRef]             
             }
 
-            if ${jo.Has[ImageHover,ImageString]}
+            if ${jo.Has[-notnull,ImageHover,ImageString]}
             {
                 joRef:SetReference["This.GetImageReference[\"${jo.Get[ImageHover,ImageString]~}\"]"]
                 if ${joRef.Reference(exists)}
@@ -1514,36 +1516,36 @@ objectdef isb2_importer
 
         variable jsonvalue joFont="{}"
 
-        if ${jo.Has[FontName]}
+        if ${jo.Has[-notnull,FontName]}
             joFont:SetString[face,"${jo.Get[FontName]~}"]
 
-        if ${jo.Has[fontBold]}
+        if ${jo.Has[-notnull,fontBold]}
             joFont:SetBool[bold,"${jo.GetInteger[fontBold]}"]
 
-        if ${jo.Has[fontSize]}
+        if ${jo.Has[-notnull,fontSize]}
             joFont:SetInteger[height,"${jo.GetInteger[fontSize]}"]
 
-        if ${jo.Has[fontColor]}
+        if ${jo.Has[-notnull,fontColor]}
             joFont:SetString[color,"${jo.Get[fontColor]~}"]
 
         if ${joFont.Used}
             joNew:SetByRef[font,joFont]
 
 
-        if ${jo.Has[backgroundColor]}
+        if ${jo.Has[-notnull,backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
         
-        if ${jo.Has[borderColor]}
+        if ${jo.Has[-notnull,borderColor]}
             joNew:SetString[borderColor,"${jo.Get[borderColor]~}"]
 
-        if ${jo.Has[alpha]}
+        if ${jo.Has[-notnull,alpha]}
             joNew:SetNumber[alpha,"${jo.GetNumber[alpha]}"]
 
-        if ${jo.Has[border]}
+        if ${jo.Has[-notnull,border]}
             joNew:SetInteger[border,"${jo.GetInteger[border]}"]
 
         variable int numButton
-        if ${jo.Has[PullFrom,MenuString]}
+        if ${jo.Has[-notnull,PullFrom,MenuString]}
         {
             joRef:SetReference["{}"]
             joRef:SetString[clickBar,"${jo.Get[PullFrom,MenuString]~}"]
@@ -1553,7 +1555,7 @@ objectdef isb2_importer
 
             joNew:SetByRef[pullFrom,joRef]
         }
-        elseif ${jo.Has[PullFrom,MenuButtonSetString]}
+        elseif ${jo.Has[-notnull,PullFrom,MenuButtonSetString]}
         {
             joRef:SetReference["{}"]
             joRef:SetString[buttonLayout,"${jo.Get[PullFrom,MenuButtonSetString]~}"]            
@@ -1567,7 +1569,7 @@ objectdef isb2_importer
         variable jsonvalue jaClicks
         variable jsonvalueref jaActions="[]"
         
-        if ${jo.Has[Actions]}
+        if ${jo.Has[-notnull,Actions]}
         {
             variable jsonvalue joState="{}"
             joState:SetByRef[menuButton,jo]
@@ -1610,7 +1612,7 @@ objectdef isb2_importer
     {
 ;        echo "ConvertMappedKeyAsHotkey ${jo~}"
 
-        if !${jo.Has[combo]}
+        if !${jo.Has[-notnull,combo]}
             return NULL
 
         variable jsonvalue joNew="{}"
@@ -1619,7 +1621,7 @@ objectdef isb2_importer
         if ${jo.GetBool[manualLoad]}
             joNew:SetBool[enable,0]
 
-        if ${jo.Has[combo,Combo]}
+        if ${jo.Has[-notnull,combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
         
         variable jsonvalue joInputMapping="{}"
@@ -1655,7 +1657,7 @@ objectdef isb2_importer
         if ${jo.Get[Description].NotNULLOrEmpty}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
-        if ${jo.Has[resetTimer]}
+        if ${jo.Has[-notnull,resetTimer]}
             joNew:SetNumber[resetTimer,"${jo.GetNumber[resetTimer]}"]
 
         switch ${jo.Get[resetType]}
@@ -1671,7 +1673,7 @@ objectdef isb2_importer
                 break
         }
 
-        if ${jo.Has[hold]}
+        if ${jo.Has[-notnull,hold]}
             joNew:SetBool[hold,${jo.GetBool[hold]}]
 
         switch ${jo.Get[mode]}
@@ -1708,11 +1710,11 @@ objectdef isb2_importer
         joState:SetByRef[mappable,joMappable]
         joState:SetByRef[step,jo]
 
-        if ${jo.Has[stick]}
+        if ${jo.Has[-notnull,stick]}
             joNew:SetNumber[stickyTime,"${jo.GetNumber[stick]}"]
-        if ${jo.Has[stop]}
+        if ${jo.Has[-notnull,stop]}
             joNew:SetNumber[stickyTime,"-1"]
-        if ${jo.Has[stump]}
+        if ${jo.Has[-notnull,stump]}
             joNew:SetBool[triggerOnce,"${jo.GetBool[stump]}"]
         if ${jo.GetBool[disabled]}
             joNew:SetBool[enable,0]
@@ -1739,9 +1741,9 @@ objectdef isb2_importer
         {
             joNew:SetValue["${This.ConvertAction_${jo.Get[type]~}[joState,jo]~}"]
 
-            if ${jo.Has[Target]}
+            if ${jo.Has[-notnull,Target]}
                 joNew:SetString[target,"${jo.Get[Target]~}"]
-            if ${jo.Has[RoundRobin]}
+            if ${jo.Has[-notnull,RoundRobin]}
                 joNew:SetBool[roundRobin,"${jo.GetBool[RoundRobin]}"]
 
             if ${jo.GetBool[timer,enabled]}
@@ -1765,9 +1767,9 @@ objectdef isb2_importer
 
         joNew:SetString[type,mappable]        
 
-        if ${jo.Has[mappedKey]}
+        if ${jo.Has[-notnull,mappedKey]}
             joNew:SetString[name,"${jo.Get[mappedKey]~}"]
-        if ${jo.Has[keyMap]}
+        if ${jo.Has[-notnull,keyMap]}
             joNew:SetString[sheet,"${jo.Get[keyMap]~}"]
 
 ;        joNew:Set[originalAction,"${jo~}"]
@@ -1842,7 +1844,7 @@ objectdef isb2_importer
         joNew:SetString[type,mappable state]        
 
         joNew:SetString[name,"${jo.Get[mappedKey]~}"]
-        if ${jo.Has[keyMap]}
+        if ${jo.Has[-notnull,keyMap]}
             joNew:SetString[sheet,"${jo.Get[keyMap]~}"]
 
         joNew:SetString[value,"${jo.Get[-default,"\"On\"",Value]~}"]
@@ -1857,11 +1859,11 @@ objectdef isb2_importer
 
         joNew:SetString[type,keystroke]        
 
-        if ${jo.Has[combo,Combo]}
+        if ${jo.Has[-notnull,combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
 
         variable bool hold
-        if ${joState.Has[mappable,hold]}
+        if ${joState.Has[-notnull,mappable,hold]}
             hold:Set[${joState.GetBool[mappable,hold]}]
         else
             hold:Set[${joState.GetBool[sheet,hold]}]
@@ -1879,7 +1881,7 @@ objectdef isb2_importer
 
         joNew:SetString[type,keystring]        
 
-        if ${jo.Has[Text]}
+        if ${jo.Has[-notnull,Text]}
             joNew:SetString[text,"${jo.Get[Text]~}"]
 
         if ${jo.GetBool[FillClipboard]}
@@ -1951,9 +1953,9 @@ objectdef isb2_importer
 
         joNew:SetString[type,set click bar button]
 
-        if ${jo.Has[ClickBarButton,ClickBarString]}
+        if ${jo.Has[-notnull,ClickBarButton,ClickBarString]}
             joNew:SetString[clickBar,"${jo.Get[ClickBarButton,ClickBarString]~}"]
-        if ${jo.Has[ClickBarButton,ClickBarButtonString]}
+        if ${jo.Has[-notnull,ClickBarButton,ClickBarButtonString]}
         {
             ; we have the NAME of a button, and we WANT a button number.
             joNew:SetInteger[numButton,"${This.GetClickBarButton["${jo.Get[ClickBarButton,ClickBarString]~}","${jo.Get[ClickBarButton,ClickBarButtonString]~}"]}"]
@@ -1961,14 +1963,19 @@ objectdef isb2_importer
 
         variable jsonvalue joChanges="{}"
 
-        if ${jo.Has[Text]}
-            joChanges:SetString[text,"${jo.Get[Text]~}"]
+        if ${jo.Has[-notnull,Text]}
+            joChanges:SetString[text,"${jo.Get[Text]~}"]       
 
         if ${jo.Has[backgroundColor]}
-            joChanges:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
+        {
+            if ${jo.GetType[backgroundColor].Equal[string]}
+                joChanges:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
+            else
+                joChanges:SetString[backgroundColor,"#ff000000"]
+        }
 
         variable jsonvalueref joRef
-        if ${jo.Has[Image,ImageString]}
+        if ${jo.Has[-notnull,Image,ImageString]}
         {
             joRef:SetReference["This.GetImageReference[\"${jo.Get[Image,ImageString]~}\"]"]
             if ${joRef.Reference(exists)}
@@ -1988,14 +1995,14 @@ objectdef isb2_importer
 
         joNew:SetString[type,virtualize mappable]
 
-        if ${jo.Has[FromMappedKey,KeyMapString]}
+        if ${jo.Has[-notnull,FromMappedKey,KeyMapString]}
             joNew:SetString[fromSheet,"${jo.Get[FromMappedKey,KeyMapString]~}"]
-        if ${jo.Has[FromMappedKey,MappedKeyString]}
+        if ${jo.Has[-notnull,FromMappedKey,MappedKeyString]}
             joNew:SetString[fromName,"${jo.Get[FromMappedKey,KeyMapString]~}"]
 
-        if ${jo.Has[ToMappedKey,KeyMapString]}
+        if ${jo.Has[-notnull,ToMappedKey,KeyMapString]}
             joNew:SetString[toSheet,"${jo.Get[ToMappedKey,KeyMapString]~}"]
-        if ${jo.Has[ToMappedKey,MappedKeyString]}
+        if ${jo.Has[-notnull,ToMappedKey,MappedKeyString]}
             joNew:SetString[toName,"${jo.Get[ToMappedKey,KeyMapString]~}"]
 
 ;        joNew:Set[originalAction,"${jo~}"]
@@ -2023,7 +2030,7 @@ objectdef isb2_importer
 
         joNew:SetString[type,broadcast state]
 
-        if ${jo.Has[BlockLocal]}
+        if ${jo.Has[-notnull,BlockLocal]}
             joNew:SetBool[blockLocal,${jo.GetBool[BlockLocal]}]
         
         if ${jo.GetBool[UseMouseState]}
@@ -2035,18 +2042,18 @@ objectdef isb2_importer
             joNew:SetString[keyboardState,"${jo.Get[-default,"\"On\"",KeyboardState]~}"]
         }
 
-        if ${jo.Has[VideoFeed,Value]}
+        if ${jo.Has[-notnull,VideoFeed,Value]}
         {
             joNew:SetBool[videoFeed,1]
 
             if ${jo.GetInteger[VideoOutputAlpha]}>=0
                 joNew:SetInteger[videoOutputAlpha,${jo.GetInteger[VideoOutputAlpha]}]
-            if ${jo.Has[videoOutputBorder]}
+            if ${jo.Has[-notnull,videoOutputBorder]}
                 joNew:SetString[videoOutputBorder,"${jo.Get[videoOutputBorder]~}"]
             
-            if ${jo.Has[videoSourceSize]}
+            if ${jo.Has[-notnull,videoSourceSize]}
                 joNew:SetByRef[videoSourceSize,"jo.Get[videoSourceSize]"]
-            if ${jo.Has[videoOutputSize]}
+            if ${jo.Has[-notnull,videoOutputSize]}
                 joNew:SetByRef[videoOutputSize,"jo.Get[videoOutputSize]"]
 
         }
@@ -2070,12 +2077,12 @@ objectdef isb2_importer
 
             if ${jo.GetInteger[VideoOutputAlpha]}>=0
                 joNew:SetInteger[videoOutputAlpha,${jo.GetInteger[VideoOutputAlpha]}]
-            if ${jo.Has[videoOutputBorder]}
+            if ${jo.Has[-notnull,videoOutputBorder]}
                 joNew:SetString[videoOutputBorder,"${jo.Get[videoOutputBorder]~}"]
             
-            if ${jo.Has[videoSourceSize]}
+            if ${jo.Has[-notnull,videoSourceSize]}
                 joNew:SetByRef[videoSourceSize,"jo.Get[videoSourceSize]"]
-            if ${jo.Has[videoOutputSize]}
+            if ${jo.Has[-notnull,videoOutputSize]}
                 joNew:SetByRef[videoOutputSize,"jo.Get[videoOutputSize]"]
 
         }
@@ -2104,9 +2111,9 @@ objectdef isb2_importer
 
         joNew:SetString[type,window state]
 
-        if ${jo.Has[RegionType]}
+        if ${jo.Has[-notnull,RegionType]}
             joNew:SetString[regionType,"${jo.Get[RegionType]~}"]
-        if ${jo.Has[Action]}
+        if ${jo.Has[-notnull,Action]}
             joNew:SetString[action,"${jo.Get[Action]~}"]
         if ${jo.GetBool[DeactivateOthers]}
             joNew:SetBool[deactivateOthers,1]
@@ -2175,11 +2182,11 @@ objectdef isb2_importer
 
         joNew:SetString[type,window focus]
 
-        if ${jo.Has[FilterTarget]}
+        if ${jo.Has[-notnull,FilterTarget]}
             joNew:SetString[filtertTarget,"${jo.Get[FilterTarget]~}"]
-        if ${jo.Has[window]}
+        if ${jo.Has[-notnull,window]}
             joNew:SetString[window,"${jo.Get[Window]~}"]
-        if ${jo.Has[Computer]}
+        if ${jo.Has[-notnull,Computer]}
             joNew:SetString[computer,"${jo.Get[Computer,ComputerString]~}"]
 
         return joNew
@@ -2230,9 +2237,9 @@ objectdef isb2_importer
             joNew:SetInteger[numButton,${numButton}]
         }
 
-        if ${jo.Has[MenuButton,MenuButtonSetString]}
+        if ${jo.Has[-notnull,MenuButton,MenuButtonSetString]}
             joNew:SetString["buttonLayout","${jo.Get[MenuButton,MenuButtonSetString]~}"]
-        elseif ${jo.Has[MenuButton,MenuString]}
+        elseif ${jo.Has[-notnull,MenuButton,MenuString]}
             joNew:SetString["clickBar","${jo.Get[MenuButton,MenuString]~}"]        
             
         if ${joOriginalChanges.Type.Equal[object]}
@@ -2251,7 +2258,7 @@ objectdef isb2_importer
 
         joNew:SetString[action,"${jo.Get[Action]~}"]
         joNew:SetString[timerPool,"${jo.Get[TimerPool]~}"]        
-        if ${jo.Has[Target2]}
+        if ${jo.Has[-notnull,Target2]}
             joNew:SetString[target,"${jo.Get[Target2]~}"]        
 
 ;        joNew:Set[originalAction,"${jo~}"]
@@ -2271,7 +2278,7 @@ objectdef isb2_importer
         if ${jo.GetInteger[fadeDurationMS]}
             joNew:SetNumber[fadeDuration,${Math.Calc[${jo.GetInteger[fadeDurationMS]}/1000]}]
 
-        if ${jo.Has[color]}
+        if ${jo.Has[-notnull,color]}
             joNew:Set[color,"${jo.Get[color].AsJSON~}"]
 
         return joNew
@@ -2284,7 +2291,7 @@ objectdef isb2_importer
 
         joNew:SetString[type,game macro]        
 
-        if ${jo.Has[useFTLModifiers]}
+        if ${jo.Has[-notnull,useFTLModifiers]}
             joNew:SetBool[useFTLModifiers,"${jo.GetBool[useFTLModifiers]}"]    
 
         joNew:SetString[sheet,"${jo.Get[WoWMacro,WoWMacroSetString]}"]
@@ -2494,7 +2501,7 @@ objectdef isb2_importer
         joNew:SetString[type,set game key binding]
         if ${jo.Get[Name]~.NotNULLOrEmpty}
             joNew:SetString[name,"${jo.Get[Name]~}"]
-        if ${jo.Has[combo,Combo]}
+        if ${jo.Has[-notnull,combo,Combo]}
             joNew:SetString[keyCombo,"${jo.Get[combo,Combo]~}"]
 
         return joNew

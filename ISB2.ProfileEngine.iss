@@ -1098,7 +1098,7 @@ objectdef isb2_profileengine
         SlotRef.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
         if ${SlotRef.Has[windowTitle]}
-            windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
+            timed 10 windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
 
         This:ExecuteEventAction[SlotRef,onLoad]
 

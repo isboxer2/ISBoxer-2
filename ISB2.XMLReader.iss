@@ -445,6 +445,7 @@ objectdef isb2_isb1transformer
             return
         switch ${joTransform.GetType["${oldProperty~}"]}
         {
+            case null
             case object
             case array
                 joTransform:Erase["${oldProperty~}"]
@@ -461,6 +462,15 @@ objectdef isb2_isb1transformer
 
         if ${joTransform.Has["${oldProperty~}"]}
         {
+            switch ${joTransform.GetType["${oldProperty~}"]}
+            {
+                case null
+                case object
+                case array
+                    joTransform:Erase["${oldProperty~}"]
+                    return
+            }
+
             fname:Set["${joTransform.Get["${oldProperty~}"]~}"]
             if ${fname.StartsWith["${LavishScript.HomeDirectory}/"]}
             {
@@ -519,7 +529,11 @@ objectdef isb2_isb1transformer
         variable jsonvalueref jo
         jo:SetReference["joTransform.Get[\"${oldProperty~}\"]"]
         if !${jo.Type.Equal[object]}
+        {
+            joTransform:Set["${newProperty~}","${joTransform.Get["${oldProperty}"]~}"]
+            joTransform:Erase["${oldProperty~}"]
             return
+        }
 
             variable int r
             variable int g
@@ -1349,7 +1363,7 @@ objectdef isb2_xmlreader
 
         if !${_node.Child(exists)}
         {                        
-            jv:SetValue["{}"]
+            jv:SetValue["null"]
             return jv
         }
 

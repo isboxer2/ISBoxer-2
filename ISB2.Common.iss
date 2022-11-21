@@ -786,7 +786,7 @@ objectdef isb2_clickbarButton
 ;        joButton.Get[content,children]:AddByRef[joImagebox]
         joButton.Get[content,children]:AddByRef[joTextblock]
 
-;        echo "\aybutton final\ax ${joButton.AsJSON~}"
+        echo "\aybutton final\ax ${joButton.AsJSON~}"
         return joButton
     }
 
@@ -1171,13 +1171,42 @@ objectdef isb2_clickbar
         Context:SetView["${joButton~}"]
     }
 
+    member:jsonvalueref GetFrameSize()
+    {
+        if ${Template.Has[frameSize]}
+            return "Template.Get[frameSize]"
+
+        variable jsonvalue ja
+        ja:SetValue["[0,0]"]
+
+        variable uint cols
+        variable uint rows
+        variable uint buttonWidth
+        variable uint buttonHeight
+
+        buttonWidth:Set[${Template.GetInteger[-default,32,buttonWidth]}]
+        buttonHeight:Set[${Template.GetInteger[-default,32,buttonHeight]}]
+        marginWidth:Set[${Template.GetInteger[buttonMargin,1]}]
+        marginHeight:Set[${Template.GetInteger[buttonMargin,2]}]
+        cols:Set[${Template.GetInteger[-default,1,columns]}]
+        rows:Set[${Template.GetInteger[-default,1,rows]}]
+
+;        ja:Set[1,${Math.Calc[ (${buttonWidth}*${cols}) + (${marginWidth}*(${cols}-1))  ].Int}]
+;        ja:Set[2,${Math.Calc[ (${buttonHeight}*${rows}) + (${marginHeight}*(${rows}-1))  ].Int}]
+
+        ja:Set[1,${Math.Calc[ 2 + (( ${buttonWidth} + ${marginWidth} ) * ${cols}) ].Int}]
+        ja:Set[2,${Math.Calc[ 2 + (( ${buttonHeight} + ${marginHeight} ) * ${rows}) ].Int}]
+
+        return ja        
+    }
+
     method CreateWindow()
     {
         echo isb2_clickbar:CreateWindow
         if ${Window.Element(exists)}
             return
 
-        variable string useName="isb2.cb.${Name~}"        
+        variable string useName="isb2.cb.${Name~}"                
 
         variable jsonvalue joWindow
         joWindow:SetValue["$$>
@@ -1201,11 +1230,10 @@ objectdef isb2_clickbar
         }
         <$$"]
 
-        if ${Template.Has[frameSize]}
-        {
-            joWindow.Get[content]:SetInteger[width,${Template.GetInteger[frameSize,1]}]
-            joWindow.Get[content]:SetInteger[height,${Template.GetInteger[frameSize,2]}]
-        }
+        variable jsonvalueref jaFrameSize
+        jaFrameSize:SetReference["This.GetFrameSize"]
+        joWindow.Get[content]:SetInteger[width,${jaFrameSize.GetInteger[1]}]
+        joWindow.Get[content]:SetInteger[height,${jaFrameSize.GetInteger[2]}]
 
         if ${Template.Has[backgroundColor]}
             joWindow:Set[backgroundBrush,"{\"color\":\"${Template.Get[backgroundColor]~}\"}"]
@@ -1213,7 +1241,7 @@ objectdef isb2_clickbar
         if ${Template.Has[borderColor]}
             joWindow:Set[borderBrush,"{\"color\":\"${Template.Get[borderColor]~}\"}"]
 
-;        echo "\ayCreateWindow final\ax ${joWindow~}"
+        echo "\ayCreateWindow final\ax ${joWindow~}"
         LGUI2:PushSkin["ISBoxer 2"]
         Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
         LGUI2:PopSkin["ISBoxer 2"]

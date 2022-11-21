@@ -1224,6 +1224,10 @@ objectdef isb2_profileengine
         {
             This:InstallHotkeyEx[guiToggle,"${jo.Get[guiToggleCombo]}","ISB2:ToggleGUIMode"]
         }        
+        if ${jo.Has[consoleToggleCombo]}
+        {
+            This:InstallHotkeyEx[consoleToggle,"${jo.Get[consoleToggleCombo]}","console toggle"]
+        }        
 
         variable jsonvalue dscopeDefinition
         dscopeDefinition:SetValue["$$>

@@ -643,6 +643,11 @@ objectdef isb2_clickbarButton
 
         Element:ApplyStyleJSON[This.GenerateView]
 
+        if ${Element.IsMouseOver}
+            Element:ApplyStyle["gotMouseOver"]
+        if ${Element.IsPressed}
+            Element:ApplyStyle["onVisualPress"]
+
         if ${shouldPush}
             This:Push
     }

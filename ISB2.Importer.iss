@@ -1979,7 +1979,7 @@ objectdef isb2_importer
         {
             joRef:SetReference["This.GetImageReference[\"${jo.Get[Image,ImageString]~}\"]"]
             if ${joRef.Reference(exists)}
-                joNew:SetByRef[image,joRef]             
+                joChanges:SetByRef[image,joRef]             
         }
 
         if ${joChanges.Used}

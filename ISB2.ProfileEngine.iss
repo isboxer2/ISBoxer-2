@@ -1608,17 +1608,24 @@ objectdef isb2_profileengine
         variable string name
         name:Set["${joAction.Get[name]~}"]
 
-        switch ${joAction.GetBool[state]}
+        if ${joAction.Get[action]~.Equal[Single]}
         {
-            case TRUE
-                ClickBars.Get["${name~}"]:Enable
-                break
-            case FALSE
-                ClickBars.Get["${name~}"]:Disable
-                break
-            case NULL
-                ClickBars.Get["${name~}"]:Toggle
-                break
+            switch ${joAction.Get[value]}
+            {
+                case On
+                    ClickBars.Get["${name~}"]:Enable
+                    break
+                case Off
+                    ClickBars.Get["${name~}"]:Disable
+                    break
+                case Toggle
+                    ClickBars.Get["${name~}"]:Toggle
+                    break
+            }
+        }
+        else
+        {
+            ; todo
         }
     }
 

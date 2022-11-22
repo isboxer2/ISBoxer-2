@@ -645,7 +645,7 @@ objectdef isb2_clickbarButton
 
         if ${Element.IsMouseOver}
             Element:ApplyStyle["gotMouseOver"]
-        if ${Element.IsPressed}
+        if ${Element.Pressed}
             Element:ApplyStyle["onVisualPress"]
 
         if ${shouldPush}

@@ -1090,6 +1090,7 @@ objectdef isb2_profileengine
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
 
         This:InstallSlotActivateHotkeys
+        This:SetRelayGroup["isboxer",1]
         This:SetRelayGroups["SlotRef.Get[targetGroups]",1]
         This:VirtualizeMappables["SlotRef.Get[virtualMappables]"]
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]
@@ -1784,6 +1785,48 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        ; todo: computer.
+        variable string useTarget="${This.ResolveTarget[joState,joAction,window]~}"
+
+        This:FocusWindow["${This.ResolveTarget[joState,joAction,window]~}","${joAction.Get[filterTarget]~}"]
+        return
+    }
+
+    method FocusWindow(string windowTarget, string filterTarget)
+    {
+        if !${windowTarget.NotNULLOrEmpty}
+        {
+            ; our selves...
+
+            if ${Display.Window.IsForeground}
+            {
+                ; already foreground
+                return
+            }
+            else
+            {
+                echo "\ayRequesting focus from foreground window ...\ax"
+                InnerSpace:Relay[foreground,"ISB2:FocusWindow[\"${Display.Window~}\"]"]
+            }
+            return
+        }
+
+        if ${Display.Window.IsForeground}
+        {
+            if ${filterTarget.NotNULLOrEmpty}
+            {
+                ;echo "focus -hotkey \"${windowTarget~}\" \"${filterTarget~}\""
+                InnerSpace:Relay[uplink,"focus -hotkey \"${windowTarget~}\" \"${filterTarget~}\""]
+            }
+            else
+            {
+;                echo "focus -hotkey \"${windowTarget~}\""
+                InnerSpace:Relay[uplink,"focus -hotkey \"${windowTarget~}\""]
+            }
+            return
+        }
+
+        InnerSpace:Relay[foreground,"ISB2:FocusWindow[\"${windowTarget~}\",\"${filterTarget~}\"]"]
     }
 
     method Action_WindowClose(jsonvalueref joState, jsonvalueref joAction, bool activate)

@@ -244,12 +244,7 @@ objectdef isb2_windowlayoutengine
 
     method Event_OnFrame()
     {
-        if ${LastApplied.Equal[CurrentRegion]}
-        {
-            This:Detach
-            return
-        }
-
+        This:Detach
         This:Apply
     }
 
@@ -590,7 +585,7 @@ objectdef isb2_windowlayoutengine
     method Event_OnWindowPosition()
     {
         echo "isb2_windowlayoutengine:OnWindowPosition ${Display.ViewableX},${Display.ViewableY} ${Display.ViewableWidth}x${Display.ViewableHeight}  render=${Display.Width}x${Display.Height}"
-        
+        This:Attach        
     }
 
     method Event_OnWindowStateChanging(string change)
@@ -611,10 +606,7 @@ objectdef isb2_windowlayoutengine
     method Event_On3DReset()
     {
         echo "isb2_windowlayoutengine:On3DReset"
-        if !${LastApplied.NotNULLOrEmpty} || ${LastApplied.Equal[ResetRegion]}
-        {
-            This:Apply
-        }
+        This:Attach
     }
 
     method Event_OnWindowCaptured()

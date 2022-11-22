@@ -2183,10 +2183,10 @@ objectdef isb2_importer
         joNew:SetString[type,window focus]
 
         if ${jo.Has[-notnull,FilterTarget]}
-            joNew:SetString[filtertTarget,"${jo.Get[FilterTarget]~}"]
-        if ${jo.Has[-notnull,window]}
+            joNew:SetString[filterTarget,"${jo.Get[FilterTarget]~}"]
+        if ${jo.Has[-notnull,Window]}
             joNew:SetString[window,"${jo.Get[Window]~}"]
-        if ${jo.Has[-notnull,Computer]}
+        if ${jo.Has[-notnull,Computer,ComputerString]}
             joNew:SetString[computer,"${jo.Get[Computer,ComputerString]~}"]
 
         return joNew

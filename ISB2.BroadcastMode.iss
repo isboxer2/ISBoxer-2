@@ -150,7 +150,7 @@ objectdef isb2_broadcastmode
             return
 
         Enabled:Set[1]
-        Broadcaster.Element:SetVisibility[Visible]
+        Broadcaster.Element:SetVisibility[Visible]:KeyboardFocus
 
         LGUI2.Element[isb2.events]:FireEventHandler[onBroadcastingStateChanged]
     }
@@ -162,6 +162,7 @@ objectdef isb2_broadcastmode
 
         Enabled:Set[0]
         Broadcaster.Element:SetVisibility[Hidden]
+        LGUI2.Screen:KeyboardFocus
 
         LGUI2.Element[isb2.events]:FireEventHandler[onBroadcastingStateChanged]
     }

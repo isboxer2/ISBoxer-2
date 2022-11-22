@@ -1395,21 +1395,38 @@ objectdef isb2_profileengine
         This:ExecuteAction[joState,joAction,${Context.GetBool[actionState,activate]}]
     }
 
+    member:string ResolveTarget(jsonvalueref joState, jsonvalueref joAction, string propertyName="target")
+    {
+        variable string useTarget="${joAction.Get["${propertyName~}"]~}"
+
+        if !${useTarget.NotNULLOrEmpty}
+            return ""
+
+        if ${useTarget.Equal[self]}
+            return ""
+
+        if ${useTarget.Equal[${Int64["${useTarget~}"]}]}
+        {
+            return "is${useTarget~}"
+        }
+
+        variable int64 rrCounter
+        if ${joAction.GetBool[roundRobin]}
+        {
+            rrCounter:Set["${This.Rotator_GetCurrentStepCounter[joState]}"]
+            rrCounter:Inc
+            return "(${useTarget~})%${rrCounter}"
+        }
+
+        return "${useTarget~}"
+    }
+
     method RetargetAction(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        variable string useTarget="${joAction.Get[target]~}"
+        variable string useTarget="${This.ResolveTarget[joState,joAction]~}"
 
         if !${useTarget.NotNULLOrEmpty}
             return FALSE
-
-        if ${useTarget.Equal[self]}
-            return FALSE
-
-        if ${useTarget.Equal[${Int64[${useTarget~}]}]}
-        {
-            ; TODO: Team-based Slot number is not necessarily the session name
-            useTarget:Set["is${useTarget~}"]
-        }
 
         variable jsonvalue joActionState="{}"
         joActionState:SetByRef[action,joAction]
@@ -3467,11 +3484,13 @@ objectdef isb2_profileengine
         if ${newState}
         {
             RelayGroups:Add["${name~}"]
+;            echo "\aprelaygroup -join \"${name~}\""
             uplink relaygroup -join "${name~}"
         }
         else
         {
             RelayGroups:Erase["${name~}"]
+;            echo "\aprelaygroup -leave \"${name~}\""
             uplink relaygroup -leave "${name~}"
         }
         return TRUE

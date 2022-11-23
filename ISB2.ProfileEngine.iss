@@ -1075,10 +1075,22 @@ objectdef isb2_profileengine
         SlotRef:SetReference[NULL]
     }
 
-    method AssignCPUCores(jsonvalueref jaCores)
+    method AssignCPUCores()
     {
+        variable jsonvalueref jaCores="SlotRef.Get[cpuCores]"
+
         proclock on
-        proc -all
+        if !${jaCores.Type.Equal[array]} || !${jaCores.Used}
+        {
+            timed 1 proc -all
+            return
+        }
+
+        variable string output
+        jaCores:ForEach["output:Concat[\" \${ForEach.Value} \${If[\${output.NotNULLOrEmpty},on,only]}\"]"]
+
+        echo "\atAssignCPUCores\ax ${output}"
+        timed 1 proc ${output~}
     }
 
     method ActivateSlot(uint numSlot)

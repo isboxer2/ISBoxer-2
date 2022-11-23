@@ -152,6 +152,23 @@ objectdef isb2_importer
 
         variable jsonvalueref joProfile
         joProfile:SetReference["ISB1Transformer.TransformLGUIXML[\"${filename~}\"]"]
+        joProfile:SetString["$schema","http://www.lavishsoft.com/schema/lgui2Package.json"]
+
+        variable jsonvalueref jaNodes
+        jaNodes:SetReference["joProfile.Get[nodes]"]
+
+        joProfile:Set[templates,"{}"]
+        joProfile:Set[elements,"[]"]
+
+        jaNodes:ForEach["This:LGUI_ConvertNode[joProfile,ForEach.Value]"]
+
+        if !${joProfile.Get[templates].Used}
+            joProfile:Erase[templates]
+        if !${joProfile.Get[elements].Used}
+            joProfile:Erase[elements]
+
+        joProfile:Erase[nodes]
+        joProfile:Erase[_tag]
 
         return joProfile
     }
@@ -2567,6 +2584,257 @@ objectdef isb2_importer
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew        
     }
+#endregion
+
+#region LGUI Conversion
+    method LGUI_ConvertNode(jsonvalueref joPackage, jsonvalueref joNode, jsonvalueref joParent)
+    {
+        echo "\ayLGUI_ConvertNode\ax ${joNode~}"
+
+        if ${joNode.Get[_tag].Equal[template]}
+        {
+            This:LGUI_ConvertTemplate[joPackage,joNode,joParent]
+            return
+        }                
+
+        This:LGUI_ConvertElement[joPackage,joNode,joParent]
+        return
+    }
+
+    method LGUI_ConvertTemplate(jsonvalueref joPackage, jsonvalueref joNode, jsonvalueref joParent)
+    {
+        echo "\ayLGUI_ConvertTemplate\ax ${joNode~}"
+
+        if ${joNode.Has[_name]}
+        {
+            joPackage.Get[templates]:SetByRef["${joNode.Get[_name]~}",joNode]
+            joNode:Erase[_name]
+        }
+        if ${joNode.Has[_Name]}
+        {
+            joPackage.Get[templates]:SetByRef["${joNode.Get[_Name]~}",joNode]
+            joNode:Erase[_Name]
+        }
+
+        if ${joNode.Has[_template]}
+        {
+            joNode:SetString[jsonTemplate,"${joNode.Get[_template]~}"]
+            joNode:Erase[_template]
+        }
+        if ${joNode.Has[_Template]}
+        {
+            joNode:SetString[jsonTemplate,"${joNode.Get[_Template]~}"]
+            joNode:Erase[_Template]
+        }
+
+        joNode:Erase[_tag]
+
+        This:LGUI_ConvertElementProperties[joNode]
+    }
+
+    member:int64 LGUI_FindByTag(jsonvalueref joNode, string tag)
+    {
+        variable jsonvalue joQuery="$$>
+        {
+            "eval":"Select.Get[_tag]",
+            "op":"==",
+            "value":${tag.AsJSON~}
+        }
+        <$$"
+
+        return "${joNode.SelectKey[joQuery]}"
+    }
+
+    method LGUI_TransformString(jsonvalueref joTransform,string oldProperty, string newProperty, string defaultValue="")
+    {
+        isb2_isb1transformer:TransformString[joTransform,"${oldProperty~}","${newProperty~}","${defaultValue~}"]
+        isb2_isb1transformer:TransformString[joTransform,"${oldProperty.Lower~}","${newProperty~}","${defaultValue~}"]
+    }
+
+    method LGUI_TransformColorToBrush(jsonvalueref joTransform,string oldProperty, string newProperty, string defaultValue="")
+    {
+        if !${joTransform.Has["${oldProperty~}"]}
+        {
+            if ${joTransform.Has["${oldProperty.Lower~}"]}
+            {
+                This:LGUI_TransformColorToBrush[joTransform,"${oldProperty.Lower~}","${newProperty~}"]
+            }
+            return
+        }
+
+        if ${joTransform.GetType["${oldProperty~}"].Equal[null]}
+            joTransform:Set["${newProperty~}","{\"color\":\"#00000000\"}"]
+        else
+            joTransform:Set["${newProperty~}","{\"color\":\"#${joTransform.Get["${oldProperty~}"]}\"}"]
+
+        joTransform:Erase["${oldProperty~}"]
+    }
+
+    method LGUI_TransformInteger(jsonvalueref joTransform,string oldProperty, string newProperty, int64 defaultValue=0)
+    {
+        isb2_isb1transformer:TransformInteger[joTransform,"${oldProperty~}","${newProperty~}","${defaultValue~}"]
+        isb2_isb1transformer:TransformInteger[joTransform,"${oldProperty.Lower~}","${newProperty~}","${defaultValue~}"]
+    }
+
+    method LGUI_TransformNumber(jsonvalueref joTransform,string oldProperty, string newProperty, float64 defaultValue=0)
+    {
+        isb2_isb1transformer:TransformNumber[joTransform,"${oldProperty~}","${newProperty~}","${defaultValue~}"]
+        isb2_isb1transformer:TransformNumber[joTransform,"${oldProperty.Lower~}","${newProperty~}","${defaultValue~}"]
+    }
+
+    method LGUI_TransformPosition(jsonvalueref joTransform,string oldProperty, string newProperty)
+    {
+        if !${joTransform.Has["${oldProperty~}"]}
+        {
+            if ${joTransform.Has["${oldProperty.Lower~}"]}
+            {
+                This:LGUI_TransformPosition[joTransform,"${oldProperty.Lower~}","${newProperty~}"]
+            }
+            return
+        }
+
+        variable string val
+        val:Set["${joTransform.Get["${oldProperty~}"]~}"]
+        joTransform:Erase["${oldProperty~}"]
+        if ${val.EndsWith["%"]}
+        {
+            if ${val.Equal[100%]}
+            {
+                switch ${newProperty}
+                {
+                    case width
+                        joTransform:SetString["horizontalAlignment","stretch"]
+                        return
+                    case height
+                        joTransform:SetString["verticalAlignment","stretch"]
+                        return
+                }
+            }
+
+            joTransform:SetNumber["${newProperty~}Factor","${Math.Calc[${val.Left[-1]}/100]}"]
+            return
+        }
+        joTransform:SetInteger["${newProperty~}","${val~}"]
+    }
+
+    method LGUI_TransformVisibility(jsonvalueref joTransform, string oldProperty, string newProperty)
+    {
+        if !${joTransform.Has["${oldProperty~}"]}
+        {
+            if ${joTransform.Has["${oldProperty.Lower~}"]}
+            {
+                This:LGUI_TransformVisibility[joTransform,"${oldProperty.Lower~}","${newProperty~}"]
+            }
+            return
+        }
+
+        if ${joTransform.GetInteger["${oldProperty}"]}
+            joTransform:SetString["${newProperty~}",visible]
+        else
+            joTransform:SetString["${newProperty~}",hidden]
+
+        joTransform:Erase["${oldProperty~}"]
+    }
+
+    method LGUI_ConvertElementProperties(jsonvalueref joNode)
+    {
+        This:LGUI_TransformString[joNode,_Name,name]
+        This:LGUI_TransformString[joNode,_Template,jsonTemplate]
+        This:LGUI_TransformString[joNode,Title,title]
+        This:LGUI_TransformString[joNode,Text,text]
+        This:LGUI_TransformPosition[joNode,Width,width]
+        This:LGUI_TransformPosition[joNode,Height,height]
+        This:LGUI_TransformPosition[joNode,X,x]
+        This:LGUI_TransformPosition[joNode,Y,y]
+        This:LGUI_TransformVisibility[joNode,Visible,visibility]
+
+        This:LGUI_TransformNumber[joNode,Alpha,opacity]
+        This:LGUI_TransformInteger[joNode,Border,borderThickness]
+
+        This:LGUI_TransformColorToBrush[joNode,BackgroundColor,backgroundBrush]
+        This:LGUI_TransformColorToBrush[joNode,BorderColor,borderBrush]
+
+        variable uint n
+        n:Set["${This.LGUI_FindByTag["joNode.Get[nodes]",Children]}"]
+        if ${n}
+        {
+            variable jsonvalueref jaNodes
+            jaNodes:SetReference["joNode.Get[nodes,${n},nodes]"]
+
+            jaNodes:ForEach["This:LGUI_ConvertNode[joProfile,ForEach.Value,joNode]"]
+
+            joNode.Get[nodes]:Erase[${n}]
+            if !${joNode.Get[nodes].Used}
+                joNode:Erase[nodes]
+        }
+
+        n:Set["${This.LGUI_FindByTag["joNode.Get[nodes]",Font]}"]
+        if ${n}
+        {
+            variable jsonvalueref joFont
+            joFont:SetReference["joNode.Get[nodes,${n}]"]
+            joFont:Erase[_tag]
+            This:LGUI_TransformString[joFont,Name,face]
+            This:LGUI_TransformInteger[joFont,Size,height]
+            This:LGUI_TransformString[joFont,_Template,jsonTemplate]
+            
+            if ${joFont.Has[Color]}
+            {
+                joNode:SetString["color","#${joFont.Get[Color]~}"]
+                joFont:Erase[Color]
+            }
+            elseif ${joFont.Has[color]}
+            {
+                joNode:SetString["color","#${joFont.Get[color]~}"]
+                joFont:Erase[color]
+            }
+
+            joNode:SetByRef[font,joFont]
+            
+            joNode.Get[nodes]:Erase[${n}]
+            if !${joNode.Get[nodes].Used}
+                joNode:Erase[nodes]
+        }
+
+    }
+
+    method LGUI_ConvertElement(jsonvalueref joPackage, jsonvalueref joNode, jsonvalueref joParent)
+    {
+        echo "\ayLGUI_ConvertElement\ax ${joNode~}"
+
+        joNode:SetString[type,"${joNode.Get[_tag].Lower~}"]
+        joNode:Erase[_tag]
+
+        This:LGUI_ConvertElementProperties[joNode]
+
+        if ${joParent.Reference(exists)}
+        {            
+            if !${joParent.Has[children]}
+                joParent:Set[children,"[]"]
+
+            joParent.Get[children]:AddByRef[joNode]
+        }
+        else
+        {
+            joPackage.Get[elements]:AddByRef[joNode]
+        }
+
+
+        switch ${joNode.Get[type]}
+        {
+            case frame
+                joNode:SetString[type,"panel"]
+                break
+            case window
+                joNode:SetByRef[content,"joNode.Get[children,1]"]
+                joNode:Erase[children]
+                break
+            case text
+            joNode:SetString[type,"textblock"]
+                break
+        }
+    }
+
 #endregion
 
 #region Utilities

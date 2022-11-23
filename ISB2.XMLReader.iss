@@ -19,7 +19,7 @@ objectdef isb2_isb1transformer
     {
         variable jsonvalueref joProfile
         
-        variable isb2_xmlreader XMLReader
+        variable isb2_xmlreader_lgui XMLReader
         joProfile:SetReference["XMLReader.Read[\"${filename~}\",ISUI,1]"]
         if !${joProfile.Type.Equal[object]}
         {
@@ -173,16 +173,16 @@ objectdef isb2_isb1transformer
 
         This:TransformFilename[joTransform,LastProfileFilename,lastProfileFilename]
 
-        This:TransformInteger[joTransform,LastMainSplitter,lastMainSplitter]
-        This:TransformInteger[joTransform,LastBottomSplitter,lastBottomSplitter]
+        isb2_isb1transformer:TransformInteger[joTransform,LastMainSplitter,lastMainSplitter]
+        isb2_isb1transformer:TransformInteger[joTransform,LastBottomSplitter,lastBottomSplitter]
 
-        This:TransformBool[joTransform,LastMultiplePCHelperState,lastMultiplePCHelperState]
-        This:TransformBool[joTransform,UseInnerSpace64,useInnerSpace64]
+        isb2_isb1transformer:TransformBool[joTransform,LastMultiplePCHelperState,lastMultiplePCHelperState]
+        isb2_isb1transformer:TransformBool[joTransform,UseInnerSpace64,useInnerSpace64]
 
-        This:TransformBool[joTransform,NeverShowCPUThrottleForm,neverShowCPUThrottleForm]
-        This:TransformBool[joTransform,NeverShowCompatibilityForm,neverShowCompatibilityForm]
-        This:TransformBool[joTransform,NeverShowMultisamplingWarning,neverShowMultisamplingWarning]
-        This:TransformBool[joTransform,NeverShowDxNothingVFXWarning,neverShowDxNothingVFXWarning]
+        isb2_isb1transformer:TransformBool[joTransform,NeverShowCPUThrottleForm,neverShowCPUThrottleForm]
+        isb2_isb1transformer:TransformBool[joTransform,NeverShowCompatibilityForm,neverShowCompatibilityForm]
+        isb2_isb1transformer:TransformBool[joTransform,NeverShowMultisamplingWarning,neverShowMultisamplingWarning]
+        isb2_isb1transformer:TransformBool[joTransform,NeverShowDxNothingVFXWarning,neverShowDxNothingVFXWarning]
     }
     
     member:jsonvalueref TransformVideoFXSet(jsonvalueref joTransform)
@@ -433,7 +433,7 @@ objectdef isb2_isb1transformer
         joTransform:SetByRef["${property~}",ja]
     }
 
-    method TransformBool(jsonvalueref joTransform,string oldProperty, string newProperty, bool defaultValue=0)
+    static method TransformBool(jsonvalueref joTransform,string oldProperty, string newProperty, bool defaultValue=0)
     {
         if !${joTransform.Has["${oldProperty~}"]}
             return
@@ -442,7 +442,7 @@ objectdef isb2_isb1transformer
         joTransform:Erase["${oldProperty~}"]
     }
 
-    method TransformInteger(jsonvalueref joTransform,string oldProperty, string newProperty, int64 defaultValue=0)
+    static method TransformInteger(jsonvalueref joTransform,string oldProperty, string newProperty, int64 defaultValue=0)
     {
         if !${joTransform.Has["${oldProperty~}"]}
             return
@@ -451,7 +451,7 @@ objectdef isb2_isb1transformer
         joTransform:Erase["${oldProperty~}"]
     }
 
-    method TransformNumber(jsonvalueref joTransform,string oldProperty, string newProperty, float64 defaultValue=0)
+    static method TransformNumber(jsonvalueref joTransform,string oldProperty, string newProperty, float64 defaultValue=0)
     {
         if !${joTransform.Has["${oldProperty~}"]}
             return
@@ -460,21 +460,27 @@ objectdef isb2_isb1transformer
         joTransform:Erase["${oldProperty~}"]
     }    
 
-    method TransformString(jsonvalueref joTransform,string oldProperty, string newProperty, string defaultValue="")
+    static method TransformString(jsonvalueref joTransform,string oldProperty, string newProperty, string defaultValue="")
     {
+        if ${newProperty.EqualCS["${oldProperty~}"]}
+            return TRUE
         if !${joTransform.Has["${oldProperty~}"]}
-            return
+            return FALSE
         switch ${joTransform.GetType["${oldProperty~}"]}
         {
             case null
             case object
             case array
                 joTransform:Erase["${oldProperty~}"]
-                return
+                return TRUE
         }
         if !${joTransform.Assert["${oldProperty~}","${defaultValue.AsJSON~}"]}
+        {
+            echo joTransform:SetString["${newProperty~}","${joTransform.Get["${oldProperty~}"]~}"]
             joTransform:SetString["${newProperty~}","${joTransform.Get["${oldProperty~}"]~}"]
+        }
         joTransform:Erase["${oldProperty~}"]
+        return TRUE
     }    
 
     method TransformFilename(jsonvalueref joTransform,string oldProperty, string newProperty)
@@ -707,24 +713,24 @@ objectdef isb2_isb1transformer
         if ${joTransform.Get[crop,3]}==0 && ${joTransform.Get[crop,4]}==0        
             joTransform:Erase[crop]
 
-        This:TransformInteger[joTransform,Border,border] 
+        isb2_isb1transformer:TransformInteger[joTransform,Border,border] 
         This:TransformFilename[joTransform,Filename,filename]
     }
 
     method AutoTransform_EventAction(jsonvalueref joTransform)
     {
-        This:TransformBool[joTransform,RoundRobin,roundRobin]
+        isb2_isb1transformer:TransformBool[joTransform,RoundRobin,roundRobin]
     }
     method AutoTransform_KeyCombo(jsonvalueref joTransform)
     {
-        This:TransformString[joTransform,Modifiers,modifiers,None]
+        isb2_isb1transformer:TransformString[joTransform,Modifiers,modifiers,None]
 
         variable jsonvalueref jo
         jo:SetReference["joTransform.Get[Key]"]
         if !${jo.Type.Equal[object]}
             return
 
-        This:TransformInteger[jo,Code,code]
+        isb2_isb1transformer:TransformInteger[jo,Code,code]
         if ${jo.Used}==0
         {
             joTransform:Erase[Key]
@@ -752,8 +758,8 @@ objectdef isb2_isb1transformer
 
         This:TransformEventAction[joTransform,ExecuteOnLoad,executeOnLoad]
 
-        This:TransformBool[joTransform,MuteBroadcasts,muteBroadcasts]
-        This:TransformBool[joTransform,VideoFeedViewersPermanent,videoFeedViewersPermanent]
+        isb2_isb1transformer:TransformBool[joTransform,MuteBroadcasts,muteBroadcasts]
+        isb2_isb1transformer:TransformBool[joTransform,VideoFeedViewersPermanent,videoFeedViewersPermanent]
 
         This:TransformWoWMacroSets[joTransform,WoWMacroSets,wowMacroSets]
 
@@ -781,20 +787,20 @@ objectdef isb2_isb1transformer
 
         This:TransformEventAction[joTransform,ExecuteOnLoad,executeOnLoad]
 
-        This:TransformInteger[joTransform,LaunchDelay,launchDelay,1]
+        isb2_isb1transformer:TransformInteger[joTransform,LaunchDelay,launchDelay,1]
 
-        This:TransformBool[joTransform,UseConsoleToggleCombo,useConsoleToggleCombo]
+        isb2_isb1transformer:TransformBool[joTransform,UseConsoleToggleCombo,useConsoleToggleCombo]
 
-        This:TransformBool[joTransform,DynamicLaunchMode,dynamicLaunchMode]
-        This:TransformBool[joTransform,LockForeground,lockForeground]
-        This:TransformBool[joTransform,LockWindow,lockWindow]
-        This:TransformBool[joTransform,DisableJambaTeamManagement,disableJambaTeamManagement]
-        This:TransformBool[joTransform,DisableFPSIndicator,disableFPSIndicator]
-        This:TransformBool[joTransform,DisableForceWindowed,disableForceWindowed]
-        This:TransformBool[joTransform,DisableVSync,disableVSync]
-        This:TransformBool[joTransform,AutoMuteBackground,autoMuteBackground]
-        This:TransformBool[joTransform,EnforceSingleWindowControl,enforceSingleWindowControl]
-        This:TransformBool[joTransform,EnforceSingleWindowControlTested,enforceSingleWindowControlTested]
+        isb2_isb1transformer:TransformBool[joTransform,DynamicLaunchMode,dynamicLaunchMode]
+        isb2_isb1transformer:TransformBool[joTransform,LockForeground,lockForeground]
+        isb2_isb1transformer:TransformBool[joTransform,LockWindow,lockWindow]
+        isb2_isb1transformer:TransformBool[joTransform,DisableJambaTeamManagement,disableJambaTeamManagement]
+        isb2_isb1transformer:TransformBool[joTransform,DisableFPSIndicator,disableFPSIndicator]
+        isb2_isb1transformer:TransformBool[joTransform,DisableForceWindowed,disableForceWindowed]
+        isb2_isb1transformer:TransformBool[joTransform,DisableVSync,disableVSync]
+        isb2_isb1transformer:TransformBool[joTransform,AutoMuteBackground,autoMuteBackground]
+        isb2_isb1transformer:TransformBool[joTransform,EnforceSingleWindowControl,enforceSingleWindowControl]
+        isb2_isb1transformer:TransformBool[joTransform,EnforceSingleWindowControlTested,enforceSingleWindowControlTested]
 
         This:TransformWoWMacroSets[joTransform,WoWMacroSets,wowMacroSets]
 
@@ -837,20 +843,20 @@ objectdef isb2_isb1transformer
         This:TransformSingleToArrayValues[joTransform,CPUCores]
         This:TransformSingleToArray[joTransform,VariableKeystrokeInstances]
 
-        This:TransformInteger[joTransform,"ForegroundMaxFPS",foregroundMaxFPS]
-        This:TransformInteger[joTransform,"BackgroundMaxFPS",backgroundMaxFPS]
+        isb2_isb1transformer:TransformInteger[joTransform,"ForegroundMaxFPS",foregroundMaxFPS]
+        isb2_isb1transformer:TransformInteger[joTransform,"BackgroundMaxFPS",backgroundMaxFPS]
 
-        This:TransformInteger[joTransform,"SwitchToComboIsGlobal",switchToComboIsGlobal]
+        isb2_isb1transformer:TransformInteger[joTransform,"SwitchToComboIsGlobal",switchToComboIsGlobal]
         This:TransformKeyCombo[joTransform,SwitchToCombo,switchToCombo]
         This:TransformKeyCombo[joTransform,SwitchToEffect,switchToEffect]
-        This:TransformString[joTransform,EffectType,effectType,None]
+        isb2_isb1transformer:TransformString[joTransform,EffectType,effectType,None]
 
-        This:TransformInteger[joTransform,"GenerateFocusTargetMacro",generateFocusTargetMacro]
-        This:TransformInteger[joTransform,"GenerateFollowMacro",generateFollowMacro]
-        This:TransformInteger[joTransform,"GenerateFollowEnablesJambaStrobing",generateFollowEnablesJambaStrobing]
+        isb2_isb1transformer:TransformInteger[joTransform,"GenerateFocusTargetMacro",generateFocusTargetMacro]
+        isb2_isb1transformer:TransformInteger[joTransform,"GenerateFollowMacro",generateFollowMacro]
+        isb2_isb1transformer:TransformInteger[joTransform,"GenerateFollowEnablesJambaStrobing",generateFollowEnablesJambaStrobing]
 
-        This:TransformInteger[joTransform,"LoadOBSRemote",loadOBSRemote]
-        This:TransformInteger[joTransform,"LoadTwitch",loadTwitch]
+        isb2_isb1transformer:TransformInteger[joTransform,"LoadOBSRemote",loadOBSRemote]
+        isb2_isb1transformer:TransformInteger[joTransform,"LoadTwitch",loadTwitch]
 
         This:AutoTransform[joTransform,"VariableKeystrokeInstances"]
     }
@@ -888,20 +894,20 @@ objectdef isb2_isb1transformer
     {
 ;        echo "\agAutoTransform_Menu\ax ${joTransform~}"
 
-        This:TransformBool[joTransform,BindSoft,bindSoft]
-        This:TransformInteger[joTransform,X,x]
-        This:TransformInteger[joTransform,Y,y]
+        isb2_isb1transformer:TransformBool[joTransform,BindSoft,bindSoft]
+        isb2_isb1transformer:TransformInteger[joTransform,X,x]
+        isb2_isb1transformer:TransformInteger[joTransform,Y,y]
     }
 
     method AutoTransform_Computer(jsonvalueref joTransform)
     {
 ;        echo "\arAutoTransform_Computer ${joTransform~}"
 
-        This:TransformInteger[joTransform,"Port","port"]
-        This:TransformInteger[joTransform,"ProcessorCount","processorCount"]
-        This:TransformString[joTransform,Host,host]
-        This:TransformString[joTransform,UplinkName,uplinkName]
-        This:TransformString[joTransform,Name,name]
+        isb2_isb1transformer:TransformInteger[joTransform,"Port","port"]
+        isb2_isb1transformer:TransformInteger[joTransform,"ProcessorCount","processorCount"]
+        isb2_isb1transformer:TransformString[joTransform,Host,host]
+        isb2_isb1transformer:TransformString[joTransform,UplinkName,uplinkName]
+        isb2_isb1transformer:TransformString[joTransform,Name,name]
 
         This:AutoTransform[joTransform,"ScreenSet","Computer"]
     }
@@ -956,11 +962,11 @@ objectdef isb2_isb1transformer
 
         This:AutoTransform[joTransform,"Steps","MappedKey"]
 
-        This:TransformBool[joTransform,ManualLoad,manualLoad]
-        This:TransformNumber[joTransform,ResetTimer,resetTimer]
-        This:TransformString[joTransform,ResetType,resetType,"Never"]
-        This:TransformString[joTransform,Mode,mode,"Default"]
-        This:TransformBool[joTransform,SendNextClickBlockLocal,sendNextClickBlockLocal]
+        isb2_isb1transformer:TransformBool[joTransform,ManualLoad,manualLoad]
+        isb2_isb1transformer:TransformNumber[joTransform,ResetTimer,resetTimer]
+        isb2_isb1transformer:TransformString[joTransform,ResetType,resetType,"Never"]
+        isb2_isb1transformer:TransformString[joTransform,Mode,mode,"Default"]
+        isb2_isb1transformer:TransformBool[joTransform,SendNextClickBlockLocal,sendNextClickBlockLocal]
 
         This:TransformNullableBool[joTransform,Hold,hold]
         This:TransformNullableBool[joTransform,UseFTLModifiers,useFTLModifiers]
@@ -975,10 +981,10 @@ objectdef isb2_isb1transformer
 
         This:AutoTransform[joTransform,Actions]
 
-        This:TransformNumber[joTransform,Stick,stick]
-        This:TransformBool[joTransform,Stop,stop]
-        This:TransformBool[joTransform,Stump,stump]
-        This:TransformBool[joTransform,Disabled,disabled]
+        isb2_isb1transformer:TransformNumber[joTransform,Stick,stick]
+        isb2_isb1transformer:TransformBool[joTransform,Stop,stop]
+        isb2_isb1transformer:TransformBool[joTransform,Stump,stump]
+        isb2_isb1transformer:TransformBool[joTransform,Disabled,disabled]
     }
 
     method AutoTransform_ClickBar(jsonvalueref joTransform)
@@ -987,19 +993,19 @@ objectdef isb2_isb1transformer
 
         This:TransformSingleToArray[joTransform,Buttons]
 
-        This:TransformInteger[joTransform,IconSize,iconSize]
-        This:TransformInteger[joTransform,IconBorder,iconBorder]
-        This:TransformInteger[joTransform,IconPadding,iconPadding]
-        This:TransformInteger[joTransform,Border,border]
-        This:TransformInteger[joTransform,CellBorder,cellBorder]
-        This:TransformInteger[joTransform,Alpha,alpha,1]
+        isb2_isb1transformer:TransformInteger[joTransform,IconSize,iconSize]
+        isb2_isb1transformer:TransformInteger[joTransform,IconBorder,iconBorder]
+        isb2_isb1transformer:TransformInteger[joTransform,IconPadding,iconPadding]
+        isb2_isb1transformer:TransformInteger[joTransform,Border,border]
+        isb2_isb1transformer:TransformInteger[joTransform,CellBorder,cellBorder]
+        isb2_isb1transformer:TransformInteger[joTransform,Alpha,alpha,1]
 
-        This:TransformInteger[joTransform,X,x]
-        This:TransformInteger[joTransform,Y,y]
-        This:TransformInteger[joTransform,Rows,rows]
-        This:TransformInteger[joTransform,Columns,columns]
-        This:TransformInteger[joTransform,RowHeight,rowHeight]
-        This:TransformInteger[joTransform,ColumnWidth,columnWidth]
+        isb2_isb1transformer:TransformInteger[joTransform,X,x]
+        isb2_isb1transformer:TransformInteger[joTransform,Y,y]
+        isb2_isb1transformer:TransformInteger[joTransform,Rows,rows]
+        isb2_isb1transformer:TransformInteger[joTransform,Columns,columns]
+        isb2_isb1transformer:TransformInteger[joTransform,RowHeight,rowHeight]
+        isb2_isb1transformer:TransformInteger[joTransform,ColumnWidth,columnWidth]
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
         This:TransformColor[joTransform,CellBorder_Color,cellborderColor]
@@ -1013,13 +1019,13 @@ objectdef isb2_isb1transformer
 
         This:TransformSingleToArray[joTransform,"ClickActions"]
 
-        This:TransformString[joTransform,Name,name]
-        This:TransformString[joTransform,Text,text]
-        This:TransformString[joTransform,Tooltip,tooltip]
+        isb2_isb1transformer:TransformString[joTransform,Name,name]
+        isb2_isb1transformer:TransformString[joTransform,Text,text]
+        isb2_isb1transformer:TransformString[joTransform,Tooltip,tooltip]
         This:AutoTransform[joTransform,TextStyle,ClickBarButton]
 
         ; although this setting appears in the profile XML, it is completely unused....
-;        This:TransformBool[joTransform,Enabled,enabled,1]
+;        isb2_isb1transformer:TransformBool[joTransform,Enabled,enabled,1]
         This:AutoTransform[joTransform,ClickActions,ClickBarButton]
         This:AutoTransform[joTransform,MouseOverAction,ClickBarButton]
 
@@ -1029,7 +1035,7 @@ objectdef isb2_isb1transformer
 
         This:TransformEventAction[joTransform,MouseOverAction,mouseoverAction]
 
-        This:TransformBool[joTransform,ClickThrough,clickThrough]        
+        isb2_isb1transformer:TransformBool[joTransform,ClickThrough,clickThrough]        
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
 
@@ -1042,11 +1048,11 @@ objectdef isb2_isb1transformer
 
     method AutoTransform_ClickBarButton_TextStyle(jsonvalueref joTransform)
     {
-        This:TransformString[joTransform,Face,face,Tahoma]
+        isb2_isb1transformer:TransformString[joTransform,Face,face,Tahoma]
 
         This:TransformColor[joTransform,Color,color,"#ffffff"]
-        This:TransformInteger[joTransform,Size,height,12]
-        This:TransformBool[joTransform,Bold,bold,FALSE]
+        isb2_isb1transformer:TransformInteger[joTransform,Size,height,12]
+        isb2_isb1transformer:TransformBool[joTransform,Bold,bold,FALSE]
     }
 
     method AutoTransform_ClickBarButton_ClickActions(jsonvalueref joTransform)
@@ -1054,13 +1060,13 @@ objectdef isb2_isb1transformer
 ;        echo "AutoTransform_ClickBarButton_ClickActions ${joTransform~}"
 
         This:TransformEventAction[joTransform,Action,action]
-        This:TransformString[joTransform,Modifiers,modifiers,"None"]   
+        isb2_isb1transformer:TransformString[joTransform,Modifiers,modifiers,"None"]   
     }
 
     method AutoTransform_ClickBarButton_MouseOverAction(jsonvalueref joTransform)
     {
 ;        echo "AutoTransform_ClickBarButton_MouseOverAction ${joTransform~}"
-        This:TransformString[joTransform,Modifiers,modifiers,"None"]        
+        isb2_isb1transformer:TransformString[joTransform,Modifiers,modifiers,"None"]        
         This:TransformEventAction[joTransform,Action,action]
 
         joTransform:Erase[LeftRight]
@@ -1093,11 +1099,11 @@ objectdef isb2_isb1transformer
 ;        echo "AutoTransform_MenuButtonSet_Buttons ${joTransform~}"
         This:TransformSingleToArray[joTransform,Actions]
 
-        This:TransformNumber[joTransform,Alpha,alpha,-1]
-        This:TransformInteger[joTransform,Border,border,-1]
-        This:TransformInteger[joTransform,FontBold,fontBold,-1]
-        This:TransformInteger[joTransform,FontSize,fontSize,-1]
-        This:TransformBool[joTransform,UseImages,useImages]
+        isb2_isb1transformer:TransformNumber[joTransform,Alpha,alpha,-1]
+        isb2_isb1transformer:TransformInteger[joTransform,Border,border,-1]
+        isb2_isb1transformer:TransformInteger[joTransform,FontBold,fontBold,-1]
+        isb2_isb1transformer:TransformInteger[joTransform,FontSize,fontSize,-1]
+        isb2_isb1transformer:TransformBool[joTransform,UseImages,useImages]
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
         This:TransformColor[joTransform,BorderColor,borderColor]
@@ -1110,7 +1116,7 @@ objectdef isb2_isb1transformer
     {
 ;        echo "AutoTransform_MenuTemplate ${joTransform~}"
 
-        This:TransformBool[joTransform,ClickThrough,clickThrough]
+        isb2_isb1transformer:TransformBool[joTransform,ClickThrough,clickThrough]
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
         This:TransformColor[joTransform,BorderColor,borderColor]
@@ -1118,18 +1124,18 @@ objectdef isb2_isb1transformer
         This:TransformColor[joTransform,buttonBorderColor,buttonBorderColor]
         This:TransformColor[joTransform,buttonFontColor,buttonFontColor]
 
-        This:TransformInteger[joTransform,Alpha,alpha]
-        This:TransformInteger[joTransform,Border,border]
-        This:TransformInteger[joTransform,buttonAlpha,buttonAlpha]
-        This:TransformInteger[joTransform,buttonBorder,buttonBorder]
-        This:TransformInteger[joTransform,buttonFontBold,buttonFontBold]
-        This:TransformInteger[joTransform,buttonFontSize,buttonFontSize]
+        isb2_isb1transformer:TransformInteger[joTransform,Alpha,alpha]
+        isb2_isb1transformer:TransformInteger[joTransform,Border,border]
+        isb2_isb1transformer:TransformInteger[joTransform,buttonAlpha,buttonAlpha]
+        isb2_isb1transformer:TransformInteger[joTransform,buttonBorder,buttonBorder]
+        isb2_isb1transformer:TransformInteger[joTransform,buttonFontBold,buttonFontBold]
+        isb2_isb1transformer:TransformInteger[joTransform,buttonFontSize,buttonFontSize]
 
-        This:TransformInteger[joTransform,NumButtons,numButtons]
+        isb2_isb1transformer:TransformInteger[joTransform,NumButtons,numButtons]
 
-        This:TransformInteger[joTransform,Radial_StartOffset,radial_StartOffset]
-        This:TransformInteger[joTransform,Radial_RadiusX,radial_RadiusX]
-        This:TransformInteger[joTransform,Radial_RadiusY,radial_RadiusY]
+        isb2_isb1transformer:TransformInteger[joTransform,Radial_StartOffset,radial_StartOffset]
+        isb2_isb1transformer:TransformInteger[joTransform,Radial_RadiusX,radial_RadiusX]
+        isb2_isb1transformer:TransformInteger[joTransform,Radial_RadiusY,radial_RadiusY]
 
         This:TransformNullableBool[joTransform,Popup,popup]
     }
@@ -1142,7 +1148,7 @@ objectdef isb2_isb1transformer
 
         This:AutoTransform[joTransform,WoWMacros,WoWMacroSet]
 
-        ;This:TransformBool[joTransform,ClickThrough,clickThrough]
+        ;isb2_isb1transformer:TransformBool[joTransform,ClickThrough,clickThrough]
     }
 
     method AutoTransform_WoWMacroSet_WoWMacros(jsonvalueref joTransform)
@@ -1150,9 +1156,9 @@ objectdef isb2_isb1transformer
 ;        echo "AutoTransform_WoWMacroSet_WoWMacros ${joTransform~}"
 
 
-        This:TransformString[joTransform,PreCommand,preCommand,"None"]
-        This:TransformBool[joTransform,TargetLastTarget,targetLastTarget]
-        This:TransformBool[joTransform,UseFTLModifiers,useFTLModifiers]
+        isb2_isb1transformer:TransformString[joTransform,PreCommand,preCommand,"None"]
+        isb2_isb1transformer:TransformBool[joTransform,TargetLastTarget,targetLastTarget]
+        isb2_isb1transformer:TransformBool[joTransform,UseFTLModifiers,useFTLModifiers]
 
         This:TransformKeyCombo[joTransform,Combo,combo]
 
@@ -1166,33 +1172,33 @@ objectdef isb2_isb1transformer
     {
 ;        echo "AutoTransform_WoWMacro_AllowCustomModifiers ${joTransform~}"
 
-        This:TransformBool[joTransform,LAlt,lAlt]
-        This:TransformBool[joTransform,RAlt,rAlt]
-        This:TransformBool[joTransform,LShift,lShift]
-        This:TransformBool[joTransform,RShift,rShift]
-        This:TransformBool[joTransform,LCtrl,lCtrl]
-        This:TransformBool[joTransform,RCtrl,rCtrl]
+        isb2_isb1transformer:TransformBool[joTransform,LAlt,lAlt]
+        isb2_isb1transformer:TransformBool[joTransform,RAlt,rAlt]
+        isb2_isb1transformer:TransformBool[joTransform,LShift,lShift]
+        isb2_isb1transformer:TransformBool[joTransform,RShift,rShift]
+        isb2_isb1transformer:TransformBool[joTransform,LCtrl,lCtrl]
+        isb2_isb1transformer:TransformBool[joTransform,RCtrl,rCtrl]
     }
 
     method AutoTransform_RepeaterProfile(jsonvalueref joTransform)
     {
 ;        echo "AutoTransform_RepeaterProfile ${joTransform~}"
 
-        This:TransformBool[joTransform,BlockLocal,blockLocal]
-        This:TransformBool[joTransform,MuteCursorWhenForeground,muteCursorWhenForeground]
-        This:TransformBool[joTransform,KeyRepeatEnabled,keyRepeatEnabled]
-        This:TransformBool[joTransform,MouseRepeatEnabled,mouseRepeatEnabled]
-        This:TransformBool[joTransform,FalseCursor,falseCursor]
-        This:TransformBool[joTransform,CursorFeed,cursorFeed]
-        This:TransformBool[joTransform,VideoFXAlwaysAffectsBroadcasting,videoFXAlwaysAffectsBroadcasting]
-        This:TransformInteger[joTransform,CursorFeedAlpha,cursorFeedAlpha]
+        isb2_isb1transformer:TransformBool[joTransform,BlockLocal,blockLocal]
+        isb2_isb1transformer:TransformBool[joTransform,MuteCursorWhenForeground,muteCursorWhenForeground]
+        isb2_isb1transformer:TransformBool[joTransform,KeyRepeatEnabled,keyRepeatEnabled]
+        isb2_isb1transformer:TransformBool[joTransform,MouseRepeatEnabled,mouseRepeatEnabled]
+        isb2_isb1transformer:TransformBool[joTransform,FalseCursor,falseCursor]
+        isb2_isb1transformer:TransformBool[joTransform,CursorFeed,cursorFeed]
+        isb2_isb1transformer:TransformBool[joTransform,VideoFXAlwaysAffectsBroadcasting,videoFXAlwaysAffectsBroadcasting]
+        isb2_isb1transformer:TransformInteger[joTransform,CursorFeedAlpha,cursorFeedAlpha]
 
         This:TransformSingleToArray[joTransform,"WhiteOrBlackList"]
         This:TransformColor[joTransform,CursorColorMask,cursorColorMask,"#ffffff"]
         
-        This:TransformString[joTransform,MouseLight,mouseLight,None]
-        This:TransformString[joTransform,KeyboardLight,keyboardLight,None]
-        This:TransformString[joTransform,MouseTransformMode,mouseTransformMode,None]
+        isb2_isb1transformer:TransformString[joTransform,MouseLight,mouseLight,None]
+        isb2_isb1transformer:TransformString[joTransform,KeyboardLight,keyboardLight,None]
+        isb2_isb1transformer:TransformString[joTransform,MouseTransformMode,mouseTransformMode,None]
 
         This:TransformSize[joTransform,CursorFeedSourceSize,cursorFeedSourceSize]
         This:TransformSize[joTransform,CursorFeedOutputSize,cursorFeedOutputSize]
@@ -1205,8 +1211,8 @@ objectdef isb2_isb1transformer
 ;        echo "AutoTransform_Actions ${joTransform~}"
         This:TransformSingleToArray[joTransform,"WhiteOrBlackList"]
 
-        This:TransformBool[joTransform,"RoundRobin","roundRobin"]
-        This:TransformBool[joTransform,"UseFTLModifiers","useFTLModifiers"]
+        isb2_isb1transformer:TransformBool[joTransform,"RoundRobin","roundRobin"]
+        isb2_isb1transformer:TransformBool[joTransform,"UseFTLModifiers","useFTLModifiers"]
 
         This:AutoTransform[joTransform,"UseCustomModifiers","Action"]
         if !${joTransform.Get[UseCustomModifiers].Used}
@@ -1214,11 +1220,11 @@ objectdef isb2_isb1transformer
 
         This:TransformKeyCombo[joTransform,Combo,combo]
 
-        This:TransformString[joTransform,KeyMapString,keyMap]
-        This:TransformString[joTransform,MappedKeyString,mappedKey]
+        isb2_isb1transformer:TransformString[joTransform,KeyMapString,keyMap]
+        isb2_isb1transformer:TransformString[joTransform,MappedKeyString,mappedKey]
 
-        This:TransformInteger[joTransform,DurationMS,durationMS]
-        This:TransformInteger[joTransform,FadeDurationMS,fadeDurationMS]
+        isb2_isb1transformer:TransformInteger[joTransform,DurationMS,durationMS]
+        isb2_isb1transformer:TransformInteger[joTransform,FadeDurationMS,fadeDurationMS]
 
         This:TransformColor[joTransform,BackgroundColor,backgroundColor]
         This:TransformColor[joTransform,BorderColor,borderColor]
@@ -1239,33 +1245,33 @@ objectdef isb2_isb1transformer
             This:AutoTransform_MenuButtonSet_Buttons["joTransform.Get[ButtonChanges]"]
         }
 
-        This:TransformString[joTransform,"_xsi:type","type"]
+        isb2_isb1transformer:TransformString[joTransform,"_xsi:type","type"]
     }
 
     method AutoTransform_ActionTimer(jsonvalueref joTransform)
     {
-        This:TransformString[joTransform,PoolName,name]
-        This:TransformNumber[joTransform,Seconds,time]
-        This:TransformBool[joTransform,AutoRecurring,recur]
-        This:TransformBool[joTransform,Enabled,enabled]
+        isb2_isb1transformer:TransformString[joTransform,PoolName,name]
+        isb2_isb1transformer:TransformNumber[joTransform,Seconds,time]
+        isb2_isb1transformer:TransformBool[joTransform,AutoRecurring,recur]
+        isb2_isb1transformer:TransformBool[joTransform,Enabled,enabled]
     }
 
     method AutoTransform_ActionTimerPool(jsonvalueref joTransform)
     {
-        This:TransformString[joTransform,Name,name]
-        This:TransformString[joTransform,Descrpition,description]
-        This:TransformInteger[joTransform,MaxTimers,maxTimers]
-        This:TransformBool[joTransform,BackEndRemoval,backEndRemoval]
+        isb2_isb1transformer:TransformString[joTransform,Name,name]
+        isb2_isb1transformer:TransformString[joTransform,Descrpition,description]
+        isb2_isb1transformer:TransformInteger[joTransform,MaxTimers,maxTimers]
+        isb2_isb1transformer:TransformBool[joTransform,BackEndRemoval,backEndRemoval]
     }
 
     method AutoTransform_Action_UseCustomModifiers(jsonvalueref joTransform)
     {
-        This:TransformBool[joTransform,LAlt,lAlt]
-        This:TransformBool[joTransform,RAlt,rAlt]
-        This:TransformBool[joTransform,LShift,lShift]
-        This:TransformBool[joTransform,RShift,rShift]
-        This:TransformBool[joTransform,LCtrl,lCtrl]
-        This:TransformBool[joTransform,RCtrl,rCtrl]
+        isb2_isb1transformer:TransformBool[joTransform,LAlt,lAlt]
+        isb2_isb1transformer:TransformBool[joTransform,RAlt,rAlt]
+        isb2_isb1transformer:TransformBool[joTransform,LShift,lShift]
+        isb2_isb1transformer:TransformBool[joTransform,RShift,rShift]
+        isb2_isb1transformer:TransformBool[joTransform,LCtrl,lCtrl]
+        isb2_isb1transformer:TransformBool[joTransform,RCtrl,rCtrl]
     }
 
     method AutoTransform_WindowLayout(jsonvalueref joTransform)
@@ -1273,14 +1279,14 @@ objectdef isb2_isb1transformer
         This:TransformSingleToArray[joTransform,Regions]
         This:TransformSingleToArray[joTransform,SwapGroups]
 
-        This:TransformString[joTransform,Name,name]
-        This:TransformString[joTransform,Description,description]
+        isb2_isb1transformer:TransformString[joTransform,Name,name]
+        isb2_isb1transformer:TransformString[joTransform,Description,description]
 
-        This:TransformString[joTransform,SwapMode,swapMode,Never]
-        This:TransformString[joTransform,FocusClickMode,focusClickMode,ApplicationDefined]
+        isb2_isb1transformer:TransformString[joTransform,SwapMode,swapMode,Never]
+        isb2_isb1transformer:TransformString[joTransform,FocusClickMode,focusClickMode,ApplicationDefined]
 
-        This:TransformBool[joTransform,InstantSwap,instantSwap]
-        This:TransformBool[joTransform,FocusFollowsMouse,focusFollowsMouse]
+        isb2_isb1transformer:TransformBool[joTransform,InstantSwap,instantSwap]
+        isb2_isb1transformer:TransformBool[joTransform,FocusFollowsMouse,focusFollowsMouse]
 
         This:AutoTransform[joTransform,Regions,WindowLayout]
         This:AutoTransform[joTransform,SwapGroups,WindowLayout]
@@ -1290,25 +1296,25 @@ objectdef isb2_isb1transformer
 
     method AutoTransform_WindowLayout_Regions(jsonvalueref joTransform)
     {
-        This:TransformInteger[joTransform,CharacterSetSlot,characterSetSlot]
-        This:TransformInteger[joTransform,SwapGroup,swapGroup]
+        isb2_isb1transformer:TransformInteger[joTransform,CharacterSetSlot,characterSetSlot]
+        isb2_isb1transformer:TransformInteger[joTransform,SwapGroup,swapGroup]
 
-        This:TransformString[joTransform,Name,name]
-        This:TransformString[joTransform,Description,description]
+        isb2_isb1transformer:TransformString[joTransform,Name,name]
+        isb2_isb1transformer:TransformString[joTransform,Description,description]
 
-        This:TransformBool[joTransform,Permanent,permanent]
-        This:TransformString[joTransform,BorderStyle,borderStyle,None]
-        This:TransformString[joTransform,AlwaysOnTopMode,alwaysOnTopMode,Normal]
+        isb2_isb1transformer:TransformBool[joTransform,Permanent,permanent]
+        isb2_isb1transformer:TransformString[joTransform,BorderStyle,borderStyle,None]
+        isb2_isb1transformer:TransformString[joTransform,AlwaysOnTopMode,alwaysOnTopMode,Normal]
 
         This:TransformRect[joTransform,Rect,rect]
     }
 
     method AutoTransform_WindowLayout_SwapGroups(jsonvalueref joTransform)
     {
-        This:TransformInteger[joTransform,_ActiveRegion,activeRegion,-1]
-        This:TransformInteger[joTransform,_DeactivateSwapGroup,deactivateSwapGroup]
-        This:TransformInteger[joTransform,_PiPSqueakSlot,pipSqueakSlot]
-        This:TransformInteger[joTransform,_ResetRegion,resetRegion,-1]
+        isb2_isb1transformer:TransformInteger[joTransform,_ActiveRegion,activeRegion,-1]
+        isb2_isb1transformer:TransformInteger[joTransform,_DeactivateSwapGroup,deactivateSwapGroup]
+        isb2_isb1transformer:TransformInteger[joTransform,_PiPSqueakSlot,pipSqueakSlot]
+        isb2_isb1transformer:TransformInteger[joTransform,_ResetRegion,resetRegion,-1]
     }
 
     method AutoTransform_UserScreenSet(jsonvalueref joTransform)
@@ -1319,7 +1325,7 @@ objectdef isb2_isb1transformer
     method AutoTransform_ScreenSet(jsonvalueref joTransform)
     {
 ;        echo "AutoTransform_ScreenSet ${joTransform~}"
-        This:TransformString[joTransform,Name,name]
+        isb2_isb1transformer:TransformString[joTransform,Name,name]
 
         This:TransformSingleToArray[joTransform,AllScreens]
 
@@ -1330,10 +1336,10 @@ objectdef isb2_isb1transformer
     {
 ;        echo "AutoTransform_ScreenSet_AllScreens ${joTransform~}"
 
-        This:TransformString[joTransform,DeviceName,deviceName]
+        isb2_isb1transformer:TransformString[joTransform,DeviceName,deviceName]
 
-        This:TransformInteger[joTransform,DPIScale,dpiScale,100]
-        This:TransformBool[joTransform,Primary,primary]
+        isb2_isb1transformer:TransformInteger[joTransform,DPIScale,dpiScale,100]
+        isb2_isb1transformer:TransformBool[joTransform,Primary,primary]
 
         This:TransformRect[joTransform,Bounds,bounds]
         This:TransformRect[joTransform,WorkingArea,workingArea]
@@ -1507,6 +1513,139 @@ objectdef isb2_xmlreader
 
         }
         /**/
+
+        joAttributes:ForEach["jo:SetString[\"_\${ForEach.Key~}\",\"\${ForEach.Value~}\"]"]
+        return jo
+    }
+}
+
+objectdef isb2_xmlreader_lgui
+{
+    variable xmlreader XMLReader
+
+    method Read(string filename, string rootNode="ISUI")
+    {
+        noop ${This.Read["${filename~}","${rootNode~}",1]}
+    }
+
+    member:jsonvalueref Read(string filename, string rootNode="ISUI", bool writeFile=0)
+    {
+        if !${filename.NotNULLOrEmpty}
+            return NULL
+
+        XMLReader:Reset
+        if !${XMLReader:ParseFile["${filename~}"](exists)}
+        {
+            Script:SetLastError["isb2_xmlreader_lgui:Read: Failed to parse file ${filename~}"]
+            return NULL
+        }
+
+        variable weakref profileNode
+        profileNode:SetReference["XMLReader.Root.FindChildElement[\"${rootNode~}\"]"]
+
+        variable jsonvalueref joProfile
+        joProfile:SetReference["This.ConvertNodeToObject[profileNode,0]"]
+
+        if ${writeFile} && ${joProfile.Type.Equal[object]}
+            joProfile:WriteFile["${filename~}.json",multiline]
+
+        return joProfile
+    }    
+
+    member:jsonvalueref ConvertNode(weakref _node)
+    {
+;        echo "ConvertNode ${_node.AsJSON~}"
+        variable jsonvalue jv
+        
+        if ${_node.Attributes.Type.Equal[object]}
+            return "This.ConvertNodeToObject[_node,0]"
+
+        if !${_node.Child(exists)}
+        {                        
+            jv:SetValue["null"]
+            return jv
+        }
+
+        if !${_node.Child.Next(exists)}
+        {
+            jv:SetValue["${_node.Child.Text.AsJSON~}"]
+;            echo "ConvertNode giving VALUE ${jv~}"
+            return jv
+        }
+
+        return "This.ConvertNodeToObject[_node,1]"
+    }
+
+    member:jsonvalueref ConvertNodesToArray(weakref _parent, string _tag)
+    {
+        variable jsonvalue ja="[]"
+        if !${_parent.Reference(exists)}
+            return ja
+
+;        echo "ConvertNodesToArray ${_tag~}"
+
+        variable weakref _child
+        _child:SetReference["_parent.FindChildElement[\"${_tag~}\"]"]
+
+        variable jsonvalueref joConverted
+
+        while ${_child.Reference(exists)}
+        {
+            joConverted:SetReference["This.ConvertNode[_child]"]
+  ;          echo "joConverted=${joConverted~}"
+            ja:AddByRef[joConverted]
+
+            _child:SetReference["_parent.FindNextChildElement[_child,\"${_tag~}\"]"]
+        }
+        return ja
+    }
+
+    member:jsonvalueref ConvertNodeToObject(weakref _node, bool AutoArray=0)
+    {
+        variable jsonvalue jo="{}"
+        if !${_node.Reference(exists)}
+            return jo
+
+;        echo "ConvertNodeToObject ${_node.AsJSON~} Leaf=${_node.Leaf}"
+
+        variable weakref _child
+
+;        variable set childTypes
+
+        _child:SetReference[_node.Child]
+
+        variable jsonvalue ja="[]"
+        jo:SetString[_tag,"${_node.Text~}"]
+
+        while ${_child.Reference(exists)}
+        {
+            if ${_child.Type.Equal[ELEMENT]}
+            {                
+                if !${_child.Child.Next(exists)}
+                {
+                    jo:Set["${_child.Text~}","${_child.Child.Text.AsJSON~}"]
+                }
+                else
+                    ja:AddByRef["This.ConvertNode[_child]"]
+            }
+            else
+            {
+;                echo "ConvertNodeToObject ${_node.AsJSON~} child=${_child.AsJSON~}"
+
+                if ${_child.Type.Equal[TEXT]} && !${jo.Has[Value]} && ${_node.Leaf}
+                {
+                    jo:SetString["Value","${_child.Text~}"]
+                    break
+                }
+            }
+            _child:SetReference[_child.Next]
+        }
+
+        if ${ja.Used}
+            jo:SetByRef[nodes,ja]
+
+        variable jsonvalueref joAttributes
+        joAttributes:SetReference[_node.Attributes]
 
         joAttributes:ForEach["jo:SetString[\"_\${ForEach.Key~}\",\"\${ForEach.Value~}\"]"]
         return jo

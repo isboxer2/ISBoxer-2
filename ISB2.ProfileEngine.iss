@@ -237,6 +237,7 @@ objectdef isb2_profileengine
     {
         echo "\atisb2_profileengine:OnWindowCaptured\ax"
         This:InstallSlotActivateHotkeys
+        This:AssignCPUCores
     }
 
     ; slot activation hotkey
@@ -1074,6 +1075,12 @@ objectdef isb2_profileengine
         SlotRef:SetReference[NULL]
     }
 
+    method AssignCPUCores(jsonvalueref jaCores)
+    {
+        proclock on
+        proc -all
+    }
+
     method ActivateSlot(uint numSlot)
     {
         Slot:Set[${numSlot}]
@@ -1088,6 +1095,8 @@ objectdef isb2_profileengine
 
         if ${SlotRef.Has[backgroundFPS]}
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
+
+        This:AssignCPUCores
 
         This:InstallSlotActivateHotkeys
         This:SetRelayGroup["isboxer",1]

@@ -139,6 +139,23 @@ objectdef isb2_importer
         jo:WriteFile["${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.isb2.json",multiline]
     }
 
+    method TransformLGUIXML(filepath filename)
+    {
+        variable jsonvalueref jo
+        jo:SetReference["This.TransformLGUIXML[\"${filename~}\"]"]
+        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename.FilenameOnly~}.lgui2Package.json",multiline]
+    }
+
+    member:jsonvalueref TransformLGUIXML(string filename)
+    {
+        variable isb2_isb1transformer ISB1Transformer
+
+        variable jsonvalueref joProfile
+        joProfile:SetReference["ISB1Transformer.TransformLGUIXML[\"${filename~}\"]"]
+
+        return joProfile
+    }
+
     member:jsonvalueref TransformRegionsXML(string filename)
     {
         variable isb2_isb1transformer ISB1Transformer

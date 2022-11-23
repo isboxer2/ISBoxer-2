@@ -15,6 +15,21 @@ objectdef isb2_isb1transformer
        return ISBProfile
     }
 
+    member:jsonvalueref TransformLGUIXML(string filename)
+    {
+        variable jsonvalueref joProfile
+        
+        variable isb2_xmlreader XMLReader
+        joProfile:SetReference["XMLReader.Read[\"${filename~}\",ISUI,1]"]
+        if !${joProfile.Type.Equal[object]}
+        {
+            return NULL
+        }
+        This:TransformLGUIRoot[joProfile]
+
+       return joProfile
+    }
+
     member:jsonvalueref TransformGlobalSettingsXML(string filename)
     {
         variable jsonvalueref joProfile
@@ -136,6 +151,12 @@ objectdef isb2_isb1transformer
         joTransform:Erase[sets]
 
         joTransform:SetByRef[regionSheets,ja]
+    }
+
+    method TransformLGUIRoot(jsonvalueref joTransform)
+    {
+        echo "\arTransformLGUIRoot\ax ${joTransform~}"
+
     }
 
     method TransformGlobalSettingsRoot(jsonvalueref joTransform)

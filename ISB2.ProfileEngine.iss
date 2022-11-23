@@ -238,6 +238,10 @@ objectdef isb2_profileengine
         echo "\atisb2_profileengine:OnWindowCaptured\ax"
         This:InstallSlotActivateHotkeys
         This:AssignCPUCores
+
+        if ${SlotRef.Has[windowTitle]}
+            timed 10 windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
+
     }
 
     ; slot activation hotkey
@@ -1119,8 +1123,6 @@ objectdef isb2_profileengine
 ;        echo "\atInstalling Slot vfxSheets\ax ${SlotRef.Get[vfxSheets]~}"
         SlotRef.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
-        if ${SlotRef.Has[windowTitle]}
-            timed 10 windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
 
         This:ExecuteEventAction[SlotRef,onLoad]
 

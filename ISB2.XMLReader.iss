@@ -530,7 +530,7 @@ objectdef isb2_isb1transformer
         jo:SetReference["joTransform.Get[\"${oldProperty~}\"]"]
         if !${jo.Type.Equal[object]}
         {
-            if ${jo.Has["${oldProperty~}"]}
+            if ${joTransform.Has["${oldProperty~}"]}
                 joTransform:Set["${newProperty~}","${joTransform.Get["${oldProperty}"]~}"]
             joTransform:Erase["${oldProperty~}"]
             return

@@ -1,5 +1,5 @@
 {
-    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
+    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
     "skin": {
         "name": "ISBoxer 2",
         "brushes":{
@@ -49,5 +49,71 @@
                   }          
             }
         }
-    }
+    },
+    "skins":[
+        {
+            "baseSkin":"ISBoxer 2",
+            "name":"ISBoxer 2 - Thanksgiving",
+            "brushes":{
+                "window.titleBar.backgroundBrush": {
+                    "jsonTemplate": "isb2.headerBackground"
+                },
+                "window.backgroundBrush":{
+                    "color": [ 0.75, 0.1, 0.1, 0.05 ]
+                },
+                "window.borderBrush":{
+                    "jsonTemplate":"isb2.background1border"
+                }
+            },
+            "templates": {
+                "isb2.headerBackground": {
+                    "color": [ 0.4, 0.4, 0.3 ]
+                },
+                "isb2.background1": {
+                    "color": [ 0.1, 0.1, 0.05 ]
+                },
+                "isb2.background1border": {
+                    "color": [ 0.2, 0.2, 0.1 ]
+                },
+                "listboxitem.gotMouseOver": {
+                    "font": {
+                      "bold": true
+                    },
+                    "color": [ 1.0, 0.9, 0.6 ]
+                },
+                "tab.headerContainer.onSelected": {
+                    "font": {
+                    "bold": true
+                    },
+                    "color": [ 1.0, 0.9, 0.6 ],
+                    "borderThickness": 2
+                },
+                "window.adjustments":{
+                    "x":-3,
+                    "y":-3,
+                    "width":6,
+                    "height":25
+                },
+                "window": {
+                    "jsonTemplate":"default:window",
+                    "borderBrush": "window.borderBrush",
+                    "backgroundBrush": "window.backgroundBrush",
+                    "styles": {
+                        "onHideTitleBar": {
+                          "borderBrush": {
+                            "color": [ 0.0, 0.0, 0.0, 0.0 ]
+                          },
+                          "backgroundBrush": {
+                            "color": [ 0.0, 0.0, 0.0, 0.0 ]
+                          }
+                        },
+                        "onShowTitleBar": {
+                            "borderBrush": "window.borderBrush",
+                            "backgroundBrush": "window.backgroundBrush"
+                          }
+                      }          
+                }
+            }
+        }
+    ]
 }

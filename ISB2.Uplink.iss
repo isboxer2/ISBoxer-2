@@ -10,6 +10,7 @@ objectdef isb2 inherits isb2_profilecollection
 
     variable isb2_importer Importer
     variable isb2_slotmanager SlotManager
+    variable string UseSkin="ISBoxer 2 - Thanksgiving"
 
     variable bool bAutoStoreSettings=TRUE
     variable string SelectedTeamName
@@ -18,7 +19,10 @@ objectdef isb2 inherits isb2_profilecollection
     {
         Script.OnSetLastError:AttachAtom[This:OnScriptError]
         This:LoadSettings
+        LGUI2:LoadPackageFile[ISB2.Skin.lgui2Package.json]
+        LGUI2:PushSkin["${UseSkin~}"]
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
+        LGUI2:PopSkin["${UseSkin~}"]
 
         This:LoadPreviousProfiles
 

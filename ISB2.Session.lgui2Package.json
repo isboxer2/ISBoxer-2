@@ -1,11 +1,9 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",    
     "includes": [
-        "ISB2.Skin.lgui2Package.json",
         "ISB2.Live.lgui2Package.json",
         "ISB2.Viewers.lgui2Package.json"
     ],
-    "skin":"ISBoxer 2",
     "templates": {
         "isb2.data":{
             "defaultActionTypes":[

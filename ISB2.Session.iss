@@ -7,6 +7,7 @@
 objectdef isb2session inherits isb2_profileengine
 {
     variable bool ValidSession
+    variable string UseSkin="ISBoxer 2 - Thanksgiving"
 
     variable isb2_profilecollection ProfileDB
     variable isb2_wowaddon WoWAddon
@@ -40,7 +41,10 @@ objectdef isb2session inherits isb2_profileengine
             ISSession:SetFlashWindow[0]
         
             This:StripInnerSpaceDefaults
+            LGUI2:LoadPackageFile[ISB2.Skin.lgui2Package.json]
+            LGUI2:PushSkin["${UseSkin~}"]
             LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]
+            LGUI2:PopSkin["${UseSkin~}"]
             ISB2BroadcastMode:LateInitialize
             This:InstallDefaultActionTypes
 

@@ -400,7 +400,7 @@ objectdef isb2_profileeditor
     method Initialize(weakref _profile)
     {
         Editing:SetReference[_profile]
-        LGUI2:PushSkin["ISBoxer 2"]
+        LGUI2:PushSkin["${ISB2.UseSkin~}"]
         Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2.profileEditor]",This].ID}"]
         Window:AddHook["onVisualDetached","$$>
         {
@@ -409,7 +409,7 @@ objectdef isb2_profileeditor
             "method":"OnWindowClosed"
         }
         <$$"]
-        LGUI2:PopSkin["ISBoxer 2"]
+        LGUI2:PopSkin["${ISB2.UseSkin~}"]
     }
 
     method Shutdown()
@@ -617,12 +617,12 @@ objectdef isb2_clickbarButton
 
         if ${useImageOverride.NotNULLOrEmpty}
         {
-            joBrush:SetString[color,"#${LGUI2.Skin[ISBoxer 2].Brush["${useImageOverride~}"].Color.Hex}"]
+            joBrush:SetString[color,"#${LGUI2.Skin[default].Brush["${useImageOverride~}"].Color.Hex}"]
             joBrush:SetString[imageBrush,"${useImageOverride~}"]
         }
         elseif ${useImage.NotNULLOrEmpty}
         {
-            joBrush:SetString[color,"#${LGUI2.Skin[ISBoxer 2].Brush["${useImage~}"].Color.Hex}"]
+            joBrush:SetString[color,"#${LGUI2.Skin[default].Brush["${useImage~}"].Color.Hex}"]
             joBrush:SetString[imageBrush,"${useImage~}"]
         }
         elseif ${backgroundColor.NotNULLOrEmpty}
@@ -1247,9 +1247,9 @@ objectdef isb2_clickbar
             joWindow:Set[borderBrush,"{\"color\":\"${Template.Get[borderColor]~}\"}"]
 
         echo "\ayCreateWindow final\ax ${joWindow~}"
-        LGUI2:PushSkin["ISBoxer 2"]
+        LGUI2:PushSkin["${ISB2.UseSkin~}"]
         Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
-        LGUI2:PopSkin["ISBoxer 2"]
+        LGUI2:PopSkin["${ISB2.UseSkin~}"]
     }
 
     
@@ -1606,7 +1606,7 @@ objectdef isb2_imagesheet
         if ${jo.Has[colorKey]}
             joImageBrush:SetString[imageFileTransparencyKey,"${jo.Get[colorKey]~}"]
 
-        LGUI2.Skin["ISBoxer 2"]:SetBrush["${Name~}.${jo.Get[name]~}",joImageBrush]
+        LGUI2.Skin["default"]:SetBrush["${Name~}.${jo.Get[name]~}",joImageBrush]
     }
 }
 
@@ -1843,9 +1843,9 @@ objectdef isb2_vfxsheet
 
 ;        echo "\ayfinal\ax ${joView~}"
 
-        LGUI2:PushSkin["ISBoxer 2"]
+        LGUI2:PushSkin["${ISB2.UseSkin~}"]
         joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
-        LGUI2:PopSkin["ISBoxer 2"]
+        LGUI2:PopSkin["${ISB2.UseSkin~}"]
     }
 
     method UninstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
@@ -1900,9 +1900,9 @@ objectdef isb2_vfxsheet
         joView:SetByRef[content,joVideofeed]
 
 ;        echo "\ayfinal\ax ${joView~}"
-        LGUI2:PushSkin["ISBoxer 2"]
+        LGUI2:PushSkin["${ISB2.UseSkin~}"]
         joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
-        LGUI2:PopSkin["ISBoxer 2"]
+        LGUI2:PopSkin["${ISB2.UseSkin~}"]
     }   
 
     method UninstallVFXSource(string sheet, string name, jsonvalueref joVFX)

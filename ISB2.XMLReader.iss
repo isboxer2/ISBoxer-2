@@ -476,7 +476,6 @@ objectdef isb2_isb1transformer
         }
         if !${joTransform.Assert["${oldProperty~}","${defaultValue.AsJSON~}"]}
         {
-            echo joTransform:SetString["${newProperty~}","${joTransform.Get["${oldProperty~}"]~}"]
             joTransform:SetString["${newProperty~}","${joTransform.Get["${oldProperty~}"]~}"]
         }
         joTransform:Erase["${oldProperty~}"]
@@ -1287,6 +1286,7 @@ objectdef isb2_isb1transformer
 
         isb2_isb1transformer:TransformBool[joTransform,InstantSwap,instantSwap]
         isb2_isb1transformer:TransformBool[joTransform,FocusFollowsMouse,focusFollowsMouse]
+        isb2_isb1transformer:TransformBool[joTransform,UseVideoFXLayout,useVFXLayout]
 
         This:AutoTransform[joTransform,Regions,WindowLayout]
         This:AutoTransform[joTransform,SwapGroups,WindowLayout]

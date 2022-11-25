@@ -1266,6 +1266,9 @@ objectdef isb2_importer
 
         if ${jo.GetBool[focusFollowsMouse]}
             joSettings:SetBool[focusFollowsMouse,1]
+        if ${jo.GetBool[useVFXLayout]}
+            joSettings:SetBool[useVFXLayout,1]
+
         joSettings:SetBool[instantSwap,"${jo.GetBool[instantSwap]}"]
 
         switch ${jo.Get[focusClickMode]}

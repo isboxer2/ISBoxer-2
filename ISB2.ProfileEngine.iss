@@ -243,6 +243,24 @@ objectdef isb2_profileengine
             windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
     }
 
+	method MuteBackground()
+	{
+		if ${Display.Window.IsForeground}
+		{
+			Audio:SetMute[0]
+		}
+		else
+		{
+			Audio:SetMute[1]
+		}
+	}
+
+    method Event_OnFrame()
+    {
+        if ${Team.GetBool[autoMuteBackground]}
+            This:MuteBackground
+    }
+
     method Event_OnScriptStopped()
     {
         echo "\atisb2_profileengine\ax:\ayEvent_OnScriptStopped ${Context.Filename~}\ax"
@@ -1126,6 +1144,7 @@ objectdef isb2_profileengine
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
 
         script.OnScriptStopped:AttachAtom[This:Event_OnScriptStopped]
+        Event[OnFrame]:AttachAtom[This:Event_OnFrame]
 
         This:ApplyWindowSettings
 

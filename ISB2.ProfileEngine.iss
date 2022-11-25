@@ -233,14 +233,27 @@ objectdef isb2_profileengine
         return ${jaSlots.SelectKey[joQuery]}
     }
 
-    method OnWindowCaptured()
+    method ApplyWindowSettings()
     {
-        echo "\atisb2_profileengine:OnWindowCaptured\ax"
+        echo "\atisb2_profileengine\ax:ApplyWindowSettings\ax"
         This:InstallSlotActivateHotkeys
         This:AssignCPUCores
 
         if ${SlotRef.Has[windowTitle]}
-            timed 10 windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
+            windowtext "${This.ProcessVariables["${SlotRef.Get[windowTitle]~}"]~}"
+    }
+
+    method Event_OnScriptStopped()
+    {
+        echo "\atisb2_profileengine\ax:\ayEvent_OnScriptStopped ${Context.Filename~}\ax"
+        if ${Context.Filename.Equal[DefaultStartup]}
+            This:ApplyWindowSettings    
+    }
+
+    method Event_OnWindowCaptured()
+    {
+        echo "\atisb2_profileengine\ax:\ayEvent_OnWindowCaptured\ax"
+        This:ApplyWindowSettings
 
     }
 
@@ -772,7 +785,7 @@ objectdef isb2_profileengine
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        echo "\apInstallClickBarButtonLayout\ax ${jo~}"
+;        echo "\apInstallClickBarButtonLayout\ax ${jo~}"
         ClickBarButtonLayouts:Erase["${jo.Get[name]~}"]
 
         ClickBarButtonLayouts:Set["${jo.Get[name]~}",jo]
@@ -1044,7 +1057,7 @@ objectdef isb2_profileengine
             }
         }
 
-        ISSession.OnWindowCaptured:AttachAtom[This:OnWindowCaptured]        
+        ISSession.OnWindowCaptured:AttachAtom[This:Event_OnWindowCaptured]        
     }
 
     method UninstallSlotActivateHotkey(uint numSlot, jsonvalueref joSlot)
@@ -1112,9 +1125,10 @@ objectdef isb2_profileengine
         if ${SlotRef.Has[backgroundFPS]}
             maxfps -bg -calculate ${SlotRef.Get[backgroundFPS]}
 
-        This:AssignCPUCores
+        script.OnScriptStopped:AttachAtom[This:Event_OnScriptStopped]
 
-        This:InstallSlotActivateHotkeys
+        This:ApplyWindowSettings
+
         This:SetRelayGroup["isboxer",1]
         This:SetRelayGroups["SlotRef.Get[targetGroups]",1]
         This:VirtualizeMappables["SlotRef.Get[virtualMappables]"]

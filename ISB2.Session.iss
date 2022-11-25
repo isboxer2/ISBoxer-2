@@ -71,7 +71,7 @@ objectdef isb2session inherits isb2_profileengine
     method StripInnerSpaceDefaults()
     {
         echo "\ayStripping Inner Space defaults...\ax"
-;        bind -delete console
+        bind -delete console
         bind -delete tinykey
 		bind -delete normalkey
 		bind -delete fullscreenkey

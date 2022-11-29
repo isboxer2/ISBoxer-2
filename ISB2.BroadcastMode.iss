@@ -3,6 +3,7 @@ variable(global) isb2_broadcastmode ISB2BroadcastMode
 objectdef isb2_broadcastmode
 {
     variable bool Enabled=FALSE
+    variable bool Suppressed=FALSE
     variable lgui2elementref Broadcaster
 
     method Initialize()
@@ -107,12 +108,20 @@ objectdef isb2_broadcastmode
     {
         echo "\atisb2_broadcastmode\ax SetKeyBroadcasting ${newValue}"
         Broadcaster.Element:SetKeyboardEnabled[${newValue}]
+        if ${Broadcaster.KeyboardEnabled}!=${newValue}
+        {
+            echo "\arBroadcaster:SetKeyboardEnabled[${newValue}]\ax failed"
+        }
     }
 
     method SetMouseBroadcasting(bool newValue)
     {
         echo "\atisb2_broadcastmode\ax SetMouseBroadcasting ${newValue}"
         Broadcaster.Element:SetMouseEnabled[${newValue}]
+        if ${Broadcaster.MouseEnabled}!=${newValue}
+        {
+            echo "\arBroadcaster:SetMouseEnabled[${newValue}]\ax failed"
+        }
     }
 
     member:string Target()
@@ -146,7 +155,7 @@ objectdef isb2_broadcastmode
 
     method Enable()
     {
-        if ${Enabled}
+        if ${Enabled} || ${Suppressed}
             return
 
         Enabled:Set[1]
@@ -165,5 +174,13 @@ objectdef isb2_broadcastmode
         LGUI2.Screen:KeyboardFocus
 
         LGUI2.Element[isb2.events]:FireEventHandler[onBroadcastingStateChanged]
+    }
+
+    method Suppress()
+    {
+        Suppressed:Set[1]
+        echo "\ayisb2_broadcastmode\ax: \arBroadcasting Mode Suppressed\ax"     
+        This:Disable  
+        lgui2remotecontrol:SetRemoteControlAllowed[0]
     }
 }

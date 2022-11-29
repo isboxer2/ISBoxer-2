@@ -1688,6 +1688,8 @@ objectdef isb2_vfxsheet
         {
             This:Enable
         }
+
+        echo "\agVFX Sheet installed\ax \ay${Name~}\ax"
     }
 
     member:jsonvalueref AsJSON()
@@ -1802,7 +1804,7 @@ objectdef isb2_vfxsheet
         variable int w=${joVFX.GetInteger[width]}
         variable int h=${joVFX.GetInteger[height]}
 
-        variable jsonvalueref joAdjust="LGUI2.Skin[ISBoxer 2].Template[window.adjustments]"
+        variable jsonvalueref joAdjust="LGUI2.Skin[\"${ISB2.UseSkin~}\"].Template[window.adjustments]"
 
         ; adjust for extra window size beyond the VFX output element
         x:Inc["${joAdjust.GetInteger[x]}"]
@@ -1818,9 +1820,10 @@ objectdef isb2_vfxsheet
             "horizontalAlignment":"stretch",
             "verticalAlignment":"stretch",
             "feedName":${joVFX.Get[feedName]~.AsJSON~},
-            "sendMouse":${joVFX.GetBool[sendMouse]},
-            "sendKeyboard":${joVFX.GetBool[sendKeyboard]},
-            "useLocalBindings":true
+            "sendMouse":${joVFX.GetBool[-default,false,sendMouse]},
+            "sendKeyboard":${joVFX.GetBool[-default,false,sendKeyboard]},
+            "useLocalBindings":${joVFX.GetBool[-default,true,useLocalBindings]},
+            "permanent":${joVFX.GetBool[-default,false,permanent]}
         }
         <$$"]
 

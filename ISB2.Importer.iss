@@ -1209,6 +1209,9 @@ objectdef isb2_importer
 
         joNew:Set[bounds,"${jo.Get[rect]~}"]
 
+        if ${jo.Has[-notnull,swapGroup]}
+            joNew:SetInteger[swapGroup,"${jo.Get[swapGroup]}"]
+
         if ${jo.Has[-notnull,characterSetSlot]}
             joNew:SetInteger[slot,"${jo.Get[characterSetSlot]}"]
 
@@ -1261,13 +1264,15 @@ objectdef isb2_importer
         joNew:SetByRef[swapGroups,jaSwapGroups]
 
         variable jsonvalueref joSettings="{}"
+
+        if ${jo.GetBool[useVFXLayout]}
+            joSettings:SetBool[useVFXLayout,1]
+
         ; all ISB1 window layouts default to no frame
         joSettings:SetString[frame,none]
 
         if ${jo.GetBool[focusFollowsMouse]}
             joSettings:SetBool[focusFollowsMouse,1]
-        if ${jo.GetBool[useVFXLayout]}
-            joSettings:SetBool[useVFXLayout,1]
 
         joSettings:SetBool[instantSwap,"${jo.GetBool[instantSwap]}"]
 

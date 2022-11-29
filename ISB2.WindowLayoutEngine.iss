@@ -19,15 +19,22 @@ objectdef isb2_windowlayoutengine
     variable jsonvalueref Settings="{}"
     variable jsonvalueref Regions="[]"
     variable jsonvalueref SwapGroup="{}"
+    variable jsonvalueref SwapGroups="[]"
+
+    variable jsonvalueref VFXSettings="{}"
 
     variable jsonvalueref CurrentRegion
 
     variable string LastApplied
 
+    variable bool FocusFollowsMouse
+    variable bool VFXRenderer
+    variable bool VFXLayout
     variable uint Group
 
     variable bool Roaming
     variable uint RoamingSlot
+    variable uint BorrowedSlot
 
     variable jsonvalueref ResetRegion
     variable uint NumResetRegion
@@ -316,27 +323,76 @@ objectdef isb2_windowlayoutengine
         This:SelectInactiveRegion[${numInactiveRegion}]
     }
 
+    method VFXLayout_OnSlotActiveStatusChanged(uint numSlot, bool newValue)
+    {
+;        InnerSpace:Relay[uplink,"echo VFXLayout_OnSlotActiveStatusChanged ${numSlot} ${newValue} (borrowed=${BorrowedSlot})"]
+
+                if ${newValue}
+                {
+                    if ${RoamingSlot} != ${numSlot}
+                    {                      
+;                        InnerSpace:Relay[uplink,"echo SetFeedName modify is${RoamingSlot}"]
+                        LGUI2.Element["isb2.vfx.VFX Window Layout.vfx.slot${numSlot}"]:SetFeedName[is${RoamingSlot}]
+                    }
+                    else
+                    {
+                        ; turn off vfx for slot
+                        if ${RoamingSlot}
+                        {
+;                            InnerSpace:Relay[uplink,"echo SetFeedName restore is${BorrowedSlot}"]
+                            LGUI2.Element["isb2.vfx.VFX Window Layout.vfx.slot${BorrowedSlot}"]:SetFeedName[is${BorrowedSlot}]
+                        }
+                        else
+                        {
+;                            InnerSpace:Relay[uplink,"echo SetFeedName hide is${numSlot}"]
+                            LGUI2.Element["isb2.vfxWindow.VFX Window Layout.vfx.slot${numSlot}"]:SetVisibility[Hidden]
+                        }
+                    }
+                    BorrowedSlot:Set[${numSlot}]
+                }
+                else
+                {
+                    ; turn on vfx for slot                    
+                    if ${BorrowedSlot} != ${numSlot}
+                    {
+;                        InnerSpace:Relay[uplink,"echo SetFeedName restore is${BorrowedSlot} show ${numSlot}"]
+                        LGUI2.Element["isb2.vfx.VFX Window Layout.vfx.slot${BorrowedSlot}"]:SetFeedName[is${BorrowedSlot}]
+                        LGUI2.Element["isb2.vfxWindow.VFX Window Layout.vfx.slot${numSlot}"]:SetVisibility[Visible]
+                    }
+                }
+
+    }
+
     method Remote_ActiveStatusChanged(string sessionName, uint numGroup, bool newValue, ewindowlayoutreason reason=0)
     {
         echo "isb2_windowlayoutengine:\ayRemote_ActiveStatusChanged\ax \"${sessionName~}\" ${numGroup} ${newValue} ${reason}"
         if ${numGroup}==${Group}
         {
-            ; roaming slot?
-            if ${newValue} && ${Roaming}
+            if ${VFXRenderer}
             {
-                ; take the inactive region
-                This:SelectInactiveRegion["${This.GetInactiveRegionForSlot["${sessionName.Right[-2]}"]}"]                    
-                echo "Roaming: Inactive Region now ${This.NumInactiveRegion}"
-                This:SetActiveStatus[0,Remote]
-                This:Apply
-                return
+                This:VFXLayout_OnSlotActiveStatusChanged["${sessionName.Right[-2]}",${newValue}]
+            }
+
+            if !${VFXLayout}
+            {
+                ; roaming slot?
+                if ${newValue} && ${Roaming}
+                {
+                    ; take the inactive region
+                    BorrowedSlot:Set["${sessionName.Right[-2]}"]
+                    This:SelectInactiveRegion["${This.GetInactiveRegionForSlot["${BorrowedSlot}"]}"]                    
+                    echo "Roaming: Inactive Region now ${This.NumInactiveRegion}"
+                    This:SetActiveStatus[0,Remote]
+                    This:Apply
+                    return
+                }
             }
 
             if ${Settings.GetBool[swapOnActivate]} 
             {
-                if !${Settings.GetBool[focusFollowsMouse]}
+                if ${This:RefreshActiveStatus[Remote](exists)}
                 {
-                    if ${This:RefreshActiveStatus[Remote](exists)}
+                    if !${FocusFollowsMouse}
                     {
                         This:Apply
                     }
@@ -386,6 +442,7 @@ objectdef isb2_windowlayoutengine
 
     method RefreshActiveStatus(ewindowlayoutreason reason=0,bool forceUpdate=FALSE)
     {
+        echo "\agRefreshActiveStatus\ax ${reason}"
         variable bool newValue=${Display.Window.IsForeground}
         if ${forceUpdate} || ${newValue}!=${Active}
         {
@@ -394,16 +451,290 @@ objectdef isb2_windowlayoutengine
         return FALSE
     }
 
+    member:uint GetSwapGroupForSlot(uint numSlot)
+    {
+        variable uint numRegion=${This.GetInactiveRegionForSlot[${numSlot}]}
+        if ${numRegion}
+        {
+            if ${Regions.Has[${numRegion},swapGroup]}
+                return ${Regions.GetInteger[${numRegion},swapGroup]}
+            return 1
+        }
+
+        variable jsonvalue joQuery
+        joQuery:SetValue["$$>
+        {
+            "eval":"Select.Get[roamingSlot\]",
+            "op":"==",
+            "value":${numSlot}
+        }
+        <$$"]
+    ;    echo "${Session}: GetSwapGroupForSlot giving ${SwapGroups.SelectKey[joQuery]} from ${joQuery~}"
+        return ${SwapGroups.SelectKey[joQuery]}
+    }
+
     member:uint GetInactiveRegionForSlot(uint numSlot)
     {
         variable jsonvalueref joQuery="$$>
         {
-            "eval":"Select.Get[slot]",
+            "eval":"Select.Get[slot\]",
             "op":"==",
             "value":${numSlot}
         }
         <$$"
         return ${Regions.SelectKey[joQuery]}
+    }
+
+    member:uint VFXLayout_GetSwapGroup()
+    {
+        ; compare ISB2.Slot to highest slot number actually in use, noting that swap groups can have a roamingSlot
+        ; that will identify the Swap Group assigned to this dxnothing window
+
+
+        variable uint highestSlot=0
+
+        variable uint n
+        variable uint checkSlot
+        variable jsonvalueref ja="Regions"
+        for ( n:Set[1] ; ${n} <= ${ja.Used} ; n:Inc )
+        {
+            checkSlot:Set[${ja.GetInteger[${n},slot]}]
+
+            if ${checkSlot} > ${highestSlot}
+                highestSlot:Set[${checkSlot}]
+        }
+
+        ja:SetReference["SwapGroups"]
+        for ( n:Set[1] ; ${n} <= ${ja.Used} ; n:Inc )
+        {
+            checkSlot:Set[${ja.GetInteger[${n},roamingSlot]}]
+
+            if ${checkSlot} > ${highestSlot}
+                highestSlot:Set[${checkSlot}]
+        }
+
+;        echo "VFXLayout_GetSwapGroup ${ISB2.Slot}-${highestSlot}=${ISB2.Slot.Dec[${highestSlot}]}"
+        return ${ISB2.Slot.Dec[${highestSlot}]}
+    }
+
+    method OffsetRegion(jsonvalueref jo, int offsetX, int offsetY)
+    {
+        variable int x=${jo.GetInteger[bounds,1]}
+        variable int y=${jo.GetInteger[bounds,2]}
+
+;        echo OffsetRegion ${offsetX},${offsetY} ${jo~}
+
+        jo.Get[bounds]:SetInteger[1,"${x.Dec[${offsetX}]}"]
+        jo.Get[bounds]:SetInteger[2,"${y.Dec[${offsetY}]}"]
+
+        echo After=${jo~}
+    }
+
+    method ExpandEdge(jsonvalueref ja, jsonvalueref jaRegion, uint num)
+    {
+        variable int newVal = ${jaRegion.GetInteger[${num}]}
+        variable int oldVal = ${ja.GetInteger[${num}]}
+
+
+        if ${num}>=3
+        {
+            ; right/bottom edge
+            
+            ; first convert width/height to right/bottom
+            newVal:Inc["${jaRegion.GetInteger[${num.Dec[2]}]}"]
+
+            if ${newVal} > ${oldVal}
+                ja:SetInteger[${num},${newVal}]
+        }
+        else
+        {
+            ; left/top edge
+            if ${newVal} < ${oldVal}
+                ja:SetInteger[${num},${newVal}]
+        }
+    }
+
+    method ExpandEdges(jsonvalueref ja, jsonvalueref joRegion)
+    {
+        if !${ja.Used}
+        {
+            ja:AddInteger["${joRegion.GetInteger[bounds,1]}"]
+            ja:AddInteger["${joRegion.GetInteger[bounds,2]}"]
+            ja:AddInteger["${joRegion.GetInteger[bounds,3].Inc[${joRegion.GetInteger[bounds,1]}]}"]
+            ja:AddInteger["${joRegion.GetInteger[bounds,4].Inc[${joRegion.GetInteger[bounds,2]}]}"]
+
+;            echo "ExpandEdges: ${joRegion~} ${ja~}"
+            return
+        }
+
+        This:ExpandEdge[ja,"joRegion.Get[bounds]",1]
+        This:ExpandEdge[ja,"joRegion.Get[bounds]",2]
+        This:ExpandEdge[ja,"joRegion.Get[bounds]",3]
+        This:ExpandEdge[ja,"joRegion.Get[bounds]",4]
+
+;        echo "ExpandEdges: ${ja~}"
+    }
+
+    member:jsonvalueref Regions_GetEdges(jsonvalueref joRegions)
+    {
+        variable jsonvalue ja="[]"
+
+        joRegions:ForEach["This:ExpandEdges[ja,ForEach.Value]"]
+
+        if !${ja.Used}
+            ja:SetValue["[0,0,0,0]"]
+
+        return ja
+    }
+
+    member:jsonvalueref SwapGroup_GetRegions(uint numSwapGroup)
+    {
+        variable jsonvalue joQuery
+        if ${numSwapGroup}==1
+        {
+            joQuery:SetValue["$$>
+            {
+                "eval":"Select.Get[swapGroup\]",
+                "op":"||",
+                "list":[
+                    {
+                        "op":"==",
+                        "value":null
+                    },
+                    {
+                        "op":"==",
+                        "value":${numSwapGroup}
+                    }
+                \]
+            }
+            <$$"]
+        }
+        else
+        {
+
+            joQuery:SetValue["$$>
+            {
+                "eval":"Select.Get[swapGroup]",
+                "op":"==",
+                "value":${numSwapGroup}
+            }
+            <$$"]
+
+        }
+;        echo "Regions.SelectValues[${joQuery~}]"
+        return "Regions.SelectValues[joQuery]"
+    }
+
+    member:jsonvalueref SwapGroup_GetHomeRegions(uint numSwapGroup)
+    {
+        variable jsonvalue joQuery
+        if ${numSwapGroup}==1
+        {
+            joQuery:SetValue["$$>
+            {
+                "op":"&&",
+                "list":[
+                    {
+                        "eval":"Select.Has[slot\]"
+                    },
+                    {
+                        "eval":"Select.Get[swapGroup\]",
+                        "op":"||",
+                        "list":[
+                            {
+                                "op":"==",
+                                "value":null
+                            },
+                            {
+                                "op":"==",
+                                "value":${numSwapGroup}
+                            }
+                        \]
+                    }
+                \]
+            }
+            <$$"]
+        }
+        else
+        {
+
+            joQuery:SetValue["$$>
+            {
+                "op":"&&",
+                "list":[
+                    {
+                        "eval":"Select.Has[slot\]"
+                    },
+                    {
+                        "eval":"Select.Get[swapGroup]",
+                        "op":"==",
+                        "value":${numSwapGroup}
+                    }
+                \]
+            }
+            <$$"]
+
+        }
+;        echo "Regions.SelectValues[${joQuery~}]"
+        return "Regions.SelectValues[joQuery]"
+    }    
+
+    member:jsonvalueref VFXLayout_GenerateVFXOutput(uint numRegion, jsonvalueref joRegion)
+    {
+        variable jsonvalue jo="{}"
+
+        jo:SetString[name,"vfx.slot${joRegion.GetInteger[slot]}"]
+        jo:SetInteger[x,${joRegion.GetInteger[bounds,1]}]
+        jo:SetInteger[y,${joRegion.GetInteger[bounds,2]}]
+        jo:SetInteger[width,${joRegion.GetInteger[bounds,3]}]
+        jo:SetInteger[height,${joRegion.GetInteger[bounds,4]}]
+        jo:SetString[feedName,"is${joRegion.GetInteger[slot]}"]
+
+        jo:SetBool[sendKeyboard,1]
+        jo:SetBool[sendMouse,1]
+        jo:SetBool[useLocalBindings,0]
+        jo:SetBool[permanent,1]
+
+        return jo
+    }
+
+    member:jsonvalueref VFXLayout_GetSettings()
+    {
+        ; assume this is a DxNothing window.
+        
+        ; 1. determine the dxnothing window number
+        ; that will identify the Swap Group assigned to this dxnothing window
+        
+        ; 2. gather the desktop area bounds for the swap group
+        ; that becomes the region for the dxNothing window
+
+        ; 3. generate VFX Regions for each of the Slots
+
+        variable jsonvalue jo="{}"
+        
+        variable uint numDxNothing="${This.VFXLayout_GetSwapGroup}"
+        if !${numDxNothing}
+            numDxNothing:Set[1]
+        jo:SetInteger["swapGroup",${numDxNothing}]
+        jo:SetByRef["regions","This.SwapGroup_GetRegions[${numDxNothing}]"]
+        jo:SetByRef["homeRegions","This.SwapGroup_GetHomeRegions[${numDxNothing}]"]
+        jo:SetByRef["edges","This.Regions_GetEdges[\"jo.Get[homeRegions]\"]"]
+
+        variable jsonvalue joLayoutRegion="{\"bounds\":[0,0,0,0]}"
+        joLayoutRegion.Get[bounds]:SetInteger[1,${jo.GetInteger[edges,1]}]
+        joLayoutRegion.Get[bounds]:SetInteger[2,${jo.GetInteger[edges,2]}]
+        joLayoutRegion.Get[bounds]:SetInteger[3,${jo.GetInteger[edges,3].Dec[${jo.GetInteger[edges,1]}]}]
+        joLayoutRegion.Get[bounds]:SetInteger[4,${jo.GetInteger[edges,4].Dec[${jo.GetInteger[edges,2]}]}]
+        jo:SetByRef[layoutRegion,joLayoutRegion]
+
+        jo.Get[homeRegions]:ForEach["This:OffsetRegion[ForEach.Value,${jo.GetInteger[edges,1]},${jo.GetInteger[edges,2]}]"]
+
+        ; build a VFX Sheet out of the home regions
+        variable jsonvalue joVFXSheet="{\"name\":\"VFX Window Layout\",\"enable\":true,\"outputs\":[]}"
+        jo.Get[homeRegions]:ForEach["joVFXSheet.Get[outputs]:AddByRef[\"This.VFXLayout_GenerateVFXOutput[\${ForEach.Key},ForEach.Value]\"]"]
+
+        jo:SetByRef[vfxSheet,joVFXSheet]
+        return jo
     }
     
     method SetLayout(jsonvalueref jo)
@@ -421,13 +752,31 @@ objectdef isb2_windowlayoutengine
         if ${jo.Has[settings]}
             Settings:SetReference["${jo.Get[settings]~}"]
 
+        VFXSettings:SetReference["{}"]
+        VFXLayout:Set["${Settings.GetBool[useVFXLayout]}"]
+
         Regions:SetReference["${jo.Get[regions]}"]
-        LGUI2.Element["windowLayoutEngine.events"]:FireEventHandler[regionsChanged]
+        SwapGroups:SetReference["${jo.Get[swapGroups]}"]
 
         if ${Settings.Has[resetRegion]}
             NumResetRegion:Set["${Settings.GetInteger[resetRegion]}"]
-        
-        Group:Set["${joInactiveRegion.GetInteger[swapGroup]}+1"]
+
+        Group:Set["${This.GetSwapGroupForSlot[${ISB2.Slot}]}"]
+        if !${Group}
+        {
+            Group:Set[1]
+
+            if ${VFXLayout}
+            {
+                VFXRenderer:Set[1]
+                VFXSettings:SetReference[This.VFXLayout_GetSettings]
+
+                Group:Set["${VFXSettings.GetInteger[swapGroup]}"]
+            }
+        }
+        else
+            VFXRenderer:Set[0]
+
         SwapGroup:SetReference["${jo.Get[swapGroups,${Group}]}"]
         if ${SwapGroup.Type.Equal[object]}
         {
@@ -444,40 +793,70 @@ objectdef isb2_windowlayoutengine
             Roaming:Set[0]
         }
 
-        switch ${Settings.GetBool[focusClick]}
+        if ${VFXRenderer}
         {
-            case FALSE
-                FocusClick eat
-                break
-            case TRUE
-                FocusClick click
-                break
-            default
-                FocusClick application
-                break
+            echo "isb2_windowlayoutengine: \atActivating VFX Layout Renderer for Swap Group ${Group}\ax"
+            ; echo "${VFXSettings~}"
+            ; add a new region for our VFX Layout area
+            Regions:AddByRef["VFXSettings.Get[layoutRegion]"]
+            ; pick this region
+            NumActiveRegion:Set["${Regions.Used}"]
+            NumResetRegion:Set["${Regions.Used}"]
+
+            ISB2BroadcastMode:Suppress
+            ISB2:InstallVFXSheet["VFXSettings.Get[vfxSheet]"]
         }
 
-        switch ${Settings.Get[swapMode]}
+        LGUI2.Element["windowLayoutEngine.events"]:FireEventHandler[regionsChanged]
+
+        if ${VFXLayout}
         {
-            case Always
-            case AlwaysForGames
-                FocusClick eat
-                break
+            FocusClick click
+            ISSession:SetFocusFollowsMouse[1]        
+            FocusFollowsMouse:Set[1]
+
+            if ${Roaming} && !${VFXRenderer}
+                Roaming:Set[0]            
+        }
+        else
+        {
+            FocusFollowsMouse:Set[${Settings.GetBool[focusFollowsMouse]}]
+            ISSession:SetFocusFollowsMouse[${FocusFollowsMouse}]
+
+            switch ${Settings.GetBool[focusClick]}
+            {
+                case FALSE
+                    FocusClick eat
+                    break
+                case TRUE
+                    FocusClick click
+                    break
+                default
+                    FocusClick application
+                    break
+            }
+
+            switch ${Settings.Get[swapMode]}
+            {
+                case Always
+                case AlwaysForGames
+                    FocusClick eat
+                    break
+            }
         }
 
-        if ${Roaming}
+        if ${Roaming} || ${VFXLayout}
             NumInactiveRegion:Set[0]
         else
+        {
             NumInactiveRegion:Set[${This.GetInactiveRegionForSlot[${ISB2.Slot}]}]
-
+        }
         variable jsonvalueref joInactiveRegion
         joInactiveRegion:SetReference["Regions.Get[joInactiveRegion]"]
 
         echo active=${NumActiveRegion} inactive=${NumInactiveRegion} reset=${NumResetRegion}
         This:SelectRegions[${NumActiveRegion},${NumInactiveRegion}]
         This:SelectResetRegion[${NumResetRegion}]
-
-        ISSession:SetFocusFollowsMouse["${Settings.GetBool[focusFollowsMouse]}"]
 
         WindowCharacteristics -lock
         This:Apply
@@ -509,7 +888,7 @@ objectdef isb2_windowlayoutengine
     {
         echo "isb2_windowlayoutengine:Event_OnInternalActivate"
 
-        if ${Settings.GetBool[swapOnInternalActivate]} && !${Settings.GetBool[focusFollowsMouse]}
+        if ${Settings.GetBool[swapOnInternalActivate]} 
         {
             if !${This:RefreshActiveStatus[OnInternalActivate](exists)}
             {
@@ -517,7 +896,7 @@ objectdef isb2_windowlayoutengine
             }
         }
 
-        if ${Settings.GetBool[-default,1,refreshOnInternalActivate]}
+        if ${Settings.GetBool[-default,1,refreshOnInternalActivate]} && !${FocusFollowsMouse}
         {
             echo "isb2_windowlayoutengine: Applying."
             This:Apply
@@ -528,7 +907,7 @@ objectdef isb2_windowlayoutengine
     {
         echo "isb2_windowlayoutengine:Event_OnActivate"
 
-        if ${Settings.GetBool[swapOnActivate]}
+        if ${Settings.GetBool[swapOnActivate]} 
         {
 ;            echo calling This:RefreshActiveStatus[OnSlotActivate]
             if !${This:RefreshActiveStatus[OnActivate](exists)}
@@ -537,7 +916,7 @@ objectdef isb2_windowlayoutengine
             }
         }
 
-        if ${Settings.GetBool[-default,1,refreshOnActivate]} && !${Settings.GetBool[focusFollowsMouse]}
+        if ${Settings.GetBool[-default,1,refreshOnActivate]} && !${FocusFollowsMouse}
         {
             echo "isb2_windowlayoutengine: Applying."
             This:Apply
@@ -556,7 +935,7 @@ objectdef isb2_windowlayoutengine
             }
         }
 
-        if ${Settings.GetBool[-default,1,refreshOnDeactivate]} && !${Settings.GetBool[focusFollowsMouse]}
+        if ${Settings.GetBool[-default,1,refreshOnDeactivate]} && !${FocusFollowsMouse}
         {
             echo "isb2_windowlayoutengine: Applying."
             This:Apply
@@ -585,7 +964,8 @@ objectdef isb2_windowlayoutengine
     method Event_OnWindowPosition()
     {
         echo "isb2_windowlayoutengine:OnWindowPosition ${Display.ViewableX},${Display.ViewableY} ${Display.ViewableWidth}x${Display.ViewableHeight}  render=${Display.Width}x${Display.Height}"
-        This:Attach        
+        if !${VFXLayout}
+            This:Attach        
     }
 
     method Event_OnWindowStateChanging(string change)
@@ -618,7 +998,7 @@ objectdef isb2_windowlayoutengine
     
     method ApplyFocusFollowMouse()
     {
-        if !${Settings.GetBool[focusFollowsMouse]}
+        if !${FocusFollowsMouse}
             return
 
 ;        echo "isb2_windowlayoutengine:ApplyFocusFollowsMouse"
@@ -634,7 +1014,8 @@ objectdef isb2_windowlayoutengine
             return TRUE
         }
 
-;        echo "isb2_windowlayoutengine:FocusSelf: relay foreground \"BasicCore.WindowLayout:FocusWindow[${Display.Window~}]\""
+;        InnerSpace:Relay[uplink,"echo \"foreground=\${ISUplink.Resolve[foreground]}\""]
+;        echo "isb2_windowlayoutengine:FocusSelf: relay foreground \"ISB2WindowLayout:FocusWindow[${Display.Window~}]\""
         relay foreground -noredirect "ISB2WindowLayout:FocusWindow[${Display.Window~}]"
         return TRUE
     }

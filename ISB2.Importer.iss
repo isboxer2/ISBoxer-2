@@ -2556,38 +2556,61 @@ objectdef isb2_importer
 
         joNew:SetString[type,vfx]        
             
-        if ${jo.Get[Name]~.NotNULLOrEmpty}
-            joNew:SetString[name,"${jo.Get[Name]~}"]
         if ${jo.Get[Action]~.NotNULLOrEmpty}
             joNew:SetString[action,"${jo.Get[Action]~}"]
 
+        switch ${jo.Get[Action]~}
+        {
+            case Destroy
+            case Add
+            {
+                variable jsonvalue joVFX
+                joVFX:SetValue["{}"]
 
-        if ${jo.Get[KeyMap,KeyMapString]~.NotNULLOrEmpty}
-            joNew:SetString[keyMap,"${jo.Get[MappedKey,KeyMapString]~}"]
-        if ${jo.Get[MappedKey,MappedKeyString]~.NotNULLOrEmpty}
-            joNew:SetString[mappedKey,"${jo.Get[MappedKey,MappedKeyString]~}"]
+                if ${jo.Get[Name]~.NotNULLOrEmpty}
+                    joVFX:SetString[name,"${jo.Get[Name]~}"]
+                if ${jo.Get[MappedKey,KeyMapString]~.NotNULLOrEmpty}
+                    joVFX:SetString[keyMap,"${jo.Get[MappedKey,KeyMapString]~}"]
+                if ${jo.Get[MappedKey,MappedKeyString]~.NotNULLOrEmpty}
+                    joVFX:SetString[mappedKey,"${jo.Get[MappedKey,MappedKeyString]~}"]
 
-        if ${jo.GetBool[IsSource]}
-            joNew:SetBool[isSource,"${jo.GetBool[IsSource]}"]
-        if ${jo.GetBool[UseKeyRepeat]}
-            joNew:SetBool[useKeyRepeat,"${jo.GetBool[UseKeyRepeat]}"]
-        if ${jo.GetBool[UseMouseRepeat]}
-            joNew:SetBool[useMouseRepeat,"${jo.GetBool[UseMouseRepeat]}"]
-        if ${jo.GetBool[UseFocusHotkey]}
-            joNew:SetBool[useFocusHotkey,"${jo.GetBool[UseFocusHotkey]}"]
-        
-        if ${jo.GetInteger[Rect,X]}
-            joNew:SetInteger[X,${jo.GetInteger[Rect,X]}]
-        if ${jo.GetInteger[Rect,Y]}
-            joNew:SetInteger[Y,${jo.GetInteger[Rect,Y]}]
-        if ${jo.GetInteger[Rect,Width]}
-            joNew:SetInteger[Width,${jo.GetInteger[Rect,Width]}]
-        if ${jo.GetInteger[Rect,Height]}
-            joNew:SetInteger[Height,${jo.GetInteger[Rect,Height]}]
+                if ${jo.GetBool[UseKeyRepeat]}
+                    joVFX:SetBool[useKeyRepeat,"${jo.GetBool[UseKeyRepeat]}"]
+                if ${jo.GetBool[UseMouseRepeat]}
+                    joVFX:SetBool[useMouseRepeat,"${jo.GetBool[UseMouseRepeat]}"]
+                if ${jo.GetBool[UseFocusHotkey]}
+                    joVFX:SetBool[useFocusHotkey,"${jo.GetBool[UseFocusHotkey]}"]
+                
+                if ${jo.GetInteger[Rect,X]}
+                    joVFX:SetInteger[X,${jo.GetInteger[Rect,X]}]
+                if ${jo.GetInteger[Rect,Y]}
+                    joVFX:SetInteger[Y,${jo.GetInteger[Rect,Y]}]
+                if ${jo.GetInteger[Rect,Width]}
+                    joVFX:SetInteger[Width,${jo.GetInteger[Rect,Width]}]
+                if ${jo.GetInteger[Rect,Height]}
+                    joVFX:SetInteger[Height,${jo.GetInteger[Rect,Height]}]
 
 
-        if ${jo.Get[borderColor]~.NotNULLOrEmpty}
-            joNew:SetString[borderColor,"${jo.Get[borderColor]~}"]
+                if ${jo.Get[borderColor]~.NotNULLOrEmpty}
+                    joVFX:SetString[borderColor,"${jo.Get[borderColor]~}"]
+
+                if ${jo.GetBool[IsSource]}
+                    joNew:SetByRef[vfxSource,joVFX]
+                else
+                    joNew:SetByRef[vfxOutput,joVFX]
+
+    ;                joVFX:SetBool[isSource,"${jo.GetBool[IsSource]}"]
+
+            }
+            break
+        default
+            {
+                if ${jo.Get[Name]~.NotNULLOrEmpty}
+                    joNew:SetString[name,"${jo.Get[Name]~}"]
+            }
+            break
+        }
+
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew        

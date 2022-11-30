@@ -29,6 +29,7 @@ objectdef isb2_profile
     variable jsonvalueref ImageSheets=[]
     variable jsonvalueref VFXSheets=[]
     variable jsonvalueref TimerPools=[]
+    variable jsonvalueref Variables=[]
 
     method Initialize(jsonvalueref jo, uint priority, string localFilename)
     {
@@ -88,6 +89,8 @@ objectdef isb2_profile
             GameMacroSheets:SetReference["jo.Get[gameMacroSheets]"]
         if ${jo.Has[timerPools]}
             TimerPools:SetReference["jo.Get[timerPools]"]
+        if ${jo.Has[variables]}
+            Variables:SetReference["jo.Get[variables]"]
     }
 
     member:jsonvalueref AsJSON()
@@ -143,6 +146,8 @@ objectdef isb2_profile
             jo:SetByRef["gameMacroSheets","GameMacroSheets"]
         if ${TimerPools.Used}
             jo:SetByRef["timerPools","TimerPools"]
+        if ${Variables.Used}
+            jo:SetByRef["variables","Variables"]
         return jo
     }
 
@@ -1915,6 +1920,137 @@ objectdef isb2_vfxsheet
 
         joVFX:SetInteger["elementID",0]
     }    
+}
+
+objectdef isb2_variable
+{
+    variable string Name
+    variable string Description
+
+    variable jsonvalue Value
+
+    variable anonevent OnValueChanged
+
+    variable jsonvalue Schema="{}"
+
+    method Initialize(jsonvalueref jo)
+    {
+        This:FromJSON[jo]
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+        if ${jo.Has[description]}
+            Description:Set["${jo.Get[description]~}"]
+
+        if ${jo.Has[schema]}
+            Schema:SetValue["${jo.Get[schema].AsJSON~}"]        
+
+        if ${jo.Has[value]}
+            This:Set["${jo.Get[value].AsJSON~}"]        
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+
+        jo:SetString[name,"${Name~}"]
+        if ${Description.NotNULLOrEmpty}
+            jo:SetString[description,"${Description~}"]
+        jo:Set[value,"${Value.AsJSON~}"]
+
+        if ${Schema.Used}
+            jo:Set[schema,"${Schema.AsJSON~}"]
+
+        return jo
+    }
+
+    method Set(string val)
+    {
+;        variable jsonvalue oldValue="${Value~}"
+        echo "\ayisb2_variable:Set\ax \"${Name~}\"=${val.AsJSON~}"
+
+        Value:SetValue["${val~}"]
+        
+        OnValueChanged:ThisExecute[This]
+    }
+
+    method Forward()
+    {
+        variable jsonvalue joQuery
+        if ${Schema.Has[enum]}
+        {
+            joQuery:SetValue["{\"op\":\"==\"}"]
+            joQuery:Set["value","${Value.AsJSON~}"]
+
+            ; find the enum value matching this one
+            variable uint numVal
+            numVal:Set[${Schema.Get[enum].SelectKey[joQuery]}]
+
+            ; increment
+            numVal:Set[  (${numVal}  % ${Schema.Get[enum].Used}) + 1] 
+
+            ; set to this enum value
+            This:Set["${Schema.Get[enum,${numVal}].AsJSON~}"]
+
+            return TRUE
+        }
+
+        switch ${Schema.Get[type]}
+        {
+            case boolean
+            {
+                This:Set["${Bool["${Value~}"].Not.AsJSON~}"]
+                return TRUE
+            }
+                break
+        }
+
+        return FALSE
+    }
+
+    method Backward()
+    {
+        variable jsonvalue joQuery
+        if ${Schema.Has[enum]}
+        {
+            joQuery:SetValue["{\"op\":\"==\"}"]
+            joQuery:Set["value","${Value.AsJSON~}"]
+
+            ; find the enum value matching this one
+            variable uint numVal
+            numVal:Set[${Schema.Get[enum].SelectKey[joQuery]}]
+
+            if ${numVal}<=1
+                numVal:Set[${Schema.Get[enum].Used}]
+            else
+                numVal:Dec
+            
+            ; set to this enum value
+            This:Set["${Schema.Get[enum,${numVal}].AsJSON~}"]
+
+            return TRUE
+        }
+
+        switch ${Schema.Get[type]}
+        {
+            case boolean
+            {
+                This:Set["${Bool["${Value~}"].Not.AsJSON~}"]
+                return TRUE
+            }
+                break
+        }
+
+        return FALSE
+    }
+
+
 }
 
 objectdef isb2_timerpool

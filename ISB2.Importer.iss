@@ -2603,6 +2603,10 @@ objectdef isb2_importer
 
             }
             break
+            case Load
+                if ${jo.Get[Name]~.NotNULLOrEmpty}
+                    joNew:SetString[sheet,"${jo.Get[Name]~}"]
+            break
         default
             {
                 if ${jo.Get[Name]~.NotNULLOrEmpty}

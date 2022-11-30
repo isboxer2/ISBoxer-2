@@ -2337,10 +2337,68 @@ objectdef isb2_profileengine
 
     method Action_VFX(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAction_VFX\ax[${activate}] ${joAction~}"
+        echo "\ayAction_VFX\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
+        variable string sheetName="default"
+        if ${joAction.Has[-notnull,sheet]}
+        {
+            sheetName:Set["${joAction.Get[sheet]~}"]
+        }
+
+        switch ${joAction.Get[action]}
+        {
+            case Load
+                {
+                    VFXSheets.Get["${sheetName~}"]:Enable
+                }
+                break
+            case Clear
+                {
+                    VFXSheets:ForEach["ForEach.Value:Disable"]
+                }
+                break
+            case Show
+                {
+                    VFXSheets.Get["${sheetName~}"]:SetVFXState["${joAction.Get[name]~}",1]
+                }
+                break
+            case Hide
+                {
+                    VFXSheets.Get["${sheetName~}"]:SetVFXState["${joAction.Get[name]~}",0]
+                }
+                break
+            case Add
+                {
+                    if !${VFXSheets.Get["${sheetName~}"](exists)}
+                    {
+                        VFXSheets:Set["${sheetName~}","{\"name\":\"${sheetName~}\"}"]
+                    }
+
+                    if ${joAction.Has[vfxOutput]}
+                    {
+                        VFXSheets.Get["${sheetName~}"]:AddOutput["joAction.Get[vfxOutput]"]
+                    }
+                    elseif ${joAction.Has[vfxSource]}
+                    {
+                        VFXSheets.Get["${sheetName~}"]:AddSource["joAction.Get[vfxSource]"]
+                    }
+                }
+                break
+            case Remove
+                {
+                    if ${joAction.Has[vfxOutput]}
+                    {
+                        VFXSheets.Get["${sheetName~}"]:RemoveVFX["${joAction.Get[vfxOutput,name]~}"]
+                    }
+                    elseif ${joAction.Has[vfxSource]}
+                    {
+                        VFXSheets.Get["${sheetName~}"]:RemoveVFX["${joAction.Get[vfxSource,name]~}"]
+                    }
+                }
+                break
+        }
     }
 
     method Action_Screenshot(jsonvalueref joState, jsonvalueref joAction, bool activate)

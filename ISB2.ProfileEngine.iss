@@ -35,6 +35,7 @@ objectdef isb2_profileengine
     variable collection:isb2_clickbarButtonLayout ClickBarButtonLayouts
     variable collection:isb2_imagesheet ImageSheets
     variable collection:isb2_timerpool TimerPools
+    variable collection:isb2_variable Variables
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -691,7 +692,6 @@ objectdef isb2_profileengine
             return FALSE
 
         TimerPools:Erase["${jo.Get[name]~}"]
-
         TimerPools:Set["${jo.Get[name]~}",jo]
     }
 
@@ -714,6 +714,45 @@ objectdef isb2_profileengine
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:UninstallTimerPool[ForEach.Value]"]
     }    
+
+
+    method InstallVariable(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        if ${Variables.Has["${jo.Get[name]~}"]}
+        {
+            Variables.Get["${jo.Get[name]~}"]:FromJSON[jo]
+            return
+        }
+
+        Variables:Set["${jo.Get[name]~}",jo]
+        LGUI2.Element[isb2.events]:FireEventHandler[onVariablesUpdated]
+    }
+
+    method InstallVariables(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallVariable[ForEach.Value]"]
+
+    }
+
+    method UninstallVariable(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        Variables:Erase["${jo.Get[name]~}"]
+        LGUI2.Element[isb2.events]:FireEventHandler[onVariablesUpdated]
+    }
+
+    method UninstallVariables(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallVariable[ForEach.Value]"]
+    }    
+
 
     method InstallProfiles(jsonvalueref ja)
     {
@@ -1150,6 +1189,7 @@ objectdef isb2_profileengine
 
         This:SetRelayGroup["isboxer",1]
         This:SetRelayGroups["SlotRef.Get[targetGroups]",1]
+        This:InstallVariables["SlotRef.Get[variables]"]
         This:VirtualizeMappables["SlotRef.Get[virtualMappables]"]
         This:ActivateProfilesByName["SlotRef.Get[profiles]"]
 
@@ -1198,6 +1238,7 @@ objectdef isb2_profileengine
         This:SetRelayGroup["${Character.Get[name]~}",1]
         This:SetRelayGroups["Character.Get[targetGroups]",1]
         This:InstallVirtualFiles["Character.Get[virtualFiles]"]
+        This:InstallVariables["Character.Get[variables]"]
         This:VirtualizeMappables["Character.Get[virtualMappables]"]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onCharacterChanged]
@@ -1273,6 +1314,7 @@ objectdef isb2_profileengine
 
         This:SetRelayGroups["Team.Get[targetGroups]",1]
         This:InstallVirtualFiles["Team.Get[virtualFiles]"]
+        This:InstallVariables["Team.Get[variables]"]
         This:VirtualizeMappables["Team.Get[virtualMappables]"]
 
         This:ActivateBroadcastProfileByName["${Team.Get["broadcastProfile"]~}"]
@@ -1337,6 +1379,7 @@ objectdef isb2_profileengine
         This:InstallClickBars[_profile.ClickBars]
         This:InstallVFXSheets[_profile.VFXSheets]
         This:InstallTimerPools[_profile.TimerPools]
+        This:InstallVariables[_profile.Variables]
 
         This:InstallCharacters[_profile.Characters]
         This:InstallTeams[_profile.Teams]
@@ -2137,6 +2180,86 @@ objectdef isb2_profileengine
         {
             ClickBars.Get["${joAction.Get[clickBar]~}"]:ApplyChanges[${joAction.Get[numButton]},"joAction.Get[changes]"]
         }
+    }
+
+    method Action_SetVariable(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\agAction_SetVariable\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        if ${joAction.Has[value]}
+        {
+            Variables.Get["${joAction.GetString[name]~}"]:Set["${joAction.Get[value].AsJSON~}"]
+            return
+        }
+
+        switch ${joAction.Get[rotate]}
+        {
+            case forward
+                Variables.Get["${joAction.GetString[name]~}"]:Forward
+                break
+            case backward
+                Variables.Get["${joAction.GetString[name]~}"]:Backward
+                break
+        }
+    }
+
+    method Action_If(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\agAction_If\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return FALSE
+
+        if !${joAction.Has[variableName]}
+            return FALSE
+
+        variable weakref vRef
+        vRef:SetReference["Variables.Get[\"${joAction.Get[variableName]~}\"]"]
+        if !${vRef.Reference(exists)}
+        {
+            echo "\arAction_If\ax: Variable not found \"${joAction.Get[variableName]~}\""
+            return FALSE
+        }
+
+        ; form a Select query
+        variable jsonvalue joQuery
+        joQuery:SetValue["{}"]
+        if ${joAction.Has[-notnull,op]}
+            joQuery:SetString[op,"${joAction.Get[op]~}"]
+        if ${joAction.Has[value]}
+            joQuery:Set[value,"${joAction.Get[value].AsJSON~}"]
+        if ${joAction.Has[with]}
+            joQuery:SetByRef[with,"joAction.Get[with]"]
+        if ${joAction.Has[list]}
+            joQuery:SetByRef[list,"joAction.Get[list]"]
+
+        ; check the result against the Variable's value
+        variable bool result
+        result:Set[${LavishScript.SelectEvaluate["vRef.Value",joQuery]}] 
+
+;        echo "\ayAction_If\ax: result=${result}"
+
+        if ${result}
+        {
+            if ${joAction.Has[true]}
+            {
+;                echo "\ayAction_If\ax: executing ${joAction.Get[true]~}"
+                This:ExecuteAction["joState","joAction.Get[true]",1]
+                This:ExecuteAction["joState","joAction.Get[true]",0]
+            }
+        }
+        else
+        {
+            if ${joAction.Has[false]}
+            {
+;               echo "\ayAction_If\ax: executing ${joAction.Get[false]~}"
+                This:ExecuteAction["joState","joAction.Get[false]",1]
+                This:ExecuteAction["joState","joAction.Get[false]",0]
+            }
+        }
+
+        return TRUE
     }
 
     method Action_KeyString(jsonvalueref joState, jsonvalueref joAction, bool activate)

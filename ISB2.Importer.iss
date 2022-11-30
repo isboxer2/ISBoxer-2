@@ -2575,9 +2575,9 @@ objectdef isb2_importer
                     joVFX:SetString[mappedKey,"${jo.Get[MappedKey,MappedKeyString]~}"]
 
                 if ${jo.GetBool[UseKeyRepeat]}
-                    joVFX:SetBool[useKeyRepeat,"${jo.GetBool[UseKeyRepeat]}"]
+                    joVFX:SetBool[sendKeyboard,"${jo.GetBool[UseKeyRepeat]}"]
                 if ${jo.GetBool[UseMouseRepeat]}
-                    joVFX:SetBool[useMouseRepeat,"${jo.GetBool[UseMouseRepeat]}"]
+                    joVFX:SetBool[sendMouse,"${jo.GetBool[UseMouseRepeat]}"]
                 if ${jo.GetBool[UseFocusHotkey]}
                     joVFX:SetBool[useFocusHotkey,"${jo.GetBool[UseFocusHotkey]}"]
                 

@@ -316,6 +316,22 @@
                     "activationState":true,
                     "retarget":true,
                     "timer":true
+                },
+                {
+                    "name":"set variable",
+                    "handler":"Action_SetVariable",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true,
+                    "variableProperties":["value","name"]
+                },
+                {
+                    "name":"if",
+                    "handler":"Action_If",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true,
+                    "variableProperties":["value","variable"]
                 }
             ]
         },
@@ -530,6 +546,58 @@
                 "color":"#ff999999"
             },
             "borderThickness":[0,1,0,0]
+        },
+        "isb2.variableListView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "jsonTemplate":"isb2.variableView",
+                "contextBinding":{
+                    "pullFormat":"${This.Parent.Context.Data}"
+                }
+            }
+        },
+        "isb2.variableView":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "padding":4,
+            "children":[
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.Get[name]}"
+                    },
+                    "font":{
+                        "heightFactor":1.4,
+                        "bold":true
+                    }
+                },
+                {
+                    "type":"textblock",
+                    "_dock":"top",
+                    "textBinding":{
+                        "pullFormat":"${ISB2.Variables.Get[\"${This.Context.Get[name]~}\"].Value}"
+                    }
+                },
+                {
+                    "type":"button",
+                    "_dock":"top",
+                    "content":"Rotate Value",
+                    "margin":5,
+                    "horizontalAlignment":"center",
+                    "eventHandlers": {
+                        "onPress":{
+                            "type":"code",
+                            "code":"ISB2.Variables.Get[\"${This.Context.Get[name]~}\"]:Forward"
+                        }
+                    }        
+                }
+            ],
+            "borderBrush":{
+                "color":"#ff999999"
+            },
+            "borderThickness":4,
+            "borderRounding":3
         },
         "isb2.lastinputListView":{
             "jsonTemplate":"listboxitem",
@@ -939,6 +1007,7 @@
                             {
                                 "type":"button",
                                 "content":"Load Tests",
+                                "visibility":"collapsed",
                                 "_dock": "right",
                                 "margin":[0,0,5,0],
                                 "eventHandlers": {
@@ -1044,32 +1113,12 @@
                             },
                             {
                                 "type":"tab",
-                                "header":"Test",
+                                "header":"Activity",
                                 "content":{
                                     "type":"dockpanel",
                                     "horizontalAlignment": "stretch",
                                     "verticalAlignment": "stretch",
                                     "children":[
-                                        {
-                                            "type":"textblock",
-                                            "text":"Available Profiles: ${ISB2.ProfileDB.Profiles.Used}",
-                                            "_dock":"top"
-                                        },
-                                        {
-                                            "type":"textblock",
-                                            "text":"Active Profiles: ${ISB2.Profiles.Used}",
-                                            "_dock":"top"
-                                        },
-                                        {
-                                            "type":"textblock",
-                                            "text":"Hotkey Sheets: ${ISB2.HotkeySheets.Used}",
-                                            "_dock":"top"
-                                        },
-                                        {
-                                            "type":"textblock",
-                                            "text":"Mappable Sheets: ${ISB2.MappableSheets.Used}",
-                                            "_dock":"top"
-                                        },
                                         {
                                             "type":"listbox",
                                             "content":{
@@ -1162,6 +1211,72 @@
                                                 }
                                             }
                                         }
+                                    ]
+                                }
+                            },
+                            {
+                                "type":"tab",
+                                "header":"Variables",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "children":[
+                                        {
+                                            "type":"listbox",
+                                            "content":{
+                                                "jsonTemplate":"listbox.content",
+                                                "orientation":"horizontal"
+                                            },
+                                            "_dock":"top",
+                                            "minSize":[100,50],
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2.Variables.AsJSON[array]}",
+                                                "pullHook":{
+                                                    "elementName": "isb2.events",
+                                                    "flags": "global",
+                                                    "event": "onVariablesUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.variableListView"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "type":"tab",
+                                "header":"Test",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "children":[
+                                        {
+                                            "type":"textblock",
+                                            "text":"Available Profiles: ${ISB2.ProfileDB.Profiles.Used}",
+                                            "_dock":"top"
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "text":"Active Profiles: ${ISB2.Profiles.Used}",
+                                            "_dock":"top"
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "text":"Hotkey Sheets: ${ISB2.HotkeySheets.Used}",
+                                            "_dock":"top"
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "text":"Mappable Sheets: ${ISB2.MappableSheets.Used}",
+                                            "_dock":"top"
+                                        }
+                                        
                                     ]
                                 }                                
                             }                                            

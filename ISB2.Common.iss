@@ -2191,7 +2191,7 @@ objectdef isb2_timerpool
     method RetimeAction(jsonvalueref joTimer, jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
 		; make room if we're supposed to...
-		if ${ActiveTimers.Size}>=${MaxTimers} && ${MaxTimers}
+		if ${ActiveTimers.Used}>=${MaxTimers} && ${MaxTimers}
 		{
 			if ${This.BackEndRemoval}
 			{

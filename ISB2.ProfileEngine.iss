@@ -1583,6 +1583,9 @@ objectdef isb2_profileengine
     {
         if ${joAction.Has[hold]}
             return ${joAction.GetBool[hold]}
+
+        if ${joAction.GetBool[onPress]} || ${joAction.GetBool[onRelease]}
+            return FALSE
         
         if ${joState.Has[hold]}
             return ${joState.GetBool[hold]}
@@ -3432,6 +3435,12 @@ objectdef isb2_profileengine
                 return
             }
 
+
+            if ${joMappable.GetBool[onRelease]}
+            {
+                return
+            }
+
             if ${mappableSheet.Reference(exists)}
             {
                 if !${mappableSheet.Hold}
@@ -3462,6 +3471,11 @@ objectdef isb2_profileengine
 ;                echo "\ayExecuteMappable\ax: onRelease"
                 This:ExecuteMappableActivationState[joMappable,1]
                 This:ExecuteMappableActivationState[joMappable,0]
+                return
+            }
+
+            if ${joMappable.GetBool[onPress]}
+            {
                 return
             }
 

@@ -1747,6 +1747,52 @@ objectdef isb2_vfxsheet
             This:Enable
     }
 
+    method SetVFXState(string name, bool newState, bool isSource)
+    {
+        if ${isSource}
+        {
+            if ${newState}
+            {
+                This:EnableSource["Sources.Get[\"${name~}\"]"]
+            }
+            else
+            {
+                This:DisableSource["Sources.Get[\"${name~}\"]"]
+            }
+        }
+        else
+        {
+            if ${newState}
+            {
+                This:EnableOutput["Outputs.Get[\"${name~}\"]"]
+            }
+            else
+            {
+                This:DisableOutput["Outputs.Get[\"${name~}\"]"]
+            }
+        }
+    }
+
+    method RemoveVFX(string name, bool isSource)
+    {
+        if ${isSource}
+        {
+            if !${Sources.Has["${name~}"]}
+                return
+            
+            This:DisableSource["Sources.Get[\"${name~}\"]"]
+            Sources:Erase["${name~}"]
+        }
+        else
+        {
+            if !${Outputs.Has["${name~}"]}
+                return
+            
+            This:DisableOutput["Outputs.Get[\"${name~}\"]"]
+            Outputs:Erase["${name~}"]
+        }
+    }
+
     method EnableOutput(jsonvalueref jo)
     {
         if !${jo.Reference(exists)}

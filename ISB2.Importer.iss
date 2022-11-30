@@ -25,6 +25,10 @@ objectdef isb2_importer
         ISBProfile:SetReference["ISB1Transformer.TransformXML[\"${filename~}\"]"]
         
         This:WriteJSON["${filename~}.json"]
+        
+        jo:SetString["$schema","http://www.lavishsoft.com/schema/isb2.json"]
+        jo:SetString[importedVersion,"${agent.Get[ISBoxer 2].Version~}"]
+        jo:SetString[name,"${filename.FilenameOnly~}"]
 
         ISBProfile:SetByRef[globalSettings,"This.TransformGlobalSettingsXML"]
 
@@ -105,9 +109,6 @@ objectdef isb2_importer
         }
 
         jo:SetByRef[vfxSheets,"ISBProfile.Get[vfxSheets]"]
-
-        jo:SetString[name,"${filename.FilenameOnly~}"]
-        jo:SetString["$schema","http://www.lavishsoft.com/schema/isb2.json"]
         return jo
     }
 

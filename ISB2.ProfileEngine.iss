@@ -2385,7 +2385,7 @@ objectdef isb2_profileengine
                     }
                     elseif ${joAction.Has[vfxSource]}
                     {
-                        VFXSheets.Get["${sheetName~}"]:AddSource["joAction.Get[vfxSource]"]:SetVFXState["${joAction.Get[vfxOutput,name]~}",1,1]
+                        VFXSheets.Get["${sheetName~}"]:AddSource["joAction.Get[vfxSource]"]:SetVFXState["${joAction.Get[vfxSource,name]~}",1,1]
                     }
                 }
                 break

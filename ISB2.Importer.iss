@@ -2569,7 +2569,10 @@ objectdef isb2_importer
                 joVFX:SetValue["{}"]
 
                 if ${jo.Get[Name]~.NotNULLOrEmpty}
+                {
                     joVFX:SetString[name,"${jo.Get[Name]~}"]
+                    joVFX:SetString[feedName,"${jo.Get[Name]~}"]
+                }
                 if ${jo.Get[MappedKey,KeyMapString]~.NotNULLOrEmpty}
                     joVFX:SetString[keyMap,"${jo.Get[MappedKey,KeyMapString]~}"]
                 if ${jo.Get[MappedKey,MappedKeyString]~.NotNULLOrEmpty}
@@ -2583,13 +2586,13 @@ objectdef isb2_importer
                     joVFX:SetBool[useFocusHotkey,"${jo.GetBool[UseFocusHotkey]}"]
                 
                 if ${jo.GetInteger[Rect,X]}
-                    joVFX:SetInteger[X,${jo.GetInteger[Rect,X]}]
+                    joVFX:SetInteger[x,${jo.GetInteger[Rect,X]}]
                 if ${jo.GetInteger[Rect,Y]}
-                    joVFX:SetInteger[Y,${jo.GetInteger[Rect,Y]}]
+                    joVFX:SetInteger[y,${jo.GetInteger[Rect,Y]}]
                 if ${jo.GetInteger[Rect,Width]}
-                    joVFX:SetInteger[Width,${jo.GetInteger[Rect,Width]}]
+                    joVFX:SetInteger[width,${jo.GetInteger[Rect,Width]}]
                 if ${jo.GetInteger[Rect,Height]}
-                    joVFX:SetInteger[Height,${jo.GetInteger[Rect,Height]}]
+                    joVFX:SetInteger[height,${jo.GetInteger[Rect,Height]}]
 
 
                 if ${jo.Get[borderColor]~.NotNULLOrEmpty}

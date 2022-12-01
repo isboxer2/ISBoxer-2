@@ -1881,6 +1881,7 @@ objectdef isb2_vfxsheet
             "sendKeyboard":${joVFX.GetBool[-default,false,sendKeyboard]},
             "useLocalBindings":${joVFX.GetBool[-default,true,useLocalBindings]},
             "permanent":${joVFX.GetBool[-default,false,permanent]}
+            "opacity":${joVFX.GetNumber[-default,1.0,opacity]}
         }
         <$$"]
 

@@ -2065,6 +2065,14 @@ objectdef isb2_variable
                 return TRUE
             }
                 break
+            case integer
+                This:Set["${Int64["${Value~}"].Inc}"]
+                ; todo: apply Schema-defined limits
+                break
+            case number
+                This:Set["${Float64["${Value~}"].Inc}"]
+                ; todo: apply Schema-defined limits
+                break
         }
 
         return FALSE
@@ -2100,6 +2108,14 @@ objectdef isb2_variable
                 This:Set["${Bool["${Value~}"].Not.AsJSON~}"]
                 return TRUE
             }
+                break
+            case integer
+                This:Set["${Int64["${Value~}"].Dec}"]
+                ; todo: apply Schema-defined limits
+                break
+            case number
+                This:Set["${Float64["${Value~}"].Dec}"]
+                ; todo: apply Schema-defined limits
                 break
         }
 

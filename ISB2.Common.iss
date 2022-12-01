@@ -1888,7 +1888,7 @@ objectdef isb2_vfxsheet
         variable jsonvalue joView
         joView:SetValue["$$>
         {
-            "name":"isb2.vfxWindow.${sheet~}.${name~}",
+            "name":"isb2.vfxOutputWindow.${sheet~}.${name~}",
             "type":"window",
             "jsonTemplate":"isb2.vfx",
             "x":${x},
@@ -1914,7 +1914,8 @@ objectdef isb2_vfxsheet
     method UninstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
     {
         echo "\agUninstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["isb2.vfxWindow.${sheet~}.${name~}"]:Destroy
+        LGUI2.Element["${joVFX.GetInteger[elementID]}"]:Destroy
+        LGUI2.Element["isb2.vfxOutputWindow.${sheet~}.${name~}"]:Destroy
 
         joVFX:SetInteger["elementID",0]
     }
@@ -1950,7 +1951,7 @@ objectdef isb2_vfxsheet
         variable jsonvalue joView
         joView:SetValue["$$>
         {
-            "name":"isb2.vfxWindow.${sheet~}.${name~}",
+            "name":"isb2.vfxSourceWindow.${sheet~}.${name~}",
             "type":"window",
             "jsonTemplate":"isb2.vfx",
             "x":${x},
@@ -1973,7 +1974,8 @@ objectdef isb2_vfxsheet
     method UninstallVFXSource(string sheet, string name, jsonvalueref joVFX)
     {
         echo "\agUninstallVFXSource\ax ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["isb2.vfxWindow.${sheet~}.${name~}"]:Destroy
+        LGUI2.Element["${joVFX.GetInteger[elementID]}"]:Destroy
+        LGUI2.Element["isb2.vfxSourceWindow.${sheet~}.${name~}"]:Destroy
 
         joVFX:SetInteger["elementID",0]
     }    

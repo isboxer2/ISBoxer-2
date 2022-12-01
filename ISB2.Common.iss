@@ -1711,6 +1711,8 @@ objectdef isb2_vfxsheet
     {
         if !${jo.Type.Equal[object]}
             return FALSE
+
+        This:DisableOutput["Outputs.Get[\"${jo.Get[name]~}\"]"]
         Outputs:SetByRef["${jo.Get[name]~}",jo]
     }
 
@@ -1718,6 +1720,8 @@ objectdef isb2_vfxsheet
     {
         if !${jo.Type.Equal[object]}
             return FALSE
+
+        This:DisableSource["Sources.Get[\"${jo.Get[name]~}\"]"]
         Sources:SetByRef["${jo.Get[name]~}",jo]
     }
     
@@ -1731,8 +1735,8 @@ objectdef isb2_vfxsheet
 
     method Disable()
     {
-        if !${Enabled}
-            return
+;        if !${Enabled}
+;            return
         echo "\arisb2_vfxsheet:Disable\ax ${Name~} ${Outputs~} ${Sources~}"
         Enabled:Set[0]
         Outputs:ForEach["This:DisableOutput[ForEach.Value]"]

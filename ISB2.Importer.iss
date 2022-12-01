@@ -2594,6 +2594,8 @@ objectdef isb2_importer
                 if ${jo.GetInteger[Rect,Height]}
                     joVFX:SetInteger[height,${jo.GetInteger[Rect,Height]}]
 
+                if ${jo.Has[Alpha]}
+                    joVFX:SetNumber[opacity,${Math.Calc[${jo.GetInteger[Alpha]}/255.0]}]
 
                 if ${jo.Get[borderColor]~.NotNULLOrEmpty}
                     joVFX:SetString[borderColor,"${jo.Get[borderColor]~}"]

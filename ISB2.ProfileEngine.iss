@@ -1442,7 +1442,7 @@ objectdef isb2_profileengine
     method ProcessVariableProperty(jsonvalueref jo, string varName)
     {
 ;        echo "ProcessVariableProperty[${varName~}] ${jo~}"
-        if !${jo.Has["${varName~}"]}
+        if !${jo.Has[-string,"${varName~}"]}
             return
 
         jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]        

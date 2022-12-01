@@ -2381,11 +2381,11 @@ objectdef isb2_profileengine
 
                     if ${joAction.Has[vfxOutput]}
                     {
-                        VFXSheets.Get["${sheetName~}"]:AddOutput["joAction.Get[vfxOutput]"]
+                        VFXSheets.Get["${sheetName~}"]:AddOutput["joAction.Get[vfxOutput]"]:SetVFXState["${joAction.Get[vfxOutput,name]~}",1]
                     }
                     elseif ${joAction.Has[vfxSource]}
                     {
-                        VFXSheets.Get["${sheetName~}"]:AddSource["joAction.Get[vfxSource]"]
+                        VFXSheets.Get["${sheetName~}"]:AddSource["joAction.Get[vfxSource]"]:SetVFXState["${joAction.Get[vfxOutput,name]~}",1,1]
                     }
                 }
                 break

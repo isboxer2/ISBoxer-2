@@ -2029,7 +2029,7 @@ objectdef isb2_variable
     method Set(string val)
     {
 ;        variable jsonvalue oldValue="${Value~}"
-        echo "\ayisb2_variable:Set\ax \"${Name~}\"=${val.AsJSON~}"
+        echo "\ayisb2_variable:Set\ax \"${Name~}\"=${val~}"
 
         Value:SetValue["${val~}"]
         

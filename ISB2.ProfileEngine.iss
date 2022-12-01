@@ -2193,17 +2193,17 @@ objectdef isb2_profileengine
 
         if ${joAction.Has[value]}
         {
-            Variables.Get["${joAction.GetString[name]~}"]:Set["${joAction.Get[value].AsJSON~}"]
+            Variables.Get["${joAction.Get[name]~}"]:Set["${joAction.Get[value].AsJSON~}"]
             return
         }
 
         switch ${joAction.Get[rotate]}
         {
             case forward
-                Variables.Get["${joAction.GetString[name]~}"]:Forward
+                Variables.Get["${joAction.Get[name]~}"]:Forward
                 break
             case backward
-                Variables.Get["${joAction.GetString[name]~}"]:Backward
+                Variables.Get["${joAction.Get[name]~}"]:Backward
                 break
         }
     }
@@ -3598,6 +3598,14 @@ objectdef isb2_profileengine
         This:ExecuteAction[joState,joAction,1]
         This:ExecuteAction[joState,joAction,0]
     }
+
+    method ManualExecuteAction(jsonvalueref joAction)
+    {
+        echo "\ayManualExecuteAction\ax ${joAction~}"
+        variable jsonvalue joState="{}"
+        This:ExecuteAction[joState,joAction,1]
+        This:ExecuteAction[joState,joAction,0]
+    } 
     
     method ExecuteAction(jsonvalueref joState, jsonvalueref _joAction, bool activate)
     {

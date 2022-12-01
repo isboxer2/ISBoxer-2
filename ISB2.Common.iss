@@ -1255,6 +1255,8 @@ objectdef isb2_clickbar
         LGUI2:PushSkin["${ISB2.UseSkin~}"]
         Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
+
+        ISB2:ApplyGUIModeTo["${Window.ID}"]
     }
 
     
@@ -1904,6 +1906,8 @@ objectdef isb2_vfxsheet
         LGUI2:PushSkin["${ISB2.UseSkin~}"]
         joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
+
+        ISB2:ApplyGUIModeTo["${joVFX.GetInteger[elementID]}"]
     }
 
     method UninstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
@@ -1961,6 +1965,8 @@ objectdef isb2_vfxsheet
         LGUI2:PushSkin["${ISB2.UseSkin~}"]
         joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
+
+        ISB2:ApplyGUIModeTo["${joVFX.GetInteger[elementID]}"]
     }   
 
     method UninstallVFXSource(string sheet, string name, jsonvalueref joVFX)

@@ -3718,6 +3718,11 @@ objectdef isb2_profileengine
     }
 #endregion
 
+    method ApplyGUIModeTo(lgui2elementref element)
+    {
+        This:ShowTitleBar[${GUIMode},${element.ID}]            
+    }
+
     method ShowTitleBar(bool show, lgui2elementref element)
     {
         if !${element.Element(exists)}

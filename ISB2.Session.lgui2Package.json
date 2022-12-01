@@ -991,6 +991,7 @@
                     {
                         "type":"dockpanel",
                         "_dock":"bottom",
+                        "margin":5,
                         "horizontalAlignment": "stretch",
                         "children":[
                             {
@@ -1001,6 +1002,18 @@
                                     "onPress":{
                                         "type":"code",
                                         "code":"ISB2:Restart"
+                                    }
+                                }
+                            },
+                            {
+                                "type":"button",
+                                "content":"Inner Space Console",
+                                "_dock": "right",
+                                "margin":[0,0,5,0],
+                                "eventHandlers": {
+                                    "onPress":{
+                                        "type":"code",
+                                        "code":"console toggle"
                                     }
                                 }
                             },

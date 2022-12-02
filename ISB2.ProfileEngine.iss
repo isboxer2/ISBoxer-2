@@ -30,12 +30,13 @@ objectdef isb2_profileengine
     variable collection:isb2_regionsheet RegionSheets
     variable collection:isb2_gamemacrosheet GameMacroSheets
     variable collection:isb2_vfxsheet VFXSheets
-    variable collection:isb2_triggerchain TriggerChains
     variable collection:isb2_clickbar ClickBars
     variable collection:isb2_clickbarButtonLayout ClickBarButtonLayouts
     variable collection:isb2_imagesheet ImageSheets
     variable collection:isb2_timerpool TimerPools
     variable collection:isb2_variable Variables
+
+    variable isb2_triggerchains TriggerChains
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -391,6 +392,8 @@ objectdef isb2_profileengine
         }
 
         TriggerChains.Get["${name~}"]:AddHandler[jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onTriggersUpdated]        
     }
 
     method InstallTriggers(jsonvalueref ja)
@@ -428,6 +431,8 @@ objectdef isb2_profileengine
 
 ;        echo InstallTeam: Teams:SetByRef["${jo.Get[name]~}",jo] 
         Teams:SetByRef["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onTeamsUpdated]        
     }
 
     method InstallTeams(jsonvalueref ja)
@@ -449,6 +454,8 @@ objectdef isb2_profileengine
 
 ;        echo InstallCharacter: Characters:SetByRef["${jo.Get[name]~}",jo] 
         Characters:SetByRef["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onCharactersUpdated]        
     }
 
     method InstallCharacters(jsonvalueref ja)
@@ -474,6 +481,8 @@ objectdef isb2_profileengine
         ClickBars:Erase["${name~}"]
 
         ClickBars:Set["${name~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onClickBarsUpdated]        
     }
 
     method InstallClickBars(jsonvalueref ja)
@@ -537,6 +546,8 @@ objectdef isb2_profileengine
         HotkeySheets:Erase["${name~}"]
 
         HotkeySheets:Set["${name~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onHotkeySheetsUpdated]        
     }
 
     method InstallHotkeySheets(jsonvalueref ja)
@@ -573,6 +584,8 @@ objectdef isb2_profileengine
         MappableSheets:Erase["${name~}"]
 
         MappableSheets:Set["${name~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onMappableSheetsUpdated]        
     }
 
     method InstallMappableSheets(jsonvalueref ja)
@@ -604,6 +617,8 @@ objectdef isb2_profileengine
             return FALSE
 
         GameKeyBindings:SetByRef["${jo.Get[name].Lower~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onGameKeyBindingsUpdated]        
     }
     method InstallGameKeyBindings(jsonvalueref ja)
     {
@@ -632,6 +647,8 @@ objectdef isb2_profileengine
         ImageSheets:Erase["${jo.Get[name]~}"]
 
         ImageSheets:Set["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onImageSheetsUpdated]        
     }
 
     method InstallImageSheets(jsonvalueref ja)
@@ -663,6 +680,8 @@ objectdef isb2_profileengine
         GameMacroSheets:Erase["${jo.Get[name]~}"]
 
         GameMacroSheets:Set["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onGameMacroSheetsUpdated]        
     }
 
     method InstallGameMacroSheets(jsonvalueref ja)
@@ -693,6 +712,8 @@ objectdef isb2_profileengine
 
         TimerPools:Erase["${jo.Get[name]~}"]
         TimerPools:Set["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onTimerPoolsUpdated]        
     }
 
     method InstallTimerPools(jsonvalueref ja)
@@ -791,6 +812,7 @@ objectdef isb2_profileengine
 
 ;        echo InstallBroadcastProfile: BroadcastProfiles:SetByRef["${jo.Get[name]~}",jo] 
         BroadcastProfiles:SetByRef["${jo.Get[name]~}",jo]
+        LGUI2.Element[isb2.events]:FireEventHandler[onBroadcastProfilesUpdated]        
     }
 
     method InstallBroadcastProfiles(jsonvalueref ja)
@@ -818,6 +840,8 @@ objectdef isb2_profileengine
 
 ;        echo InstallClickBarTemplate: ClickBarTemplates:SetByRef["${jo.Get[name]~}",jo] 
         ClickBarTemplates:SetByRef["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onClickBarTemplatesUpdated]        
     }
 
     method InstallClickBarTemplates(jsonvalueref ja)
@@ -846,6 +870,8 @@ objectdef isb2_profileengine
         ClickBarButtonLayouts:Erase["${jo.Get[name]~}"]
 
         ClickBarButtonLayouts:Set["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onClickBarButtonLayoutsUpdated]        
     }
 
     method InstallClickBarButtonLayouts(jsonvalueref ja)
@@ -872,6 +898,8 @@ objectdef isb2_profileengine
 
 ;        echo InstallWindowLayout: WindowLayouts:SetByRef["${jo.Get[name]~}",jo] 
         WindowLayouts:SetByRef["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onWindowLayoutsUpdated]        
     }
 
     method InstallWindowLayouts(jsonvalueref ja)
@@ -894,6 +922,8 @@ objectdef isb2_profileengine
         VFXSheets:Erase["${jo.Get[name]~}"]
 
         VFXSheets:Set["${jo.Get[name]~}",jo]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onVFXSheetsUpdated]        
     }
 
     method InstallVFXSheets(jsonvalueref ja)
@@ -922,6 +952,8 @@ objectdef isb2_profileengine
 
         echo "\agInstallInputMapping\ax ${name~}: ${joMapping}"
         InputMappings:SetByRef["${name~}",joMapping]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onInputMappingsUpdated]        
     }
 
     method UninstallInputMapping(string name)
@@ -964,6 +996,8 @@ objectdef isb2_profileengine
         LGUI2:AddBinding["${joBinding~}"]
 
         Hotkeys:Add["${fullName~}"]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onHotkeysUpdated]        
     }
 
     ; Installs a Hotkey, given a name, a key combination, and LavishScript code to execute
@@ -1003,6 +1037,8 @@ objectdef isb2_profileengine
         LGUI2:AddBinding["${joBinding~}"]
 
         Hotkeys:Add["${name~}"]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onHotkeysUpdated]        
     }
 
     method UninstallHotkey(string sheet, string name)
@@ -2376,7 +2412,7 @@ objectdef isb2_profileengine
                 {
                     if !${VFXSheets.Get["${sheetName~}"](exists)}
                     {
-                        VFXSheets:Set["${sheetName~}","{\"name\":\"${sheetName~}\"}"]
+                        This:InstallVFXSheet["{\"name\":\"${sheetName~}\"}"]
                     }
 
                     if ${joAction.Has[vfxOutput]}
@@ -2446,18 +2482,74 @@ objectdef isb2_profileengine
 
     method Action_AddTrigger(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAction_AddTrigger\ax[${activate}] ${joAction~}"
+        echo "\ayAction_AddTrigger\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
-            return
+            return FALSE
 
+        variable weakref triggerChain
+
+        ; object
+        ; name
+        triggerChain:SetReference["This.ResolveTriggerChain[joAction,1]"]
+        if !${triggerChain.Reference(exists)}
+            return FALSE
+
+        ; trigger
+        triggerChain:AddTrigger["joAction.Get[trigger]"]
+        return TRUE
     }
 
     method Action_RemoveTrigger(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\arAction_RemoveTrigger\ax[${activate}] ${joAction~}"
+        echo "\ayAction_RemoveTrigger\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
+        variable weakref triggerChain
+        triggerChain:SetReference["This.ResolveTriggerChain[joAction,0]"]
+        if !${triggerChain.Reference(exists)}
+            return FALSE
+
+        if ${joAction.Has[-notnull,triggerName]}
+            triggerChain:RemoveTrigger["${triggerName}"]
+        elseif ${joAction.Has[trigger,name]}
+            triggerChain:RemoveTrigger["${jo.Get[trigger,name]~}"]
+        else
+            return FALSE
+
+        return TRUE
+    }
+
+    method Action_FireTriggers(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\ayAction_FireTriggers\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable weakref triggerChain
+        triggerChain:SetReference["This.ResolveTriggerChain[joAction,0]"]
+        if !${triggerChain.Reference(exists)}
+            return FALSE
+
+        variable bool hold
+        hold:Set[${This.ActionHoldState[joState,joAction]}]
+
+        if !${hold} || ${joAction.Has[activationState]}
+        {
+            triggerChain:Fire[1]
+            triggerChain:Fire[0]
+            return
+        }
+
+        if ${activate}
+        {
+            triggerChain:Fire[1]
+        }
+        else
+        {
+            triggerChain:Fire[0]
+        }            
+        return TRUE
     }
 
 #endregion
@@ -3177,20 +3269,6 @@ objectdef isb2_profileengine
         }
     }
 
-    method ExecuteTriggerByName(string name, bool newState)
-    {
-        name:Set["${This.ProcessVariables["${name~}"]~}"]
-
-        TriggerChains.Get["${name}"].Handlers:ForEach["This:ExecuteTrigger[ForEach.Value,${newState}]"]
-    }
-
-    method ExecuteTrigger(jsonvalueref joTrigger, bool newState)
-    {
-        if !${joTrigger.Type.Equal[object]}
-            return
-        This:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
-    }
-
     method RemoveLastHotkey(jsonvalueref joHotkey)
     {
         if !${joHotkey.Type.Equal[object]}
@@ -3712,10 +3790,17 @@ objectdef isb2_profileengine
                     return FALSE
                 return ${This:ExecuteHotkeyByName["${joMapping.Get[sheet]~}","${targetName~}",${newState}](exists)}
             case trigger
-                targetName:Set["${joMapping.Get[name]~}"]
-                if !${targetName.NotNULLOrEmpty}
-                    return FALSE
-                return ${This:ExecuteTriggerByName["${targetName~}",${newState}](exists)}
+                {
+                    variable weakref triggerChain
+
+                    ; object
+                    ; name
+                    triggerChain:SetReference["This.ResolveTriggerChain[joMapping,0]"]
+                    if !${triggerChain.Reference(exists)}
+                        return FALSE
+
+                    return ${triggerChain:Fire[${newState}](exists)}
+                }
             case action
                 return ${This:ExecuteAction["This.ActionStateFromOwner[joMapping]","joMapping.Get[action]",${newState}](exists)}
             case actions
@@ -3725,6 +3810,58 @@ objectdef isb2_profileengine
         return FALSE
     }
 #endregion
+
+    member:weakref ResolveObject(jsonvalueref jo)
+    {
+        switch ${jo.Get[type]}
+        {
+            case clickbar
+                return "ClickBars.Get[\"${jo.Get[name]~}\"]"
+            case clickbarbutton
+                {
+                    if ${jo.Has[-notnull,clickBar]}
+                        return "ClickBars.Get[\"${jo.Get[clickBar]~}\"].Buttons[${jo.GetInteger[button]}]"
+                    if ${jo.Has[-notnull,buttonLayout]}
+                        return "ClickBarButtonLayouts.Get[\"${jo.Get[buttonLayout]~}\"].Buttons[${jo.GetInteger[button]}]"
+                }
+                break
+            case buttonlayout
+                return "ClickBarButtonLayouts.Get[\"${jo.Get[name]~}\"]"
+            case variable
+                return "Variables.Get[\"${jo.Get[name]~}\"]"
+            case timerpool
+                return "TimerPools.Get[\"${jo.Get[name]~}\"]"
+            case hotkeysheet
+                return "HotkeySheets.Get[\"${jo.Get[name]~}\"]"
+            case imagesheet
+                return "ImageSheets.Get[\"${jo.Get[name]~}\"]"
+            case mappablesheet
+                return "MappableSheets.Get[\"${jo.Get[name]~}\"]"
+            case regionsheet
+                return "RegionSheets.Get[\"${jo.Get[name]~}\"]"
+            case gamemacrosheet
+                return "GameMacroSheets.Get[\"${jo.Get[name]~}\"]"
+            case vfxsheet
+                return "VFXSheets.Get[\"${jo.Get[name]~}\"]"
+            case isboxer2
+                return "This"
+        }
+    }
+
+    member:weakref ResolveTriggerChain(jsonvalueref jo, bool autoCreate)
+    {
+        variable jsonvaluref joObject="jo.Get[object]"
+        if !${joObject.Reference(exists)}
+            return 0
+
+        variable weakref obj
+        obj:SetReference["This.ResolveObject[joObject]"]
+
+        if !${obj.Reference(exists)}
+            return 0
+
+        return "obj.TriggerChains.Get[\"${jo.Get[name]}\",${autoCreate}]"
+    }
 
     method ApplyGUIModeTo(lgui2elementref element)
     {

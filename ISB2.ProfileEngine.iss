@@ -2290,6 +2290,7 @@ objectdef isb2_profileengine
         ; form a Select query
         variable jsonvalue joQuery
         joQuery:SetValue["{\"op\":\"==\"}"]
+        joQuery:SetString[eval,"Select.Get[value]"]
         joQuery:SetByRef[value,"vRef.Value"]
 
         key:Set[${joAction.Get[cases].SelectKey[joQuery]}]

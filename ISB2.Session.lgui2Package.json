@@ -348,6 +348,13 @@
                     "retarget":true,
                     "timer":true,
                     "variableProperties":["variableName"]
+                },
+                {
+                    "name":"random",
+                    "handler":"Action_Random",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
                 }
             ]
         },

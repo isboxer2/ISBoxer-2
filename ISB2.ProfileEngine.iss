@@ -2250,6 +2250,24 @@ objectdef isb2_profileengine
         }
     }
 
+    method Action_Random(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\agAction_Random\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return FALSE
+
+        if !${joAction.Has[-array,actions]}
+            return FALSE
+
+        variable int64 key
+        key:Set["${Math.Rand[${joAction.Get[actions].Used}]}+1"]
+
+        echo "\ayAction_Random\ax: executing ${joAction.Get[actions,${key}]~}"
+        This:ExecuteAction["joState","joAction.Get[actions,${key}]",1]
+        This:ExecuteAction["joState","joAction.Get[actions,${key}]",0]        
+        return TRUE
+    }
+
     method Action_Switch(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\agAction_Switch\ax[${activate}] ${joAction~}"

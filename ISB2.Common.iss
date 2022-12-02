@@ -1232,6 +1232,7 @@ objectdef isb2_clickbar
             "title":${Name.AsJSON~},
             "x":${X},
             "y":${Y},
+            "opacity":${Template.GetNumber[-default,1.0,alpha]},
             "content":{
                 "jsonTemplate":"isb2.clickbar.listbox",
                 "content":{

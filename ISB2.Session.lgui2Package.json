@@ -339,7 +339,15 @@
                     "activationState":true,
                     "retarget":true,
                     "timer":true,
-                    "variableProperties":["value","variable"]
+                    "variableProperties":["value","variableName"]
+                },
+                {
+                    "name":"switch",
+                    "handler":"Action_Switch",
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true,
+                    "variableProperties":["variableName"]
                 }
             ]
         },

@@ -2250,6 +2250,51 @@ objectdef isb2_profileengine
         }
     }
 
+    method Action_Switch(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\agAction_Switch\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return FALSE
+
+        if !${joAction.Has[variableName]} || !${joAction.Has[-array,cases]}
+            return FALSE
+
+        variable weakref vRef
+        vRef:SetReference["Variables.Get[\"${joAction.Get[variableName]~}\"]"]
+        if !${vRef.Reference(exists)}
+        {
+            echo "\arAction_Switch\ax: Variable not found \"${joAction.Get[variableName]~}\""
+            return FALSE
+        }
+
+        variable int64 key
+
+        ; form a Select query
+        variable jsonvalue joQuery
+        joQuery:SetValue["{\"op\":\"==\"}"]
+        joQuery:SetByRef[value,"vRef.Value"]
+
+        key:Set[${joAction.Get[cases].SelectKey[joQuery]}]
+        if !${key}
+        {
+            if ${joAction.Has[default]}
+            {
+                echo "\ayAction_Switch\ax: executing ${joAction.Get[default]~}"
+                This:ExecuteAction["joState","joAction.Get[default]",1]
+                This:ExecuteAction["joState","joAction.Get[default]",0]
+                return TRUE
+            }
+
+            echo "\ayAction_Switch\ax: switch case not found for ${vRef.Value.AsJSON~}"
+            return TRUE
+        }      
+
+        echo "\ayAction_Switch\ax: executing ${joAction.Get[cases,${key}]~}"
+        This:ExecuteAction["joState","joAction.Get[cases,${key}]",1]
+        This:ExecuteAction["joState","joAction.Get[cases,${key}]",0]        
+        return TRUE
+    }
+
     method Action_If(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\agAction_If\ax[${activate}] ${joAction~}"

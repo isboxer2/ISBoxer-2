@@ -338,7 +338,6 @@
                     "handler":"Action_If",
                     "activationState":true,
                     "retarget":true,
-                    "timer":true,
                     "variableProperties":["value","variableName"]
                 },
                 {
@@ -346,15 +345,13 @@
                     "handler":"Action_Switch",
                     "activationState":true,
                     "retarget":true,
-                    "timer":true,
                     "variableProperties":["variableName"]
                 },
                 {
                     "name":"random",
                     "handler":"Action_Random",
                     "activationState":true,
-                    "retarget":true,
-                    "timer":true
+                    "retarget":true
                 }
             ]
         },
@@ -1161,103 +1158,106 @@
                                 "type":"tab",
                                 "header":"Activity",
                                 "content":{
-                                    "type":"dockpanel",
+                                    "type":"scrollviewer",
                                     "horizontalAlignment": "stretch",
                                     "verticalAlignment": "stretch",
-                                    "children":[
-                                        {
-                                            "type":"listbox",
-                                            "content":{
-                                                "jsonTemplate":"listbox.content",
-                                                "orientation":"horizontal"
-                                            },
-                                            "_dock":"top",
-                                            "minSize":[100,50],
-                                            "itemsBinding":{
-                                                "pullFormat":"${ISB2.LastHotkeys}",
-                                                "pullHook":{
-                                                    "elementName": "isb2.events",
-                                                    "flags": "global",
-                                                    "event": "onLastHotkeysUpdated"
+                                    "content":{
+                                        "type":"dockpanel",
+                                        "children":[
+                                            {
+                                                "type":"listbox",
+                                                "content":{
+                                                    "jsonTemplate":"listbox.content",
+                                                    "orientation":"horizontal"
+                                                },
+                                                "_dock":"top",
+                                                "minSize":[100,50],
+                                                "itemsBinding":{
+                                                    "pullFormat":"${ISB2.LastHotkeys}",
+                                                    "pullHook":{
+                                                        "elementName": "isb2.events",
+                                                        "flags": "global",
+                                                        "event": "onLastHotkeysUpdated"
+                                                    }
+                                                },
+                                                "itemViewGenerators":{
+                                                    "default":{
+                                                        "type":"template",
+                                                        "template":"isb2.hotkeyListView"
+                                                    }
                                                 }
                                             },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.hotkeyListView"
+                                            {
+                                                "type":"listbox",
+                                                "content":{
+                                                    "jsonTemplate":"listbox.content",
+                                                    "orientation":"horizontal"
+                                                },
+                                                "_dock":"top",
+                                                "minSize":[100,50],
+                                                "itemsBinding":{
+                                                    "pullFormat":"${ISB2.LastMappables}",
+                                                    "pullHook":{
+                                                        "elementName": "isb2.events",
+                                                        "flags": "global",
+                                                        "event": "onLastMappablesUpdated"
+                                                    }
+                                                },
+                                                "itemViewGenerators":{
+                                                    "default":{
+                                                        "type":"template",
+                                                        "template":"isb2.mappableListView"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type":"listbox",
+                                                "content":{
+                                                    "jsonTemplate":"listbox.content",
+                                                    "orientation":"horizontal"
+                                                },
+                                                "_dock":"top",
+                                                "minSize":[100,50],
+                                                "itemsBinding":{
+                                                    "pullFormat":"${ISB2.LastActions}",
+                                                    "pullHook":{
+                                                        "elementName": "isb2.events",
+                                                        "flags": "global",
+                                                        "event": "onLastActionsUpdated"
+                                                    }
+                                                },
+                                                "itemViewGenerators":{
+                                                    "default":{
+                                                        "type":"template",
+                                                        "template":"isb2.actionListView"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type":"listbox",
+                                                "content":{
+                                                    "jsonTemplate":"listbox.content",
+                                                    "orientation":"horizontal"
+                                                },
+                                                "_dock":"top",
+                                                "minSize":[100,50],
+                                                "itemsBinding":{
+                                                    "pullFormat":"${ISB2.LastInputs}",
+                                                    "pullHook":{
+                                                        "elementName": "isb2.events",
+                                                        "flags": "global",
+                                                        "event": "onLastInputsUpdated"
+                                                    }
+                                                },
+                                                "itemViewGenerators":{
+                                                    "default":{
+                                                        "type":"template",
+                                                        "template":"isb2.lastinputListView"
+                                                    }
                                                 }
                                             }
-                                        },
-                                        {
-                                            "type":"listbox",
-                                            "content":{
-                                                "jsonTemplate":"listbox.content",
-                                                "orientation":"horizontal"
-                                            },
-                                            "_dock":"top",
-                                            "minSize":[100,50],
-                                            "itemsBinding":{
-                                                "pullFormat":"${ISB2.LastMappables}",
-                                                "pullHook":{
-                                                    "elementName": "isb2.events",
-                                                    "flags": "global",
-                                                    "event": "onLastMappablesUpdated"
-                                                }
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.mappableListView"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "type":"listbox",
-                                            "content":{
-                                                "jsonTemplate":"listbox.content",
-                                                "orientation":"horizontal"
-                                            },
-                                            "_dock":"top",
-                                            "minSize":[100,50],
-                                            "itemsBinding":{
-                                                "pullFormat":"${ISB2.LastActions}",
-                                                "pullHook":{
-                                                    "elementName": "isb2.events",
-                                                    "flags": "global",
-                                                    "event": "onLastActionsUpdated"
-                                                }
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.actionListView"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "type":"listbox",
-                                            "content":{
-                                                "jsonTemplate":"listbox.content",
-                                                "orientation":"horizontal"
-                                            },
-                                            "_dock":"top",
-                                            "minSize":[100,50],
-                                            "itemsBinding":{
-                                                "pullFormat":"${ISB2.LastInputs}",
-                                                "pullHook":{
-                                                    "elementName": "isb2.events",
-                                                    "flags": "global",
-                                                    "event": "onLastInputsUpdated"
-                                                }
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.lastinputListView"
-                                                }
-                                            }
-                                        }
-                                    ]
+                                        ]
+                                    }
                                 }
                             },
                             {

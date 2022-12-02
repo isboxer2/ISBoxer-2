@@ -381,15 +381,22 @@
                 }
             }
         },
+        "isb2.clickbar.listbox.content":{
+            "jsonTemplate": "listbox.content",
+            "type": "wrappanel",
+            "uniform":false,
+            "orientation":"horizontal",
+            "childSize":[32,32],
+            "backgroundBrush":{
+                "color":"#00000000"
+            }      
+        },
         "isb2.clickbar.listbox":{
             "jsonTemplate":"listbox",
             "type":"listbox",
             "borderThickness":0,
             "content":{
-                "jsonTemplate": "listbox.content",
-                "type": "wrappanel",
-                "orientation":"horizontal",
-                "childSize":[32,32]      
+                "jsonTemplate":"isb2.clickbar.listbox.content"
             },
             "contentContainer": {
                 "jsonTemplate": "listbox.contentContainerFitWidth",

@@ -1235,10 +1235,7 @@ objectdef isb2_clickbar
             "content":{
                 "jsonTemplate":"isb2.clickbar.listbox",
                 "content":{
-                    "jsonTemplate": "listbox.content",
-                    "type": "wrappanel",
-                    "uniform":false,
-                    "orientation":"horizontal",
+                    "jsonTemplate":"isb2.clickbar.listbox.content",
                     "childSize":[${Template.GetInteger[-default,32,buttonWidth].Inc[${Template.GetInteger[buttonMargin,1]}]},${Template.GetInteger[-default,32,buttonHeight].Inc[${Template.GetInteger[buttonMargin,2]}]}]      
                 }
             }

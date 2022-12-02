@@ -225,6 +225,14 @@
                     "timer":true
                 },
                 {
+                    "name":"trigger",
+                    "handler":"Action_Trigger",
+                    "variableProperties":["name"],
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
                     "name":"broadcast state",
                     "handler":"Action_BroadcastState",
                     "variableProperties":["value"],
@@ -546,6 +554,16 @@
                 "color":"#ff999999"
             },
             "borderThickness":[0,1,0,0]
+        },
+        "isb2.vfxSheetComboboxView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
         },
         "isb2.variableListView":{
             "jsonTemplate":"listboxitem",
@@ -1259,6 +1277,55 @@
                                             }
                                         }
                                     ]
+                                }
+                            },
+                            {
+                                "type":"tab",
+                                "header":"Video FX",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "padding":5,
+                                    "children":[
+                                        {
+                                            "type":"combobox",
+                                            "name":"isb2.listVFXSheets",
+                                            "_dock":"top",
+                                            "minSize":[100,20],
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2.VFXSheets.AsJSON[array]}",
+                                                "pullHook":{
+                                                    "elementName": "isb2.events",
+                                                    "flags": "global",
+                                                    "event": "onVFXSheetsUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.vfxSheetComboboxView"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type":"scrollviewer",
+                                            "_dock":"top",
+                                            "horizontalAlignment":"stretch",
+                                            "verticalAlignment":"stretch",
+                                            "margin":[0,5,0,0],
+                                            "borderThickness":1,
+                                            "borderBrush":{
+                                                "color":"#7f7f7f"
+                                            },                                            
+                                            "content":
+                                                {
+                                                    "type":"textblock",
+                                                    "text":"${ISB2.VFXSheets.Get[\"${LGUI2.Element[isb2.listVFXSheets].SelectedItem.Data.Get[name]~}\"].AsJSON.AsJSON[multiline]}"
+                                                }
+                                            
+                                        }
+                                    ]                                    
                                 }
                             },
                             {

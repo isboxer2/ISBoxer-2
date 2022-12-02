@@ -1239,7 +1239,7 @@ objectdef isb2_clickbar
                     "type": "wrappanel",
                     "uniform":false,
                     "orientation":"horizontal",
-                    "childSize":[${Template.GetInteger[buttonWidth].Inc[${Template.GetInteger[buttonMargin,1]}]},${Template.GetInteger[buttonHeight].Inc[${Template.GetInteger[buttonMargin,2]}]}]      
+                    "childSize":[${Template.GetInteger[-default,32,buttonWidth].Inc[${Template.GetInteger[buttonMargin,1]}]},${Template.GetInteger[-default,32,buttonHeight].Inc[${Template.GetInteger[buttonMargin,2]}]}]      
                 }
             }
         }

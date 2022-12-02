@@ -1631,8 +1631,9 @@ objectdef isb2_profileengine
         if ${joState.Has[hold]}
             return ${joState.GetBool[hold]}
 
-        if ${joState.Has[sheet]}
-            return ${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}
+        ; this is now implemented by ActionStateFromMappable/ActionStateFromOwner
+;        if ${joState.Has[sheet]}
+;            return ${MappableSheets.Get["${joState.Get[sheet]~}"].Hold}
 
         return FALSE
     }

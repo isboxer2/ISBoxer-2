@@ -1601,8 +1601,11 @@ objectdef isb2_profileengine
 
         joState:SetByRef[mappable,joMappable]
         joState:SetString[sheet,"${joMappable.Get[sheet]~}"]
-        if ${hold}
-            joState:SetBool[hold,${hold}]
+
+        if ${joMappable.Has[hold]}
+            joState:SetBool[hold,${joMappable.GetBool[hold]}]
+        elseif ${hold} || ${MappableSheets.Get["${joMappable.Get[sheet]~}"].Hold}
+            joState:SetBool[hold,1]        
         return joState
     }
 
@@ -1610,8 +1613,10 @@ objectdef isb2_profileengine
     {
         variable jsonvalueref joState="{}"
         joState:SetByRef[owner,joOwner]
-        if ${hold}
-            joState:SetBool[hold,${hold}]
+        if ${joOwner.Has[hold]}
+            joState:SetBool[hold,${joOwner.GetBool[hold]}]
+        elseif ${hold}
+            joState:SetBool[hold,1]
         return joState
     }
 
@@ -3802,9 +3807,9 @@ objectdef isb2_profileengine
                     return ${triggerChain:Fire[${newState}](exists)}
                 }
             case action
-                return ${This:ExecuteAction["This.ActionStateFromOwner[joMapping]","joMapping.Get[action]",${newState}](exists)}
+                return ${This:ExecuteAction["This.ActionStateFromOwner[joMapping,1]","joMapping.Get[action]",${newState}](exists)}
             case actions
-                return ${This:ExecuteActionList["This.ActionStateFromOwner[joMapping]","joMapping.Get[actions]",${newState}](exists)}
+                return ${This:ExecuteActionList["This.ActionStateFromOwner[joMapping,1]","joMapping.Get[actions]",${newState}](exists)}
         }
 
         return FALSE

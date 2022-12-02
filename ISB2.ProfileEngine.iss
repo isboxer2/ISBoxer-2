@@ -2308,9 +2308,9 @@ objectdef isb2_profileengine
             return TRUE
         }      
 
-        echo "\ayAction_Switch\ax: executing ${joAction.Get[cases,${key}]~}"
-        This:ExecuteAction["joState","joAction.Get[cases,${key}]",1]
-        This:ExecuteAction["joState","joAction.Get[cases,${key}]",0]        
+        echo "\ayAction_Switch\ax: executing ${joAction.Get[cases,${key},action]~}"
+        This:ExecuteAction["joState","joAction.Get[cases,${key},action]",1]
+        This:ExecuteAction["joState","joAction.Get[cases,${key},action]",0]        
         return TRUE
     }
 

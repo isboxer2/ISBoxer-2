@@ -31,6 +31,8 @@ objectdef isb2_profile
     variable jsonvalueref TimerPools=[]
     variable jsonvalueref Variables=[]
 
+    variable isb2_triggerchains TriggerChains
+
     method Initialize(jsonvalueref jo, uint priority, string localFilename)
     {
         This:FromJSON[jo]
@@ -494,6 +496,7 @@ objectdef isb2_clickbarButton
     variable jsonvalueref Data
     variable lgui2elementref Element
     variable jsonvalue ActiveClicks="[null,null,null,null,null]"
+    variable isb2_triggerchains TriggerChains
 
     ; propagation
     variable weakref Source
@@ -928,6 +931,7 @@ objectdef isb2_clickbarButtonLayout
 
 ;    variable jsonvalueref Data
     variable index:isb2_clickbarButton Buttons
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -989,6 +993,7 @@ objectdef isb2_clickbar
     variable lgui2elementref Window
 
     variable index:isb2_clickbarButton Buttons
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -1266,7 +1271,7 @@ objectdef isb2_clickbar
 objectdef isb2_triggerchain
 {
     variable string Name
-    variable jsonvalue Handlers="{}"
+    variable jsonvalue Triggers="{}"
 
     method Initialize(string name)
     {
@@ -1277,32 +1282,59 @@ objectdef isb2_triggerchain
     {
         variable jsonvalue jo="{}"
         jo:SetString[name,"${Name~}"]
-        jo:SetByRef[handlers,Handlers]
+        jo:SetByRef[triggers,Triggers]
         return jo
     }
 
-    method AddHandler(jsonvalueref joTrigger)
+    method AddTrigger(jsonvalueref joTrigger)
     {
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        Handlers:SetByRef["${joTrigger.Get[name]~}",joTrigger]
+        Triggers:SetByRef["${joTrigger.Get[name]~}",joTrigger]
         return TRUE
     }
 
-    method RemoveHandler(jsonvalueref joTrigger)
+    method RemoveTrigger(jsonvalueref joTrigger)
     {
-        Handlers:Erase["${joTrigger.Get[name]~}"]
+        Triggers:Erase["${joTrigger.Get[name]~}"]
     }
 
-    method RemoveHandlerByName(string name)
+    method RemoveTriggerByName(string name)
     {
-        Handlers:Erase["${name~}"]
+        Triggers:Erase["${name~}"]
     }
 
-    method Execute(weakref obj, bool newState)
+    method Fire(bool newState)
     {
-        Handlers:ForEach["obj:ExecuteTrigger[ForEach.Value,${newState}]"]
+        Triggers:ForEach["This:FireTrigger[ForEach.Value,${newState}]"]
+        return TRUE
+    }
+
+    method FireTrigger(jsonvalueref joTrigger, bool newState)
+    {
+        ISB2:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
+    }
+}
+
+objectdef isb2_triggerchains
+{
+    variable collection:isb2_triggerchain Chains
+
+    member:weakref Get(string name, bool autoCreate)
+    {
+        if ${autoCreate}
+        {
+            variable weakref chain
+            if !${Chains.Get["${name~}"](exists)}
+                Chains:Set["${name~}","${name~}"]
+        }
+        return "Chains.Get[\"${name~}\"]"
+    }
+
+    method Fire(string name, bool newState)
+    {
+        return ${Chains.Get["${name~}"]:Fire[${newState}](exists)}
     }
 }
 
@@ -1317,6 +1349,7 @@ objectdef isb2_hotkeysheet
     variable bool Enabled
 
     variable jsonvalue Hotkeys="{}"
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -1438,6 +1471,7 @@ objectdef isb2_mappablesheet
     variable string Mode="OnRelease"
     
     variable string VirtualizeAs
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -1528,6 +1562,7 @@ objectdef isb2_gamemacrosheet
     variable string GameName
 
     variable jsonvalue Macros="{}"
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {        
@@ -1570,6 +1605,7 @@ objectdef isb2_imagesheet
     variable string Name
 
     variable jsonvalue Images="{}"
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -1623,6 +1659,7 @@ objectdef isb2_regionsheet
     variable bool Enabled
 
     variable jsonvalue Regions="{}"
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -1669,6 +1706,7 @@ objectdef isb2_vfxsheet
 
     variable jsonvalue Outputs="{}"
     variable jsonvalue Sources="{}"
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -1988,9 +2026,9 @@ objectdef isb2_variable
 
     variable jsonvalue Value
 
-    variable anonevent OnValueChanged
-
     variable jsonvalue Schema="{}"
+
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {
@@ -2035,8 +2073,8 @@ objectdef isb2_variable
         echo "\ayisb2_variable:Set\ax \"${Name~}\"=${val~}"
 
         Value:SetValue["${val~}"]
-        
-        OnValueChanged:ThisExecute[This]
+
+        TriggerChains:Fire["OnValueChanged"]
     }
 
     method Forward()
@@ -2137,6 +2175,8 @@ objectdef isb2_timerpool
 
     variable jsonvalue ActiveTimers="[]"
     variable bool Attached
+
+    variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
     {

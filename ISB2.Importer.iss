@@ -923,6 +923,8 @@ objectdef isb2_importer
 
         if ${jo.Has[-notnull,TextStyle]}
         {
+            if ${jo.GetType[TextStyle,color].Equal[null]}
+                jo.Get[TextStyle]:SetString[color,"#000000"]
             joNew:SetByRef[font,"jo.Get[TextStyle]"]
         }
 

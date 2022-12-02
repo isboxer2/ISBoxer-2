@@ -945,7 +945,7 @@ objectdef isb2_importer
         if ${jo.Has[-notnull,y]}
             joNew:SetInteger[y,"${jo.GetInteger[y]}"]
         if ${jo.Has[-notnull,alpha]}
-            joTemplate:SetInteger[alpha,"${jo.GetInteger[alpha]}"]
+            joTemplate:SetNumber[alpha,"${jo.GetNumber[alpha]}"]
         if ${jo.Has[-notnull,rows]}
             joTemplate:SetInteger[rows,"${jo.GetInteger[rows]}"]
         if ${jo.Has[-notnull,columns]}

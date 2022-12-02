@@ -997,7 +997,7 @@ objectdef isb2_isb1transformer
         isb2_isb1transformer:TransformInteger[joTransform,IconPadding,iconPadding]
         isb2_isb1transformer:TransformInteger[joTransform,Border,border]
         isb2_isb1transformer:TransformInteger[joTransform,CellBorder,cellBorder]
-        isb2_isb1transformer:TransformInteger[joTransform,Alpha,alpha,1]
+        isb2_isb1transformer:TransformNumber[joTransform,Alpha,alpha,1]
 
         isb2_isb1transformer:TransformInteger[joTransform,X,x]
         isb2_isb1transformer:TransformInteger[joTransform,Y,y]

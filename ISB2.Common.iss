@@ -736,8 +736,8 @@ objectdef isb2_clickbarButton
         {
             joFont:Merge["Data.Get[font]"]
 
-            if ${joFont.Has[font,color]}
-                joButton:SetString[color,"${joButton.Get[font,color]~}"]
+            if ${joFont.Has[color]}
+                joTextblock:SetString[color,"${joFont.Get[color]~}"]
             
             joButton:SetByRef[font,joFont]
         }

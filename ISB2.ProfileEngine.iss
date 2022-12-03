@@ -2219,12 +2219,78 @@ objectdef isb2_profileengine
 
         if ${joAction.Has[buttonLayout]}
         {            
-            ClickBarButtonLayouts.Get["${joAction.Get[buttonLayout]~}"]:ApplyChanges[${joAction.Get[numButton]},"joAction.Get[changes]"]
+            ClickBarButtonLayouts.Get["${joAction.Get[buttonLayout]~}"]:ApplyChanges["joAction.Get[changes]",${joAction.GetInteger[numButton]}]
         }
         elseif ${joAction.Has[clickBar]}
         {
-            ClickBars.Get["${joAction.Get[clickBar]~}"]:ApplyChanges[${joAction.Get[numButton]},"joAction.Get[changes]"]
+            ClickBars.Get["${joAction.Get[clickBar]~}"]:ApplyChanges["joAction.Get[changes]",${joAction.GetInteger[numButton]}]
         }
+    }
+
+    method Action_Style(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\ayAction_Style\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return FALSE
+
+        variable weakref obj
+        obj:SetReference["This.ResolveGUIObject[\"joAction.Get[object]\"]"]
+        if !${obj.Reference(exists)}
+            return FALSE
+
+        if !${obj:ApplyStyleJSON["joAction.Get[style]"](exists)}
+        {
+            return FALSE
+        }
+
+        return TRUE
+    }
+
+    method Action_Animate(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\ayAction_Animate\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return FALSE
+
+        if ${joAction.Has[-notnull,animationName]}
+        {
+            joAction.Get[animation]:SetString[name,"${joAction.Get[animationName]~}"]
+        }
+
+        variable weakref obj
+        obj:SetReference["This.ResolveGUIObject[\"joAction.Get[object]\"]"]
+        if !${obj.Reference(exists)}
+        {
+            echo "GUI object not found ${joAction.Get[object]~}"
+            return FALSE
+        }
+
+        if !${obj:Animate["joAction.Get[animation]"](exists)}
+        {
+            echo "Animate failed"
+            return FALSE
+        }
+
+        return TRUE
+    }
+
+    method Action_StopAnimation(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\ayAction_StopAnimation\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+        variable weakref obj
+        obj:SetReference["This.ResolveGUIObject[\"joAction.Get[object]\"]"]
+        if !${obj.Reference(exists)}
+            return FALSE
+
+        if !${obj:StopAnimation["${joAction.Get[animationName]~}"](exists)}
+        {
+            return FALSE
+        }
+
+        return TRUE
     }
 
     method Action_SetVariable(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2590,9 +2656,9 @@ objectdef isb2_profileengine
         return TRUE
     }
 
-    method Action_FireTriggers(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    method Action_Trigger(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
-        echo "\ayAction_FireTriggers\ax[${activate}] ${joAction~}"
+        echo "\ayAction_Trigger\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
 
@@ -2606,18 +2672,18 @@ objectdef isb2_profileengine
 
         if !${hold} || ${joAction.Has[activationState]}
         {
-            triggerChain:Fire[1]
-            triggerChain:Fire[0]
+            triggerChain:FireState[1]
+            triggerChain:FireState[0]
             return
         }
 
         if ${activate}
         {
-            triggerChain:Fire[1]
+            triggerChain:FireState[1]
         }
         else
         {
-            triggerChain:Fire[0]
+            triggerChain:FireState[0]
         }            
         return TRUE
     }
@@ -3881,6 +3947,23 @@ objectdef isb2_profileengine
     }
 #endregion
 
+    member:weakref ResolveGUIObject(jsonvalueref jo)
+    {
+        switch ${jo.Get[type]}
+        {
+            case clickbar
+                return "ClickBars.Get[\"${jo.Get[name]~}\"]"
+            case clickbarbutton
+                {
+                    if ${jo.Has[-notnull,clickBar]}
+                        return "ClickBars.Get[\"${jo.Get[clickBar]~}\"].Buttons[${jo.GetInteger[button]}]"
+                    if ${jo.Has[-notnull,buttonLayout]}
+                        return "ClickBarButtonLayouts.Get[\"${jo.Get[buttonLayout]~}\"].Buttons[${jo.GetInteger[button]}]"
+                }
+                break
+        }
+    }
+
     member:weakref ResolveObject(jsonvalueref jo)
     {
         switch ${jo.Get[type]}
@@ -3920,7 +4003,7 @@ objectdef isb2_profileengine
 
     member:weakref ResolveTriggerChain(jsonvalueref jo, bool autoCreate)
     {
-        variable jsonvaluref joObject="jo.Get[object]"
+        variable jsonvalueref joObject="jo.Get[object]"
         if !${joObject.Reference(exists)}
             return 0
 

@@ -501,6 +501,9 @@ objectdef isb2_clickbarButton
     ; propagation
     variable weakref Source
     variable anonevent OnPropagate
+    variable anonevent OnAnimate
+    variable anonevent OnStyle
+    variable anonevent OnStopAnimation
 
     method Initialize(weakref _clickBar, int _numButton, jsonvalueref jo)
     {
@@ -583,19 +586,42 @@ objectdef isb2_clickbarButton
     {
 ;        echo "\ayPullFrom\ax ${newSource.Data~}"
         if ${Source.Reference(exists)}
+        {
             Source.OnPropagate:DetachAtom[This:OnSourcePush]
+            Source.OnAnimate:DetachAtom[This:OnSourceAnimate]
+            Source.OnStyle:DetachAtom[This:OnSourceStyle]
+            Source.OnStopAnimation:DetachAtom[This:OnSourceStopAnimation]
+        }
 
         Source:SetReference[newSource]
         if ${Source.Reference(exists)}
         {
             This:ApplyChanges[Source.Data]
             Source.OnPropagate:AttachAtom[This:OnSourcePush]
+            Source.OnAnimate:AttachAtom[This:OnSourceAnimate]
+            Source.OnStyle:AttachAtom[This:OnSourceStyle]
+            Source.OnStopAnimation:AttachAtom[This:OnSourceStopAnimation]
         }
     }
 
     method OnSourcePush()
     {
         This:ApplyChanges[Source.Data]
+    }
+
+    method OnSourceAnimate()
+    {
+        This:Animate[Context]
+    }
+
+    method OnSourceStopAnimation(string name)
+    {
+        This:StopAnimation["${name~}"]
+    }
+
+    method OnSourceStyle()
+    {
+        This:ApplyStyleJSON[Context]
     }
 
     member:jsonvalueref GetImageBrush(jsonvalueref joImage)
@@ -638,6 +664,25 @@ objectdef isb2_clickbarButton
 
         return joBrush
     }
+
+    method StopAnimation(string name)
+    {
+        Element.Animation["${name~}"]:Stop
+        OnStopAnimation:Execute["${name~}"]
+    }
+
+    method Animate(jsonvalueref joAnimation)
+    {
+        Element:Animate[joAnimation]
+        OnAnimate:ThisExecute[joAnimation]
+    }
+
+    method ApplyStyleJSON(jsonvalueref joStyle)
+    {
+        Element:ApplyStyleJSON[joStyle]
+        OnStyle:ThisExecute[joStyle]
+    }
+
 
     method ApplyChanges(jsonvalueref jo, bool shouldPush=1)
     {
@@ -969,10 +1014,9 @@ objectdef isb2_clickbarButtonLayout
         Buttons:ForEach["This:AddButtonToClickBar[clickBar,\${ForEach.Key},ForEach.Value]"]
     }
 
-    method ApplyChanges(int numButton, jsonvalueref joChanges)
+    method ApplyChanges(jsonvalueref joChanges, int numButton)
     {
 ;        echo "\apisb2_clickbarButtonLayout\ax:ApplyChanges[${numButton}] ${joChanges~}"
-
         if ${numButton}
         {
             Buttons.Get[${numButton}]:ApplyChanges[joChanges]
@@ -1155,7 +1199,7 @@ objectdef isb2_clickbar
         return ja
     }
 
-    method ApplyChanges(int numButton, jsonvalueref joChanges)
+    method ApplyChanges(jsonvalueref joChanges, int numButton)
     {
 ;        echo "\apisb2_clickbar\ax:ApplyChanges[${numButton}] ${joChanges~}"
 
@@ -1163,6 +1207,21 @@ objectdef isb2_clickbar
         {
             Buttons.Get[${numButton}]:ApplyChanges[joChanges]
         }
+    }
+
+    method StopAnimation(string name)
+    {
+        Window.Animation["${name~}"]:Stop
+    }
+
+    method Animate(jsonvalueref joAnimation)
+    {
+        Window:Animate[joAnimation]
+    }
+
+    method ApplyStyleJSON(jsonvalueref joStyle)
+    {
+        Window:ApplyStyleJSON[joStyle]
     }
 
     method GenerateButtonView()
@@ -1286,7 +1345,7 @@ objectdef isb2_triggerchain
 
     method AddTrigger(jsonvalueref joTrigger)
     {
-        if !${jo.Type.Equal[object]}
+        if !${joTrigger.Type.Equal[object]}
             return FALSE
 
         Triggers:SetByRef["${joTrigger.Get[name]~}",joTrigger]
@@ -1305,12 +1364,14 @@ objectdef isb2_triggerchain
 
     method Fire(bool newState)
     {
+;        echo "\ayisb2_triggerchain:Fire\ax ${Name~} ${newState}"
         Triggers:ForEach["This:FireTrigger[ForEach.Value,${newState}]"]
         return TRUE
     }
 
     method FireTrigger(jsonvalueref joTrigger, bool newState)
     {
+;        echo "\ayisb2_triggerchain:FireTrigger\ax ${joTrigger~} ${newState}"
         ISB2:ExecuteInputMapping["joTrigger.Get[inputMapping]",${newState}]
     }
 }
@@ -1330,8 +1391,15 @@ objectdef isb2_triggerchains
         return "Chains.Get[\"${name~}\"]"
     }
 
-    method Fire(string name, bool newState)
+    method Fire(string name)
     {
+        Chains.Get["${name~}"]:Fire[1]
+        return ${Chains.Get["${name~}"]:Fire[0](exists)}
+    }
+
+    method FireState(string name, bool newState)
+    {
+;        echo "\ayisb2_triggerchains:FireState\ax ${name~} ${newState}"
         return ${Chains.Get["${name~}"]:Fire[${newState}](exists)}
     }
 }

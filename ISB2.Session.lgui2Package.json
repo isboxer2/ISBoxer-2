@@ -203,7 +203,31 @@
                 {
                     "name":"set click bar button",
                     "handler":"Action_SetClickBarButton",
+                    "variableProperties":["buttonLayout","clickBar"],
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"style",
+                    "handler":"Action_Style",
                     "variableProperties":["name"],
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"animate",
+                    "handler":"Action_Animate",
+                    "variableProperties":["name","animationName"],
+                    "activationState":true,
+                    "retarget":true,
+                    "timer":true
+                },
+                {
+                    "name":"stop animation",
+                    "handler":"Action_StopAnimation",
+                    "variableProperties":["name","animationName"],
                     "activationState":true,
                     "retarget":true,
                     "timer":true
@@ -219,7 +243,7 @@
                 {
                     "name":"remove trigger",
                     "handler":"Action_RemoveTrigger",
-                    "variableProperties":["name"],
+                    "variableProperties":["triggerName"],
                     "activationState":true,
                     "retarget":true,
                     "timer":true

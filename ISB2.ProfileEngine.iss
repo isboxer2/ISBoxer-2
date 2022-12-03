@@ -3961,6 +3961,10 @@ objectdef isb2_profileengine
                         return "ClickBarButtonLayouts.Get[\"${jo.Get[buttonLayout]~}\"].Buttons[${jo.GetInteger[button]}]"
                 }
                 break
+            case vfxsource
+                return "VFXSheets.Get[\"${jo.Get[-default,"\"default\"",sheet]~}\"].Sources.Get[\"${jo.Get[name]~}\"]"
+            case vfxoutput
+                return "VFXSheets.Get[\"${jo.Get[-default,"\"default\"",sheet]~}\"].Outputs.Get[\"${jo.Get[name]~}\"]"
         }
     }
 
@@ -3996,6 +4000,10 @@ objectdef isb2_profileengine
                 return "GameMacroSheets.Get[\"${jo.Get[name]~}\"]"
             case vfxsheet
                 return "VFXSheets.Get[\"${jo.Get[name]~}\"]"
+            case vfxsource
+                return "VFXSheets.Get[\"${jo.Get[-default,default,sheet]~}\"].Sources.Get[\"${jo.Get[name]~}\"]"
+            case vfxoutput
+                return "VFXSheets.Get[\"${jo.Get[-default,default,sheet]~}\"].Outputs.Get[\"${jo.Get[name]~}\"]"
             case isboxer2
                 return "This"
         }

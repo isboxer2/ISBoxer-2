@@ -1104,18 +1104,22 @@ objectdef isb2_clickbar
 
         if ${jo.GetBool[enable]}
         {
-            This:CreateWindow
+            This:Enable
         }
     }
 
     method Shutdown()
     {
-        Window:Destroy
+        This:Disable
     }
 
     method Disable()
     {
+        if !${Window.Element(exists)}
+            return
+
         Window:Destroy
+        TriggerChains:Fire["OnDisabled"]
     }
 
     method Enable()
@@ -1124,6 +1128,7 @@ objectdef isb2_clickbar
             return
 
         This:CreateWindow
+        TriggerChains:Fire["OnEnabled"]
     }
 
     method Toggle()
@@ -1131,7 +1136,7 @@ objectdef isb2_clickbar
         if ${Window.Element(exists)}
             This:Disable
         else
-            This:CreateWindow
+            This:Enable
     }
 
     method OnButtonLoaded()
@@ -1475,6 +1480,7 @@ objectdef isb2_hotkeysheet
         joQuery:SetString[eval,"Select.GetBool[enable]"]
         Hotkeys:ForEach["This:EnableHotkey[ForEach.Value]",joQuery]
 
+        TriggerChains:Fire["OnEnabled"]
         return TRUE
     }
 
@@ -1485,6 +1491,7 @@ objectdef isb2_hotkeysheet
         Enabled:Set[0]
         Hotkeys:ForEach["This:DisableHotkey[ForEach.Value]"]
 
+        TriggerChains:Fire["OnDisabled"]
         return TRUE
     }
 
@@ -1604,12 +1611,17 @@ objectdef isb2_mappablesheet
             return FALSE
 
         Enabled:Set[1]
+        TriggerChains:Fire["OnEnabled"]
         return TRUE
     }
 
     method Disable()
     {
+        if !${Enabled}
+            return TRUE
+
         Enabled:Set[0]
+        TriggerChains:Fire["OnDisabled"]
         return TRUE
     }
 
@@ -1765,13 +1777,301 @@ objectdef isb2_regionsheet
     }
 }
 
+objectdef isb2_vfxOutput
+{
+    variable string Name
+    variable jsonvalueref Data
+    variable isb2_triggerchains TriggerChains
+    variable weakref Sheet
+    variable lgui2elementref Window
+
+    method Initialize(weakref sheet, jsonvalueref jo)
+    {
+        Sheet:SetReference[sheet]
+        This:FromJSON[jo]
+    }
+
+    method Shutdown()
+    {
+        This:Disable
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        Data:SetReference[jo]
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        if ${jo.GetBool[enable]}
+        {
+            This:Enable
+        }        
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        return Data
+    }
+
+    method SetState(bool newState)
+    {
+        if ${newState}
+            This:Enable
+        else
+            This:Disable
+    }
+    
+    method Enable()
+    {
+        if ${Window.Element(exists)}
+            return
+
+        if !${Data.Reference(exists)}
+            return
+
+        if !${Data.Has[name]}
+            return
+
+        This:CreateWindow
+        TriggerChains:Fire["OnEnabled"]
+    }
+
+    method Disable()
+    {
+        if !${Window.Element(exists)}
+            return
+
+        Window:Destroy
+        TriggerChains:Fire["OnDisabled"]
+    }
+
+    method CreateWindow()
+    {
+;        echo "\agisb2_vfxOutput:CreateWindow\ax"
+        variable int x=${Data.GetInteger[x]}
+        variable int y=${Data.GetInteger[y]}
+        variable int w=${Data.GetInteger[width]}
+        variable int h=${Data.GetInteger[height]}
+
+        variable jsonvalueref joAdjust="LGUI2.Skin[\"${ISB2.UseSkin~}\"].Template[window.adjustments]"
+
+        ; adjust for extra window size beyond the VFX output element
+        x:Inc["${joAdjust.GetInteger[x]}"]
+        y:Inc["${joAdjust.GetInteger[y]}"]
+        w:Inc["${joAdjust.GetInteger[width]}"]
+        h:Inc["${joAdjust.GetInteger[height]}"]
+
+        variable jsonvalue joVideofeed
+        joVideofeed:SetValue["$$>
+        {
+            "name":"isb2.vfx.${Sheet.Name~}.${Name~}",
+            "type":"videofeed",
+            "horizontalAlignment":"stretch",
+            "verticalAlignment":"stretch",
+            "feedName":${Data.Get[feedName]~.AsJSON~},
+            "sendMouse":${Data.GetBool[-default,false,sendMouse]},
+            "sendKeyboard":${Data.GetBool[-default,false,sendKeyboard]},
+            "useLocalBindings":${Data.GetBool[-default,true,useLocalBindings]},
+            "permanent":${Data.GetBool[-default,false,permanent]}
+            "opacity":${Data.GetNumber[-default,1.0,opacity]}
+        }
+        <$$"]
+
+        variable jsonvalue joWindow
+        joWindow:SetValue["$$>
+        {
+            "name":"isb2.vfxOutputWindow.${Sheet.Name~}.${Name~}",
+            "type":"window",
+            "jsonTemplate":"isb2.vfx",
+            "x":${x},
+            "y":${y},
+            "width":${w},
+            "height":${h},
+            "title":"VFX Output: ${Data.Get[feedName]~}"
+        }
+        <$$"]
+
+
+        joWindow:SetByRef[content,joVideofeed]
+
+;        echo "\ayfinal\ax ${joView~}"
+
+        LGUI2:PushSkin["${ISB2.UseSkin~}"]
+        Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
+        LGUI2:PopSkin["${ISB2.UseSkin~}"]
+
+        ISB2:ApplyGUIModeTo["${Window.ID}"]
+    }
+
+    method StopAnimation(string name)
+    {
+        Window.Animation["${name~}"]:Stop
+    }
+
+    method Animate(jsonvalueref joAnimation)
+    {
+        Window:Animate[joAnimation]
+    }
+
+    method ApplyStyleJSON(jsonvalueref joStyle)
+    {
+        Window:ApplyStyleJSON[joStyle]
+    }
+}
+
+objectdef isb2_vfxSource
+{
+    variable string Name
+    variable jsonvalueref Data
+    variable isb2_triggerchains TriggerChains
+    variable weakref Sheet
+    variable lgui2elementref Window
+
+    method Initialize(weakref sheet, jsonvalueref jo)
+    {
+        Sheet:SetReference[sheet]
+        This:FromJSON[jo]
+    }
+
+    method Shutdown()
+    {
+        This:Disable
+    }
+
+    method FromJSON(jsonvalueref jo)
+    {
+        if !${jo.Reference(exists)}
+            return
+
+        Data:SetReference[jo]
+
+        if ${jo.Has[name]}
+            Name:Set["${jo.Get[name]~}"]
+
+        if ${jo.GetBool[enable]}
+        {
+            This:Enable
+        }
+    }
+
+    member:jsonvalueref AsJSON()
+    {
+        return Data
+    }
+
+    method SetState(bool newState)
+    {
+        if ${newState}
+            This:Enable
+        else
+            This:Disable
+    }
+
+    method Enable()
+    {
+;        echo "\agisb2_vfxSource:Enable\ax ${Data~}"
+        if ${Window.Element(exists)}
+            return
+
+        if !${Data.Reference(exists)}
+            return
+
+        if !${Data.Has[name]}
+            return
+
+        This:CreateWindow
+        TriggerChains:Fire["OnEnabled"]        
+    }
+
+    method Disable()
+    {
+        if !${Window.Element(exists)}
+            return
+
+        Window:Destroy
+        TriggerChains:Fire["OnDisabled"]
+    }
+
+
+    method CreateWindow()
+    {
+;        echo "\agisb2_vfxSource:CreateWindow\ax"
+
+        variable int x=${Data.GetInteger[x]}
+        variable int y=${Data.GetInteger[y]}
+        variable int w=${Data.GetInteger[width]}
+        variable int h=${Data.GetInteger[height]}
+
+        variable jsonvalueref joAdjust="LGUI2.Skin[ISBoxer 2].Template[window.adjustments]"
+
+        ; adjust for extra window size beyond the VFX source element
+        x:Inc["${joAdjust.GetInteger[x]}"]
+        y:Inc["${joAdjust.GetInteger[y]}"]
+        w:Inc["${joAdjust.GetInteger[width]}"]
+        h:Inc["${joAdjust.GetInteger[height]}"]
+
+        variable jsonvalue joVideofeed
+        joVideofeed:SetValue["$$>
+        {
+            "name":"isb2.vfx.${Sheet.Name~}.${Name~}",
+            "type":"videofeedsource",
+            "horizontalAlignment":"stretch",
+            "verticalAlignment":"stretch",
+            "feedName":${Data.Get[feedName]~.AsJSON~}
+        }
+        <$$"]
+
+        variable jsonvalue joWindow
+        joWindow:SetValue["$$>
+        {
+            "name":"isb2.vfxSourceWindow.${Sheet.Name~}.${Name~}",
+            "type":"window",
+            "jsonTemplate":"isb2.vfx",
+            "x":${x},
+            "y":${y},
+            "width":${w},
+            "height":${h},
+            "title":"VFX Source: ${Data.Get[feedName]~}"
+        }
+        <$$"]
+        joWindow:SetByRef[content,joVideofeed]
+
+;        echo "\ayfinal\ax ${joWindow~}"
+        LGUI2:PushSkin["${ISB2.UseSkin~}"]
+        Window:Set["${LGUI2.LoadReference[joWindow,This].ID}"]
+        LGUI2:PopSkin["${ISB2.UseSkin~}"]
+
+        ISB2:ApplyGUIModeTo["${Window.ID}"]
+    }   
+    
+    method StopAnimation(string name)
+    {
+        Window.Animation["${name~}"]:Stop
+    }
+
+    method Animate(jsonvalueref joAnimation)
+    {
+        Window:Animate[joAnimation]
+    }
+
+    method ApplyStyleJSON(jsonvalueref joStyle)
+    {
+        Window:ApplyStyleJSON[joStyle]
+    }    
+}
+
 objectdef isb2_vfxsheet
 {
     variable string Name
     variable bool Enabled
 
-    variable jsonvalue Outputs="{}"
-    variable jsonvalue Sources="{}"
+    variable collection:isb2_vfxOutput Outputs
+    variable collection:isb2_vfxSource Sources
+
     variable isb2_triggerchains TriggerChains
 
     method Initialize(jsonvalueref jo)
@@ -1818,8 +2118,7 @@ objectdef isb2_vfxsheet
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        This:DisableOutput["Outputs.Get[\"${jo.Get[name]~}\"]"]
-        Outputs:SetByRef["${jo.Get[name]~}",jo]
+        Outputs:Set["${jo.Get[name]~}",This,jo]
     }
 
     method AddSource(jsonvalueref jo)
@@ -1827,16 +2126,18 @@ objectdef isb2_vfxsheet
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        This:DisableSource["Sources.Get[\"${jo.Get[name]~}\"]"]
-        Sources:SetByRef["${jo.Get[name]~}",jo]
+        Sources:Set["${jo.Get[name]~}",This,jo]
     }
     
     method Enable()
     {
         echo "\arisb2_vfxsheet:Enable\ax ${Name~}"
         Enabled:Set[1]
-        Outputs:ForEach["This:EnableOutput[ForEach.Value]"]
-        Sources:ForEach["This:EnableSource[ForEach.Value]"]
+        
+        Outputs:ForEach["ForEach.Value:Enable"]
+        Sources:ForEach["ForEach.Value:Enable"]
+
+        TriggerChains:Fire["OnEnabled"]
     }
 
     method Disable()
@@ -1845,8 +2146,10 @@ objectdef isb2_vfxsheet
 ;            return
         echo "\arisb2_vfxsheet:Disable\ax ${Name~} ${Outputs~} ${Sources~}"
         Enabled:Set[0]
-        Outputs:ForEach["This:DisableOutput[ForEach.Value]"]
-        Sources:ForEach["This:DisableSource[ForEach.Value]"]
+        Outputs:ForEach["ForEach.Value:Disable"]
+        Sources:ForEach["ForEach.Value:Disable"]
+
+        TriggerChains:Fire["OnDisabled"]
     }
 
     method Toggle()
@@ -1861,25 +2164,11 @@ objectdef isb2_vfxsheet
     {
         if ${isSource}
         {
-            if ${newState}
-            {
-                This:EnableSource["Sources.Get[\"${name~}\"]"]
-            }
-            else
-            {
-                This:DisableSource["Sources.Get[\"${name~}\"]"]
-            }
+            Sources.Get["${name~}"]:SetState[${newState}]
         }
         else
         {
-            if ${newState}
-            {
-                This:EnableOutput["Outputs.Get[\"${name~}\"]"]
-            }
-            else
-            {
-                This:DisableOutput["Outputs.Get[\"${name~}\"]"]
-            }
+            Outputs.Get["${name~}"]:SetState[${newState}]
         }
     }
 
@@ -1887,202 +2176,13 @@ objectdef isb2_vfxsheet
     {
         if ${isSource}
         {
-            if !${Sources.Has["${name~}"]}
-                return
-            
-            This:DisableSource["Sources.Get[\"${name~}\"]"]
             Sources:Erase["${name~}"]
         }
         else
         {
-            if !${Outputs.Has["${name~}"]}
-                return
-            
-            This:DisableOutput["Outputs.Get[\"${name~}\"]"]
             Outputs:Erase["${name~}"]
         }
     }
-
-    method EnableOutput(jsonvalueref jo)
-    {
-        if !${jo.Reference(exists)}
-            return
-
-        if !${jo.Has[name]}
-            return
-
-        This:InstallVFXOutput["${Name~}","${jo.Get[name]~}",jo]
-
-        jo:SetBool["enabled",1]
-    }
-
-    method DisableOutput(jsonvalueref jo)
-    {
-        echo "\arvfxsheet:DisableOutput ${jo~}"
-        if !${jo.Reference(exists)}
-            return
-
-        if !${jo.Has[name]}
-            return
-        
-        This:UninstallVFXOutput["${Name~}","${jo.Get[name]~}",jo]
-
-        jo:SetBool["enabled",0]
-    }
-
-    method EnableSource(jsonvalueref jo)
-    {
-        if !${jo.Reference(exists)}
-            return
-
-        if !${jo.Has[name]}
-            return
-
-        This:InstallVFXSource["${Name~}","${jo.Get[name]~}",jo]
-
-        jo:SetBool["enabled",1]
-    }
-
-    method DisableSource(jsonvalueref jo)
-    {
-        echo "\arvfxsheet:DisableSource ${jo~}"
-        if !${jo.Reference(exists)}
-            return
-        if !${jo.Has[name]}
-            return
-        
-        This:UninstallVFXSource["${Name~}","${jo.Get[name]~}",jo]
-
-        jo:SetBool["enabled",0]
-    }
-
-
-    method InstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agInstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
-        variable int x=${joVFX.GetInteger[x]}
-        variable int y=${joVFX.GetInteger[y]}
-        variable int w=${joVFX.GetInteger[width]}
-        variable int h=${joVFX.GetInteger[height]}
-
-        variable jsonvalueref joAdjust="LGUI2.Skin[\"${ISB2.UseSkin~}\"].Template[window.adjustments]"
-
-        ; adjust for extra window size beyond the VFX output element
-        x:Inc["${joAdjust.GetInteger[x]}"]
-        y:Inc["${joAdjust.GetInteger[y]}"]
-        w:Inc["${joAdjust.GetInteger[width]}"]
-        h:Inc["${joAdjust.GetInteger[height]}"]
-
-        variable jsonvalue joVideofeed
-        joVideofeed:SetValue["$$>
-        {
-            "name":"isb2.vfx.${sheet~}.${name~}",
-            "type":"videofeed",
-            "horizontalAlignment":"stretch",
-            "verticalAlignment":"stretch",
-            "feedName":${joVFX.Get[feedName]~.AsJSON~},
-            "sendMouse":${joVFX.GetBool[-default,false,sendMouse]},
-            "sendKeyboard":${joVFX.GetBool[-default,false,sendKeyboard]},
-            "useLocalBindings":${joVFX.GetBool[-default,true,useLocalBindings]},
-            "permanent":${joVFX.GetBool[-default,false,permanent]}
-            "opacity":${joVFX.GetNumber[-default,1.0,opacity]}
-        }
-        <$$"]
-
-        variable jsonvalue joView
-        joView:SetValue["$$>
-        {
-            "name":"isb2.vfxOutputWindow.${sheet~}.${name~}",
-            "type":"window",
-            "jsonTemplate":"isb2.vfx",
-            "x":${x},
-            "y":${y},
-            "width":${w},
-            "height":${h},
-            "title":"VFX Output: ${joVFX.Get[feedName]~}"
-        }
-        <$$"]
-
-
-        joView:SetByRef[content,joVideofeed]
-
-;        echo "\ayfinal\ax ${joView~}"
-
-        LGUI2:PushSkin["${ISB2.UseSkin~}"]
-        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
-        LGUI2:PopSkin["${ISB2.UseSkin~}"]
-
-        ISB2:ApplyGUIModeTo["${joVFX.GetInteger[elementID]}"]
-    }
-
-    method UninstallVFXOutput(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agUninstallVFXOutput\ax ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["${joVFX.GetInteger[elementID]}"]:Destroy
-        LGUI2.Element["isb2.vfxOutputWindow.${sheet~}.${name~}"]:Destroy
-
-        joVFX:SetInteger["elementID",0]
-    }
-    
-    method InstallVFXSource(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agInstallVFXSource\ax ${sheet~} ${name~} ${joVFX~}"
-
-        variable int x=${joVFX.GetInteger[x]}
-        variable int y=${joVFX.GetInteger[y]}
-        variable int w=${joVFX.GetInteger[width]}
-        variable int h=${joVFX.GetInteger[height]}
-
-        variable jsonvalueref joAdjust="LGUI2.Skin[ISBoxer 2].Template[window.adjustments]"
-
-        ; adjust for extra window size beyond the VFX source element
-        x:Inc["${joAdjust.GetInteger[x]}"]
-        y:Inc["${joAdjust.GetInteger[y]}"]
-        w:Inc["${joAdjust.GetInteger[width]}"]
-        h:Inc["${joAdjust.GetInteger[height]}"]
-
-        variable jsonvalue joVideofeed
-        joVideofeed:SetValue["$$>
-        {
-            "name":"isb2.vfx.${sheet~}.${name~}",
-            "type":"videofeedsource",
-            "horizontalAlignment":"stretch",
-            "verticalAlignment":"stretch",
-            "feedName":${joVFX.Get[feedName]~.AsJSON~}
-        }
-        <$$"]
-
-        variable jsonvalue joView
-        joView:SetValue["$$>
-        {
-            "name":"isb2.vfxSourceWindow.${sheet~}.${name~}",
-            "type":"window",
-            "jsonTemplate":"isb2.vfx",
-            "x":${x},
-            "y":${y},
-            "width":${w},
-            "height":${h},
-            "title":"VFX Source: ${joVFX.Get[feedName]~}"
-        }
-        <$$"]
-        joView:SetByRef[content,joVideofeed]
-
-;        echo "\ayfinal\ax ${joView~}"
-        LGUI2:PushSkin["${ISB2.UseSkin~}"]
-        joVFX:SetInteger["elementID",${LGUI2.LoadReference[joView,joVFX].ID}]        
-        LGUI2:PopSkin["${ISB2.UseSkin~}"]
-
-        ISB2:ApplyGUIModeTo["${joVFX.GetInteger[elementID]}"]
-    }   
-
-    method UninstallVFXSource(string sheet, string name, jsonvalueref joVFX)
-    {
-        echo "\agUninstallVFXSource\ax ${sheet~} ${name~} ${joVFX~}"
-        LGUI2.Element["${joVFX.GetInteger[elementID]}"]:Destroy
-        LGUI2.Element["isb2.vfxSourceWindow.${sheet~}.${name~}"]:Destroy
-
-        joVFX:SetInteger["elementID",0]
-    }    
 }
 
 objectdef isb2_variable

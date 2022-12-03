@@ -1576,6 +1576,8 @@ objectdef isb2_importer
         if ${joFont.Used}
             joNew:SetByRef[font,joFont]
 
+        if ${jo.Has[-notnull,Text]}
+            joNew:SetString[text,"${jo.Get[Text]~}"]
 
         if ${jo.Has[-notnull,backgroundColor]}
             joNew:SetString[backgroundColor,"${jo.Get[backgroundColor]~}"]
@@ -1967,7 +1969,21 @@ objectdef isb2_importer
         if ${jo.Get[Menu,MenuString]~.NotNULLOrEmpty}
             joNew:SetString[name,"${jo.Get[Menu,MenuString]~}"]
 ;        joNew:SetString[value,"${jo.Get[Value]~}"]
-        joNew:SetString[action,"${jo.Get[ActionType]~}"]
+
+        switch ${jo.Get[ActionType]}
+        {
+            case Load
+                joNew:SetString[action,Single]
+                joNew:SetString[value,On]
+                break
+            case Unload
+                joNew:SetString[action,Single]
+                joNew:SetString[value,Off]
+                break
+            default
+                joNew:SetString[action,"${jo.Get[ActionType]~}"]
+                break
+        }
 
 ;        joNew:Set[originalAction,"${jo~}"]
         return joNew

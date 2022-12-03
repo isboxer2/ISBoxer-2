@@ -1472,6 +1472,9 @@ objectdef isb2_profileengine
         else
             text:Set["${text.ReplaceSubstring["{SLOT}",1]}"]
 
+        if ${Character.Reference(exists)}
+            text:Set["${text.ReplaceSubstring["{CHARACTER}","${Character.Get[name]}"]}"]
+
         return "${text~}"        
     }
     ; for any object, process variables within a specific property 

@@ -202,18 +202,43 @@ objectdef isb2_managedSlot
         if ${joLaunch.Has[waitForMainSession]}
             WaitForMainSession:Set[${joLaunch.GetBool[waitForMainSession]}]
         
+        if ${SlotObserver.MainSession(exists)}
+        {
+            State:Set[5]
+        }
+        elseif ${SlotObserver.Sessions.Used}
+        {
+            State:Set[6]
+        }
+
         joLaunchInfo:SetReference[joLaunch]
+    }
+
+    method Kill()
+    {
+        SlotObserver.Sessions:ForEach["kill \"\${ForEach.Key~}\""]
+        Launcher:Abort
+        Launcher:SetReference[0]
     }
 
     method Launch()
     {
+        if ${SlotObserver.Sessions.Used}
+        {
+            return FALSE
+        }
+
         State:Set[-1]
         if ${Launcher.Reference(exists)}
+        {
             return FALSE
+        }
 
         variable jsonvalue joGLI="${joCharacter.Get[gameLaunchInfo]~}"
         if !${joGLI.Type.Equal[object]}
+        {
             return FALSE      
+        }
 
         joLaunchInfo:SetBool[isb2,1]
         joLaunchInfo:SetByRef["isb2profiles",ISB2.GetLoadedFilenames]
@@ -227,6 +252,7 @@ objectdef isb2_managedSlot
         }
         if !${Launcher.Reference(exists)}
         {
+
             return FALSE
         }
 
@@ -335,6 +361,8 @@ objectdef isb2_managedSlot
                 return "Startup"
             case 5
                 return "Live"
+            case 6
+                return "Questionable"
         }
     }
     
@@ -468,9 +496,39 @@ objectdef isb2_slotmanager
         return FALSE
     }
 
+    member:bool AnyPending()
+    {
+        if !${Slots.Used}
+            return FALSE
+
+        variable jsonvalueref joQuery="$$>
+        {
+            "member":"State",
+            "op":"&&",
+            "list":[
+                {
+                    "op":">="
+                    "value":1
+                },
+                {
+                    "op":"<="
+                    "value":4
+                }
+            ]
+        }       
+        <$$"
+
+        if ${Slots.SelectKey[joQuery]}
+        {
+            return TRUE
+        }
+
+        return FALSE
+    }
+
     member:bool Active()
     {
-        return ${This.AnyNotLive}        
+        return ${This.AnyPending}        
     }
 
     member:float Duration()

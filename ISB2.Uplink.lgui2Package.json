@@ -29,6 +29,28 @@
                         "margin":[10,0,15,0]
                     },
                     {
+                        "_dock":"right",
+                        "type":"button",
+                        "content":"Kill",
+                        "eventHandlers":{
+                            "onPress":{
+                                "type":"code",
+                                "code":"This.Context:Kill"
+                            }
+                        }
+                    },
+                    {
+                        "_dock":"right",
+                        "type":"button",
+                        "content":"Re-launch",
+                        "eventHandlers":{
+                            "onPress":{
+                                "type":"code",
+                                "code":"This.Context:Launch"
+                            }
+                        }
+                    },
+                    {
                         "_dock":"top",
                         "type":"textblock",
                         "text":"${This.Context.Title}",

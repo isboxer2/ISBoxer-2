@@ -17,6 +17,18 @@ objectdef isb2 inherits isb2_profilecollection
 
     method Initialize()
     {
+        if !${agent.Get[ISBoxer 2](exists)}
+        {
+            echo "ISBoxer 2 inactive; Agent not found..."
+            return
+        }
+
+        if ${InnerSpace.Build} < ${agent.Get[ISBoxer 2].MinimumBuild}
+        {
+            echo "ISBoxer 2 inactive; Inner Space build ${agent.Get[ISBoxer 2].MinimumBuild} or later required (currently ${InnerSpace.Build})"
+            return
+        }
+
         Script.OnSetLastError:AttachAtom[This:OnScriptError]
         This:LoadSettings
         LGUI2:LoadPackageFile[ISB2.Skin.lgui2Package.json]

@@ -3729,6 +3729,7 @@ objectdef isb2_profileengine
             return
 
 ;        echo "\agExecuteRotatorStep\ax[${newState}] ${joStep~}"
+;        echo "\ayExecuteRotatorStep\ax triggered=${joStep.GetInteger[stepTriggered]} triggerOnce=${joStep.GetBool[triggerOnce]}"
 
         ; if the step is disabled, don't execute it.
         if ${joStep.GetBool[enable].Equal[FALSE]}
@@ -3736,7 +3737,7 @@ objectdef isb2_profileengine
 
         if ${newState}
         {
-            if ${jo.GetInteger[stepTriggered]}<1
+            if ${joRotator.GetInteger[stepTriggered]}<1
             {
                 ; safe to execute, but mark as triggered
                 joRotator:SetInteger["stepTriggered",1]    
@@ -3749,7 +3750,7 @@ objectdef isb2_profileengine
         }
         else
         {
-            if ${jo.GetInteger[stepTriggered]}<2
+            if ${joRotator.GetInteger[stepTriggered]}<2
             {
                 ; safe to execute, but mark as triggered
                 joRotator:SetInteger["stepTriggered",2]    

@@ -311,6 +311,16 @@ objectdef isb2_profilecollection
         return ja
     }
 
+    member:jsonvalueref SelectAll(string arrayName)
+    {
+        variable jsonvalue ja="[]"
+
+        Profiles:ForEach["ForEach.Value.${arrayName~}:ForEach[\"ja:AddByRef[ForEach.Value]\"]"]
+
+        return ja
+
+    }
+
     member:jsonvalueref FindOne(string arrayName,string objectName, string preferProfile="")
     {
         variable uint foundPriority=0

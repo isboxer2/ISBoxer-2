@@ -123,6 +123,12 @@ objectdef isb2 inherits isb2_profilecollection
         This:AutoStoreSettings
     }
 
+    method SetLaunchDelay(float newValue)
+    {
+        Settings:SetNumber[launchDelay,${newValue}]
+        This:AutoStoreSettings
+    }
+
     method SelectProfile(string name)
     {
         SelectedProfile:SetReference["Profiles.Get[\"${name~}\"]"]
@@ -131,6 +137,7 @@ objectdef isb2 inherits isb2_profilecollection
 
     method SelectTeam(string name)
     {
+        echo "\aySelectTeam\ax ${name~}"
         if ${name.NotNULLOrEmpty}
         {
             SelectedTeamName:Set["${name~}"]
@@ -148,12 +155,11 @@ objectdef isb2 inherits isb2_profilecollection
 
     method LaunchSelectedTeam()
     {
-        variable string teamName="${LGUI2.Element[isb2.launcher.teams].SelectedItem.Data}"
-        if !${teamName.NotNULLOrEmpty}
+        if !${SelectedTeamName.NotNULLOrEmpty}
             return FALSE
 
 
-        return ${SlotManager:LaunchTeamByName["${teamName~}"]}
+        return ${SlotManager:LaunchTeamByName["${SelectedTeamName~}"]}
     }
 
     method OnImportButton()
@@ -187,7 +193,8 @@ objectdef isb2_managedSlot
 
         NumSlot:Set[${joLaunch.GetInteger[slot]}]
 
-        State:Set[0]
+        This:SetState[0]
+        OriginalState:Set[0]
         SlotObserver:SetReference["slotobserver.New[${NumSlot}]"]
 
         SlotObserver.OnMainSessionUpdated:AttachAtom[This:OnMainSessionUpdated]
@@ -202,16 +209,27 @@ objectdef isb2_managedSlot
         if ${joLaunch.Has[waitForMainSession]}
             WaitForMainSession:Set[${joLaunch.GetBool[waitForMainSession]}]
         
+        if ${joLaunch.Has[launchDelay]}
+            LaunchDelay:Set[${joLaunch.GetNumber[launchDelay].Mul[1000]}]
+
         if ${SlotObserver.MainSession(exists)}
         {
-            State:Set[5]
+            This:SetState[5]
+            OriginalState:Set[5]
         }
         elseif ${SlotObserver.Sessions.Used}
         {
-            State:Set[6]
+            This:SetState[6]
+            OriginalState:Set[6]
         }
 
         joLaunchInfo:SetReference[joLaunch]
+    }
+
+    method SetState(int newState)
+    {
+        State:Set[${newState}]
+        StateTimestamp:Set[${Script.RunningTime}]
     }
 
     method Kill()
@@ -228,7 +246,7 @@ objectdef isb2_managedSlot
             return FALSE
         }
 
-        State:Set[-1]
+        This:SetState[-1]
         if ${Launcher.Reference(exists)}
         {
             return FALSE
@@ -259,12 +277,12 @@ objectdef isb2_managedSlot
         Launcher.OnLaunchStarted:AttachAtom[This:OnLaunchStarted]
         Launcher.OnLaunchFailed:AttachAtom[This:OnLaunchFailed]
         Launcher.OnLaunchSucceeded:AttachAtom[This:OnLaunchSucceeded]
-
+        LaunchDelay:Set["${ISB2.Settings.GetNumber[launchDelay]}*1000"]
 
 
         if !${Launcher:Start(exists)}
             return FALSE
-        State:Set[1]
+        This:SetState[1]
         return TRUE
     }
 
@@ -273,24 +291,24 @@ objectdef isb2_managedSlot
         if !${Launcher.Reference(exists)}
             return FALSE
         Launcher:Abort
-        State:Set[-2]
+        This:SetState[-2]
     }
 
     method OnLaunchStarted()
     {
-        State:Set[2]
+        This:SetState[2]
         echo "isb2_managedSlot[${NumSlot}]:OnLaunchStarted"
     }
 
     method OnLaunchFailed()
     {
-        State:Set[-3]
+        This:SetState[-3]
         echo "isb2_managedSlot[${NumSlot}]:OnLaunchFailed: ${Launcher.Error~}"
     }
 
     method OnLaunchSucceeded()
     {
-        State:Set[3]
+        This:SetState[3]
         echo "isb2_managedSlot[${NumSlot}]:OnLaunchSucceeded"
     }
 
@@ -299,7 +317,7 @@ objectdef isb2_managedSlot
         if ${State}==5
             return FALSE
             
-        State:Set[4]
+        This:SetState[4]
         echo "isb2_managedSlot[${NumSlot}]:OnSessionAdded"
     }
 
@@ -312,14 +330,16 @@ objectdef isb2_managedSlot
     method OnMainSessionLost()
     {
         ; this was specifically a main session. during startup, this is not normal
-        State:Set[-4]
+        This:SetState[-4]
         echo "isb2_managedSlot[${NumSlot}]:OnMainSessionLost"
     }
 
     method OnMainSessionUpdated()
     {
-        State:Set[5]
+        This:SetState[5]
         echo "isb2_managedSlot[${NumSlot}]:OnMainSessionUpdated"
+
+        ISB2.SlotManager.LastLaunchedTime:Set[${Script.RunningTime}]
     }
 
     member:bool Waiting()
@@ -331,9 +351,17 @@ objectdef isb2_managedSlot
 
         if ${WaitForMainSession}
         {
-            if ${State}<5
+            if ${State}!=5
                 return TRUE
-        }
+
+            ; we have a main session, determine if we should wait before launching the next window.
+            if ${LaunchDelay} && ${ISB2.SlotManager.LastLaunchedTime}
+            {
+;                if ${Script.RunningTime} < (${StateTimestamp} + ${LaunchDelay})
+                if ${Script.RunningTime} < (${ISB2.SlotManager.LastLaunchedTime} + ${LaunchDelay})
+                    return TRUE
+            }
+        }        
         return FALSE
     }
 
@@ -437,8 +465,11 @@ objectdef isb2_managedSlot
     variable jsonvalueref joCharacter
     variable jsonvalueref joTeam
     
+    variable int64 StateTimestamp
     variable int State
+    variable int OriginalState
     variable bool WaitForMainSession
+    variable uint LaunchDelay
 }
 
 objectdef isb2_slotmanager
@@ -447,6 +478,7 @@ objectdef isb2_slotmanager
     {
         Slots:Clear
         Launching:SetReference[0]
+        LaunchingSlotNum:Set[0]
         LGUI2.Element[isb2.events]:FireEventHandler[onSlotsUpdated]
         
     }
@@ -457,6 +489,7 @@ objectdef isb2_slotmanager
         if !${LaunchingSlot:First(exists)}
             return FALSE
 
+        LaunchingSlotNum:Set[1]
         LGUI2.Element[isb2.launching]:SetVisibility[Visible]
         StopTime:Set[0]
         StartTime:Set["${Script.RunningTime}"]
@@ -722,7 +755,7 @@ objectdef isb2_slotmanager
         This:ResolveTeam[joLaunch]
         joLaunch:SetInteger["slot",${numSlot}]
 
-        Slots:Set[${numSlot},"joLaunch"]
+        Slots:Set[${numSlot.LeadingZeroes[3]},"joLaunch"]
         LGUI2.Element[isb2.events]:FireEventHandler[onSlotsUpdated]
         return TRUE
     }
@@ -741,8 +774,10 @@ objectdef isb2_slotmanager
 
         do
         {        
-            if ${LaunchingSlot.Value.Waiting}
+            if ${LaunchingSlotNum}<${Slots.Used} && ${LaunchingSlot.Value.Waiting}
+            {
                 return TRUE
+            }
 
             if !${LaunchingSlot:Next(exists)}
             {
@@ -753,6 +788,7 @@ objectdef isb2_slotmanager
                 return FALSE
             }
 
+            LaunchingSlotNum:Inc
             LaunchingSlot.Value:Launch
         }
         while 1
@@ -764,10 +800,13 @@ objectdef isb2_slotmanager
     }
 
     variable iterator LaunchingSlot
+    variable uint LaunchingSlotNum
     variable collection:isb2_managedSlot Slots
     variable weakref Launching
     variable uint StartTime
     variable uint StopTime
+
+    variable uint LastLaunchedTime
 }
 
 variable(global) isb2 ISB2

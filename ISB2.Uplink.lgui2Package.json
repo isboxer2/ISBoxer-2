@@ -15,7 +15,7 @@
             "content":{
                 "type":"dockpanel",
                 "contextBinding":{
-                    "pullFormat":"${ISB2.SlotManager.Slots.Get[${_CONTEXTITEMDATA_.Get[slot]}]}"
+                    "pullFormat":"${ISB2.SlotManager.Slots.Get[${_CONTEXTITEMDATA_.GetInteger[slot].LeadingZeroes[3]}]}"
                 },
                 "children":[
                     {
@@ -266,12 +266,7 @@
                                                             "object":"ISB2",
                                                             "method":"LaunchSelectedTeam"
                                                         }
-                                                    },
-                                                    "selectedItemBinding":{
-                                                        "pullFormat":"${ISB2.SelectedTeamName}",
-                                                        "pushFormat":["ISB2:SelectTeam[\"","\"]"]
-                                                    },
-                                                    "selectedItemBindingProperty":"name"        
+                                                    }
                                                 },
                                                 {
                                                     "type":"textblock",
@@ -285,13 +280,24 @@
                                                     "horizontalAlignment":"stretch",
                                                     "name":"isb2.launcher.teams",
                                                     "itemsBinding":{
-                                                        "pullFormat":"${ISB2.SelectAllNames[Teams]}",
+                                                        "pullFormat":"${ISB2.SelectAll[Teams]}",
                                                         "pullHook":{
                                                             "elementName":"isb2.events",
                                                             "flags":"global",
                                                             "event":"onProfilesUpdated"
                                                         }
-                                                    }                                            
+                                                    },
+                                                    "selectedItemBinding":{
+                                                        "pullFormat":"${ISB2.SelectedTeamName}",
+                                                        "pushFormat":["ISB2:SelectTeam[\"","\"]"]
+                                                    },
+                                                    "selectedItemBindingProperty":"name",
+                                                    "itemViewGenerators":{
+                                                        "default":{
+                                                            "type":"template",
+                                                            "template":"isb2.teamView"
+                                                        }
+                                                    }
                                                 }
                                             ]
                                         },
@@ -306,6 +312,31 @@
                                                 "pullFormat":"${ISB2.QuickLaunch}",
                                                 "pushFormat":["ISB2:SetQuickLaunch[\"","\"]"]
                                             }
+                                        },
+                                        {
+                                            "type":"stackpanel",
+                                            "_dock":"top",
+                                            "orientation":"horizontal",
+                                            "horizontalAlignment":"right",
+                                            "children":[
+                                                {
+                                                    "type":"textblock",
+                                                    "text":"Launch delay: "
+                                                },
+                                                {
+                                                    "type":"textbox",
+                                                    "minSize":[100,10],
+                                                    "textBinding":{
+                                                        "pullFormat":"${ISB2.Settings.GetNumber[-default,0,launchDelay].Centi}",
+                                                        "pushFormat":["ISB2:SetLaunchDelay[\"","\"]"],
+                                                    },
+                                                    "textBindingUsesFocus":true
+                                                },
+                                                {
+                                                    "type":"textblock",
+                                                    "text":" seconds"
+                                                }
+                                            ]
                                         },
                                         {
                                             "type":"checkbox",

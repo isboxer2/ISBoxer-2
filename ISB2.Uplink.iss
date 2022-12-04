@@ -10,7 +10,7 @@ objectdef isb2 inherits isb2_profilecollection
 
     variable isb2_importer Importer
     variable isb2_slotmanager SlotManager
-    variable string UseSkin="ISBoxer 2 - Thanksgiving"
+    variable string UseSkin="ISBoxer 2"
 
     variable bool bAutoStoreSettings=TRUE
     variable string SelectedTeamName
@@ -631,6 +631,8 @@ objectdef isb2_slotmanager
     {
         if ${jLaunch.Type.Equal[array]}
         {
+            Slots:Clear
+            Launching:SetReference[0]
             jLaunch:ForEach["This:Prepare[ForEach.Value]"]
             return TRUE
         }

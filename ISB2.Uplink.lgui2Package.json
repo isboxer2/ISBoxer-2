@@ -328,7 +328,7 @@
                                                     "minSize":[100,10],
                                                     "textBinding":{
                                                         "pullFormat":"${ISB2.Settings.GetNumber[-default,0,launchDelay].Centi}",
-                                                        "pushFormat":["ISB2:SetLaunchDelay[\"","\"]"],
+                                                        "pushFormat":["ISB2:SetLaunchDelay[\"","\"]"]
                                                     },
                                                     "textBindingUsesFocus":true
                                                 },

@@ -1463,7 +1463,39 @@ objectdef isb2_profileengine
         if !${text.Find["{"]}
             return "${text~}"        
 
-        ; todo ... handle variables!
+        variable int pos
+        variable int endpos
+        variable string name
+
+        pos:Set["${text.Find["{U:"]}"]
+        while ${pos}
+        {
+;            echo "\ayProcessVariables\ax: User variable in ${text~}"
+            ; user variable
+            endpos:Set["${text.FindFrom[${pos.Inc},"}"]}"]
+            if !${endpos}
+            {
+                ; unterminated user variable reference
+                text:Set["${text.Left[${pos.Dec}]~}"]
+                Script:SetLastError["unterminated user variable reference in ${text~}"]
+                break
+            }
+
+            ; get variable name
+            ; convert end position to length
+            endpos:Set["${endpos}-(${pos}+3)"]            
+            name:Set["${text.Mid[${pos.Inc[3]},${endpos}]}"]
+
+            variable weakref vRef
+            vRef:SetReference["Variables.Get[\"${name~}\"]"]
+            if ${vRef.Reference(exists)}
+                text:Set["${text.ReplaceSubstring["{U:${name~}}","${vRef.Value~}"]}"]    
+            else
+                text:Set["${text.ReplaceSubstring["{U:${name~}}",""]}"]    
+
+            pos:Set["${text.FindFrom[${pos.Inc},"{U:"]}"]
+        }
+
 
         if ${Slot}
             text:Set["${text.ReplaceSubstring["{SLOT}",${Slot}]}"]
@@ -1494,6 +1526,7 @@ objectdef isb2_profileengine
             return
 
         joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Value~}\"]"]
+        This:ProcessVariableProperty[joAction,target]
     }
 #endregion
 

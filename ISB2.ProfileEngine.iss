@@ -1513,10 +1513,21 @@ objectdef isb2_profileengine
     method ProcessVariableProperty(jsonvalueref jo, string varName)
     {
 ;        echo "ProcessVariableProperty[${varName~}] ${jo~}"
-        if !${jo.Has[-string,"${varName~}"]}
-            return
+        switch ${jo.GetType["${varName~}"]}
+        {
+            case string
+                jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]
+                break
+            case object
+            case array
+                This:ProcessVariableProperties["jo.Get[\"${varName~}\"]"]
+                break
+        }
+    }
 
-        jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]        
+    method ProcessVariableProperties(jsonvalueref jo)
+    {
+        jo:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Key}\"]"]
     }
 
     ; for any Action object of a given action type, process its variableProperties
@@ -1934,7 +1945,8 @@ objectdef isb2_profileengine
         if ${joAction.Has[fadeDuration]}
             fadeDuration:Set[${joAction.GetNumber[fadeDuration]}]
 
-        variable jsonvalue joAnimation="$$>
+        variable jsonvalue joAnimation
+        joAnimation:SetValue["$$>
         {
             "type":"chain",
             "name":"fade",
@@ -1958,7 +1970,7 @@ objectdef isb2_profileengine
                 }
             ]
         }
-        <$$"
+        <$$"]
 
         LGUI2.Element[isb2.popupText]:ApplyStyleJSON[joStyle]
         LGUI2.Element[isb2.popupTextPanel]:ApplyStyleJSON["{\"opacity\":1.0}"]

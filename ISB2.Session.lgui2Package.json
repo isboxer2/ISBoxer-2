@@ -282,6 +282,7 @@
                 {
                     "name":"popup text",
                     "handler":"Action_PopupText",
+                    "variableProperties":["text"],
                     "activationState":true,
                     "retarget":true,
                     "timer":true

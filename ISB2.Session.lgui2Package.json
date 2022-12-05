@@ -11,6 +11,7 @@
                     "name":"keystroke",
                     "handler":"Action_Keystroke",
                     "retarget":true,
+                    "variableProperties":["keyCombo"],
                     "timer":false,
                     "activationState":true
                 },
@@ -55,7 +56,7 @@
                 {
                     "name":"set game key binding",
                     "handler":"Action_SetGameKeyBinding",
-                    "variableProperties":["name"],
+                    "variableProperties":["name","keyCombo"],
                     "activationState":true,
                     "retarget":true,
                     "timer":true
@@ -131,7 +132,7 @@
                 {
                     "name":"mappable step",
                     "handler":"Action_MappableStep",
-                    "variableProperties":["name","sheet"],
+                    "variableProperties":["name","sheet","step"],
                     "activationState":true,
                     "retarget":true,
                     "timer":true
@@ -139,7 +140,7 @@
                 {
                     "name":"mappable step state",
                     "handler":"Action_MappableStepState",
-                    "variableProperties":["name","sheet"],
+                    "variableProperties":["name","sheet","step"],
                     "activationState":true,
                     "retarget":true,
                     "timer":true
@@ -282,7 +283,7 @@
                 {
                     "name":"popup text",
                     "handler":"Action_PopupText",
-                    "variableProperties":["text"],
+                    "variableProperties":["text","duration","fadeDuration"],
                     "activationState":true,
                     "retarget":true,
                     "timer":true

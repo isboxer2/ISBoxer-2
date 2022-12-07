@@ -3,6 +3,8 @@ objectdef isb2_quicksetup
     variable jsonvalueref EditingCharacter="{}"
     variable jsonvalueref Characters="[]"
 
+    variable jsonvalueref GameLaunchInfo="[]"
+
     variable bool ExistingCharacter
 
     variable string TeamName
@@ -11,7 +13,7 @@ objectdef isb2_quicksetup
 
     method Initialize()
     {
-
+        This:GenerateGameLaunchInfo
     }
 
     method Shutdown()
@@ -107,6 +109,12 @@ objectdef isb2_quicksetup
             return
         }
 
+        if !${EditingCharacter.GetInteger[_gameLaunchInfo]}
+        {
+            Error:Set["Game Launch Info required!"]
+            return
+        }
+
         Characters:AddByRef[EditingCharacter.Duplicate]
         LGUI2.Element[isb2.QuickSetupWindow]:FireEventHandler[onCharactersUpdated]
         LGUI2.Element[isb2.QuickSetup.EditingCharacter.name]:KeyboardFocus
@@ -173,6 +181,45 @@ objectdef isb2_quicksetup
         jaSlots:AddByRef[joSlot]
     }
 
+    method AddGameLaunchInfo_Profile(string gameName, string profileName)
+    {
+        if !${profileName.NotNULLOrEmpty} || ${profileName.Equal[_set_guid]}
+            return
+        echo "\ayAddGameLaunchInfo_Profile\ax ${gameName~} -> ${profileName~}"
+        variable jsonvalue joGLI="{}"
+        joGLI:SetString[game,"${gameName~}"]
+        joGLI:SetString[gameProfile,"${profileName~}"]
+
+        GameLaunchInfo:AddByRef[joGLI]
+    }
+
+    method AddGameLaunchInfo_Game(string name, jsonvalueref joGame)
+    {
+        if !${name.NotNULLOrEmpty} || ${name.Equal[_set_guid]}
+            return
+        echo "\ayAddGameLaunchInfo_Game\ax ${name~} ${joGame~}"
+
+        joGame.Get[Profiles]:ForEach["This:AddGameLaunchInfo_Profile[\"${name~}\",\"\${ForEach.Key~}\"]"]
+    }
+
+    method GenerateGameLaunchInfo(string gameName)
+    {
+        GameLaunchInfo:Set["[]"]
+
+        ISUplink.Games:ForEach["This:AddGameLaunchInfo_Game[\"\${ForEach.Key~}\",ForEach.Value]"]
+
+        LGUI2.Element[isb2.QuickSetupWindow]:FireEventHandler[onGameLaunchInfoUpdated]
+    }
+
+    method UpdateGameLaunchInfo(jsonvalueref jo)
+    {
+        if !${jo.Has[_gameLaunchInfo]}
+            return
+
+        jo:SetByRef[gameLaunchInfo,"GameLaunchInfo.Get[${jo.GetInteger[_gameLaunchInfo]}]"]        
+        jo:Erase[_gameLaunchInfo]
+    }
+
     method Finish()
     {
         echo "\ayisb2_quicksetup:Finish\ax"     
@@ -184,6 +231,7 @@ objectdef isb2_quicksetup
         joTeam:SetString[name,"${TeamName}"]
         variable jsonvalue jaSlots="[]"
         Characters:ForEach["This:AddSlot[jaSlots,ForEach.Value]"]
+        Characters:ForEach["This:UpdateGameLaunchInfo[ForEach.Value]"]
 
         variable jsonvalue joProfile="{}"
         joProfile:SetString["$schema","http://www.lavishsoft.com/schema/isb2.json"]
@@ -192,6 +240,7 @@ objectdef isb2_quicksetup
         joProfile:SetString[name,"Team ${TeamName~}"]
 
         joProfile:Set[teams,"[]"]
+        joTeam:SetByRef[slots,jaSlots]
         joProfile.Get[teams]:AddByRef[joTeam]
         joProfile:SetByRef[characters,Characters]
 

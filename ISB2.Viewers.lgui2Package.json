@@ -109,6 +109,38 @@
                 }
             }
         },        
+        "isb2.gameLaunchInfoView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"dockpanel",
+                "horizontalAlignment":"stretch",
+                "children":[
+                    {
+                        "_dock":"left",
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[gameProfile]}",
+                            "pullReplaceNull":""
+                        },
+                        "font":{
+                            "bold":true
+                        }                                
+                    },
+                    {
+                        "_dock":"right",
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[game]}",
+                            "pullReplaceNull":""
+                        },
+                        "font":{
+                            "heightFactor":0.9
+                        }                                
+                    }
+                ]
+            }
+        },        
         "isb2.gameKeyBindingView":{
             "jsonTemplate":"listboxitem",
             "padding":2,

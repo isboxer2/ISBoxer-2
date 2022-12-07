@@ -462,10 +462,10 @@
             "title":"ISBoxer 2: Quick Setup. This isn't even my final form!",
             "horizontalAlignment":"center",
             "verticalAlignment":"center",
-            "width":600,
+            "width":700,
             "height":400,
-            "minSize":[600,400],
-            "visibility": "visible",
+            "minSize":[700,400],
+            "visibility": "hidden",
             "content":{
                 "type":"pagecontrol",
                 "horizontalAlignment":"stretch",
@@ -738,6 +738,40 @@
                                                             "pushFormat":["This.ObjectView.Object:SetString[gameServer,\"","\"]"]
                                                           },
                                                           "editTemplate":"propertyview.textbox"                              
+                                                    },
+                                                    {
+                                                        "name":"Game Launch Info",
+                                                        "editTemplate":"propertyview.combobox",
+                                                        "controlData":{
+                                                            "itemsBinding":{
+                                                                "pullFormat":"${ISB2QuickSetup.GameLaunchInfo}"
+                                                            },
+                                                            "itemViewGenerators":{
+                                                                "default":{
+                                                                    "type":"template",
+                                                                    "template":"isb2.gameLaunchInfoView"
+                                                                }
+                                                            },
+                                                            "popup":{
+                                                                "jsonTemplate":"combobox.popup",
+                                                                "content":{
+                                                                    "jsonTemplate":"combobox.popup.content",
+                                                                    "maxSize":[600,300],
+                                                                    "contentContainer":{
+                                                                        "jsonTemplate":"listbox.contentContainerFitWidth"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "contentContainer":{
+                                                                "type": "panel",
+                                                                "horizontalAlignment":"stretch"
+                                                            },
+                                                            "selectedItemBinding":{
+                                                                "pullFormat":"${This.Locate[\"\",objectview,ancestor].Object.Get[_gameLaunchInfo]}",
+                                                                "pullReplaceNull":"",
+                                                                "pushFormat":["This.Locate[\"\",objectview,ancestor].Object:SetInteger[_gameLaunchInfo,\"","\"]"]
+                                                            }
+                                                        }
                                                     }                                                    
                                                 ]
                                             }

@@ -98,6 +98,17 @@
                 }
             }
         },
+        "isb2.gameView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },        
         "isb2.gameKeyBindingView":{
             "jsonTemplate":"listboxitem",
             "padding":2,

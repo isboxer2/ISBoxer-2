@@ -7,7 +7,7 @@
 objectdef isb2session inherits isb2_profileengine
 {
     variable bool ValidSession
-    variable string UseSkin="ISBoxer 2 - Thanksgiving"
+    variable string UseSkin="ISBoxer 2"
 
     variable isb2_profilecollection ProfileDB
     variable isb2_wowaddon WoWAddon

@@ -1520,6 +1520,7 @@ objectdef isb2_profileengine
                 break
             case object
             case array
+                echo "ProcessVariableProperty[${varName~}] ${jo~}"
                 This:ProcessVariableProperties["jo.Get[\"${varName~}\"]"]
                 break
         }
@@ -1527,16 +1528,24 @@ objectdef isb2_profileengine
 
     method ProcessVariableProperties(jsonvalueref jo)
     {
-        jo:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Key}\"]"]
+        jo:ForEach["This:ProcessVariableProperty[jo,\"\${ForEach.Key}\"]"]
     }
 
     ; for any Action object of a given action type, process its variableProperties
     method ProcessActionVariables(jsonvalueref joActionType, jsonvalueref joAction)
     {
-        if !${joActionType.Get[variableProperties].Type.Equal[array]}
-            return
+        if ${joAction.Has[-object,variableProperties]}
+        {
+            This:ProcessVariableProperty[joAction,variableProperties]
+            joAction:Merge["joAction.Get[variableProperties]"]
 
-        joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Value~}\"]"]
+            joAction:Erase[variableProperties]
+        }
+
+        if ${joActionType.Has[-array,variableProperties]}
+        {
+            joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Value~}\"]"]
+        }
         This:ProcessVariableProperty[joAction,target]
     }
 #endregion

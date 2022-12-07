@@ -5,6 +5,38 @@
         "ISB2.Viewers.lgui2Package.json"
     ],
     "templates": {
+        "isb2.QuickSetup.characterView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"panel",
+                "horizontalAlignment":"stretch",
+                "children":[
+                    {
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                            "pullReplaceNull":""
+                        }
+                    }    
+                ],
+                "contextMenu":{
+                    "type":"contextmenu",
+                    "eventHandlers": {
+                        "onItemSelected": {
+                          "type": "method",
+                          "object":"ISB2QuickSetup",
+                          "method": "OnCharacterContextMenuSelection"
+                        }
+                      },
+                      "items": [
+                        "Move Up",
+                        "Move Down",
+                        "Remove"
+                      ]
+                }    
+            }
+        },
         "isb2.slotmanager.slotView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -419,6 +451,333 @@
                                 }                                
                             }                                                        
                         ]
+                    }
+                ]
+            }
+        },
+        {
+            "name":"isb2.QuickSetupWindow",
+            "type":"window",
+            "hideOnClose":true,
+            "title":"ISBoxer 2: Quick Setup. This isn't even my final form!",
+            "horizontalAlignment":"center",
+            "verticalAlignment":"center",
+            "width":600,
+            "height":400,
+            "minSize":[600,400],
+            "visibility": "visible",
+            "content":{
+                "type":"pagecontrol",
+                "horizontalAlignment":"stretch",
+                "verticalAlignment":"stretch",
+                "headerContainer":{
+                    "jsonTemplate":"pagecontrol.headerContainer",
+                    "overlay":{
+                        "jsonTemplate":"pagecontrol.headerContainer.overlay",
+                        "children":{
+                            "errorMessage":{
+                                "type":"textblock",
+                                "horizontalAlignment":"center",
+                                "verticalAlignment":"top",
+                                "_dock":"top",
+                                "text":"${ISB2QuickSetup.Error}",
+                                "font":{
+                                    "heightFactor":1.4,
+                                    "bold":true
+                                },
+                                "color":"#ff0000",
+                                "margin":5
+                            },
+                            "previousPage": {
+                                "jsonTemplate": "pagecontrol.backButton",
+                                "type": "button",
+                                "_dock": "left"
+                            },
+                            "nextPage": {
+                                "jsonTemplate": "pagecontrol.nextButton",
+                                "type": "button",
+                                "_dock": "right"
+                            },
+                            "finishButton": {
+                                "jsonTemplate": "pagecontrol.finishButton",
+                                "type": "button",
+                                "_dock": "right"
+                            }           
+                        }                            
+                    }
+                },
+                "eventHandlers":{
+                    "selectedTabChanged":{
+                        "type":"method",
+                        "object":"ISB2QuickSetup",
+                        "method":"OnSelectedTabChanged"
+                    }
+                },
+                "pages":[
+                    {
+                        "type":"page",
+                        "header":"Game Selection",
+                            "eventHandlers":{
+                            "validatePage":{
+                                "type":"method",
+                                "object":"ISB2QuickSetup",
+                                "method":"ValidatePage",
+                                "args":["Game"]
+                            }
+
+                        },
+                        "content":{
+                            "type":"dockpanel",
+                            "horizontalAlignment":"stretch",
+                            "verticalAlignment":"stretch",
+                            "children":[
+                                {
+                                    "_dock":"top",
+                                    "type":"textblock",
+                                    "font":{
+                                        "heightFactor":1.2,
+                                        "bold":true
+                                    },
+                                    "text":"Please select a game to configure",
+                                    "horizontalAlignment":"center"
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"combobox",
+                                    "horizontalAlignment":"stretch",
+                                    "margin":5,
+                                    "itemsBinding":{
+                                        "pullFormat":"${LGUI2.Skin[default].Template[isb2.data].Get[games]}"
+                                    },
+                                    "itemViewGenerators":{
+                                        "default":{
+                                            "type":"template",
+                                            "template":"isb2.gameView"
+                                        }
+                                    },
+                                    "selectedItemBinding":"ISB2QuickSetup.GameName",
+                                    "selectedItemBindingProperty":"name"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "type":"page",
+                        "header":"Character Selection",
+                        "eventHandlers":{
+                            "validatePage":{
+                                "type":"method",
+                                "object":"ISB2QuickSetup",
+                                "method":"ValidatePage",
+                                "args":["Characters"]
+                            }
+
+                        },
+                        "content":{
+                            "type":"dockpanel",
+                            "horizontalAlignment":"stretch",
+                            "verticalAlignment":"stretch",
+                            "padding":5,
+                            "children":[
+                                {
+                                    "_dock":"top",
+                                    "type":"textblock",
+                                    "font":{
+                                        "heightFactor":1.2,
+                                        "bold":true
+                                    },
+                                    "text":"Please select characters (or game windows) to form a Team",
+                                    "horizontalAlignment":"center",
+                                    "margin":[0,0,0,5]
+                                },
+                                {
+                                    "_dock":"right",
+                                    "type":"dockpanel",
+                                    "width":200,
+                                    "margin":[5,0,0,0],
+                                    "children":[
+                                        {
+                                            "type":"textblock",
+                                            "_dock":"top",
+                                            "text":"Added Characters",
+                                            "horizontalAlignment":"center"
+                                        },
+                                        {
+                                            "type":"listbox",
+                                            "_dock":"top",
+                                            "contentContainer":{
+                                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                                            },
+                                            "verticalAlignment":"stretch",
+                                            "horizontalAlignment":"stretch",
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2QuickSetup.Characters}",
+                                                "pullHook": {
+                                                    "elementName": "isb2.QuickSetupWindow",
+                                                    "flags": "global",
+                                                    "event": "onCharactersUpdated"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.QuickSetup.characterView"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onSelectionChanged":{
+                                                    "type":"method",
+                                                    "object":"ISB2QuickSetup",
+                                                    "method":"OnAddedCharacterSelection"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"expander",
+                                    "expanded":false,
+                                    "header":"Detected Characters",
+                                    "content":{
+                                        "type":"textblock",
+                                        "text":"Surprise!"
+                                    }
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"expander",
+                                    "header":"Manual Entry",
+                                    "content":{
+                                        "type":"dockpanel",
+                                        "horizontalAlignment":"stretch",
+                                        "verticalAlignment":"stretch",
+                                        "children":[
+                                            {
+                                                "type":"button",
+                                                "_dock":"bottom",
+                                                "horizontalAlignment":"right",
+                                                "content":"Add",
+                                                "margin":[0,5,0,0],
+                                                "eventHandlers":{
+                                                    "onRelease":{
+                                                        "type":"method",
+                                                        "object":"ISB2QuickSetup",
+                                                        "method":"AddCharacter"
+                                                    }
+                                                }
+                                            },                                            
+                                            {
+                                                "type":"objectview",
+                                                "name":"isb2.QuickSetup.Character",
+                                                "_dock":"top",
+                                                "verticalAlignment":"stretch",
+                                                "horizontalAlignment":"stretch",
+                                                "objectBinding":{
+                                                    "pullFormat":"${ISB2QuickSetup.EditingCharacter}"
+                                                },
+                                                "properties":[
+                                                    {
+                                                        "name":"Display Name",
+                                                        "dataBinding":{
+                                                            "pullFormat":"${This.ObjectView.Object.Get[name]}",
+                                                            "pullReplaceNull":"",
+                                                            "pushFormat":["This.ObjectView.Object:SetString[name,\"","\"]"]
+                                                          },
+                                                          "editTemplate":"propertyview.textbox",
+                                                          "controlData":{
+                                                            "name":"isb2.QuickSetup.EditingCharacter.name"
+                                                          }                              
+                                                    },
+                                                    {
+                                                        "name":"Game",
+                                                        "dataBinding":{
+                                                            "pullFormat":"${This.ObjectView.Object.Get[game]}",
+                                                            "pullReplaceNull":"",
+                                                            "pushFormat":["This.ObjectView.Object:SetString[game,\"","\"]"]
+                                                          },
+                                                          "editTemplate":"propertyview.textbox"                              
+                                                    },
+                                                    {
+                                                        "name":"Actual Name",
+                                                        "dataBinding":{
+                                                            "pullFormat":"${This.ObjectView.Object.Get[actualName]}",
+                                                            "pullReplaceNull":"",
+                                                            "pushFormat":["This.ObjectView.Object:SetString[actualName,\"","\"]"]
+                                                          },
+                                                          "editTemplate":"propertyview.textbox"                              
+                                                    },
+                                                    {
+                                                        "name":"E-mail Address",
+                                                        "dataBinding":{
+                                                            "pullFormat":"${This.ObjectView.Object.Get[email]}",
+                                                            "pullReplaceNull":"",
+                                                            "pushFormat":["This.ObjectView.Object:SetString[email,\"","\"]"]
+                                                          },
+                                                          "editTemplate":"propertyview.textbox"                              
+                                                    },
+                                                    {
+                                                        "name":"Game Account",
+                                                        "dataBinding":{
+                                                            "pullFormat":"${This.ObjectView.Object.Get[accountName]}",
+                                                            "pullReplaceNull":"",
+                                                            "pushFormat":["This.ObjectView.Object:SetString[accountName,\"","\"]"]
+                                                          },
+                                                          "editTemplate":"propertyview.textbox"                              
+                                                    },
+                                                    {
+                                                        "name":"Game Server",
+                                                        "dataBinding":{
+                                                            "pullFormat":"${This.ObjectView.Object.Get[gameServer]}",
+                                                            "pullReplaceNull":"",
+                                                            "pushFormat":["This.ObjectView.Object:SetString[gameServer,\"","\"]"]
+                                                          },
+                                                          "editTemplate":"propertyview.textbox"                              
+                                                    }                                                    
+                                                ]
+                                            }
+                                        ]                                                    
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "type":"page",
+                        "header":"Team Name",
+                        "content":{
+                            "type":"dockpanel",
+                            "horizontalAlignment":"stretch",
+                            "verticalAlignment":"stretch",
+                            "children":[
+                                {
+                                    "_dock":"top",
+                                    "type":"textblock",
+                                    "text":"Please choose a unique name for this Team",
+                                    "font":{
+                                        "heightFactor":1.2,
+                                        "bold":true
+                                    },
+                                    "horizontalAlignment":"center"
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"textbox",
+                                    "name":"isb2.QuickSetup.TeamName",
+                                    "horizontalAlignment":"stretch",
+                                    "textBinding":"ISB2QuickSetup.TeamName",
+                                    "margin":5                                    
+                                }
+                            ]
+                        },
+                        "eventHandlers":{
+                            "validatePage":{
+                                "type":"method",
+                                "object":"ISB2QuickSetup",
+                                "method":"ValidatePage",
+                                "args":["TeamName"]
+                            }
+                        }
                     }
                 ]
             }

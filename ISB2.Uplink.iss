@@ -1,5 +1,6 @@
 #include "ISB2.Common.iss"
 #include "ISB2.Importer.iss"
+#include "ISB2.QuickSetup.iss"
 
 objectdef isb2 inherits isb2_profilecollection
 {
@@ -349,7 +350,7 @@ objectdef isb2_managedSlot
     method OnMainSessionUpdated()
     {
         This:SetState[5]
-        echo "isb2_managedSlot[${NumSlot}]:OnMainSessionUpdated"
+        echo "isb2_managedSlot[${NumSlot}]:OnMainSessionUpdated ${Context.AsJSON~}"
 
         ISB2.SlotManager.LastLaunchedTime:Set[${Script.RunningTime}]
     }

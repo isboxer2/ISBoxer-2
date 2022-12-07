@@ -27,7 +27,8 @@ objectdef isb2_importer
         This:WriteJSON["${filename~}.json"]
         
         jo:SetString["$schema","http://www.lavishsoft.com/schema/isb2.json"]
-        jo:SetString[importedVersion,"${agent.Get[ISBoxer 2].Version~}"]
+        jo:SetString[source,"imported"]
+        jo:SetString[isb2Version,"${agent.Get[ISBoxer 2].Version~}"]
         jo:SetString[name,"${filename.FilenameOnly~}"]
 
         ISBProfile:SetByRef[globalSettings,"This.TransformGlobalSettingsXML"]

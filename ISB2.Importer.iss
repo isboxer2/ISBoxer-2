@@ -121,7 +121,7 @@ objectdef isb2_importer
 
         jo:SetReference["ISB1Transformer.TransformGlobalSettingsXML[\"${filename~}\"]"]
 
-        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename.FilenameOnly~}.isb2.json",multiline]
+        jo:WriteFile["${ISB2.ProfilesFolder~}/${filename.FilenameOnly~}.isb2.json",multiline]
         return jo
         
     }
@@ -130,21 +130,21 @@ objectdef isb2_importer
     {
         variable jsonvalueref jo
         jo:SetReference["This.TransformProfileXML[\"${filename~}\"]"]
-        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename.FilenameOnly~}.isb2.json",multiline]
+        jo:WriteFile["${ISB2.ProfilesFolder}~}/${filename.FilenameOnly~}.isb2.json",multiline]
     }
 
     method TransformCurrentProfileXML()
     {
         variable jsonvalueref jo
         jo:SetReference["This.TransformProfileXML[\"${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.XML\"]"]
-        jo:WriteFile["${LavishScript.HomeDirectory~}/ISBoxerToolkitProfile.LastExported.isb2.json",multiline]
+        jo:WriteFile["${LavishScript.ProfilesFolder~}/ISBoxerToolkitProfile.LastExported.isb2.json",multiline]
     }
 
     method TransformLGUIXML(filepath filename)
     {
         variable jsonvalueref jo
         jo:SetReference["This.TransformLGUIXML[\"${filename~}\"]"]
-        jo:WriteFile["${LavishScript.HomeDirectory~}/${filename.FilenameOnly~}.lgui2Package.json",multiline]
+        jo:WriteFile["${LavishScript.ProfilesFolder~}/${filename.FilenameOnly~}.lgui2Package.json",multiline]
     }
 
     member:jsonvalueref TransformLGUIXML(string filename)

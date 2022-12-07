@@ -7,6 +7,9 @@ objectdef isb2 inherits isb2_profilecollection
     ; Reference to the currently selected Profile in the main window
     variable weakref SelectedProfile
 
+    variable filepath SettingsFolder
+    variable filepath ProfilesFolder
+
     variable jsonvalueref Settings="{}"
 
     variable isb2_importer Importer
@@ -31,7 +34,11 @@ objectdef isb2 inherits isb2_profilecollection
         }
 
         Script.OnSetLastError:AttachAtom[This:OnScriptError]
+        This:DetectSettingsFolder
         This:LoadSettings
+
+        echo "ISBoxer 2: Using Profiles Folder ${ProfilesFolder~}"
+
         LGUI2:LoadPackageFile[ISB2.Skin.lgui2Package.json]
         LGUI2:PushSkin["${UseSkin~}"]
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
@@ -70,9 +77,35 @@ objectdef isb2 inherits isb2_profilecollection
         This:AutoStoreSettings
     }
 
+    method DetectSettingsFolder()
+    {
+        SettingsFolder:Set["%USERPROFILE%/Documents"]:MakeAbsolute
+        if ${SettingsFolder.PathExists}
+        {
+            if !${SettingsFolder.FileExists[ISBoxer 2]}
+            {
+                mkdir "${SettingsFolder~}/ISBoxer 2"            
+            }
+            if ${SettingsFolder.FileExists[ISBoxer 2]}
+            {
+                SettingsFolder:Set["${SettingsFolder~}/ISBoxer 2"]
+                ProfilesFolder:Set["${SettingsFolder~}/Profiles"]
+                if !${SettingsFolder.FileExists[Profiles]}
+                    mkdir "${ProfilesFolder~}"
+
+                echo "ISBoxer 2: Using Settings Folder ${SettingsFolder~}"
+                return
+            }
+        }
+
+        SettingsFolder:Set["${Script.CurrentDirectory}/"]:MakeAbsolute
+        ProfilesFolder:Set["${SettingsFolder~}"]
+        echo "ISBoxer 2: Using Settings Folder ${SettingsFolder~}"
+    }
+
     member:filepath SettingsFilename()
     {
-        return "${Script.CurrentDirectory}/ISB2.Settings.json"
+        return "${SettingsFolder~}/ISB2.Settings.json"
     }
 
     method LoadDefaultSettings()
@@ -87,7 +120,7 @@ objectdef isb2 inherits isb2_profilecollection
 
     method LoadSettings()
     {
-        if ${Script.CurrentDirectory.FileExists[ISB2.Settings.json]}
+        if ${SettingsFolder.FileExists[ISB2.Settings.json]}
         {
             Settings:SetReference["jsonobject.ParseFile[\"${This.SettingsFilename~}\"]"]
             if !${Settings.Reference(exists)}
@@ -101,6 +134,16 @@ objectdef isb2 inherits isb2_profilecollection
             This:StoreSettings
         }
 
+        variable filepath newVal
+        ; profiles folder...
+        if ${Settings.Has[-string,profilesFolder]}
+        {
+            newVal:Set["${Settings.Get[profilesFolder]~}"]
+            if ${newVal.NotNULLOrEmpty} && ${newVal.PathExists}
+            {
+                ProfilesFolder:Set["${newVal~}"]:MakeAbsolute
+            }
+        }
     }
 
     method StoreSettings()

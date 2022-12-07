@@ -143,10 +143,64 @@ objectdef isb2_quicksetup
                     Error:Set["Team name required"]
                     LGUI2.Element[isb2.QuickSetup.TeamName]:KeyboardFocus
                     Context.Args:SetBool[pageValid,0]
+                    return
+                }
+
+                ; team name is fine, see if there's already a stored profile with this name
+                variable string fileName
+                fileName:Set["Team.${This.GetSanitizedName["${TeamName~}"]}.isb2.json"]
+                if ${ISB2.ProfilesFolder.FileExists["${fileName~}"]}
+                {
+                    Error:Set["Profile ${fileName~} already exists"]
+                    Context.Args:SetBool[pageValid,0]
+                    return
                 }
             }
                 break
         }
+    }
+
+    member:string GetSanitizedName(string name)
+    {
+        return "${name.Replace["?","","*","",":","","<","",">","","|","","/","","\\","","\"",""]~}"
+    }
+
+    method AddSlot(jsonvalueref jaSlots, jsonvalueref joCharacter)
+    {
+        variable jsonvalue joSlot="{}"
+        joSlot:SetString[character,"${joCharacter.Get[name]~}"]
+
+        jaSlots:AddByRef[joSlot]
+    }
+
+    method Finish()
+    {
+        echo "\ayisb2_quicksetup:Finish\ax"     
+
+        LGUI2.Element[isb2.QuickSetupWindow]:SetVisibility[hidden]
+
+        ; generate team object
+        variable jsonvalue joTeam="{}"
+        joTeam:SetString[name,"${TeamName}"]
+        variable jsonvalue jaSlots="[]"
+        Characters:ForEach["This:AddSlot[jaSlots,ForEach.Value]"]
+
+        variable jsonvalue joProfile="{}"
+        joProfile:SetString["$schema","http://www.lavishsoft.com/schema/isb2.json"]
+        joProfile:SetString[source,"quick setup"]
+        joProfile:SetString[isb2Version,"${agent.Get[ISBoxer 2].Version~}"]
+        joProfile:SetString[name,"Team ${TeamName~}"]
+
+        joProfile:Set[teams,"[]"]
+        joProfile.Get[teams]:AddByRef[joTeam]
+        joProfile:SetByRef[characters,Characters]
+
+
+        variable string fileName
+        fileName:Set["Team.${This.GetSanitizedName["${TeamName~}"]}.isb2.json"]
+        echo "Writing new profile to \at${ISB2.ProfilesFolder~}/${fileName~}\ax"
+
+        joProfile:WriteFile["${ISB2.ProfilesFolder~}/${fileName~}",multiline]
     }
 }
 

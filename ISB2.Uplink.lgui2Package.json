@@ -511,6 +511,11 @@
                         "type":"method",
                         "object":"ISB2QuickSetup",
                         "method":"OnSelectedTabChanged"
+                    },
+                    "onFinished":{
+                        "type":"method",
+                        "object":"ISB2QuickSetup",
+                        "method":"Finish"
                     }
                 },
                 "pages":[

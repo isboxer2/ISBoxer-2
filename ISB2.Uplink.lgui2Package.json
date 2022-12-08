@@ -462,9 +462,9 @@
             "title":"ISBoxer 2: Quick Setup. This isn't even my final form!",
             "horizontalAlignment":"center",
             "verticalAlignment":"center",
-            "width":700,
-            "height":400,
-            "minSize":[700,400],
+            "width":800,
+            "height":600,
+            "minSize":[800,600],
             "visibility": "hidden",
             "content":{
                 "type":"pagecontrol",
@@ -522,14 +522,13 @@
                     {
                         "type":"page",
                         "header":"Game Selection",
-                            "eventHandlers":{
+                        "eventHandlers":{
                             "validatePage":{
                                 "type":"method",
                                 "object":"ISB2QuickSetup",
                                 "method":"ValidatePage",
                                 "args":["Game"]
                             }
-
                         },
                         "content":{
                             "type":"dockpanel",
@@ -816,6 +815,176 @@
                                 "method":"ValidatePage",
                                 "args":["TeamName"]
                             }
+                        }
+                    },
+                    {
+                        "type":"page",
+                        "header":"Window Layout",
+                        "content":{
+                            "type":"dockpanel",
+                            "horizontalAlignment":"stretch",
+                            "verticalAlignment":"stretch",
+                            "children":[
+                                {
+                                    "type":"expander",
+                                    "_dock":"top",
+                                    "header":"Region Generator Settings",
+                                    "content":{
+                                        "type":"objectview",
+                                        "horizontalAlignment":"stretch",
+                                        "height":200,
+                                        "objectBinding":{
+                                            "pullFormat":"${ISB2QuickSetup.RegionGeneratorSettings}"
+                                        },
+                                        "defunctProperties":[
+                                            {
+                                                "name":"Number of Slots",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.Get[numSlots]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetInteger[numSlots,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.textbox"
+                                            },
+                                            {
+                                                "name":"Number of Inactive Windows",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.Get[numInactiveWindows]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetInteger[numInactiveWindows,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.textbox"
+                                            }
+                                        ],
+                                        "properties": [
+                                            {
+                                                "name":"Generator",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.Get[generator]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetString[generator,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.textbox"          
+                                            },
+                                            {
+                                                "name":"Avoid Taskbar",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetBool[avoidTaskbar]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetBool[avoidTaskbar,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.checkbox"          
+                                            },
+                                            {
+                                                "name":"Leave Hole",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetBool[leaveHole]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetBool[leaveHole,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.checkbox"          
+                                            },
+                                            {
+                                                "name":"Edge",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.Get[edge]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetString[edge,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.textbox"          
+                                            },
+                                            {
+                                                "name":"Rows",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetInteger[rows]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetInteger[rows,\"","\"]"]
+                                                },
+                                                "controlData":{
+                                                    "textBindingUsesFocus":true
+                                                },
+                                                "editTemplate":"propertyview.textbox"
+                                            },
+                                            {
+                                                "name":"Columns",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetInteger[columns]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetInteger[columns,\"","\"]"]
+                                                },
+                                                "controlData":{
+                                                    "textBindingUsesFocus":true
+                                                },
+                                                "editTemplate":"propertyview.textbox"
+                                            },
+                                            {
+                                                "name":"Use Monitor",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetInteger[useMonitor]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetInteger[useMonitor,\"","\"]"]
+                                                },
+                                                "controlData":{
+                                                    "textBindingUsesFocus":true
+                                                },
+                                                "editTemplate":"propertyview.textbox"
+                                            }
+                                        ]    
+                                    }                                    
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"button",
+                                    "horizontalAlignment":"center",
+                                    "content":"Refresh Layouts",
+                                    "eventHandlers":{
+                                        "onPress":{
+                                            "type":"method",
+                                            "object":"ISB2QuickSetup",
+                                            "method":"RefreshWindowLayouts"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"combobox",
+                                    "horizontalAlignment":"stretch",
+                                    "itemsBinding":{
+                                        "pullFormat":"${ISB2QuickSetup.WindowLayouts}",
+                                        "pullHook": {
+                                            "elementName": "isb2.QuickSetupWindow",
+                                            "flags": "global",
+                                            "event": "onWindowLayoutsUpdated"
+                                        }
+                                    },
+                                    "itemViewGenerators":{
+                                        "default":{
+                                            "type":"template",
+                                            "template":"windowLayoutEngine.layoutView"
+                                        }
+                                    },
+                                    "popup":{
+                                        "jsonTemplate":"combobox.popup",
+                                        "content":{
+                                            "jsonTemplate":"combobox.popup.content",
+                                            "maxSize":[600,300],
+                                            "contentContainer":{
+                                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "type":"expander",
+                                    "_dock":"top",
+                                    "header":"Layout Behavior",
+                                    "content":{
+                                        "type":"objectview",
+                                        "horizontalAlignment":"stretch",
+                                        "height":200    
+                                    }
+                                }
+                            ]
                         }
                     }
                 ]

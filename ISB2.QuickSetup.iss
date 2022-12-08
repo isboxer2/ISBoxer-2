@@ -1,9 +1,16 @@
+#include "ISB2.WindowLayoutGenerators.iss"
+
 objectdef isb2_quicksetup
 {
     variable jsonvalueref EditingCharacter="{}"
     variable jsonvalueref Characters="[]"
 
     variable jsonvalueref GameLaunchInfo="[]"
+    variable jsonvalueref WindowLayoutSettings="{}"
+    variable jsonvalueref RegionGeneratorSettings="{}"
+
+    variable windowLayoutGenerators WindowLayoutGenerators
+    variable jsonvalueref WindowLayouts="[]"
 
     variable bool ExistingCharacter
 
@@ -13,6 +20,7 @@ objectdef isb2_quicksetup
 
     method Initialize()
     {
+        This:DetectMonitors
         This:GenerateGameLaunchInfo
     }
 
@@ -47,6 +55,22 @@ objectdef isb2_quicksetup
     method OnSelectedTabChanged()
     {
         Error:Set[]
+        echo "OnSelectedTabChanged: ${Context.Source(type)} ${Context.Source.ID} ${Context.Args~}"
+
+        switch ${Context.Source.SelectedTab.Header.Text}
+        {
+            case Game Selection
+                break
+            case Character Selection
+                LGUI2.Element[isb2.QuickSetup.EditingCharacter.name]:KeyboardFocus
+                break
+            case Window Layout
+                This:RefreshWindowLayouts
+                break
+            case Team Name
+                LGUI2.Element[isb2.QuickSetup.TeamName]:KeyboardFocus
+                break
+        }
     }
 
     member:uint FindCharacter(string name)
@@ -251,6 +275,164 @@ objectdef isb2_quicksetup
 
         joProfile:WriteFile["${ISB2.ProfilesFolder~}/${fileName~}",multiline]
     }
+
+    method DetectMonitors()
+    {
+        variable jsonvalue jaMonitors="[]"
+        variable uint i
+        for ( i:Set[1] ; ${i}<=${Display.Monitors} ; i:Inc)
+        {
+            jaMonitors:Add["${Display.Monitor[${i}].AsJSON~}"]
+        }
+
+        RegionGeneratorSettings:SetByRef[monitors,jaMonitors]
+    }
+
+    method AddLayout(string name, string generator, jsonvalueref inputData, jsonvalue regions)
+    {
+        variable jsonvalue jo="{}"
+
+        jo:SetString["name","${name~}"]
+        jo:SetString["generator","${generator~}"]
+        jo:Set["inputData","${inputData.AsJSON~}"]
+        jo:SetByRef["regions","regions"]    
+
+        WindowLayouts:AddByRef[jo]
+    }
+
+    method AddScreen(jsonvalueref ja, jsonvalueref joMonitor)
+    {
+        variable jsonvalue jo="{}"
+        
+        jo:SetString["itemType","screen"]
+        jo:SetString["name","${joMonitor.Get[name]~}"]
+        jo:SetInteger["left",${joMonitor.GetInteger[left]}]
+        jo:SetInteger["top",${joMonitor.GetInteger[top]}]
+        jo:SetInteger["width",${joMonitor.GetInteger[width]}]
+        jo:SetInteger["height",${joMonitor.GetInteger[height]}]
+
+        ja:AddByRef[jo]
+    }
+
+    method AddRegion(jsonvalueref ja, jsonvalueref joRegion)
+    {
+        variable jsonvalue jo="${joRegion.AsJSON~}"
+
+        if ${joRegion.Has[numLayout]}
+        {
+            jo:SetString["itemType","region${joRegion.GetInteger[numLayout]}"]
+        }
+        else
+        {
+            jo:SetString["itemType","region"]
+        }
+        ja:AddByRef[jo]
+    }    
+
+    method RefreshWindowLayouts()
+    {
+        echo "\ayRefreshWindowLayouts\ax"
+        WindowLayouts:SetReference["[]"]
+        variable jsonvalueref useData="RegionGeneratorSettings.Duplicate"
+        useData:SetInteger[numSlots,${Characters.Used}]
+        /*
+        useData:SetValue["$$>
+        {
+            "numSlots":5,
+            "useMonitor":1,
+            "monitors":[
+                ${Display.Monitor.AsJSON~}
+            ],
+            "avoidTaskbar":false,
+            "leaveHole":true,
+            "edge":"bottom",
+            "rows":4,
+            "columns":2
+        }
+        <$$"]
+        */
+
+        useData:SetString[edge,"bottom"]
+        This:AddLayout["Bottom","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+        useData:SetString[edge,"right"]
+        This:AddLayout["Right","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+        useData:SetString[edge,"top"]
+        This:AddLayout["Top","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+        useData:SetString[edge,"left"]
+        This:AddLayout["Left","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+
+        This:AddLayout["Stacked","Stacked",useData,"${WindowLayoutGenerators.Stacked.GenerateRegions["useData"]~}"]
+
+
+        This:AddLayout["Tile","Tile",useData,"${WindowLayoutGenerators.Tile.GenerateRegions["useData"]~}"]
+
+        This:AddLayout["Grid","Grid",useData,"${WindowLayoutGenerators.Grid.GenerateRegions["useData"]~}"]       
+
+        LGUI2.Element[isb2.QuickSetupWindow]:FireEventHandler[onWindowLayoutsUpdated]
+    }
+
+    member:jsonvalue GetLayoutPreviewExtents(jsonvalueref joLayout)
+    {
+        variable int left
+        variable int right
+        variable int top
+        variable int bottom
+
+        variable uint numMonitor
+
+        variable uint numMonitors
+
+        numMonitors:Set[${joLayout.Get[inputData,monitors].Used}]
+
+        variable jsonvalueref joMonitor
+
+        for (numMonitor:Set[1] ; ${numMonitor}<=${numMonitors} ; numMonitor:Inc)
+        {
+            joMonitor:SetReference["joLayout.Get[inputData,monitors,${numMonitor}]"]
+            if !${joMonitor.Reference(exists)}
+                break
+
+            if ${joMonitor.GetInteger[left]}<${left}
+                left:Set["${joMonitor.GetInteger[left]}"]
+            if ${joMonitor.GetInteger[top]}<${top}
+                top:Set["${joMonitor.GetInteger[top]}"]
+
+            if ${joMonitor.GetInteger[right]}>${right}
+                right:Set["${joMonitor.GetInteger[right]}"]
+            if ${joMonitor.GetInteger[bottom]}>${bottom}
+                bottom:Set["${joMonitor.GetInteger[bottom]}"]
+        }
+
+;        echo GetLayoutPreviewExtents "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
+        return "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
+    }
+
+    member:jsonvalueref GetLayoutPreviewItems(uint numLayout,lgui2elementref element)
+    {
+        variable jsonvalue ja="[]"
+
+        variable jsonvalueref joLayout
+        joLayout:SetReference["WindowLayouts.Get[${numLayout}]"]
+        if !${joLayout.Reference(exists)}
+            return NULL
+
+;        echo GetLayoutPreviewItems element=${element}
+        if ${element.Element(exists)}
+        {
+            variable jsonvalue jaExtents
+            jaExtents:SetValue["${This.GetLayoutPreviewExtents[joLayout]}"]
+
+            element:SetVirtualOrigin[${jaExtents.GetInteger[1]},${jaExtents.GetInteger[2]}]
+            element:SetVirtualSize[${jaExtents.GetInteger[3]},${jaExtents.GetInteger[4]}]
+        }
+
+        ; screens
+        joLayout.Get[inputData,monitors]:ForEach["This:AddScreen[ja,ForEach.Value]"]
+        ; regions
+        joLayout.Get[regions]:ForEach["This:AddRegion[ja,ForEach.Value]"]
+
+        return ja
+    }    
 }
 
 variable(global) isb2_quicksetup ISB2QuickSetup

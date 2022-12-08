@@ -1520,7 +1520,7 @@ objectdef isb2_profileengine
                 break
             case object
             case array
-                echo "ProcessVariableProperty[${varName~}] ${jo~}"
+;                echo "ProcessVariableProperty[${varName~}] ${jo~}"
                 This:ProcessVariableProperties["jo.Get[\"${varName~}\"]"]
                 break
         }

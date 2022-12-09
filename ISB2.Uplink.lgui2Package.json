@@ -456,6 +456,19 @@
                                                             "method":"OnLoadButton"
                                                         }
                                                     }
+                                                },
+                                                {
+                                                    "type":"button",
+                                                    "_dock":"top",
+                                                    "margin":[0,5,0,0],
+                                                    "content":"Quick Setup ...",
+                                                    "eventHandlers":{
+                                                        "onRelease":{
+                                                            "type":"method",
+                                                            "object":"ISB2QuickSetup",
+                                                            "method":"Start"
+                                                        }
+                                                    }
                                                 }
                                             ]
                                         },
@@ -500,9 +513,9 @@
             "horizontalAlignment":"center",
             "verticalAlignment":"center",
             "width":800,
-            "height":400,
-            "minSize":[800,400],
-            "visibility": "visible",
+            "height":500,
+            "minSize":[800,500],
+            "visibility": "hidden",
             "content":{
                 "type":"pagecontrol",
                 "horizontalAlignment":"stretch",
@@ -1024,9 +1037,21 @@
                                     },
                                     "popup":{
                                         "jsonTemplate":"combobox.popup",
+                                        "contentContainer":{
+                                            "type":"anchor",
+                                            "clipToParent":true,
+                                            "anchorMode":"element",
+                                            "anchorToElement":{
+                                                "elementType":"combobox",
+                                                "flags":"ancestor",
+                                                "elementTree":"logical"
+                                            },
+                                            "anchorOffset":[-20,-20]
+                                        },
                                         "content":{
                                             "jsonTemplate":"combobox.popup.content",
                                             "maxSize":[800,600],
+                                            "backgroundBrush":{"color":"#7f000000"},
                                             "contentContainer":{
                                                 "jsonTemplate":"listbox.contentContainerFitWidth"
                                             }

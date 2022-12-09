@@ -35,6 +35,22 @@ objectdef isb2_quicksetup
 
     }
 
+    method Start()
+    {
+        if !${LGUI2.Element[isb2.QuickSetupWindow].Visibility~.Equal[visible]}
+        {
+            TeamName:Set[]
+            Error:Set[]
+            Characters:Set["[]"]
+            EditingCharacter:Set["{}"]
+            WindowLayouts:Set["[]"]
+            WindowLayout:Set[NULL]
+            ExistingCharacter:Set[0]
+            LGUI2.Element[isb2.QuickSetupWindow]:SetVisibility[visible]
+        }
+        timed 0 "LGUI2.Element[isb2.QuickSetupWindow]:BubbleToTop"       
+    }
+
     method OnCharacterContextMenuSelection()
     {
         echo "Context Menu Selection: ${Context.Source(type)} ${Context.Source.Item["${Context.Args.GetInteger[index]}"].Data~} ${Context.Source.Context.Data~}"
@@ -318,9 +334,9 @@ objectdef isb2_quicksetup
             if !${joSettings.Has[focusFollowsMouse]}
                 joSettings:SetBool[focusFollowsMouse,1]
             if !${joSettings.Has[swapOnActivate]}
-                joSettings:SetString[swapOnActivate,0]
+                joSettings:SetBool[swapOnActivate,0]
             if !${joSettings.Has[swapOnHotkey]}
-                joSettings:SetString[swapOnHotkey,0]
+                joSettings:SetBool[swapOnHotkey,0]
             if !${joSettings.Has[swapMode]}
                 joSettings:SetString[swapMode,Never]
             
@@ -371,6 +387,9 @@ objectdef isb2_quicksetup
         echo "Writing new profile to \at${ISB2.ProfilesFolder~}/${fileName~}\ax"
 
         joProfile:WriteFile["${ISB2.ProfilesFolder~}/${fileName~}",multiline]
+
+        ISB2:LoadFile["${ISB2.ProfilesFolder~}/${fileName~}"]
+
     }
 
     method DetectMonitors()

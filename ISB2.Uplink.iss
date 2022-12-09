@@ -221,14 +221,14 @@ objectdef isb2 inherits isb2_profilecollection
     method OnImportButton()
     {
         ; select a file to import
-        LGUI2.Element[isb2.import.window]:SetVisibility[Visible]
+        LGUI2.Element[isb2.importWindow]:SetVisibility[Visible]
     }
 
     method OnImportWindowFinalized()
     {
         variable filepath fileName="${Context.Source.Value~}"
         echo "File selected for import: ${fileName~}"
-        LGUI2.Element[isb2.import.window]:SetVisibility[Hidden]
+        LGUI2.Element[isb2.importWindow]:SetVisibility[Hidden]
 
         Importer:TransformProfileXML["${fileName~}"]
 
@@ -237,7 +237,17 @@ objectdef isb2 inherits isb2_profilecollection
 
     method OnLoadButton()
     {
+        ; select a file to load
+        LGUI2.Element[isb2.loadWindow]:SetVisibility[Visible]
+    }
 
+    method OnLoadWindowFinalized()
+    {
+        variable filepath fileName="${Context.Source.Value~}"
+        echo "File selected for load: ${fileName~}"
+        LGUI2.Element[isb2.loadWindow]:SetVisibility[Hidden]
+
+        This:LoadFile["${fileName~}"]
     }
 }
 

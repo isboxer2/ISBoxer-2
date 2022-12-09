@@ -111,7 +111,7 @@
             "width":400,
             "height":600,
             "title":"ISBoxer 2: ISBoxer Toolkit Profile Importer",
-            "name":"isb2.import.window",
+            "name":"isb2.importWindow",
             "visibility":"hidden",
             "hideOnClose":true,
             "strata":0.6,
@@ -139,6 +139,43 @@
                 ]            
             }
         },
+        {
+            "type":"window",
+            "width":400,
+            "height":600,
+            "title":"ISBoxer 2: Load ISBoxer 2 Profile",
+            "name":"isb2.loadWindow",
+            "visibility":"hidden",
+            "hideOnClose":true,
+            "strata":0.6,
+            "content":{
+                "type":"dockpanel",
+                "horizontalAlignment":"stretch",
+                "verticalAlignment":"stretch",
+                "children":[
+                    {
+                        "type":"filepicker",
+                        "_dock":"top",
+                        "horizontalAlignment":"stretch",
+                        "verticalAlignment":"stretch",
+                        "requireExisting":true,
+                        "wildcard":"*.isb2.json",
+                        "path":"%USERPROFILE%/Documents",
+                        "eventHandlers":{
+                            "onVisualAttached":{
+                                "type":"code",
+                                "code":"This:SetPath[\"${ISB2.ProfilesFolder~}\"]"
+                            },
+                            "onFinalized":{
+                                "type": "method",
+                                "object":"ISB2",
+                                "method":"OnLoadWindowFinalized"
+                            }
+                        }
+                    }
+                ]            
+            }
+        },        
         {
             "type":"window",
             "visibility":"hidden",

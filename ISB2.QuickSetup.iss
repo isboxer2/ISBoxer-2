@@ -12,6 +12,8 @@ objectdef isb2_quicksetup
     variable windowLayoutGenerators WindowLayoutGenerators
     variable jsonvalueref WindowLayouts="[]"
 
+    variable jsonvalueref WindowLayout
+
     variable bool ExistingCharacter
 
     variable string TeamName
@@ -20,6 +22,10 @@ objectdef isb2_quicksetup
 
     method Initialize()
     {
+        WindowLayoutSettings:SetBool[instantSwap,1]
+        WindowLayoutSettings:SetBool[swapOnActivate,1]
+        WindowLayoutSettings:SetBool[swapOnHotkey,1]
+
         This:DetectMonitors
         This:GenerateGameLaunchInfo
     }
@@ -71,6 +77,12 @@ objectdef isb2_quicksetup
                 LGUI2.Element[isb2.QuickSetup.TeamName]:KeyboardFocus
                 break
         }
+    }
+
+    method OnSelectedWindowLayoutChanged()
+    {
+        echo "\ayOnSelectedWindowLayoutChanged\ax: ${Context.Source(type)} ${Context.Source.ID} ${Context.Source.SelectedItem.Data~}"
+        WindowLayout:SetReference[Context.Source.SelectedItem.Data]
     }
 
     member:uint FindCharacter(string name)
@@ -184,6 +196,7 @@ objectdef isb2_quicksetup
                 if ${ISB2.ProfilesFolder.FileExists["${fileName~}"]}
                 {
                     Error:Set["Profile ${fileName~} already exists"]
+                    LGUI2.Element[isb2.QuickSetup.TeamName]:KeyboardFocus
                     Context.Args:SetBool[pageValid,0]
                     return
                 }
@@ -244,6 +257,79 @@ objectdef isb2_quicksetup
         jo:Erase[_gameLaunchInfo]
     }
 
+    method ConvertLayoutRegion(jsonvalueref jo)
+    {
+        if ${jo.Has[x]}
+        {
+            jo:Set[bounds,"[${jo.GetInteger[x]},${jo.GetInteger[y]},${jo.GetInteger[width]},${jo.GetInteger[height]}]"]
+            jo:Erase[x]
+            jo:Erase[y]
+            jo:Erase[width]
+            jo:Erase[height]
+        }
+
+        if ${jo.Has[numRegion]}
+        {            
+            jo:SetInteger[slot,${jo.GetInteger[numRegion]}]
+            jo:Erase[numRegion]
+        }
+
+        jo:Erase[mainRegion]
+    }
+
+    member:jsonvalueref GetFinalWindowLayout()
+    {
+        if !${WindowLayout.Reference(exists)}
+            return NULL
+
+        variable jsonvalue jo
+        jo:SetValue["{}"]
+
+        jo:SetString[name,"${TeamName~}"]
+        jo:SetByRef[regions,"WindowLayout.Get[regions]"]
+        jo.Get[regions]:ForEach["This:ConvertLayoutRegion[ForEach.Value]"]    
+
+        variable jsonvalueref joSettings
+        joSettings:SetReference["WindowLayout.Get[settings]"]
+        
+        if !${joSettings.Has[frame]}
+            joSettings:SetString[frame,none]
+
+        if !${joSettings.Has[instantSwap]}
+            joSettings:SetBool[instantSwap,${WindowLayoutSettings.GetBool[-default,true,instantSwap]}]
+
+        if ${joSettings.Has[swapGroups]}        
+        {
+            if ${WindowLayoutSettings.GetBool[-default,true,swapOnActivate]}
+            {
+                joSettings:SetBool[swapOnActivate,1]
+                joSettings:SetString[swapMode,AlwaysForGames]
+            }
+            elseif ${WindowLayoutSettings.GetBool[-default,true,swapOnHotkey]}
+            {
+                joSettings:SetBool[swapOnHotkey,1]
+            }
+
+            jo:SetByRef[swapGroups,"joSettings.Get[swapGroups]"]
+            joSettings:Erase[swapGroups]
+        }
+        else
+        {
+            if !${joSettings.Has[focusFollowsMouse]}
+                joSettings:SetBool[focusFollowsMouse,1]
+            if !${joSettings.Has[swapOnActivate]}
+                joSettings:SetString[swapOnActivate,0]
+            if !${joSettings.Has[swapOnHotkey]}
+                joSettings:SetString[swapOnHotkey,0]
+            if !${joSettings.Has[swapMode]}
+                joSettings:SetString[swapMode,Never]
+            
+        }
+
+        jo:SetByRef[settings,joSettings]
+        return jo
+    }
+
     method Finish()
     {
         echo "\ayisb2_quicksetup:Finish\ax"     
@@ -268,6 +354,17 @@ objectdef isb2_quicksetup
         joProfile.Get[teams]:AddByRef[joTeam]
         joProfile:SetByRef[characters,Characters]
 
+        variable jsonvalueref joWindowLayout
+        if ${WindowLayout.Reference(exists)}
+        {
+            joWindowLayout:SetReference[This.GetFinalWindowLayout]
+            if ${joWindowLayout.Reference(exists)}
+            {
+                joProfile:Set[windowLayouts,"[]"]
+                joTeam:SetString[windowLayout,"${joWindowLayout.Get[name]~}"]
+                joProfile.Get[windowLayouts]:AddByRef[joWindowLayout]
+            }
+        }
 
         variable string fileName
         fileName:Set["Team.${This.GetSanitizedName["${TeamName~}"]}.isb2.json"]
@@ -288,16 +385,34 @@ objectdef isb2_quicksetup
         RegionGeneratorSettings:SetByRef[monitors,jaMonitors]
     }
 
-    method AddLayout(string name, string generator, jsonvalueref inputData, jsonvalue regions)
+    member:bool HasLayout(jsonvalueref regions)
     {
+        variable jsonvalue joQuery="{\"op\":\"==\"}"
+        joQuery:SetByRef[value,"regions"]
+        joQuery:SetString[eval,"Select.Get[regions]"]
+
+;        echo "using query=${joQuery~}"
+
+        return ${WindowLayouts.SelectKey[joQuery]}
+    }
+
+    method AddLayout(string name, string generator, jsonvalueref inputData, jsonvalueref regions, jsonvalueref joSettings)
+    {
+        if !${regions.Type.Equal[array]} || !${regions.Used}
+            return FALSE
+        if ${This.HasLayout[regions]}
+            return FALSE
+
         variable jsonvalue jo="{}"
 
         jo:SetString["name","${name~}"]
         jo:SetString["generator","${generator~}"]
-        jo:Set["inputData","${inputData.AsJSON~}"]
-        jo:SetByRef["regions","regions"]    
+        jo:SetByRef["inputData","inputData.Duplicate"]
+        jo:SetByRef["regions","regions"]
+        jo:SetByRef[settings,joSettings]
 
         WindowLayouts:AddByRef[jo]
+        return TRUE
     }
 
     method AddScreen(jsonvalueref ja, jsonvalueref joMonitor)
@@ -329,6 +444,90 @@ objectdef isb2_quicksetup
         ja:AddByRef[jo]
     }    
 
+    method AddGeneratedLayouts(string name, string generator, jsonvalueref _useData)
+    {
+        if !${_useData.Type.Equal[object]}
+            return
+        variable jsonvalueref useData
+        useData:SetReference[_useData.Duplicate]
+
+        variable weakref useGenerator
+        useGenerator:SetReference["WindowLayoutGenerators.GetGenerator[\"${generator~}\"]"]
+
+
+        variable(static) uint numCalls
+        numCalls:Inc
+;        echo "AddGeneratedLayouts[${numCalls}] ${name~} ${generator~}"
+
+        This:AddLayout["${name~}","${generator~}",useData,"useGenerator.GenerateRegions[useData]","useGenerator.GenerateSettings[useData]"]
+
+        if !${useData.Has[-notnull,avoidTaskbar]}
+        {
+            useData:SetBool[avoidTaskbar,0]
+            This:AddGeneratedLayouts["${name~} (cover taskbar)","${generator~}",useData]
+            useData:SetBool[avoidTaskbar,1]
+            This:AddGeneratedLayouts["${name~} (avoid taskbar)","${generator~}",useData]
+        }
+
+        if !${useData.Has[-notnull,leaveHole]}
+        {
+            useData:SetBool[leaveHole,0]
+            This:AddGeneratedLayouts["${name~} (no hole)","${generator~}",useData]
+            useData:SetBool[leaveHole,1]
+            This:AddGeneratedLayouts["${name~} (leave hole)","${generator~}",useData]
+        }
+        
+        if ${useGenerator.Uses.Contains[edge]} && (!${useData.Has[-string,edge]} || !${useData.Get[edge].NotNULLOrEmpty})
+        {
+            useData:SetString[edge,"bottom"]
+            This:AddGeneratedLayouts["${name~} (bottom)","${generator~}",useData]
+            useData:SetString[edge,"right"]
+            This:AddGeneratedLayouts["${name~} (right)","${generator~}",useData]
+            useData:SetString[edge,"top"]
+            This:AddGeneratedLayouts["${name~} (top)","${generator~}",useData]
+            useData:SetString[edge,"left"]
+            This:AddGeneratedLayouts["${name~} (left)","${generator~}",useData]
+        }
+
+        variable uint row
+        variable uint col
+
+        if ${useGenerator.Uses.Contains[rows]} && !${useData.GetInteger[rows]} && !${useData.GetInteger[columns]}
+        {
+            for (row:Set[2] ; ${row}<=${Characters.Used} ; row:Inc)
+            {
+                useData:SetInteger[rows,${row}]
+                for (col:Set[2] ; ${col}<=${Characters.Used} ; col:Inc)
+                {
+                    if ${row}*${col} >= ${Characters.Used}
+                    {                    
+                        useData:SetInteger[columns,${col}]      
+;                        This:AddLayout["${name~} (${col}x${row})","${generator~}",useData,"WindowLayoutGenerators.GetGenerator[\"${generator~}\"].GenerateRegions[useData]"]              
+                        This:AddGeneratedLayouts["${name~} (${col}x${row})","${generator~}",useData]
+                    }
+                }
+            }            
+        }
+
+        /*
+        useData:SetString[edge,"bottom"]
+        This:AddLayout["Bottom","Edge",useData,"WindowLayoutGenerators.Edge.GenerateRegions["useData"]"]
+        useData:SetString[edge,"right"]
+        This:AddLayout["Right","Edge",useData,"WindowLayoutGenerators.Edge.GenerateRegions["useData"]"]
+        useData:SetString[edge,"top"]
+        This:AddLayout["Top","Edge",useData,"WindowLayoutGenerators.Edge.GenerateRegions["useData"]"]
+        useData:SetString[edge,"left"]
+        This:AddLayout["Left","Edge",useData,"WindowLayoutGenerators.Edge.GenerateRegions["useData"]"]
+
+        This:AddLayout["Stacked","Stacked",useData,"WindowLayoutGenerators.Stacked.GenerateRegions["useData"]"]
+
+
+        This:AddLayout["Tile","Tile",useData,"WindowLayoutGenerators.Tile.GenerateRegions["useData"]"]
+
+        This:AddLayout["Grid","Grid",useData,"WindowLayoutGenerators.Grid.GenerateRegions["useData"]"]       
+        /**/
+    }
+
     method RefreshWindowLayouts()
     {
         echo "\ayRefreshWindowLayouts\ax"
@@ -352,21 +551,24 @@ objectdef isb2_quicksetup
         <$$"]
         */
 
+        /*
         useData:SetString[edge,"bottom"]
-        This:AddLayout["Bottom","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+        This:AddGeneratedLayouts["Bottom","Edge",useData]
         useData:SetString[edge,"right"]
-        This:AddLayout["Right","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+        This:AddGeneratedLayouts["Right","Edge",useData]
         useData:SetString[edge,"top"]
-        This:AddLayout["Top","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+        This:AddGeneratedLayouts["Top","Edge",useData]
         useData:SetString[edge,"left"]
-        This:AddLayout["Left","Edge",useData,"${WindowLayoutGenerators.Edge.GenerateRegions["useData"]~}"]
+        This:AddGeneratedLayouts["Left","Edge",useData]
+        /**/
 
-        This:AddLayout["Stacked","Stacked",useData,"${WindowLayoutGenerators.Stacked.GenerateRegions["useData"]~}"]
+        This:AddGeneratedLayouts["Edge","Edge",useData]
+        This:AddGeneratedLayouts["Stacked","Stacked",useData]
 
 
-        This:AddLayout["Tile","Tile",useData,"${WindowLayoutGenerators.Tile.GenerateRegions["useData"]~}"]
+        This:AddGeneratedLayouts["Tile","Tile",useData]
 
-        This:AddLayout["Grid","Grid",useData,"${WindowLayoutGenerators.Grid.GenerateRegions["useData"]~}"]       
+        This:AddGeneratedLayouts["Grid","Grid",useData]       
 
         LGUI2.Element[isb2.QuickSetupWindow]:FireEventHandler[onWindowLayoutsUpdated]
     }
@@ -407,14 +609,18 @@ objectdef isb2_quicksetup
         return "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
     }
 
-    member:jsonvalueref GetLayoutPreviewItems(uint numLayout,lgui2elementref element)
+    member:jsonvalueref GetLayoutPreviewItems(lgui2elementref element)
     {
         variable jsonvalue ja="[]"
 
+;        echo "\ayGetLayoutPreviewItems\ax: element=${element.ID} context=${element.Context~}"
         variable jsonvalueref joLayout
-        joLayout:SetReference["WindowLayouts.Get[${numLayout}]"]
+        joLayout:SetReference[element.Context]
         if !${joLayout.Reference(exists)}
+        {
+;            echo "\ayGetLayoutPreviewItems\ax: NULL"
             return NULL
+        }
 
 ;        echo GetLayoutPreviewItems element=${element}
         if ${element.Element(exists)}
@@ -431,6 +637,7 @@ objectdef isb2_quicksetup
         ; regions
         joLayout.Get[regions]:ForEach["This:AddRegion[ja,ForEach.Value]"]
 
+;        echo "\ayGetLayoutPreviewItems\ax: ${ja~}"
         return ja
     }    
 }

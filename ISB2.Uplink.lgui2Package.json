@@ -463,13 +463,24 @@
             "horizontalAlignment":"center",
             "verticalAlignment":"center",
             "width":800,
-            "height":600,
-            "minSize":[800,600],
-            "visibility": "hidden",
+            "height":400,
+            "minSize":[800,400],
+            "visibility": "visible",
             "content":{
                 "type":"pagecontrol",
                 "horizontalAlignment":"stretch",
                 "verticalAlignment":"stretch",
+                "contentContainer": {
+                    "jsonTemplate": "scrollviewer",
+                    "type": "scrollviewer",
+                    "horizontalScroll": "fit",
+                    "acceptsMouseFocus": false,
+                    "contentContainer": {
+                      "type": "border",
+                      "margin": 1,
+                      "horizontalContentAlignment": "stretch"
+                    }
+                  },
                 "headerContainer":{
                     "jsonTemplate":"pagecontrol.headerContainer",
                     "overlay":{
@@ -533,7 +544,6 @@
                         "content":{
                             "type":"dockpanel",
                             "horizontalAlignment":"stretch",
-                            "verticalAlignment":"stretch",
                             "children":[
                                 {
                                     "_dock":"top",
@@ -580,7 +590,6 @@
                         "content":{
                             "type":"dockpanel",
                             "horizontalAlignment":"stretch",
-                            "verticalAlignment":"stretch",
                             "padding":5,
                             "children":[
                                 {
@@ -612,7 +621,7 @@
                                             "contentContainer":{
                                                 "jsonTemplate":"listbox.contentContainerFitWidth"
                                             },
-                                            "verticalAlignment":"stretch",
+                                            "minSize":[0,200],
                                             "horizontalAlignment":"stretch",
                                             "itemsBinding":{
                                                 "pullFormat":"${ISB2QuickSetup.Characters}",
@@ -651,11 +660,11 @@
                                 {
                                     "_dock":"top",
                                     "type":"expander",
+                                    "margin":[0,5,0,0],
                                     "header":"Manual Entry",
                                     "content":{
                                         "type":"dockpanel",
                                         "horizontalAlignment":"stretch",
-                                        "verticalAlignment":"stretch",
                                         "children":[
                                             {
                                                 "type":"button",
@@ -675,7 +684,6 @@
                                                 "type":"objectview",
                                                 "name":"isb2.QuickSetup.Character",
                                                 "_dock":"top",
-                                                "verticalAlignment":"stretch",
                                                 "horizontalAlignment":"stretch",
                                                 "objectBinding":{
                                                     "pullFormat":"${ISB2QuickSetup.EditingCharacter}"
@@ -786,7 +794,6 @@
                         "content":{
                             "type":"dockpanel",
                             "horizontalAlignment":"stretch",
-                            "verticalAlignment":"stretch",
                             "children":[
                                 {
                                     "_dock":"top",
@@ -823,7 +830,6 @@
                         "content":{
                             "type":"dockpanel",
                             "horizontalAlignment":"stretch",
-                            "verticalAlignment":"stretch",
                             "children":[
                                 {
                                     "type":"expander",
@@ -832,7 +838,6 @@
                                     "content":{
                                         "type":"objectview",
                                         "horizontalAlignment":"stretch",
-                                        "height":200,
                                         "objectBinding":{
                                             "pullFormat":"${ISB2QuickSetup.RegionGeneratorSettings}"
                                         },
@@ -871,7 +876,11 @@
                                                 "dataBinding":{
                                                     "pullFormat":"${This.ObjectView.Object.GetBool[avoidTaskbar]}",
                                                     "pullReplaceNull":"",
-                                                    "pushFormat":["This.ObjectView.Object:SetBool[avoidTaskbar,\"","\"]"]
+                                                    "pushFormat":["This.ObjectView.Object:Set[avoidTaskbar,\"","\"]"]
+                                                },
+                                                "controlData":{
+                                                    "useIndeterminate":true,
+                                                    "pushAsBool":true
                                                 },
                                                 "editTemplate":"propertyview.checkbox"          
                                             },
@@ -880,7 +889,11 @@
                                                 "dataBinding":{
                                                     "pullFormat":"${This.ObjectView.Object.GetBool[leaveHole]}",
                                                     "pullReplaceNull":"",
-                                                    "pushFormat":["This.ObjectView.Object:SetBool[leaveHole,\"","\"]"]
+                                                    "pushFormat":["This.ObjectView.Object:Set[leaveHole,\"","\"]"]
+                                                },
+                                                "controlData":{
+                                                    "useIndeterminate":true,
+                                                    "pushAsBool":true
                                                 },
                                                 "editTemplate":"propertyview.checkbox"          
                                             },
@@ -937,6 +950,7 @@
                                     "type":"button",
                                     "horizontalAlignment":"center",
                                     "content":"Refresh Layouts",
+                                    "margin":10,
                                     "eventHandlers":{
                                         "onPress":{
                                             "type":"method",
@@ -948,6 +962,7 @@
                                 {
                                     "_dock":"top",
                                     "type":"combobox",
+                                    "name":"isb2.QuickSetup.WindowLayout",
                                     "horizontalAlignment":"stretch",
                                     "itemsBinding":{
                                         "pullFormat":"${ISB2QuickSetup.WindowLayouts}",
@@ -957,17 +972,24 @@
                                             "event": "onWindowLayoutsUpdated"
                                         }
                                     },
+                                    "eventHandlers":{
+                                        "onSelectionChanged":{
+                                            "type":"method",
+                                            "object":"ISB2QuickSetup",
+                                            "method":"OnSelectedWindowLayoutChanged"
+                                        }
+                                    },
                                     "itemViewGenerators":{
                                         "default":{
                                             "type":"template",
-                                            "template":"windowLayoutEngine.layoutView"
+                                            "template":"windowLayoutEngine.layoutListView"
                                         }
                                     },
                                     "popup":{
                                         "jsonTemplate":"combobox.popup",
                                         "content":{
                                             "jsonTemplate":"combobox.popup.content",
-                                            "maxSize":[600,300],
+                                            "maxSize":[800,600],
                                             "contentContainer":{
                                                 "jsonTemplate":"listbox.contentContainerFitWidth"
                                             }
@@ -978,10 +1000,134 @@
                                     "type":"expander",
                                     "_dock":"top",
                                     "header":"Layout Behavior",
+                                    "margin":[0,10,0,0],
                                     "content":{
                                         "type":"objectview",
                                         "horizontalAlignment":"stretch",
-                                        "height":200    
+                                        "objectBinding":{
+                                            "pullFormat":"${ISB2QuickSetup.WindowLayoutSettings}"
+                                        },
+                                        "properties": [
+                                            {
+                                                "name":"Focus Follows Mouse",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetBool[focusFollowsMouse]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetBool[focusFollowsMouse,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.checkbox"          
+                                            },
+                                            {
+                                                "name":"Instant Swapping",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetBool[instantSwap]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetBool[instantSwap,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.checkbox"          
+                                            },
+                                            {
+                                                "name":"Swap windows on any activation",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetBool[swapOnActivate]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetBool[swapOnActivate,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.checkbox"          
+                                            },
+                                            {
+                                                "name":"Swap windows on Hotkey",
+                                                "dataBinding":{
+                                                    "pullFormat":"${This.ObjectView.Object.GetBool[swapOnHotkey]}",
+                                                    "pullReplaceNull":"",
+                                                    "pushFormat":["This.ObjectView.Object:SetBool[swapOnHotkey,\"","\"]"]
+                                                },
+                                                "editTemplate":"propertyview.checkbox"          
+                                            }
+                                        ]                                        
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "type":"page",
+                        "header":"Review",
+                        "content":{
+                            "type":"dockpanel",
+                            "horizontalAlignment":"stretch",
+                            "children":[
+                                {
+                                    "_dock":"top",
+                                    "type":"textblock",
+                                    "text":"Review your Team configuration",
+                                    "font":{
+                                        "heightFactor":1.4,
+                                        "bold":true
+                                    },
+                                    "margin":[0,0,0,5]
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"stackpanel",
+                                    "orientation":"horizontal",
+                                    "children":[
+                                        {
+                                            "type":"textblock",
+                                            "text":"Team Name: "
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "text":"${ISB2QuickSetup.TeamName}",
+                                            "font":{
+                                                "bold":true
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"expander",
+                                    "header":"Characters (${ISB2QuickSetup.Characters.Used})",
+                                    "content":"This is a decoy"
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"stackpanel",
+                                    "orientation":"horizontal",
+                                    "children":[
+                                        {
+                                            "type":"textblock",
+                                            "text":"Window Layout: "
+                                        },
+                                        {
+                                            "type":"textblock",
+                                            "textBinding":{
+                                                "pullFormat":"${ISB2QuickSetup.WindowLayout.Get[name]}",
+                                                "pullReplaceNull":"None"
+                                            },
+                                            "font":{
+                                                "bold":true
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"expander",
+                                    "header":"Preview",
+                                    "content":{
+                                        "jsonTemplate":"windowLayoutEngine.layoutPreview",
+                                        "height":200,
+                                        "horizontalAlignment":"stretch",
+                                        "contextBinding":{
+                                            "pullFormat":"${ISB2QuickSetup.WindowLayout}",
+                                            "pullHook":{
+                                                "elementName":"isb2.QuickSetup.WindowLayout",
+                                                "flags": "global",
+                                                "event": "onSelectionChanged"
+                                            }                                        
+                                        }    
                                     }
                                 }
                             ]

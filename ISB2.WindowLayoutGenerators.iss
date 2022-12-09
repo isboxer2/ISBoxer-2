@@ -2,8 +2,19 @@ objectdef windowLayoutGenerator
 {
     variable string Name="Unnamed Window Layout"
     variable string Description="Fails to generate a Window Layout"
+    variable set Uses
 
     member:jsonvalueref GenerateRegions(jsonvalueref joInput)
+    {
+        return NULL
+    }
+
+    member:jsonvalueref GenerateSettings(jsonvalueref joInput)
+    {
+        return NULL
+    }
+
+    member:jsonvalueref GenerateLayout(jsonvalueref joInput)
     {
         return NULL
     }
@@ -32,6 +43,11 @@ objectdef windowLayoutGenerators
         Generators:Set["${ScreenPer~}",ScreenPer]
         Generators:Set["${Tile~}",Tile]
         Generators:Set["${Grid~}",Grid]
+
+        Uses:Add[monitors]
+        Uses:Add[useMonitor]
+        Uses:Add[avoidTaskbar]
+
 ;        Generators:Set["${Horizontal~}",Horizontal]
 ;        Generators:Set["${Vertical~}",Vertical]
     }
@@ -85,9 +101,46 @@ objectdef windowLayoutGenerator_Common inherits windowLayoutGenerator
         return NULL
     }
 
+    method GenerateSettings_Subclass(jsonvalueref joInput, jsonvalueref joSettings)
+    {
+
+    }
+
+
+    member:jsonvalueref GenerateSettings(jsonvalueref joInput)
+    {
+        variable jsonvalueref joSettings="{}"
+        if ${numInactiveRegions} < ${numSlots}
+        {
+            joSettings:SetInteger[roamingSlot,1]
+        }
+
+        This:GenerateSettings_Subclass[joInput,joSettings]
+        return joSettings
+    }
+
+    member:jsonvalueref GenerateLayout(jsonvalueref joInput)
+    {
+        variable jsonvalueref jaRegions="This.GenerateRegions[joInput]"
+
+        if !${jaRegions.Reference(exists)}
+            return NULL
+
+        variable jsonvalue joLayout
+        joLayout:SetValue["{}"]
+        joLayout:SetByRef[regions,jaRegions]
+
+        variable jsonvalueref joSettings
+        joSettings:SetReference["This.GenerateSettings[joInput]"]
+        if ${joSettings.Reference(exists)}
+            joLayout:SetByRef[settings,joSettings]
+
+        return joLayout
+    }
+
     member:jsonvalueref GenerateRegions(jsonvalueref joInput)
     {
-        echo "GenerateRegions ${joInput~}"
+;        echo "GenerateRegions ${joInput~}"
         variable jsonvalue ja
         useMonitor:Set[${joInput.GetInteger[useMonitor]}]
         
@@ -292,11 +345,20 @@ objectdef windowLayoutGenerator_Stacked inherits windowLayoutGenerator_Common
         Description:Set["Generates a layout where all windows are stacked on top of each other in the same place (for example, full screen)"]
     }
 
+
+    method GenerateSettings_Subclass(jsonvalueref joInput, jsonvalueref joSettings)
+    {
+        joSettings:SetBool[focusFollowsMouse,0]
+        joSettings:SetBool[swapOnActivate,0]
+        joSettings:SetString[swapMode,Never]
+    }
+
     member:jsonvalueref GenerateRegions_Subclass(jsonvalueref joInput)
     {
         variable jsonvalue ja="[]"
         variable jsonvalue joRegion
 
+        /*
         ; main region
         joRegion:SetValue["$$>
             {
@@ -310,6 +372,7 @@ objectdef windowLayoutGenerator_Stacked inherits windowLayoutGenerator_Common
         <$$"]
 
         ja:Add["${joRegion~}"]
+        /**/
 
         variable uint numSlot
 
@@ -337,6 +400,12 @@ objectdef windowLayoutGenerator_Edge inherits windowLayoutGenerator_Common
     {
         Name:Set[Edge]
         Description:Set["Generates a standard layout with small regions along an edge of the screen"]
+        Uses:Add[edge]
+    }
+
+    method GenerateSettings_Subclass(jsonvalueref joInput, jsonvalueref joSettings)
+    {
+        joSettings:Set[swapGroups,"{\"reset\":1,\"active\":1}"]
     }
 
     member:jsonvalueref GenerateRegions_Subclass(jsonvalueref joInput)
@@ -504,6 +573,13 @@ objectdef windowLayoutGenerator_Tile inherits windowLayoutGenerator_Common
         Description:Set["Generates a layout where all windows are tiled"]
     }
 
+    method GenerateSettings_Subclass(jsonvalueref joInput, jsonvalueref joSettings)
+    {
+        joSettings:SetBool[focusFollowsMouse,1]
+        joSettings:SetBool[swapOnActivate,0]
+        joSettings:SetString[swapMode,Never]
+    }
+
     member:uint GetSquareSize(uint numRegions)
     {
         ; find the best square
@@ -586,6 +662,15 @@ objectdef windowLayoutGenerator_Grid inherits windowLayoutGenerator_Common
     {
         Name:Set[Grid]
         Description:Set["Generates a layout where all windows are tiled within a specified grid"]
+        Uses:Add[columns]
+        Uses:Add[rows]
+    }
+
+    method GenerateSettings_Subclass(jsonvalueref joInput, jsonvalueref joSettings)
+    {
+        joSettings:SetBool[focusFollowsMouse,1]
+        joSettings:SetBool[swapOnActivate,0]
+        joSettings:SetString[swapMode,Never]
     }
 
     member:jsonvalueref GenerateRegions_Subclass(jsonvalueref joInput)
@@ -596,10 +681,8 @@ objectdef windowLayoutGenerator_Grid inherits windowLayoutGenerator_Common
 
         variable uint gridSizeX=${joInput.GetInteger[columns]}
         variable uint gridSizeY=${joInput.GetInteger[rows]}
-        if ${gridSizeX}<1
-            gridSizeX:Set[1]
-        if ${gridSizeY}<1
-            gridSizeY:Set[1]
+        if ${gridSizeX}<1 || ${gridSizeY}<1
+            return NULL
         
 ;        echo Grid size ${gridSizeX}x${gridSizeY}
 

@@ -13,6 +13,7 @@ objectdef isb2_profile
     variable jsonvalueref Metadata
 
     variable jsonvalueref Profiles=[]
+    variable jsonvalueref Builders=[]
     variable jsonvalueref Teams=[]
     variable jsonvalueref Characters=[]
     variable jsonvalueref BroadcastProfiles=[]
@@ -57,6 +58,8 @@ objectdef isb2_profile
 
         if ${jo.Has[metadata]}
             Metadata:SetReference["jo.Get[metadata]"]
+        if ${jo.Has[builders]}
+            Builders:SetReference["jo.Get[builders]"]
         if ${jo.Has[profiles]}
             Profiles:SetReference["jo.Get[profiles]"]
         if ${jo.Has[teams]}
@@ -114,6 +117,8 @@ objectdef isb2_profile
             jo:Set["description",Description]
         if ${Metadata.Type.Equal[object]}
             jo:SetByRef["metadata","Metadata"]
+        if ${Builders.Used}
+            jo:SetByRef["builders",Builders]
         if ${Profiles.Used}
             jo:SetByRef["profiles",Profiles]
         if ${Teams.Used}
@@ -318,7 +323,6 @@ objectdef isb2_profilecollection
         Profiles:ForEach["ForEach.Value.${arrayName~}:ForEach[\"ja:AddByRef[ForEach.Value]\"]"]
 
         return ja
-
     }
 
     member:jsonvalueref FindOne(string arrayName,string objectName, string preferProfile="")
@@ -361,6 +365,60 @@ objectdef isb2_profilecollection
         while ${Iterator:Next(exists)}
 
         return foundObject
+    }
+
+    member:jsonvalueref NewLocated(string profileName, jsonvalueref jo)
+    {
+        variable jsonvalue joLocated="{}"
+
+        joLocated:SetString[profile,"${profileName~}"]
+        joLocated:SetByRef[object,jo]
+        return joLocated
+    }
+
+    method AddNewLocated(jsonvalueref ja, string profileName, jsonvalueref jo)
+    {
+        ja:AddByRef["This.NewLocated[\"${profileName~}\",jo]"]
+    }
+
+    member:jsonvalueref LocateAll(string arrayName,string objectName)
+    {
+        variable jsonvalue result="[]"
+
+        variable jsonvalueref checkObject
+
+        variable iterator Iterator
+        Profiles:GetIterator[Iterator]
+
+        if ${objectName.NotNULLOrEmpty}
+        {
+            if !${Iterator:First(exists)}
+                return NULL
+
+            do
+            {            
+                checkObject:SetReference["Iterator.Value.FindOne[\"${arrayName~}\",\"${objectName~}\"]"]
+                if ${checkObject.Type.Equal[object]}
+                {
+                    result:AddByRef["This.NewLocated[\"${Iterator.Key~}\",checkObject]"]
+                }
+            }
+            while ${Iterator:Next(exists)}
+        }
+        else
+        {
+            if !${Iterator:First(exists)}
+                return NULL
+
+            do
+            {            
+                checkObject:SetReference["Iterator.Value.${arrayName~}"]
+                checkObject:ForEach["This:AddNewLocated[result,\"${Iterator.Key~}\",ForEach.Value]"]                                
+            }
+            while ${Iterator:Next(exists)}
+        }
+
+        return result        
     }
 
     member:jsonvalueref Locate(string arrayName,string objectName, string preferProfile="")

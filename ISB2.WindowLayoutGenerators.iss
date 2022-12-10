@@ -110,10 +110,6 @@ objectdef windowLayoutGenerator_Common inherits windowLayoutGenerator
     member:jsonvalueref GenerateSettings(jsonvalueref joInput)
     {
         variable jsonvalueref joSettings="{}"
-        if ${numInactiveRegions} < ${numSlots}
-        {
-            joSettings:SetInteger[roamingSlot,1]
-        }
 
         This:GenerateSettings_Subclass[joInput,joSettings]
         return joSettings
@@ -405,7 +401,15 @@ objectdef windowLayoutGenerator_Edge inherits windowLayoutGenerator_Common
 
     method GenerateSettings_Subclass(jsonvalueref joInput, jsonvalueref joSettings)
     {
-        joSettings:Set[swapGroups,"{\"reset\":1,\"active\":1}"]
+        variable jsonvalue joSwapGroup="{\"reset\":1,\"active\":1}"
+        variable jsonvalue jaSwapGroups="[]"
+
+        if !${joInput.GetBool[leaveHole]}
+            joSwapGroup:SetInteger[roamingSlot,1]
+
+        jaSwapGroups:AddByRef[joSwapGroup]
+
+        joSettings:SetByRef[swapGroups,jaSwapGroups]
     }
 
     member:jsonvalueref GenerateRegions_Subclass(jsonvalueref joInput)

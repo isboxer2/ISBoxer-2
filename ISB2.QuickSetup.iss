@@ -274,7 +274,7 @@ objectdef isb2_quicksetup
         jo:Erase[_gameLaunchInfo]
     }
 
-    method ConvertLayoutRegion(jsonvalueref jo)
+    method ConvertLayoutRegion(jsonvalueref joSettings, jsonvalueref jo)
     {
         if ${jo.Has[x]}
         {
@@ -285,9 +285,11 @@ objectdef isb2_quicksetup
             jo:Erase[height]
         }
 
+        variable uint roamingSlot=${joSettings.GetInteger[roamingSlot]}
         if ${jo.Has[numRegion]}
         {            
-            jo:SetInteger[slot,${jo.GetInteger[numRegion]}]
+            if ${jo.GetInteger[numRegion]} != ${roamingSlot}
+                jo:SetInteger[slot,${jo.GetInteger[numRegion]}]                
             jo:Erase[numRegion]
         }
 
@@ -304,10 +306,10 @@ objectdef isb2_quicksetup
 
         jo:SetString[name,"${TeamName~}"]
         jo:SetByRef[regions,"WindowLayout.Get[regions]"]
-        jo.Get[regions]:ForEach["This:ConvertLayoutRegion[ForEach.Value]"]    
-
         variable jsonvalueref joSettings
         joSettings:SetReference["WindowLayout.Get[settings]"]
+        jo.Get[regions]:ForEach["This:ConvertLayoutRegion[joSettings,ForEach.Value]"]    
+
         
         if !${joSettings.Has[frame]}
             joSettings:SetString[frame,none]

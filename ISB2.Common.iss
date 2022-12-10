@@ -47,14 +47,14 @@ objectdef isb2_profile
         if !${jo.Reference(exists)}
             return
 
-        if ${jo.Has[name]}
+        if ${jo.Has[-notnull,name]}
             Name:Set["${jo.Get[name]~}"]
-        if ${jo.Has[description]}
-            Name:Set["${jo.Get[description]~}"]
-        if ${jo.Has[version]}
-            Name:Set["${jo.Get[version]~}"]
+        if ${jo.Has[-notnull,description]}
+            Description:Set["${jo.Get[description]~}"]
+        if ${jo.Has[-notnull,isb2Version]}
+            Version:Set["${jo.Get[isb2Version]~}"]
         if ${jo.Has[minimumBuild]}
-            Name:Set["${jo.Get[minimumBuild]~}"]
+            MinimumBuild:Set["${jo.GetInteger[minimumBuild]~}"]
 
         if ${jo.Has[metadata]}
             Metadata:SetReference["jo.Get[metadata]"]
@@ -110,11 +110,11 @@ objectdef isb2_profile
         <$$"]
 
         if ${Description.NotNULLOrEmpty}
-            jo:Set["description",Description]
+            jo:SetString["description","${Description~}"]
         if ${Version.NotNULLOrEmpty}
-            jo:Set["version",Version]
+            jo:SetString["isb2Version","${Version~}"]
         if ${MinimumBuild}
-            jo:Set["description",Description]
+            jo:SetInteger["minimumBuild","${MinimumBuild}"]
         if ${Metadata.Type.Equal[object]}
             jo:SetByRef["metadata","Metadata"]
         if ${Builders.Used}

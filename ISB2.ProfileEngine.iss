@@ -1458,11 +1458,12 @@ objectdef isb2_profileengine
 #endregion
 
 #region Variable Processors
-    member:string ProcessVariables(string text)
+    member:string ProcessVariables(string text, jsonvalueref joState)
     {
         if !${text.Find["{"]}
             return "${text~}"        
 
+        variable weakref vRef
         variable int pos
         variable int endpos
         variable string name
@@ -1486,7 +1487,6 @@ objectdef isb2_profileengine
             endpos:Set["${endpos}-(${pos}+3)"]            
             name:Set["${text.Mid[${pos.Inc[3]},${endpos}]}"]
 
-            variable weakref vRef
             vRef:SetReference["Variables.Get[\"${name~}\"]"]
             if ${vRef.Reference(exists)}
                 text:Set["${text.ReplaceSubstring["{U:${name~}}","${vRef.Value~}"]}"]    
@@ -1496,6 +1496,36 @@ objectdef isb2_profileengine
             pos:Set["${text.FindFrom[${pos.Inc},"{U:"]}"]
         }
 
+        pos:Set["${text.Find["{P:"]}"]
+        while ${pos}
+        {
+;            echo "\ayProcessVariables\ax: Parameter in ${text~} -- ${joState~}"
+            ; user variable
+            endpos:Set["${text.FindFrom[${pos.Inc},"}"]}"]
+            if !${endpos}
+            {
+                ; unterminated user variable reference
+                text:Set["${text.Left[${pos.Dec}]~}"]
+                Script:SetLastError["unterminated user variable reference in ${text~}"]
+                break
+            }
+
+            ; get variable name
+            ; convert end position to length
+            endpos:Set["${endpos}-(${pos}+3)"]            
+            name:Set["${text.Mid[${pos.Inc[3]},${endpos}]}"]
+
+            if ${joState.Has[params,"${name~}"]}
+            {
+                text:Set["${text.ReplaceSubstring["{P:${name~}}","${joState.Get[params,"${name~}"]~}"]}"]    
+            }
+            else
+            {
+                text:Set["${text.ReplaceSubstring["{P:${name~}}",""]}"]    
+            }
+
+            pos:Set["${text.FindFrom[${pos.Inc},"{P:"]}"]
+        }
 
         if ${Slot}
             text:Set["${text.ReplaceSubstring["{SLOT}",${Slot}]}"]
@@ -1510,33 +1540,33 @@ objectdef isb2_profileengine
         return "${text~}"        
     }
     ; for any object, process variables within a specific property 
-    method ProcessVariableProperty(jsonvalueref jo, string varName)
+    method ProcessVariableProperty(jsonvalueref joState,jsonvalueref jo, string varName)
     {
 ;        echo "ProcessVariableProperty[${varName~}] ${jo~}"
         switch ${jo.GetType["${varName~}"]}
         {
             case string
-                jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}"]~}"]
+                jo:SetString["${varName~}","${This.ProcessVariables["${jo.Get["${varName~}"]~}",joState]~}"]
                 break
             case object
             case array
 ;                echo "ProcessVariableProperty[${varName~}] ${jo~}"
-                This:ProcessVariableProperties["jo.Get[\"${varName~}\"]"]
+                This:ProcessVariableProperties[joState,"jo.Get[\"${varName~}\"]"]
                 break
         }
     }
 
-    method ProcessVariableProperties(jsonvalueref jo)
+    method ProcessVariableProperties(jsonvalueref joState, jsonvalueref jo)
     {
-        jo:ForEach["This:ProcessVariableProperty[jo,\"\${ForEach.Key}\"]"]
+        jo:ForEach["This:ProcessVariableProperty[joState,jo,\"\${ForEach.Key}\"]"]
     }
 
     ; for any Action object of a given action type, process its variableProperties
-    method ProcessActionVariables(jsonvalueref joActionType, jsonvalueref joAction)
+    method ProcessActionVariables(jsonvalueref joState, jsonvalueref joActionType, jsonvalueref joAction)
     {
         if ${joAction.Has[-object,variableProperties]}
         {
-            This:ProcessVariableProperty[joAction,variableProperties]
+            This:ProcessVariableProperty[joState,joAction,variableProperties]
             joAction:Merge["joAction.Get[variableProperties]"]
 
             joAction:Erase[variableProperties]
@@ -1544,9 +1574,9 @@ objectdef isb2_profileengine
 
         if ${joActionType.Has[-array,variableProperties]}
         {
-            joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joAction,\"\${ForEach.Value~}\"]"]
+            joActionType.Get[variableProperties]:ForEach["This:ProcessVariableProperty[joState,joAction,\"\${ForEach.Value~}\"]"]
         }
-        This:ProcessVariableProperty[joAction,target]
+        This:ProcessVariableProperty[joState,joAction,target]
     }
 #endregion
 
@@ -1651,12 +1681,15 @@ objectdef isb2_profileengine
         return ${TimerPools.Get["${name~}"]:RetimeAction[joTimer,joState,joAction,${activate}](exists)}        
     }
 
-    member:jsonvalueref ActionStateFromMappable(jsonvalueref joMappable, bool hold)
+    member:jsonvalueref ActionStateFromMappable(jsonvalueref joMappable, bool hold, jsonvalueref joParams)
     {
         variable jsonvalueref joState="{}"
 
         joState:SetByRef[mappable,joMappable]
         joState:SetString[sheet,"${joMappable.Get[sheet]~}"]
+
+        if ${joParams.Reference(exists)}
+            joState:SetByRef[params,joParams]
 
         if ${joMappable.Has[hold]}
             joState:SetBool[hold,${joMappable.GetBool[hold]}]
@@ -2054,14 +2087,18 @@ objectdef isb2_profileengine
         variable bool hold
         hold:Set[${This.ActionHoldState[joState,joAction]}]
 
+        variable jsonvalueref joParams
+        if ${joAction.Has[-object,params]}
+            joParams:SetReference["joAction.Get[params]"]
+
         if !${hold} || ${joAction.Has[activationState]}
         {
-            This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",1]
-            This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",0]
+            This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",1,joParams]
+            This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",0,joParams]
             return
         }
 
-        This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",${activate}]
+        This:ExecuteMappableByName["${joAction.Get[sheet]~}","${joAction.Get[name]~}",${activate},joParams]
     }
 
     method Action_VirtualizeMappable(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -3416,7 +3453,7 @@ objectdef isb2_profileengine
         }
     }
 
-    method ExecuteMappableByName(string sheet, string name, bool newState)
+    method ExecuteMappableByName(string sheet, string name, bool newState, jsonvalueref joParams)
     {
         sheet:Set["${This.ProcessVariables["${sheet~}"]~}"]
         name:Set["${This.ProcessVariables["${name~}"]~}"]
@@ -3427,7 +3464,7 @@ objectdef isb2_profileengine
             return
 
 
-        This:ExecuteMappable["joMappable",${newState}]
+        This:ExecuteMappable["joMappable",${newState},joParams]
     }
 
     method ExecuteGameKeyBindingByName(string name, bool newState)
@@ -3646,7 +3683,7 @@ objectdef isb2_profileengine
         LGUI2.Element[isb2.events]:FireEventHandler[onLastMappablesUpdated]
     }
 
-    method ExecuteMappableActivationState(jsonvalueref joMappable, bool newState)
+    method ExecuteMappableActivationState(jsonvalueref joMappable, bool newState, jsonvalueref joParams)
     {
         ; get current step, then call This:ExecuteRotatorStep
         if !${newState}
@@ -3660,7 +3697,7 @@ objectdef isb2_profileengine
         numStep:Set[${This.Rotator_GetCurrentStepNum[joMappable]}]
         if ${numStep}>0
         {
-            This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]","This.ActionStateFromMappable[joMappable]",${newState}]
+            This:ExecuteRotatorStep[joMappable,"joMappable.Get[steps,${numStep}]","This.ActionStateFromMappable[joMappable,0,joParams]",${newState}]
             This:Rotator_PostExecute[joMappable,${newState},${numStep}]
         }
         else
@@ -3671,7 +3708,7 @@ objectdef isb2_profileengine
         This:SetLastMappable[joMappable,${newState}]
     }
 
-    method ExecuteMappable(jsonvalueref joMappable, bool newState)
+    method ExecuteMappable(jsonvalueref joMappable, bool newState, jsonvalueref joParams)
     {
         if !${joMappable.Type.Equal[object]}
             return
@@ -3687,7 +3724,7 @@ objectdef isb2_profileengine
         if ${joMappable.GetBool[hold]}
         {
 ;            echo "\ayExecuteMappable\ax: Hold"
-            This:ExecuteMappableActivationState[joMappable,${newState}]
+            This:ExecuteMappableActivationState[joMappable,${newState},joParams]
             return
         }
         
@@ -3701,8 +3738,8 @@ objectdef isb2_profileengine
                     return
 
 ;                echo "\ayExecuteMappable\ax: onPress"
-                This:ExecuteMappableActivationState[joMappable,1]
-                This:ExecuteMappableActivationState[joMappable,0]
+                This:ExecuteMappableActivationState[joMappable,1,joParams]
+                This:ExecuteMappableActivationState[joMappable,0,joParams]
                 return
             }
 
@@ -3723,8 +3760,8 @@ objectdef isb2_profileengine
                         case OnPress
                         case OnPressAndRelease
 ;                            echo "\ayExecuteMappable\ax: ${mappableSheet.Mode} (sheet)"
-                            This:ExecuteMappableActivationState[joMappable,1]
-                            This:ExecuteMappableActivationState[joMappable,0]
+                            This:ExecuteMappableActivationState[joMappable,1,joParams]
+                            This:ExecuteMappableActivationState[joMappable,0,joParams]
                             return
                     }
 ;                    echo "\ayExecuteMappable\ax: ${newState} ${mappableSheet.Mode} post-check"
@@ -3740,8 +3777,8 @@ objectdef isb2_profileengine
                     return
 
 ;                echo "\ayExecuteMappable\ax: onRelease"
-                This:ExecuteMappableActivationState[joMappable,1]
-                This:ExecuteMappableActivationState[joMappable,0]
+                This:ExecuteMappableActivationState[joMappable,1,joParams]
+                This:ExecuteMappableActivationState[joMappable,0,joParams]
                 return
             }
 
@@ -3759,8 +3796,8 @@ objectdef isb2_profileengine
                         case OnRelease
                         case OnPressAndRelease
                             echo "\ayExecuteMappable\ax: ${mappableSheet.Mode} (sheet)"
-                            This:ExecuteMappableActivationState[joMappable,1]
-                            This:ExecuteMappableActivationState[joMappable,0]
+                            This:ExecuteMappableActivationState[joMappable,1,joParams]
+                            This:ExecuteMappableActivationState[joMappable,0,joParams]
                             return
                         case OnPress
                             return
@@ -3771,7 +3808,7 @@ objectdef isb2_profileengine
         }
         
 ;        echo "\ayExecuteMappable\ax: Split ${mappableSheet.Name~} ${mappableSheet.Mode~} ${mappableSheet.Hold}"
-        This:ExecuteMappableActivationState[joMappable,${newState}]
+        This:ExecuteMappableActivationState[joMappable,${newState},joParams]
     }
 
     ; for any Rotate object, execute a given step, depending on press/release state
@@ -3910,7 +3947,7 @@ objectdef isb2_profileengine
         joAction:SetReference[_joAction.Duplicate]
         
         ; process any variableProperties
-        This:ProcessActionVariables[joActionType,joAction]
+        This:ProcessActionVariables[joState,joActionType,joAction]
 
         ; see if the action type supports action timers
         if ${joActionType.GetBool[timer]}

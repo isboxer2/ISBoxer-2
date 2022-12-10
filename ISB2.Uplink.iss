@@ -249,6 +249,24 @@ objectdef isb2 inherits isb2_profilecollection
 
         This:LoadFile["${fileName~}"]
     }
+
+    method FilteredLoadFile(jsonvalueref jo)
+    {
+        variable string filename
+        filename:Set["${jo.Get[filename]~}"]
+
+        if ${filename.EndsWith[isb2.json]}
+            This:LoadFile["${filename~}"]
+    }
+
+    method OnDragDropProfiles()
+    {
+;        echo "OnDragDropProfiles ${Context(type)} ${Context.Args~}"
+
+        Context.Args.Get[files]:ForEach["This:FilteredLoadFile[\"\${ForEach.Value~}\"]"]
+
+        Context:SetHandled[1]
+    }
 }
 
 objectdef isb2_managedSlot

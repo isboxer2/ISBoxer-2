@@ -2,6 +2,7 @@
 
 objectdef isb2_quicksetup
 {
+    variable jsonvalueref Builders="[]"
     variable jsonvalueref EditingCharacter="{}"
     variable jsonvalueref Characters="[]"
 
@@ -26,8 +27,6 @@ objectdef isb2_quicksetup
         WindowLayoutSettings:SetBool[swapOnActivate,1]
         WindowLayoutSettings:SetBool[swapOnHotkey,1]
 
-        This:DetectMonitors
-        This:GenerateGameLaunchInfo
     }
 
     method Shutdown()
@@ -37,6 +36,10 @@ objectdef isb2_quicksetup
 
     method Start()
     {
+        This:DetectMonitors
+        This:GenerateGameLaunchInfo
+        This:RefreshBuilders
+        
         if !${LGUI2.Element[isb2.QuickSetupWindow].Visibility~.Equal[visible]}
         {
             LGUI2.Element["isb2.QuickSetupWindow.pagecontrol"]:SelectPage[1]
@@ -92,6 +95,9 @@ objectdef isb2_quicksetup
                 break
             case Team Name
                 LGUI2.Element[isb2.QuickSetup.TeamName]:KeyboardFocus
+                break
+            case Configuration Builder
+                This:RefreshBuilders
                 break
         }
     }
@@ -662,6 +668,31 @@ objectdef isb2_quicksetup
 ;        echo "\ayGetLayoutPreviewItems\ax: ${ja~}"
         return ja
     }    
+
+    method AddLocatedBuilder(jsonvalueref joLocated)
+    {
+        variable jsonvalue jo="{}"
+        variable jsonvalueref joBuilder="joLocated.Get[object]"
+
+        jo:SetBool[enable,${joBuilder.GetBool[enable]}]
+
+        jo:SetString[profile,"${joLocated.Get[profile]~}"]
+        jo:SetByRef[builder,joBuilder]
+
+        Builders:AddByRef[jo]
+    }
+
+    method RefreshBuilders()
+    {
+        echo "\ayRefreshBuilders\ax"
+        Builders:SetReference["[]"]
+
+        ISB2.LocateAll[Builders]:ForEach["This:AddLocatedBuilder[ForEach.Value]"]
+        
+
+        LGUI2.Element[isb2.QuickSetupWindow]:FireEventHandler[onBuildersUpdated]
+    }
+
 }
 
 variable(global) isb2_quicksetup ISB2QuickSetup

@@ -39,6 +39,7 @@ objectdef isb2_quicksetup
     {
         if !${LGUI2.Element[isb2.QuickSetupWindow].Visibility~.Equal[visible]}
         {
+            LGUI2.Element["isb2.QuickSetupWindow.pagecontrol"]:SelectPage[1]
             TeamName:Set[]
             Error:Set[]
             Characters:Set["[]"]

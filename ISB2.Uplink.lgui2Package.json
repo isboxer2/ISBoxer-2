@@ -518,6 +518,7 @@
             "visibility": "hidden",
             "content":{
                 "type":"pagecontrol",
+                "name":"isb2.QuickSetupWindow.pagecontrol",
                 "horizontalAlignment":"stretch",
                 "verticalAlignment":"stretch",
                 "contentContainer": {

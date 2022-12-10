@@ -559,7 +559,7 @@ objectdef isb2_quicksetup
     method RefreshWindowLayouts()
     {
         echo "\ayRefreshWindowLayouts\ax"
-        WindowLayouts:SetReference["[]"]
+        WindowLayouts:Clear
         variable jsonvalueref useData="RegionGeneratorSettings.Duplicate"
         useData:SetInteger[numSlots,${Characters.Used}]
         /*
@@ -667,7 +667,32 @@ objectdef isb2_quicksetup
 
 ;        echo "\ayGetLayoutPreviewItems\ax: ${ja~}"
         return ja
-    }    
+    }   
+
+    method PrepareBuilderHotkey(jsonvalueref jo, jsonvalueref joHotkeyBuilder)
+    {
+        if ${joHotkeyBuilder.Has[-string,keyCombo]}
+            return
+
+        variable jsonvalueref joSheet
+        joSheet:SetReference["ISB2.FindOne[HotkeySheets,\"${joHotkeyBuilder.Get[sheet]}\",\"${jo.Get[profile]~}\"]"]
+        if !${joSheet.Reference(exists)}
+        {
+            echo "PrepareBuilderHotkey: sheet ${joHotkeyBuilder.Get[sheet]~} not found"
+            return
+        }
+
+        variable jsonvalueref joHotkey
+        joHotkey:SetReference["ISB2.FindInArray[\"joSheet.Get[hotkeys]\",\"${joHotkeyBuilder.Get[name]~}\"]"]
+        if !${joHotkey.Reference(exists)}
+        {
+            echo "PrepareBuilderHotkey: hotkey ${joHotkeyBuilder.Get[name]~} not found in sheet"
+            return
+        }
+
+        if ${joHotkey.Has[-string,keyCombo]}
+            joHotkeyBuilder:SetString[keyCombo,"${joHotkey.Get[keyCombo]~}"]
+    } 
 
     method AddLocatedBuilder(jsonvalueref joLocated)
     {
@@ -679,13 +704,16 @@ objectdef isb2_quicksetup
         jo:SetString[profile,"${joLocated.Get[profile]~}"]
         jo:SetByRef[builder,joBuilder]
 
+        ; get initial hotkeys
+        joBuilder.Get[hotkeys]:ForEach["This:PrepareBuilderHotkey[jo,ForEach.Value]"]
+
         Builders:AddByRef[jo]
     }
 
     method RefreshBuilders()
     {
         echo "\ayRefreshBuilders\ax"
-        Builders:SetReference["[]"]
+        Builders:Clear
 
         ISB2.LocateAll[Builders]:ForEach["This:AddLocatedBuilder[ForEach.Value]"]
         

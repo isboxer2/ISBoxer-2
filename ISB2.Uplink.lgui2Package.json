@@ -54,7 +54,7 @@
                         "valueBinding": {
                             "pullFormat":"${_CONTEXTITEMDATA_.Get[keyCombo]}",
                             "pullReplaceNull":"",
-                            "pushFormat":["echo ${_CONTEXTITEMDATA_~} _CONTEXTITEMDATA_:SetString[keyCombo,\"","\"]"]
+                            "pushFormat":["_CONTEXTITEMDATA_:SetString[keyCombo,\"","\"]"]
                         }
                     }
                 ]

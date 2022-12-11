@@ -1,0 +1,164 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/isb2.json",
+    "name": "MMO",
+    "builders":[
+        {
+            "name": "MMO - Standard"
+        },
+        {
+            "name":"MMO - Pro"
+        }
+    ],
+    "hotkeySheets": [
+        {
+            "name": "MMO - Base Hotkeys",
+            "hotkeys": [
+                {
+                    "name": "Follow Me"
+                },
+                {
+                    "name": "Assist Me"
+                },
+                {
+                    "name": "All Jump"
+                },
+                {
+                    "name": "Others Turn Left"
+                },
+                {
+                    "name": "Others Turn Right"
+                }
+            ]
+        },
+        {
+            "name": "MMO - Combat Hotkeys"
+        },
+        {
+            "name": "MMO Pro - Combat Hotkeys",
+            "hotkeys": [
+                {
+                    "name": "DPS Rotation"
+                }
+            ]
+        }
+    ],
+    "mappableSheets":[
+        {
+            "name": "MMO - Base Hotkeys",
+            "mappables": [
+                {
+                    "name": "Follow Me"
+                },
+                {
+                    "name": "Assist Me"
+                },
+                {
+                    "name": "All Jump"
+                },
+                {
+                    "name": "Others Turn Left"
+                },
+                {
+                    "name": "Others Turn Right"
+                }
+            ]
+        }
+    ],
+    "gameKeyBindings": [
+        {
+            "category": "Movement",
+            "name": "Move Forward"
+        },
+        {
+            "category": "Movement",
+            "name": "Move Backward"
+        },
+        {
+            "category": "Movement",
+            "name": "Move Left"
+        },
+        {
+            "category": "Movement",
+            "name": "Move Right"
+        },
+        {
+            "category": "Movement",
+            "name": "Turn Left"
+        },
+        {
+            "category": "Movement",
+            "name": "Turn Right"
+        },
+        {
+            "category": "Targeting",
+            "name": "Follow Target"
+        },
+        {
+            "category": "Targeting",
+            "name": "Assist Target"
+        },
+        {
+            "category": "Targeting",
+            "name": "Interact with Target"
+        }
+    ],
+    "variables": [
+        {
+            "name":"MMO.Assist On Combat",
+            "value":true,
+            "schema": {
+                "type":"boolean"
+            }
+        },
+        {
+            "name":"MMO.Interact On Combat",
+            "value":false,
+            "schema": {
+                "type":"boolean"
+            }
+        },
+        {
+            "name":"MMO.Follow On Combat",
+            "value":false,
+            "schema": {
+                "type":"boolean"
+            }
+        },
+        {
+            "name": "MMO.Role",
+            "value":"Unknown",
+            "schema": {
+                "type":"string",
+                "enum": ["Unknown","DPS","Healer","Tank"]
+            }
+        },
+        {
+            "name": "MMO.Specialization",
+            "value":"Unknown",
+            "schema": {
+                "type":"string"
+            }
+        },
+        {
+            "name": "MMO.Class",
+            "value":"Unknown",
+            "schema": {
+                "type":"string"
+            }
+        },
+        {
+            "name": "MMO.Race",
+            "value":"Unknown",
+            "schema": {
+                "type":"string"
+            }
+        },
+        {
+            "name": "MMO.Level",
+            "value":0,
+            "schema": {
+                "type":"integer"
+            }
+        }
+    ]
+}

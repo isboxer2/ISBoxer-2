@@ -1,0 +1,452 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/isb2.json",
+    "name": "ISBoxer 2 Core",
+    "builders":[
+        {
+            "name": "Core Toggles",
+            "team": {
+                "hotkeySheets": ["Core Toggles"],
+                "mappableSheets": ["Core Toggles"]
+            },        
+            "hotkeys": [
+                {
+                    "sheet": "Core Toggles",
+                    "name": "Toggle Hotkeys"
+                },
+                {
+                    "sheet": "Core Toggles",
+                    "name": "Toggle Broadcasting"
+                }
+            ]
+        },
+        {
+            "name": "Core Window Switching",
+            "description": "Forward and backward window rotation hotkeys",
+            "team":{
+                "hotkeySheets": ["Core Window Switching"],
+                "mappableSheets": ["Core Window Switching"]
+            },
+            "hotkeys": [
+                {
+                    "sheet": "Core Window Switching",
+                    "name": "Forward"
+                },
+                {
+                    "sheet": "Core Window Switching",
+                    "name":"Backward"
+                }
+            ]
+        },
+        {
+            "name": "Core Slot Activation Hotkeys",
+            "description": "Per-slot activation hotkeys Ctrl+Alt+1, etc",
+            "team":{
+                "slots": [
+                    {
+                        "switchToCombo":"Ctrl+Alt+1"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+2"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+3"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+4"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+5"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+6"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+7"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+8"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+9"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+0"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+-"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+="
+                    }
+                ]                
+            }
+        },
+        {
+            "name": "Core Slot Activation Hotkeys (AltGr friendly)",
+            "description": "Per-slot activation hotkeys Shift+Alt+1, etc",
+            "team":{
+                "slots": [
+                    {
+                        "switchToCombo":"Shift+Alt+1"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+2"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+3"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+4"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+5"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+6"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+7"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+8"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+9"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+0"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+-"
+                    },
+                    {
+                        "switchToCombo":"Shift+Alt+="
+                    }
+                ]                
+            }
+        }
+    ],
+    "hotkeySheets": [
+        {
+            "name": "Core Toggles",
+            "hotkeys": [
+                {
+                    "name": "Toggle Hotkeys",
+                    "keyCombo":"Shift+Alt+M",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "Core Toggles",
+                        "name": "Toggle Hotkeys"
+                    }                    
+                },
+                {
+                    "name": "Toggle Broadcasting",
+                    "keyCombo":"Shift+Alt+R",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "Core Toggles",
+                        "name": "Toggle Broadcasting"
+                    }                    
+                }
+            ]
+        },
+        {
+            "name": "Core Window Switching",
+            "hotkeys": [
+                {
+                    "name":"Forward",
+                    "inputMapping": {
+                            "type":"mappable",
+                            "sheet": "Core Window Switching",
+                            "name": "Forward"
+                    }
+                },
+                {
+                    "name": "Backward",
+                    "inputMapping": {
+                        "type":"mappable",
+                        "sheet": "Core Window Switching",
+                        "name": "Backward"
+                    }
+                }
+            ]
+        }
+    ],
+    "mappableSheets":[
+        {
+            "name": "Core Toggles",
+            "mappables": [
+                {
+                    "name": "Toggle Hotkeys",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"set variable",
+                                    "name": "Core.enable hotkeys",
+                                    "rotate": "forward"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Enable Hotkeys",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"set variable",
+                                    "name": "Core.enable hotkeys",
+                                    "value":true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Disable Hotkeys",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"set variable",
+                                    "name": "Core.enable hotkeys",
+                                    "value":false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Toggle Broadcasting",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"if",
+                                    "variableName": "Core.allow broadcasting",
+                                    "op": "==",
+                                    "value":true,
+                                    "true": {
+                                        "type":"set variable",
+                                        "name": "Core.enable broadcasting",
+                                        "rotate": "forward"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Enable Broadcasting",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"if",
+                                    "variableName": "Core.allow broadcasting",
+                                    "op": "==",
+                                    "value":true,
+                                    "true": {
+                                        "type":"set variable",
+                                        "name": "Core.enable broadcasting",
+                                        "value":true    
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Disable Broadcasting",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"set variable",
+                                    "name": "Core.enable broadcasting",
+                                    "value":false
+                                }                                
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "On Broadcasting Enabled",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"broadcasting state",
+                                    "keyboardState": "On",
+                                    "mouseState": "On"                                    
+                                },
+                                {
+                                    "type":"popup text",
+                                    "text": "Broadcasting Ensabled"        
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "On Broadcasting Disabled",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"broadcasting state",
+                                    "keyboardState": "Off",
+                                    "mouseState": "Off"                                    
+                                },
+                                {
+                                    "type":"popup text",
+                                    "text": "Broadcasting Disabled"        
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Core Window Switching",
+            "mappables": [
+                {
+                    "name":"Forward",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"window focus",
+                                    "filterTarget": "@isboxer&~dxnothing",
+                                    "window": "-next"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Backward",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"window focus",
+                                    "filterTarget": "@isboxer&~dxnothing",
+                                    "window": "-previous"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variables": [
+        {
+            "name": "Core.enable hotkeys",
+            "value":true,
+            "schema": {
+                "type":"boolean"
+            }
+        },
+        {
+            "name": "Core.enable broadcasting",
+            "value":false,
+            "schema": {
+                "type":"boolean"
+            }            
+        },
+        {
+            "name": "Core.allow broadcasting",
+            "value":true,
+            "schema": {
+                "type":"boolean"
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "name": "Core.enable hotkeys",
+            "object": {
+                "type": "variable",
+                "name": "Core.enable hotkeys"
+            },            
+            "trigger": {
+                "name": "Core.enable hotkeys",
+                "inputMapping": {
+                    "type": "action",
+                    "action": {
+                        "type":"if",
+                        "variableName":"Core.enable hotkeys",
+                        "op": "==",
+                        "value":true,
+                        "true":{
+                            "type":"popup text",
+                            "text": "Hotkeys Enabled"
+                        },
+                        "false": {
+                            "type":"popup text",
+                            "text": "Hotkeys Disabled"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "Core.enable broadcasting",
+            "object": {
+                "type": "variable",
+                "name": "Core.enable broadcasting"
+            },            
+            "trigger": {
+                "name": "Core.enable broadcasting",
+                "inputMapping": {
+                    "type": "action",
+                    "action": {
+                        "type":"if",
+                        "variableName":"Core.enable broadcasting",
+                        "op": "==",
+                        "value":true,
+                        "true":{                                                    
+                            "type": "mappable",
+                            "sheet": "Core Toggles",
+                            "name": "On Broadcasting Enabled"          
+                        },
+                        "false": {
+                            "type": "mappable",
+                            "sheet": "Core Toggles",
+                            "name": "On Broadcasting Disabled"          
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "Core.allow broadcasting",
+            "object": {
+                "type": "variable",
+                "name": "Core.allow broadcasting"
+            },
+            "trigger": {
+                "name": "Core.allow broadcasting",
+                "inputMapping": {
+                    "type": "action",
+                    "action": {
+                        "type": "if",
+                        "variableName": "Core.allow broadcasting",
+                        "op": "==",
+                        "value":true,
+                        "false": {
+                            "type":"mappable",
+                            "sheet": "Core Toggles",
+                            "name": "On Broadcasting Disabled"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

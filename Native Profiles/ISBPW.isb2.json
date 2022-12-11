@@ -1,0 +1,307 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/isb2.json",
+    "name": "ISBoxer Per-Window",
+    "builders":[
+        {
+            "name":"Per-Slot Master Switching",
+            "description": "For non-broadcasting games, enables Follow, Assist, Targeting and Interact mechanics",
+            "hotkeys":[
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Set Master",
+                    "keyCombo":"Alt+M"
+                },
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Interact"
+                },
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Follow Master"                
+                },
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Assist Master"                
+                }                                
+            ],
+            "gameKeyBindings": [
+                {
+                    "name": "Follow Slot {SLOT}"
+                },
+                {
+                    "name": "Assist Slot {SLOT}"
+                },
+                {
+                    "name": "Target Slot {SLOT}"
+                },
+                {
+                    "name":"Interact with Target"
+                }
+            ]        
+        },
+        {
+            "name":"Combat Hotkeys 1 through =",
+            "description": "For non-broadcasting games, enables basic combat hotkeys",
+            "team":{
+                "slots": [
+                    {
+                        "switchToCombo":"Ctrl+Alt+1"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+2"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+3"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+4"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+5"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+6"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+7"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+8"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+9"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+0"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+-"
+                    },
+                    {
+                        "switchToCombo":"Ctrl+Alt+="
+                    }
+                ]
+            },
+            "character":{
+                "virtualFiles": [
+                    {
+                        "pattern": "*/Config.WTF",
+                        "replacement": "{0}/Config-{CHARACTER}.WTF"
+                    }
+                ]
+            },
+            "slot":{
+                "windowTitle": "{CHARACTER}"            
+            }
+        }
+    ],
+    "hotkeySheets": [
+        {
+            "name": "Base Hotkeys",
+            "enable": true,
+            "hotkeys": [
+                {
+                    "name": "Follow Me",
+                    "keyCombo": "Alt+F",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "Base Hotkeys",
+                        "name": "Follow Me"
+                    }
+                }
+            ]
+        }
+    ],
+        "mappableSheets":[
+        {
+            "name":"Always On",
+            "mappables":[
+                {
+                    "name":"Activate Maps"
+                },
+                {
+                    "name":"Next Window"
+                },
+                {
+                    "name":"Previous Window"
+                },
+                {
+                    "name":"Close All Windows"
+                }
+            ]
+        },
+        {
+            "name":"Base Hotkeys",
+            "mappables":[
+                {
+                    "name":"Follow Master"
+                },
+                {
+                    "name":"Assist Master"
+                },
+                {
+                    "name":"Interact with Target"
+                },
+                {
+                    "name":"Face Toward Target"
+                },
+                {
+                    "name":"Invite Team"
+                },
+                {
+                    "name":"Set Master"
+                }
+            ]
+        },
+        {
+            "name":"Toggles",
+            "mappables":[
+                {
+                    "name":"Activate Maps (all windows)"
+                }
+            ]
+        },
+        {
+            "name":"Party",
+            "mappables":[
+                {
+                    "name":"Assist Master"
+                },
+                {
+                    "name":"Auto-Assist Master"
+                },
+                {
+                    "name":"Follow Master"
+                },
+                {
+                    "name":"Target Master"
+                },
+                {
+                    "name":"Interact with Target"
+                },
+                {
+                    "name":"Auto-Interact with Target"
+                },
+                {
+                    "name":"Face Target"
+                },
+                {
+                    "name":"Invite Team"
+                }
+            ]
+        },
+        {
+            "name":"Master Switching",
+            "mappables":[
+                {
+                    "name":"Set Master Slot 1"
+                },
+                {
+                    "name":"Set Master Slot 2"
+                },
+                {
+                    "name":"Set Master Slot 3"
+                },
+                {
+                    "name":"Set Master Slot 4"
+                },
+                {
+                    "name":"Set Master Slot 5"
+                },
+                {
+                    "name":"Set Master Slot 6"
+                },
+                {
+                    "name":"Set Master Slot 7"
+                }
+            ]
+        },
+        {
+            "name":"Combat Hotkeys",
+            "mappables":[
+                {
+                    "name":"1",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"input mapping",
+                                    "inputMapping":{
+                                        "type":"mappable",
+                                        "sheet":"Party",
+                                        "name":"Auto-Assist Master"
+                                    }
+                                },
+                                {
+                                    "type":"input mapping",
+                                    "inputMapping":{
+                                        "type":"mappable",
+                                        "sheet":"Party",
+                                        "name":"Auto-Interact with Target"
+                                    }
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo":"1"
+                                }                                
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"2",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"input mapping",
+                                    "inputMapping":{
+                                        "type":"trigger",
+                                        "name":"pre-combat key"
+                                    }
+                                },
+                                {
+                                    "type":"keystroke",
+                                    "keyCombo":"2"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"3"
+                },
+                {
+                    "name":"4"
+                },
+                {
+                    "name":"5"
+                },
+                {
+                    "name":"6"
+                },
+                {
+                    "name":"7"
+                },
+                {
+                    "name":"8"
+                },
+                {
+                    "name":"9"
+                },
+                {
+                    "name":"0"
+                },
+                {
+                    "name":"-"
+                },
+                {
+                    "name":"="
+                },
+                {
+                    "name":"DPS Rotation"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,77 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/isb2.json",
+    "name": "ARPG",
+    "builders":[
+        {
+            "name": "ARPG - Standard"
+        }
+    ],
+    "hotkeySheets": [
+        {
+            "name":"ARPG - Base Hotkeys",
+            "hotkeys": [
+                {
+                    "name":"Hold to Control Slot 1"
+                },
+                {
+                    "name":"Hold to Control Slot 2"
+                },
+                {
+                    "name":"Hold to Control Slot 3"
+                },
+                {
+                    "name":"Hold to Control Slot 4"
+                },
+                {
+                    "name":"Hold to Control Slot 5"
+                },
+                {
+                    "name":"Hold to Control Slot 6"
+                },
+                {
+                    "name":"Hold to Control Slot 7"
+                },
+                {
+                    "name":"Hold to Control Slot 8"
+                }
+            ]
+        }
+    ],
+    "mappableSheets":[
+        {
+         "name": "ARPG - Base Hotkeys",
+         "mappables": [
+            {
+                "name":"Hold to Control Slot 1"
+            },
+            {
+                "name":"Hold to Control Slot 2"
+            },
+            {
+                "name":"Hold to Control Slot 3"
+            },
+            {
+                "name":"Hold to Control Slot 4"
+            },
+            {
+                "name":"Hold to Control Slot 5"
+            },
+            {
+                "name":"Hold to Control Slot 6"
+            },
+            {
+                "name":"Hold to Control Slot 7"
+            },
+            {
+                "name":"Hold to Control Slot 8"
+            }
+         ]   
+        }
+    ],
+    "gameKeyBindings": [
+        
+    ],
+    "variables": [
+        
+    ]
+}

@@ -1,15 +1,15 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/isb2.json",
     "name": "ISBoxer Per-Window",
-    "builders":[
+    "builders": [
         {
-            "name":"Per-Slot Master Switching",
-            "description": "For non-broadcasting games, enables Follow, Assist, Targeting and Interact mechanics",
-            "hotkeys":[
+            "name":"WoW Macro-based Master Switching",
+            "description": "For World of Wacraft versions supporting ISBoxer 2 Addon (1.12.3 and later), enables Follow, Assist, Targeting and Interact mechanics",
+            "hotkeys": [
                 {
                     "sheet": "ISBPW - Base Hotkeys",
                     "name": "Set Master",
-                    "keyCombo":"Alt+M"
+                    "keyCombo": "Alt+M"
                 },
                 {
                     "sheet": "ISBPW - Base Hotkeys",
@@ -17,12 +17,39 @@
                 },
                 {
                     "sheet": "ISBPW - Base Hotkeys",
-                    "name": "Follow Master"                
+                    "name": "Follow Master"
                 },
                 {
                     "sheet": "ISBPW - Base Hotkeys",
-                    "name": "Assist Master"                
-                }                                
+                    "name": "Assist Master"
+                }
+            ],
+            "team": {
+                "hotkeySheets":["ISBPW - Base Hotkeys"],
+                "mappableSheets": ["ISBPW - Master Switching"]
+            }
+        },
+        {
+            "name": "Per-Slot Master Switching",
+            "description": "For non-broadcasting games, enables Follow, Assist, Targeting and Interact mechanics",
+            "hotkeys": [
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Set Master",
+                    "keyCombo": "Alt+M"
+                },
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Interact"
+                },
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Follow Master"
+                },
+                {
+                    "sheet": "ISBPW - Base Hotkeys",
+                    "name": "Assist Master"
+                }
             ],
             "gameKeyBindings": [
                 {
@@ -35,273 +62,1203 @@
                     "name": "Target Slot {SLOT}"
                 },
                 {
-                    "name":"Interact with Target"
+                    "name": "Interact with Target"
                 }
-            ]        
+            ],
+            "team": {
+                "hotkeySheets":["ISBPW - Base Hotkeys"],
+                "mappableSheets": ["ISBPW - Master Switching"]
+            }
         },
         {
-            "name":"Combat Hotkeys 1 through =",
+            "name": "Combat Hotkeys 1 through =",
             "description": "For non-broadcasting games, enables basic combat hotkeys",
-            "team":{
-                "slots": [
-                    {
-                        "switchToCombo":"Ctrl+Alt+1"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+2"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+3"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+4"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+5"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+6"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+7"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+8"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+9"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+0"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+-"
-                    },
-                    {
-                        "switchToCombo":"Ctrl+Alt+="
-                    }
-                ]
-            },
-            "character":{
-                "virtualFiles": [
-                    {
-                        "pattern": "*/Config.WTF",
-                        "replacement": "{0}/Config-{CHARACTER}.WTF"
-                    }
-                ]
-            },
-            "slot":{
-                "windowTitle": "{CHARACTER}"            
+            "team": {
+                "hotkeySheets": ["ISBPW - Combat Hotkeys"],
+                "mappableSheets": ["ISBPW - Base Hotkeys","ISBPW - Party","ISBPW - Combat Hotkeys"]
             }
+        }
+    ],
+    "gameKeyBindings": [
+        {
+            "name": "Follow Master",
+            "category": "Movement",
+            "keyCombo": "Shift+F11"
+        },
+        {
+            "name": "Assist Master",
+            "category": "Movement",
+            "keyCombo": "Shift+Backspace"
+        },
+        {
+            "name": "Target Master",
+            "category": "Movement",
+            "keyCombo": "Shift+]"
+        },
+        {
+            "name": "Interact with Target",
+            "category": "Movement"
+        },
+        {
+            "name": "Move Backward",
+            "description": "Moves the character backward. (Requires HOLD option on Mapped Key)",
+            "category": "Movement",
+            "keyCombo": "S"
         }
     ],
     "hotkeySheets": [
         {
-            "name": "Base Hotkeys",
-            "enable": true,
+            "name": "ISBPW - Base Hotkeys",
             "hotkeys": [
                 {
-                    "name": "Follow Me",
+                    "name": "Follow Master",
                     "keyCombo": "Alt+F",
                     "inputMapping": {
                         "type": "mappable",
-                        "sheet": "Base Hotkeys",
-                        "name": "Follow Me"
+                        "sheet": "ISBPW - Base Hotkeys",
+                        "name": "Follow Master"
+                    }
+                },
+                {
+                    "name": "Assist Master",
+                    "keyCombo": "Alt+A",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Base Hotkeys",
+                        "name": "Assist Master"
+                    }
+                },
+                {
+                    "name": "Interact with Target",
+                    "keyCombo": "Alt+J",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Base Hotkeys",
+                        "name": "Interact with Target"
+                    }
+                },
+                {
+                    "name": "Invite Team",
+                    "keyCombo": "Shift+Alt+I",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Base Hotkeys",
+                        "name": "Invite Team"
+                    }
+                },
+                {
+                    "name": "Set Master",
+                    "keyCombo": "Alt+M",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Base Hotkeys",
+                        "name": "Set Master"
+                    }
+                },
+                {
+                    "name": "Interact with Target - Alternate",
+                    "keyCombo": "\\",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Base Hotkeys",
+                        "name": "Interact with Target - Alternate"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ISBPW - Combat Hotkeys",
+            "hotkeys": [
+                {
+                    "name": "1",
+                    "keyCombo": "1",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "1"
+                    }
+                },
+                {
+                    "name": "2",
+                    "keyCombo": "2",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "2"
+                    }
+                },
+                {
+                    "name": "3",
+                    "keyCombo": "3",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "3"
+                    }
+                },
+                {
+                    "name": "4",
+                    "keyCombo": "4",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "4"
+                    }
+                },
+                {
+                    "name": "5",
+                    "keyCombo": "5",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "5"
+                    }
+                },
+                {
+                    "name": "6",
+                    "keyCombo": "6",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "6"
+                    }
+                },
+                {
+                    "name": "7",
+                    "keyCombo": "7",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "7"
+                    }
+                },
+                {
+                    "name": "8",
+                    "keyCombo": "8",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "8"
+                    }
+                },
+                {
+                    "name": "9",
+                    "keyCombo": "9",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "9"
+                    }
+                },
+                {
+                    "name": "0",
+                    "keyCombo": "0",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "0"
+                    }
+                },
+                {
+                    "name": "-",
+                    "keyCombo": "-",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "-"
+                    }
+                },
+                {
+                    "name": "=",
+                    "keyCombo": "=",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "="
+                    }
+                },
+                {
+                    "name": "DPS Rotation",
+                    "keyCombo": "`",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ISBPW - Combat Hotkeys",
+                        "name": "DPS Rotation"
                     }
                 }
             ]
         }
     ],
-        "mappableSheets":[
+    "mappableSheets": [
         {
-            "name":"Always On",
-            "mappables":[
+            "name": "ISBPW - Base Hotkeys",
+            "mappables": [
                 {
-                    "name":"Activate Maps"
-                },
-                {
-                    "name":"Next Window"
-                },
-                {
-                    "name":"Previous Window"
-                },
-                {
-                    "name":"Close All Windows"
-                }
-            ]
-        },
-        {
-            "name":"Base Hotkeys",
-            "mappables":[
-                {
-                    "name":"Follow Master"
-                },
-                {
-                    "name":"Assist Master"
-                },
-                {
-                    "name":"Interact with Target"
-                },
-                {
-                    "name":"Face Toward Target"
-                },
-                {
-                    "name":"Invite Team"
-                },
-                {
-                    "name":"Set Master"
-                }
-            ]
-        },
-        {
-            "name":"Toggles",
-            "mappables":[
-                {
-                    "name":"Activate Maps (all windows)"
-                }
-            ]
-        },
-        {
-            "name":"Party",
-            "mappables":[
-                {
-                    "name":"Assist Master"
-                },
-                {
-                    "name":"Auto-Assist Master"
-                },
-                {
-                    "name":"Follow Master"
-                },
-                {
-                    "name":"Target Master"
-                },
-                {
-                    "name":"Interact with Target"
-                },
-                {
-                    "name":"Auto-Interact with Target"
-                },
-                {
-                    "name":"Face Target"
-                },
-                {
-                    "name":"Invite Team"
-                }
-            ]
-        },
-        {
-            "name":"Master Switching",
-            "mappables":[
-                {
-                    "name":"Set Master Slot 1"
-                },
-                {
-                    "name":"Set Master Slot 2"
-                },
-                {
-                    "name":"Set Master Slot 3"
-                },
-                {
-                    "name":"Set Master Slot 4"
-                },
-                {
-                    "name":"Set Master Slot 5"
-                },
-                {
-                    "name":"Set Master Slot 6"
-                },
-                {
-                    "name":"Set Master Slot 7"
-                }
-            ]
-        },
-        {
-            "name":"Combat Hotkeys",
-            "mappables":[
-                {
-                    "name":"1",
+                    "name":"Enable Hotkeys",
                     "steps": [
                         {
                             "actions": [
                                 {
-                                    "type":"input mapping",
-                                    "inputMapping":{
-                                        "type":"mappable",
-                                        "sheet":"Party",
-                                        "name":"Auto-Assist Master"
-                                    }
+                                    "type":"hotkey sheet state",
+                                    "name": "ISBPW - Base Hotkeys",
+                                    "value":"On",
+                                    "weak":true
                                 },
                                 {
-                                    "type":"input mapping",
-                                    "inputMapping":{
-                                        "type":"mappable",
-                                        "sheet":"Party",
-                                        "name":"Auto-Interact with Target"
-                                    }
-                                },
-                                {
-                                    "type": "keystroke",
-                                    "keyCombo":"1"
-                                }                                
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name":"2",
-                    "steps": [
-                        {
-                            "actions": [
-                                {
-                                    "type":"input mapping",
-                                    "inputMapping":{
-                                        "type":"trigger",
-                                        "name":"pre-combat key"
-                                    }
-                                },
-                                {
-                                    "type":"keystroke",
-                                    "keyCombo":"2"
+                                    "type":"hotkey sheet state",
+                                    "name": "ISBPW - Combat Hotkeys",
+                                    "value":"On",
+                                    "weak":true
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    "name":"3"
+                    "name":"Disble Hotkeys",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"hotkey sheet state",
+                                    "name": "ISBPW - Base Hotkeys",
+                                    "value":"Off"
+                                },
+                                {
+                                    "type":"hotkey sheet state",
+                                    "name": "ISBPW - Combat Hotkeys",
+                                    "value":"Off"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"4"
+                    "name": "Follow Master",
+                    "hold": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Follow Master",
+                                    "sheet": "ISBPW - Party"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"5"
+                    "name": "Assist Master",
+                    "hold": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"6"
+                    "name": "Interact with Target",
+                    "description": "Interact with Target will help you interact with NPCs (e.g. merchants, quest givers and enemies) and, when combined with Click to Move, can be used to keep melees on target.\nSee http://isboxer.com/wiki/WoW:Interact_with_Target.",
+                    "resetTimer": 1.0,
+                    "hold": true,
+                    "onRelease": true,
+                    "onPress": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"7"
+                    "name": "Face Toward Target",
+                    "description": "Interact with Target will help you interact with NPCs (e.g. merchants, quest givers and enemies) and, when combined with Click to Move, can be used to keep melees on target.\nSee http://isboxer.com/wiki/WoW:Interact_with_Target.",
+                    "resetTimer": 1.0,
+                    "hold": true,
+                    "onRelease": true,
+                    "onPress": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Face Target",
+                                    "sheet": "ISBPW - Party"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"8"
+                    "name": "Invite Team",
+                    "description": "For World of Warcraft, this is configured by default to invite your configured Character Set.",
+                    "hold": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Invite Team",
+                                    "sheet": "ISBPW - Party"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"9"
+                    "name": "Set Master",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Set Master Slot {SLOT}",
+                                    "sheet": "ISBPW - Master Switching",
+                                    "target": "all"
+                                },
+                                {
+                                    "type": "mappable state",
+                                    "name": "Assist Master",
+                                    "sheet": "ISBPW - Party",
+                                    "value": "Off"
+                                },
+                                {
+                                    "type": "mappable state",
+                                    "name": "Assist Master",
+                                    "sheet": "ISBPW - Party",
+                                    "value": "On",
+                                    "target": "all other"
+                                },
+                                {
+                                    "type": "popup text",
+                                    "text": "New Master Assigned!",
+                                    "color": "#40ff40"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"0"
+                    "name": "Interact with Target - Alternate",
+                    "description": "Generated by Mapped Key Wizard with 'Alternate Hotkey'. The 'Hold' option is used here to retain the original Hotkey's behavior for when it is Pressed and Released.",
+                    "hold": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ISBPW - Party",
+            "mappables": [
+                {
+                    "name": "Assist Master",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game key binding",
+                                    "name": "Assist Master"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"-"
+                    "name": "Auto-Assist Master",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"="
+                    "name": "Follow Master",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game key binding",
+                                    "name": "Follow Master"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "name":"DPS Rotation"
+                    "name": "Target Master",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game key binding",
+                                    "name": "Target Master"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "==================================",
+                    "steps": [
+                        {}
+                    ]
+                },
+                {
+                    "name": "Interact with Target",
+                    "onRelease": true,
+                    "onPress": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Click to Move On",
+                                    "sheet": "ISBPW - WoW"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "game key binding",
+                                    "name": "Interact with Target"
+                                }
+                            ]
+                        },
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Click to Move Off",
+                                    "sheet": "ISBPW - WoW"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Auto-Interact with Target",
+                    "enable": false,
+                    "hold": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Click to Move On",
+                                    "sheet": "ISBPW - WoW"
+                                },
+                                {
+                                    "type": "game key binding",
+                                    "name": "Interact with Target"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Face Target",
+                    "onRelease": true,
+                    "onPress": true,
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Click to Move On",
+                                    "sheet": "ISBPW - WoW"
+                                },
+                                {
+                                    "type": "game key binding",
+                                    "name": "Interact with Target"
+                                }
+                            ]
+                        },
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Click to Move Off",
+                                    "sheet": "ISBPW - WoW"
+                                },
+                                {
+                                    "type": "game key binding",
+                                    "name": "Move Backward"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "------------------------------------------------------",
+                    "steps": [
+                        {}
+                    ]
+                },
+                {
+                    "name": "Invite Team",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Invite Team",
+                                    "sheet": "ISBPW - WoW"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ISBPW - Master Switching",
+            "mappables": [
+                {
+                    "name": "Set Master Slot 1",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Follow Master",
+                                    "keyCombo": "Shift+F11"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Assist Master",
+                                    "keyCombo": "Shift+Backspace"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Target Master",
+                                    "keyCombo": "Shift+]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Set Master Slot 2",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Follow Master",
+                                    "keyCombo": "Alt+F11"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Assist Master",
+                                    "keyCombo": "Alt+Backspace"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Target Master",
+                                    "keyCombo": "Alt+]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Set Master Slot 3",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Follow Master",
+                                    "keyCombo": "Ctrl+F11"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Assist Master",
+                                    "keyCombo": "Ctrl+Backspace"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Target Master",
+                                    "keyCombo": "Ctrl+]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Set Master Slot 4",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Follow Master",
+                                    "keyCombo": "Shift+Alt+F11"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Assist Master",
+                                    "keyCombo": "Shift+Alt+Backspace"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Target Master",
+                                    "keyCombo": "Shift+Alt+]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Set Master Slot 5",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Follow Master",
+                                    "keyCombo": "Ctrl+Shift+F11"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Assist Master",
+                                    "keyCombo": "Ctrl+Shift+Backspace"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Target Master",
+                                    "keyCombo": "Ctrl+Shift+]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Set Master Slot 6",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Follow Master",
+                                    "keyCombo": "Ctrl+Alt+F11"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Assist Master",
+                                    "keyCombo": "Ctrl+Alt+Backspace"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Target Master",
+                                    "keyCombo": "Ctrl+Alt+]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Set Master Slot 7",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Follow Master",
+                                    "keyCombo": "Ctrl+Shift+Alt+F11"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Assist Master",
+                                    "keyCombo": "Ctrl+Shift+Alt+Backspace"
+                                },
+                                {
+                                    "type": "set game key binding",
+                                    "name": "Target Master",
+                                    "keyCombo": "Ctrl+Shift+Alt+]"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ISBPW - Combat Hotkeys",
+            "mappables": [
+                {
+                    "name": "1",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "1"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "2",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "2"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "3",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "3"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "4",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "4"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "5",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "5"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "6",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "6"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "7",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "7"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "8",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "8"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "9",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "9"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "0",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "0"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "-",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "-"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "=",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Interact with Target",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "keystroke",
+                                    "keyCombo": "="
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "DPS Rotation",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "mappable",
+                                    "name": "Auto-Assist Master",
+                                    "sheet": "ISBPW - Party"
+                                },
+                                {
+                                    "type": "mappable",
+                                    "name": "DPS Rotation",
+                                    "sheet": "Virtual Combat"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ISBPW - WoW",
+            "mappables": [
+                {
+                    "name": "Click to Move Off",
+                    "description": "This turns Click to Move off. It is used by the Interact with Target key in the Non-combat Key Map.",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game macro",
+                                    "sheet": "ISBoxer 2 Core",
+                                    "name": "Click-to-Move OFF"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Click to Move On",
+                    "description": "This turns Click to Move on. It is used by the Interact with Target key in the Non-combat Key Map.",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game macro",
+                                    "sheet": "ISBoxer 2 Core",
+                                    "name": "Click-to-Move ON"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "JambaMaster",
+                    "description": "This tells the Jamba Addon to tell the other characters the current one is master.\n\nThe Quick Setup Wizard uses this and similar mappings for whatever character switching (e.g. follow upon character switch) options were selected on the last page. A different Mapped Key can be selected later if desired, by selecting it per Slot in your Character Set (in a drop-down box on the right side). Or just run the wizard again...",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game macro",
+                                    "sheet": "ISBoxer 2 Core",
+                                    "name": "JambaMaster"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "JambaStrobe Off",
+                    "description": "This tells the Jamba Addon to turn off follow strobing. It is used by Toggle Jamba Follow Strobing in the Non-combat Key Map.",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game macro",
+                                    "sheet": "ISBoxer 2 Core",
+                                    "name": "JambaStrobe OFF"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "JambaStrobe On",
+                    "description": "This tells the Jamba Addon to turn on follow strobing. It is used by Toggle Jamba Follow Strobing.",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game macro",
+                                    "sheet": "ISBoxer 2 Core",
+                                    "name": "JambaStrobe ON"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Invite Team",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type": "game macro",
+                                    "sheet": "ISBoxer 2 Core",
+                                    "name": "/invite team"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
+    ],
+    "triggers": [
+        {
+            "name": "ISBPW - Hotkeys",
+            "object": {
+                "type": "variable",
+                "name": "Core.enable hotkeys"
+            },
+            "trigger": {
+                "name": "ISBPW - Hotkeys",
+                "inputMapping": {
+                    "type": "action",
+                    "action": {
+                        "type": "if",
+                        "variableName": "Core.enable hotkeys",
+                        "op": "==",
+                        "value":true,
+                        "true": {
+                            "type":"mappable",
+                            "sheet": "ISBPW - Base Hotkeys",
+                            "name": "Enable Hotkeys"
+                        },
+                        "false": {
+                            "type":"mappable",
+                            "sheet": "ISBPW - Base Hotkeys",
+                            "name": "Disable Hotkeys"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "variables": [
+          {
+            "name":"ISBPW.follow on combat",
+            "schema":{ 
+              "type":"boolean"
+            },
+            "value":false
+          },
+          {
+            "name":"ISBPW.interact on combat",
+            "schema":{ 
+              "type":"boolean"
+            },
+            "value":false
+          },
+          {
+            "name":"ISBPW.assist on combat",
+            "schema":{ 
+              "type":"boolean"
+            },
+            "value":false
+          }
     ]
 }

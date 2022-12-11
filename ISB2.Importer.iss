@@ -131,7 +131,7 @@ objectdef isb2_importer
     {
         variable jsonvalueref jo
         jo:SetReference["This.TransformProfileXML[\"${filename~}\"]"]
-        jo:WriteFile["${ISB2.ProfilesFolder}~}/${filename.FilenameOnly~}.isb2.json",multiline]
+        jo:WriteFile["${ISB2.ProfilesFolder~}/${filename.FilenameOnly~}.isb2.json",multiline]
     }
 
     method TransformCurrentProfileXML()

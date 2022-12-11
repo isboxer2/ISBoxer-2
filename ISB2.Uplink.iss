@@ -242,7 +242,7 @@ objectdef isb2 inherits isb2_profilecollection
 
         Importer:TransformProfileXML["${fileName~}"]
 
-        This:LoadFile["${LavishScript.HomeDirectory~}/${fileName.FilenameOnly~}.isb2.json"]
+        This:LoadFile["${ProfilesFolder~}/${fileName.FilenameOnly~}.isb2.json"]
     }
 
     method OnLoadButton()

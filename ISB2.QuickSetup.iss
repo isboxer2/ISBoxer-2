@@ -63,10 +63,10 @@ objectdef isb2_quicksetup
             LGUI2.Element["isb2.QuickSetupWindow.pagecontrol"]:SelectPage[1]
             TeamName:Set[]
             Error:Set[]
-            Characters:Set["[]"]
-            EditingCharacter:Set["{}"]
-            WindowLayouts:Set["[]"]
-            WindowLayout:Set[NULL]
+            Characters:Clear
+            EditingCharacter:SetReference["{}"]
+            WindowLayouts:Clear
+            WindowLayout:SetReference[NULL]
             ExistingCharacter:Set[0]
             LGUI2.Element[isb2.QuickSetupWindow]:SetVisibility[visible]
         }
@@ -384,6 +384,72 @@ objectdef isb2_quicksetup
         jaVirtualFiles:ForEach["joOwner.Get[virtualFiles]:AddByRef[ForEach.Value]"]
     }
 
+    method AddArrayStringTo(jsonvalueref joOwner, string arrayName, string name)
+    {
+        if !${joOwner.Has[-array,"${arrayName~}"]}
+        {
+            joOwner:Set["${arrayName~}","[]"]
+            joOwner.Get["${arrayName~}"]:AddString["${name~}"]
+            return
+        }
+
+        if ${joOwner.Get["${arrayName~}"].Contains["${name.AsJSON~}"]}
+            return
+        joOwner.Get["${arrayName~}"]:AddString["${name~}"]
+    }
+
+    method AddArrayStringsTo(jsonvalueref joOwner, string arrayName, jsonvalueref jaSource)
+    {
+        jaSource:ForEach["This:AddArrayStringTo[joOwner,\"${arrayName~}\","\${ForEach.Value}"]"]
+    }
+
+    method ApplyTeamBuilder(jsonvalueref joProfile, jsonvalueref joTeamBuilder)
+    {
+        echo "\ayApplyTeamBuilder:\ax ${joTeamBuilder~}"
+
+        if ${joTeamBuilder.Has[-array,hotkeySheets]}
+        {
+            This:AddArrayStringsTo["joProfile.Get[teams,1]","hotkeySheets","joTeamBuilder.Get[hotkeySheets]"]
+        }
+        if ${joTeamBuilder.Has[-array,mappableSheets]}
+        {
+            This:AddArrayStringsTo["joProfile.Get[teams,1]","mappableSheets","joTeamBuilder.Get[mappableSheets]"]
+        }
+        if ${joTeamBuilder.Has[-array,clickBars]}
+        {
+            This:AddArrayStringsTo["joProfile.Get[teams,1]","clickBars","joTeamBuilder.Get[clickBars]"]
+        }        
+        if ${joTeamBuilder.Has[-array,gameMacroSheets]}
+        {
+            This:AddArrayStringsTo["joProfile.Get[teams,1]","gameMacroSheets","joTeamBuilder.Get[gameMacroSheets]"]
+        }        
+
+        if ${joTeamBuilder.Has[-array,slots]}
+        {
+            variable jsonvalueref jaTeamSlots
+            variable jsonvalueref jaBuilderSlots
+            variable uint i 
+
+            jaTeamSlots:SetReference["joProfile.Get[teams,1,slots]"]
+            jaBuilderSlots:SetReference["joTeamBuilder.Get[slots]"]
+
+            for ( i:Set[1] ; ${i} <= ${jaTeamSlots.Used} && ${i} <= ${jaBuilderSlots.Used} ; i:Inc)
+            {
+                jaTeamSlots.Get[${i}]:Merge["jaBuilderSlots.Get[${i}]",FALSE]
+            }
+        }
+    }
+
+    method ApplySlotBuilder(jsonvalueref joProfile, jsonvalueref joSlotBuilder)
+    {
+        echo "\arApplySlotBuilder:\ax ${joSlotBuilder~}"
+    }
+
+    method ApplyCharacterBuilder(jsonvalueref joProfile, jsonvalueref joCharacterBuilder)
+    {
+        echo "\arApplyCharacterBuilder:\ax ${joCharacterBuilder~}"
+    }
+
     method ApplyBuilder(jsonvalueref joProfile, jsonvalueref joLocatedBuilder)
     {
         if !${joLocatedBuilder.GetBool[enable]}
@@ -391,6 +457,20 @@ objectdef isb2_quicksetup
 
         echo "\arApplyBuilder:\ax ${joLocatedBuilder~}"
 
+        variable jsonvalueref joBuilder
+        joBuilder:SetReference["joLocatedBuilder.Get[builder]"]
+
+        ; attach builder profile to team...
+        This:AddArrayStringTo["joProfile.Get[teams,1]",profiles,"${joLocatedBuilder.Get[profile]~}"]
+
+        if ${joBuilder.Has[-object,team]}
+            This:ApplyTeamBuilder[joProfile,"joBuilder.Get[team]"]
+
+        if ${joBuilder.Has[-object,slot]}
+            This:ApplySlotBuilder[joProfile,"joBuilder.Get[slot]"]
+
+        if ${joBuilder.Has[-object,slot]}
+            This:ApplyCharacterBuilder[joProfile,"joBuilder.Get[character]"]
 
         return TRUE
     }

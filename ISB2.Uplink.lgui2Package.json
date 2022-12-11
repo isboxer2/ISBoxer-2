@@ -770,7 +770,10 @@
                                             "template":"isb2.gameView"
                                         }
                                     },
-                                    "selectedItemBinding":"ISB2QuickSetup.GameName",
+                                    "selectedItemBinding":{
+                                        "pullFormat":"${ISB2QuickSetup.GameName}",
+                                        "pushFormat":["ISB2QuickSetup:SelectGame[\"","\"]"]
+                                    },
                                     "selectedItemBindingProperty":"name"
                                 }
                             ]

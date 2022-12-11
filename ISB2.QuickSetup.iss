@@ -21,6 +21,8 @@ objectdef isb2_quicksetup
     variable string Error
     variable string GameName
 
+    variable jsonvalueref SelectedGame
+
     method Initialize()
     {
         WindowLayoutSettings:SetBool[instantSwap,1]
@@ -32,6 +34,22 @@ objectdef isb2_quicksetup
     method Shutdown()
     {
 
+    }
+
+    method SelectGame(string gameName)
+    {
+        GameName:Set["${gameName~}"]
+        if !${gameName.NotNULLOrEmpty}
+        {
+            SelectedGame:SetReference[NULL]
+            return
+        }
+
+
+        variable jsonvalueref jaGames
+        jaGames:SetReference["LGUI2.Skin[default].Template[isb2.data].Get[games]"]
+
+        SelectedGame:SetReference["ISB2.FindInArray[jaGames,\"${gameName~}\"]"]
     }
 
     method Start()
@@ -694,12 +712,60 @@ objectdef isb2_quicksetup
             joHotkeyBuilder:SetString[keyCombo,"${joHotkey.Get[keyCombo]~}"]
     } 
 
+    member:bool CheckGameName(jsonvalueref joGame, string name)
+    {
+        if ${joGame.Get[name]~.Equal["${name~}"]}
+            return TRUE
+        if ${joGame.Get[shortName]~.Equal["${name~}"]}
+            return TRUE
+        return FALSE
+    }
+
+    member:bool ShouldShowBuilder(jsonvalueref joBuilder)
+    {        
+        switch ${joBuilder.GetType[game]}
+        {
+            case string
+                {
+                    if !${This.CheckGameName[SelectedGame,"${joBuilder.Get[game]~}"]}
+                    {
+                        return FALSE
+                    }
+                }
+                break
+            case array
+                break
+        }
+
+        switch ${joBuilder.GetType[genre]}
+        {
+            case string
+            {
+                if ${SelectedGame.Has[-string,genre]}
+                {
+                    if !${joBuilder.Get[genre]~.Equal["${SelectedGame.Get[genre]~}"]}
+                    {
+                        return FALSE
+                    }
+                }
+            }
+                break
+            case array
+                break
+        }
+        
+        return TRUE
+    }
+
     method AddLocatedBuilder(jsonvalueref joLocated)
     {
         variable jsonvalue jo="{}"
         variable jsonvalueref joBuilder="joLocated.Get[object]"
 
-        jo:SetBool[enable,${joBuilder.GetBool[enable]}]
+        if !${This.ShouldShowBuilder[joBuilder]}
+            return FALSE
+
+        jo:SetBool[enable,${joBuilder.GetBool[enable]}]        
 
         jo:SetString[profile,"${joLocated.Get[profile]~}"]
         jo:SetByRef[builder,joBuilder]
@@ -708,6 +774,8 @@ objectdef isb2_quicksetup
         joBuilder.Get[hotkeys]:ForEach["This:PrepareBuilderHotkey[jo,ForEach.Value]"]
 
         Builders:AddByRef[jo]
+
+        return TRUE
     }
 
     method RefreshBuilders()

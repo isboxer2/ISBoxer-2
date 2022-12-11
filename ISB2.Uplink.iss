@@ -80,27 +80,28 @@ objectdef isb2 inherits isb2_profilecollection
 
     method DetectSettingsFolder()
     {
+        ; use Documents folder if it exists
         SettingsFolder:Set["%USERPROFILE%/Documents"]:MakeAbsolute
+        if !${SettingsFolder.PathExists}
+        {
+            ; otherwise try InnerSpace folder
+            SettingsFolder:Set["${LavishScript.HomeDirectory}"]:MakeAbsolute
+        }
+
         if ${SettingsFolder.PathExists}
         {
+            ; now only use an ISBoxer 2 sub-folder
             if !${SettingsFolder.FileExists[ISBoxer 2]}
             {
                 mkdir "${SettingsFolder~}/ISBoxer 2"            
             }
-            if ${SettingsFolder.FileExists[ISBoxer 2]}
-            {
-                SettingsFolder:Set["${SettingsFolder~}/ISBoxer 2"]
-                ProfilesFolder:Set["${SettingsFolder~}/Profiles"]
-                if !${SettingsFolder.FileExists[Profiles]}
-                    mkdir "${ProfilesFolder~}"
-
-                echo "ISBoxer 2: Using Settings Folder ${SettingsFolder~}"
-                return
-            }
+            SettingsFolder:Set["${SettingsFolder~}/ISBoxer 2"]
         }
+        
+        ProfilesFolder:Set["${SettingsFolder~}/Profiles"]
+        if !${SettingsFolder.FileExists[Profiles]}
+            mkdir "${ProfilesFolder~}"
 
-        SettingsFolder:Set["${Script.CurrentDirectory}/"]:MakeAbsolute
-        ProfilesFolder:Set["${SettingsFolder~}"]
         echo "ISBoxer 2: Using Settings Folder ${SettingsFolder~}"
     }
 

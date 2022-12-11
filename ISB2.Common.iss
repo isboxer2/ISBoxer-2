@@ -5,6 +5,7 @@ objectdef isb2_profile
 {
     variable string LocalFilename
     variable uint Priority
+    variable bool Native
 
     variable string Name
     variable string Description
@@ -34,12 +35,13 @@ objectdef isb2_profile
 
     variable isb2_triggerchains TriggerChains
 
-    method Initialize(jsonvalueref jo, uint priority, string localFilename)
+    method Initialize(jsonvalueref jo, uint priority, string localFilename, bool native)
     {
         This:FromJSON[jo]
         Priority:Set[${priority}]
         if ${localFilename.NotNULLOrEmpty}
             LocalFilename:Set["${localFilename~}"]
+        Native:Set[${native}]
     }
 
     method FromJSON(jsonvalueref jo)
@@ -160,6 +162,11 @@ objectdef isb2_profile
 
     method Store()
     {
+        if ${Native}
+        {
+            ; dont overwrite native profiles            
+            return FALSE
+        }
         if ${LocalFilename.NotNULLOrEmpty}
         {
             This.AsJSON:WriteFile["${LocalFilename~}",multiline]
@@ -229,19 +236,19 @@ objectdef isb2_profilecollection
         return ja
     }
 
-    method LoadFiles(jsonvalueref jaFilenames)
+    method LoadFiles(jsonvalueref jaFilenames, bool native)
     {
         if !${jaFilenames.Type.Equal[array]}
             return FALSE
 
-        jaFilenames:ForEach["This:LoadFile[\"\${ForEach.Value~}\"]"]
+        jaFilenames:ForEach["This:LoadFile[\"\${ForEach.Value~}\,${native}]"]
         return TRUE
     }
 
-    method LoadFolder(filepath filePath)
+    method LoadFolder(filepath filePath, bool native)
     {
         echo LoadFolder ${filePath~}
-        filePath.GetFiles["*.isb2.json"]:ForEach["This:LoadFile[\"${filePath~}/\${ForEach.Value.Get[filename]}\"]"]
+        filePath.GetFiles["*.isb2.json"]:ForEach["This:LoadFile[\"${filePath~}/\${ForEach.Value.Get[filename]}\",${native}]"]
     }
 
     method OpenEditor(string profileName)
@@ -256,7 +263,7 @@ objectdef isb2_profilecollection
     }
 
     ; Loads a profile from a given file
-    method LoadFile(filepath fileName)
+    method LoadFile(filepath fileName, bool native)
     {
         ; given a path like "Tests/WoW.isb2.json" this turns it into like "C:/blah blah/Tests/isb2.json"
         fileName:MakeAbsolute
@@ -286,7 +293,7 @@ objectdef isb2_profilecollection
 
         LoadCount:Inc
         ; Assign the Profile
-        Profiles:Set["${name~}","jo",${LoadCount},"${fileName~}"]
+        Profiles:Set["${name~}","jo",${LoadCount},"${fileName~}",${native}]
 
         ; the isb2_profile object is now created, assign its LocalFilename
         Profiles.Get["${name~}"].LocalFilename:Set["${fileName~}"]

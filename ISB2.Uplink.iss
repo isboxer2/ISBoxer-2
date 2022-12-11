@@ -44,6 +44,7 @@ objectdef isb2 inherits isb2_profilecollection
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
         LGUI2:PopSkin["${UseSkin~}"]
 
+        This:LoadNativeProfiles
         This:LoadPreviousProfiles
 
         if ${Settings.Has[lastSelectedTeam]}
@@ -71,7 +72,7 @@ objectdef isb2 inherits isb2_profilecollection
     method OnProfilesUpdated()
     {
         variable jsonvalueref ja="[]"
-        Profiles:ForEach["ja:AddString[\"\${ForEach.Value.LocalFilename~}\"]"]
+        This.GetUserProfilesArray:ForEach["ja:AddString[\"\${ForEach.Value.LocalFilename~}\"]"]
         Settings:SetByRef[loadedProfiles,ja]
 
         This:AutoStoreSettings
@@ -111,6 +112,11 @@ objectdef isb2 inherits isb2_profilecollection
     method LoadDefaultSettings()
     {
         Settings:SetReference["{}"]
+    }
+
+    method LoadNativeProfiles()
+    {
+        This:LoadFolder["${agent.Get[ISBoxer 2].Directory~}/Native Profiles/",1]   
     }
 
     method LoadPreviousProfiles()
@@ -267,6 +273,27 @@ objectdef isb2 inherits isb2_profilecollection
 
         Context:SetHandled[1]
     }
+
+    member:jsonvalueref GetUserProfilesArray()
+    {
+        variable jsonvalue ja="[]"
+
+        variable jsonvalue joQuery="{\"eval\":\"Select.Native\",\"op\":\"==\",\"value\":false}"
+
+        Profiles:ForEach["ja:AddByRef[ForEach.Value.AsJSON]",joQuery]
+        return ja
+    }
+
+    member:jsonvalueref GetNativeProfilesArray()
+    {
+        variable jsonvalue ja="[]"
+
+        variable jsonvalue joQuery="{\"eval\":\"Select.Native\",\"op\":\"==\",\"value\":true}"
+
+        Profiles:ForEach["ja:AddByRef[ForEach.Value.AsJSON]",joQuery]
+        return ja
+    }
+
 }
 
 objectdef isb2_managedSlot

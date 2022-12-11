@@ -628,7 +628,7 @@
                                             "horizontalAlignment": "stretch",
                                             "verticalAlignment": "stretch",
                                             "itemsBinding":{
-                                                "pullFormat": "${ISB2.Profiles.AsJSON[array]}",
+                                                "pullFormat": "${ISB2.GetUserProfilesArray}",
                                                 "pullHook": {
                                                     "elementName": "isb2.events",
                                                     "flags": "global",

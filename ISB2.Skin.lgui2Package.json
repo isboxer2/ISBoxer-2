@@ -121,23 +121,46 @@
             "games":[
                 {
                     "name":"Diablo Immortal",
-                    "shortName":"DI"
+                    "shortName":"DI",
+                    "genre":"ARPG"
                 },
                 {
                     "name":"EverQuest",
-                    "shortName":"EQ1"
+                    "shortName":"EQ1",
+                    "genre":"MMO"
                 },
                 {
                     "name":"EVE Online",
-                    "shortName":"EVE"
+                    "shortName":"EVE",
+                    "genre":"MMO"
                 },
                 {
                     "name":"Lord of the Rings Online",
-                    "shortName":"LOTRO"
+                    "shortName":"LOTRO",
+                    "genre":"MMO"
                 },
                 {
                     "name":"World of Warcraft",
-                    "shortName":"WoW"
+                    "shortName":"WoW",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "replacement":"{1}/Battle.net-{CHARACTER}.config",
+                            "pattern":"*/Battle.net.config"
+                        },
+                        {
+                            "replacement":"{1}/Config-{CHARACTER}.WTF",
+                            "pattern":"*/Config.WTF"
+                        },
+                        {
+                            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/{CHARACTER}/",
+                            "pattern":"Software/Blizzard Entertainment/Battle.net/"
+                        },
+                        {
+                            "replacement":"Software/Blizzard Entertainment/World of Warcraft/Client-ISBoxer/{CHARACTER}/",
+                            "pattern":"Software/Blizzard Entertainment/World of Warcraft/Client/"
+                        }                  
+                    ]
                 },
                 {
                     "name":"Other",

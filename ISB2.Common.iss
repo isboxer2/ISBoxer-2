@@ -241,7 +241,7 @@ objectdef isb2_profilecollection
         if !${jaFilenames.Type.Equal[array]}
             return FALSE
 
-        jaFilenames:ForEach["This:LoadFile[\"\${ForEach.Value~}\,${native}]"]
+        jaFilenames:ForEach["This:LoadFile[\"\${ForEach.Value~}\",${native}]"]
         return TRUE
     }
 
@@ -1520,6 +1520,8 @@ objectdef isb2_hotkeysheet
     variable bool Enable
     variable bool Enabled
 
+    variable bool WasEnabled
+
     variable jsonvalue Hotkeys="{}"
     variable isb2_triggerchains TriggerChains
 
@@ -1565,15 +1567,19 @@ objectdef isb2_hotkeysheet
         return TRUE
     }
 
-    method Enable()
+    method Enable(bool maybeNot)
     {
         if ${Enabled}
             return TRUE
+
+        if ${maybeNot} && !${WasEnabled}
+            return FALSE
         
         if !${ISB2.AllowHotkeySheet["${Name~}"]}
             return FALSE
 
         Enabled:Set[1]
+        WasEnabled:Set[1]
 
         variable jsonvalue joQuery="{}"
         joQuery:SetString[op,"!="]
@@ -1596,12 +1602,12 @@ objectdef isb2_hotkeysheet
         return TRUE
     }
 
-    method Toggle()
+    method Toggle(bool maybeNot)
     {
         if ${Enabled}
             This:Disable
         else
-            This:Enable
+            This:Enable[${maybeNot}]
     }
 
     method EnableHotkey(jsonvalueref jo)
@@ -1640,6 +1646,7 @@ objectdef isb2_mappablesheet
 
     variable bool Enable
     variable bool Enabled
+    variable bool WasEnabled
 
     variable bool Hold
     variable string Mode="OnRelease"
@@ -1704,14 +1711,19 @@ objectdef isb2_mappablesheet
         return TRUE
     }
 
-    method Enable()
+    method Enable(bool maybeNot)
     {
         if ${Enabled}
             return TRUE
+
+        if ${maybeNot} && !${WasEnabled}
+            return FALSE
+
         if !${ISB2.AllowMappableSheet["${Name~}"]}
             return FALSE
 
         Enabled:Set[1]
+        WasEnabled:Set[1]
         TriggerChains:Fire["OnEnabled"]
         return TRUE
     }
@@ -1726,12 +1738,12 @@ objectdef isb2_mappablesheet
         return TRUE
     }
 
-    method Toggle()
+    method Toggle(bool maybeNot)
     {
         if ${Enabled}
             This:Disable
         else
-            This:Enable
+            This:Enable[${maybeNot}]
     }    
 }
 

@@ -1871,16 +1871,16 @@ objectdef isb2_profileengine
         variable string name
         name:Set["${joAction.Get[name]~}"]
 
-        switch ${joAction.GetBool[state]}
+        switch ${joAction.Get[value]}
         {
-            case TRUE
-                HotkeySheets.Get["${name~}"]:Enable
+            case On
+                HotkeySheets.Get["${name~}"]:Enable[${joAction.GetBool[weak]}]
                 break
-            case FALSE
+            case Off
                 HotkeySheets.Get["${name~}"]:Disable
                 break
-            case NULL
-                HotkeySheets.Get["${name~}"]:Toggle
+            case Toggle
+                HotkeySheets.Get["${name~}"]:Toggle[${joAction.GetBool[weak]}]
                 break
         }
     }
@@ -1894,16 +1894,16 @@ objectdef isb2_profileengine
         variable string name
         name:Set["${joAction.Get[name]~}"]
 
-        switch ${joAction.GetBool[state]}
+        switch ${joAction.Get[value]}
         {
-            case TRUE
-                MappableSheets.Get["${name~}"]:Enable
+            case On
+                MappableSheets.Get["${name~}"]:Enable[${joAction.GetBool[weak]}]
                 break
-            case FALSE
+            case Off
                 MappableSheets.Get["${name~}"]:Disable
                 break
-            case NULL
-                MappableSheets.Get["${name~}"]:Toggle
+            case Toggle
+                MappableSheets.Get["${name~}"]:Toggle[${joAction.GetBool[weak]}]
                 break
         }
     }

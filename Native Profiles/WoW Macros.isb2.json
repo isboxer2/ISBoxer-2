@@ -1,0 +1,22 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/isb2.json",
+    "name": "World of Warcraft Macros",
+    "builders":[
+        {
+            "name": "ISBoxer 2 Core",
+            "team": {
+                "gameMacroSheets":[
+                    "ISBoxer 2 Core"
+                ]
+            }
+        }
+    ],
+    "gameMacroSheets": [
+        {
+            "name": "ISBoxer 2 Core",
+            "macros": [
+
+            ]
+        }
+    ]
+}

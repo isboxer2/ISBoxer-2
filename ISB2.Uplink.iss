@@ -350,6 +350,43 @@ objectdef isb2_managedSlot
         Launcher:SetReference[0]
     }
 
+    member:jsonvalueref CollectProfiles()
+    {
+;        variable jsonvalueref ja="ISB2.GetUserProfilesArray"
+        variable jsonvalue ja="[]"
+        ; add profiles only as directed by team, slot, or character
+
+        This:AddProfile[ja,"${joLaunchInfo.Get[teamProfile]~}"]
+        This:AddProfiles[ja,"joTeam"]
+        This:AddProfiles[ja,"joTeam.Get[slots,${NumSlot}]"]
+        This:AddProfile[ja,"${joLaunchInfo.Get[characterProfile]~}"]
+        This:AddProfiles[ja,"joCharacter"]
+
+        return ja
+    }
+
+    method AddProfile(jsonvalueref ja, string name)
+    {
+        variable weakref _profile="ISB2.Profiles.Get[\"${name~}\"]"
+        if !${_profile.Reference(exists)}
+            return FALSE
+
+        if ${ja.Contains["${_profile.LocalFilename.AsJSON~}"]}
+            return FALSE
+
+        ja:AddString["${_profile.LocalFilename~}"]
+        return TRUE
+    }
+
+    method AddProfiles(jsonvalueref ja, jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        jo.Get[profiles]:ForEach["This:AddProfile[ja,\"\${ForEach.Value}\"]"]
+        return TRUE
+    }
+
     method Launch()
     {
         if ${SlotObserver.Sessions.Used}
@@ -370,7 +407,7 @@ objectdef isb2_managedSlot
         }
 
         joLaunchInfo:SetBool[isb2,1]
-        joLaunchInfo:SetByRef["isb2profiles",ISB2.GetLoadedFilenames]
+        joLaunchInfo:SetByRef["isb2profiles",This.CollectProfiles]
         joGLI:SetByRef[metadata,joLaunchInfo]
 
         Script:SetLastError        

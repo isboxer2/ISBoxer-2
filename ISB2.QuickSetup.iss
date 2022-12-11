@@ -373,6 +373,33 @@ objectdef isb2_quicksetup
         return jo
     }
 
+    method AddVirtualFiles(jsonvalueref joOwner, jsonvalueref jaVirtualFiles)
+    {
+        if !${joOwner.Has[-array,virtualFiles]}
+        {
+            joOwner:SetByRef[jaVirtualFiles.Duplicate]
+            return
+        }
+
+        jaVirtualFiles:ForEach["joOwner.Get[virtualFiles]:AddByRef[ForEach.Value]"]
+    }
+
+    method ApplyBuilder(jsonvalueref joProfile, jsonvalueref joLocatedBuilder)
+    {
+        if !${joLocatedBuilder.GetBool[enable]}
+            return FALSE
+
+        echo "\arApplyBuilder:\ax ${joLocatedBuilder~}"
+
+
+        return TRUE
+    }
+
+    method ApplyBuilders(jsonvalueref joProfile)
+    {
+        Builders:ForEach["This:ApplyBuilder[joProfile,ForEach.Value]"]
+    }
+
     method Finish()
     {
         echo "\ayisb2_quicksetup:Finish\ax"     
@@ -397,6 +424,14 @@ objectdef isb2_quicksetup
         joProfile.Get[teams]:AddByRef[joTeam]
         joProfile:SetByRef[characters,Characters]
 
+        variable jsonvalueref jaVirtualFiles
+        ; add Virtual Files ...
+        if ${SelectedGame.Has[-array,virtualFiles]}
+        {            
+            jaVirtualFiles:SetReference["SelectedGame.Get[virtualFiles]"]
+            Characters:ForEach["This:AddVirtualFiles[ForEach.Value,jaVirtualFiles]"]
+        }
+
         variable jsonvalueref joWindowLayout
         if ${WindowLayout.Reference(exists)}
         {
@@ -408,6 +443,9 @@ objectdef isb2_quicksetup
                 joProfile.Get[windowLayouts]:AddByRef[joWindowLayout]
             }
         }
+
+        ; apply builders
+        This:ApplyBuilders[joProfile]
 
         variable string fileName
         fileName:Set["Team.${This.GetSanitizedName["${TeamName~}"]}.isb2.json"]
@@ -737,6 +775,20 @@ objectdef isb2_quicksetup
                 break
         }
 
+        switch ${joBuilder.GetType[notGame]}
+        {
+            case string
+                {
+                    if ${This.CheckGameName[SelectedGame,"${joBuilder.Get[notGame]~}"]}
+                    {
+                        return FALSE
+                    }
+                }
+                break
+            case array
+                break
+        }        
+
         switch ${joBuilder.GetType[genre]}
         {
             case string
@@ -753,6 +805,23 @@ objectdef isb2_quicksetup
             case array
                 break
         }
+
+        switch ${joBuilder.GetType[notGenre]}
+        {
+            case string
+            {
+                if ${SelectedGame.Has[-string,notGenre]}
+                {
+                    if ${joBuilder.Get[genre]~.Equal["${SelectedGame.Get[notGenre]~}"]}
+                    {
+                        return FALSE
+                    }
+                }
+            }
+                break
+            case array
+                break
+        }        
         
         return TRUE
     }

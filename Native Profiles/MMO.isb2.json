@@ -3,10 +3,12 @@
     "name": "MMO",
     "builders":[
         {
-            "name": "MMO - Standard"
+            "name": "MMO - Standard",
+            "genre":"MMO"
         },
         {
-            "name":"MMO - Pro"
+            "name":"MMO - Pro",
+            "genre":"MMO"
         }
     ],
     "hotkeySheets": [

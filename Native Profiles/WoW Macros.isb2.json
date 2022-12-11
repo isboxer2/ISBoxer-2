@@ -3,6 +3,7 @@
     "name": "World of Warcraft Macros",
     "builders":[
         {
+            "game":"WoW",
             "name": "ISBoxer 2 Core",
             "team": {
                 "gameMacroSheets":[

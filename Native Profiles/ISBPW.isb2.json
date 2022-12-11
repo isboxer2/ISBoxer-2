@@ -4,6 +4,7 @@
     "builders": [
         {
             "name":"WoW Macro-based Master Switching",
+            "game":"WoW",        
             "description": "For World of Wacraft versions supporting ISBoxer 2 Addon (1.12.3 and later), enables Follow, Assist, Targeting and Interact mechanics",
             "hotkeys": [
                 {
@@ -31,6 +32,7 @@
         },
         {
             "name": "Per-Slot Master Switching",
+            "genre":"MMO",
             "description": "For non-broadcasting games, enables Follow, Assist, Targeting and Interact mechanics",
             "hotkeys": [
                 {
@@ -72,6 +74,7 @@
         },
         {
             "name": "Combat Hotkeys 1 through =",
+            "genre":"MMO",
             "description": "For non-broadcasting games, enables basic combat hotkeys",
             "team": {
                 "hotkeySheets": ["ISBPW - Combat Hotkeys"],
@@ -1258,7 +1261,7 @@
             "schema":{ 
               "type":"boolean"
             },
-            "value":false
+            "value":true
           }
     ]
 }

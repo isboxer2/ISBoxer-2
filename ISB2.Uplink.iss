@@ -72,7 +72,10 @@ objectdef isb2 inherits isb2_profilecollection
     method OnProfilesUpdated()
     {
         variable jsonvalueref ja="[]"
-        This.GetUserProfilesArray:ForEach["ja:AddString[\"\${ForEach.Value.LocalFilename~}\"]"]
+
+        variable jsonvalue joQuery="{\"member\":\"Native\",\"op\":\"==\",\"value\":false}"
+
+        Profiles:ForEach["ja:AddString[\"\${ForEach.Value.LocalFilename~}\"]",joQuery]
         Settings:SetByRef[loadedProfiles,ja]
 
         This:AutoStoreSettings

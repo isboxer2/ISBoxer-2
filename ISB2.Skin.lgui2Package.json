@@ -539,6 +539,12 @@
                     "handler":"Action_Random",
                     "activationState":true,
                     "retarget":true
+                },
+                {
+                    "name":"actions",
+                    "handler":"Action_Actions",
+                    "activationState":true,
+                    "retarget":true
                 }
             ]
         }

@@ -42,6 +42,8 @@ objectdef isb2_profile
         if ${localFilename.NotNULLOrEmpty}
             LocalFilename:Set["${localFilename~}"]
         Native:Set[${native}]
+
+        TriggerChains:ApplyPendingTriggersAs[profile,"${Name~}"]
     }
 
     method FromJSON(jsonvalueref jo)
@@ -1082,6 +1084,8 @@ objectdef isb2_clickbarButtonLayout
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[buttonlayout,"${Name~}"]        
     }
 
     method FromJSON(jsonvalueref jo)
@@ -1143,6 +1147,8 @@ objectdef isb2_clickbar
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[clickbar,"${Name~}"]        
     }
 
     method FromJSON(jsonvalueref jo)
@@ -1434,7 +1440,7 @@ objectdef isb2_clickbar
 objectdef isb2_triggerchain
 {
     variable string Name
-    variable jsonvalue Triggers="{}"
+    variable jsonvalueref Triggers="{}"
 
     method Initialize(string name)
     {
@@ -1486,11 +1492,50 @@ objectdef isb2_triggerchains
 {
     variable collection:isb2_triggerchain Chains
 
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"    
+        jo:Set[chains,"${Chains.AsJSON~}"]
+        return jo
+    }
+
+    method ApplyPendingTriggersAs(string _type, string _name)
+    {
+        variable jsonvalue jo="{\"type\":\"${_type~}\"}"
+        if ${_name.NotNULLOrEmpty}
+            jo:SetString[name,"${_name~}"]
+
+        return ${This:ApplyPendingTriggers[jo](exists)}
+    }
+
+    method ApplyPendingTriggers(jsonvalueref joObject)
+    {
+        ; grab pending triggers specified for this object
+        variable weakref obj="ISB2.PendingTriggerChains.Get[\"${joObject~}\"]"
+
+        if !${obj.Reference(exists)}
+            return FALSE
+
+        echo "\ayApplyPendingTriggers\ax ${joObject~} => ${obj.AsJSON~}"
+        obj.Chains:ForEach["This:MoveChain[ForEach.Value]"]
+
+        ISB2.PendingTriggerChains:Erase["${joObject~}"]
+        return TRUE
+    }
+
+    method MoveChain(weakref other_chain)
+    {
+        variable weakref my_chain="This.Get[\"${other_chain.Name~}\",1]"
+
+        echo "MoveChain other ${other_chain.AsJSON~}"
+        my_chain.Triggers:SetReference[other_chain.Triggers]
+        echo "MoveChain result ${my_chain.AsJSON~}"
+    }
+
     member:weakref Get(string name, bool autoCreate)
     {
         if ${autoCreate}
         {
-            variable weakref chain
             if !${Chains.Get["${name~}"](exists)}
                 Chains:Set["${name~}","${name~}"]
         }
@@ -1528,6 +1573,8 @@ objectdef isb2_hotkeysheet
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[hotkeysheet,"${Name~}"]        
     }
 
     method Shutdown()
@@ -1658,6 +1705,8 @@ objectdef isb2_mappablesheet
     {
 ;        Enabled:Set[1]
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[mappablesheet,"${Name~}"]        
     }
 
     method FromJSON(jsonvalueref jo)
@@ -1758,6 +1807,8 @@ objectdef isb2_gamemacrosheet
     method Initialize(jsonvalueref jo)
     {        
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[gamemacrosheet,"${Name~}"]        
     }
 
     method FromJSON(jsonvalueref jo)
@@ -1801,6 +1852,8 @@ objectdef isb2_imagesheet
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[imagesheet,"${Name~}"]        
     }
 
     method FromJSON(jsonvalueref jo)
@@ -1855,6 +1908,8 @@ objectdef isb2_regionsheet
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[regionsheet,"${Name~}"]        
     }
 
     method FromJSON(jsonvalueref jo)
@@ -1902,6 +1957,9 @@ objectdef isb2_vfxOutput
     {
         Sheet:SetReference[sheet]
         This:FromJSON[jo]
+        
+        
+        ; TriggerChains:ApplyPendingTriggersAs[vfxoutput,"${Name~}"]                
     }
 
     method Shutdown()
@@ -2048,6 +2106,8 @@ objectdef isb2_vfxSource
     {
         Sheet:SetReference[sheet]
         This:FromJSON[jo]
+
+        ; TriggerChains:ApplyPendingTriggersAs[vfxsource,"${Name~}"]        
     }
 
     method Shutdown()
@@ -2190,6 +2250,8 @@ objectdef isb2_vfxsheet
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[vfxsheet,"${Name~}"]        
     }
 
     method Shutdown()
@@ -2312,6 +2374,8 @@ objectdef isb2_variable
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+
+        TriggerChains:ApplyPendingTriggersAs[variable,"${Name~}"]        
     }
 
     method FromJSON(jsonvalueref jo)
@@ -2460,6 +2524,7 @@ objectdef isb2_timerpool
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
+        TriggerChains:ApplyPendingTriggersAs[timerpool,"${Name~}"]                
     }
 
     method Shutdown()

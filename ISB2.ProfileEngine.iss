@@ -37,6 +37,7 @@ objectdef isb2_profileengine
     variable collection:isb2_variable Variables
 
     variable isb2_triggerchains TriggerChains
+    variable collection:isb2_triggerchains PendingTriggerChains
 
     variable jsonvalue InputMappings="{}"
     variable jsonvalue GameKeyBindings="{}"
@@ -383,17 +384,18 @@ objectdef isb2_profileengine
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        variable string name
-        name:Set["${jo.Get[name]~}"]
 
-        if !${TriggerChains.Get["${name~}"](exists)}
-        {
-            TriggerChains:Set["${name~}","${name~}"]
-        }
+        variable weakref triggerChain
 
-        TriggerChains.Get["${name~}"]:AddHandler[jo]
+        ; object
+        ; name
+        triggerChain:SetReference["This.ResolveTriggerChain[jo,1]"]
+        if !${triggerChain.Reference(exists)}
+            return FALSE
 
-        LGUI2.Element[isb2.events]:FireEventHandler[onTriggersUpdated]        
+        ; trigger
+        triggerChain:AddTrigger["jo.Get[trigger]"]
+        return TRUE
     }
 
     method InstallTriggers(jsonvalueref ja)
@@ -742,7 +744,7 @@ objectdef isb2_profileengine
         if !${jo.Type.Equal[object]}
             return FALSE
 
-        if ${Variables.Has["${jo.Get[name]~}"]}
+        if ${Variables.Get["${jo.Get[name]~}"](exists)}
         {
             Variables.Get["${jo.Get[name]~}"]:FromJSON[jo]
             return
@@ -2474,6 +2476,15 @@ objectdef isb2_profileengine
         return TRUE
     }
 
+    method Action_Actions(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\agAction_Actions\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return FALSE
+
+        return ${This:ExecuteActionList[joState,"joAction.Get[actions]",${activate}](exists)}
+    }
+
     method Action_If(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\agAction_If\ax[${activate}] ${joAction~}"
@@ -4114,8 +4125,23 @@ objectdef isb2_profileengine
         obj:SetReference["This.ResolveObject[joObject]"]
 
         if !${obj.Reference(exists)}
-            return 0
+        {
+            if !${autoCreate}
+                return 0
 
+            ; object doesn't exist, auto-create a PENDING trigger chain for the object to apply to itself
+            obj:SetReference["This.PendingTriggerChains.Get[\"${joObject~}\"]"]
+            if !${obj.Reference(exists)}
+            {
+                echo "\ayCreating pending trigger chain for\ax ${joObject~}"
+                ; pending chain does not exist
+                This.PendingTriggerChains:Set["${joObject~}","${jo.Get[name]~}"]
+                obj:SetReference["This.PendingTriggerChains.Get[\"${joObject~}\"]"]
+
+                return "obj.Get[\"${jo.Get[name]}\",${autoCreate}]"
+            }                                
+        }
+        
         return "obj.TriggerChains.Get[\"${jo.Get[name]}\",${autoCreate}]"
     }
 

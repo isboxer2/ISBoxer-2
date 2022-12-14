@@ -318,7 +318,7 @@
                     ]
                 },
                 {
-                    "name":"Disble Hotkeys",
+                    "name":"Disable Hotkeys",
                     "steps": [
                         {
                             "actions": [
@@ -475,6 +475,94 @@
             "name": "ISBPW - Party",
             "mappables": [
                 {
+                    "name": "Pre-Combat",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"mappable",
+                                    "sheet":"ISBPW - Party",
+                                    "name": "Assist Master - Combat"        
+                                },
+                                {
+                                    "type":"if",
+                                    "variableName": "ISBPW.follow on combat",
+                                    "op": "==",
+                                    "value":true,
+                                    "true": {
+                                        "type":"mappable",
+                                        "sheet":"ISBPW - Party",
+                                        "name":"Follow Master"
+                                    },
+                                    "false": {
+                                        "type":"mappable",
+                                        "sheet":"ISBPW - Party",
+                                        "name": "Interact with Target - Combat"    
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"Assist Master - Combat",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"if",
+                                    "variableName": "ISBPW.assist on combat",
+                                    "op": "==",
+                                    "true":{
+                                        "type":"mappable",
+                                        "sheet": "ISBPW - Party",
+                                        "name": "Assist Master"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name":"Follow Master - Combat",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"if",
+                                    "variableName": "ISBPW.follow on combat",
+                                    "op": "==",
+                                    "true":{
+                                        "type":"mappable",
+                                        "sheet": "ISBPW - Party",
+                                        "name": "Follow Master"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Interact with Target - Combat",
+                    "steps": [
+                        {
+                            "actions": [
+                                {
+                                    "type":"if",
+                                    "variableName": "ISBPW.interact on combat",
+                                    "op":"==",
+                                    "value":true,
+                                    "true": {
+                                        "type":"mappable",
+                                        "sheet":"ISBPW - Party",
+                                        "name": "Melee Interact with Target"    
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "name": "Assist Master",
                     "steps": [
                         {
@@ -482,20 +570,6 @@
                                 {
                                     "type": "game key binding",
                                     "name": "Assist Master"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "Auto-Assist Master",
-                    "steps": [
-                        {
-                            "actions": [
-                                {
-                                    "type": "mappable",
-                                    "name": "Assist Master",
-                                    "sheet": "ISBPW - Party"
                                 }
                             ]
                         }
@@ -525,12 +599,6 @@
                                 }
                             ]
                         }
-                    ]
-                },
-                {
-                    "name": "==================================",
-                    "steps": [
-                        {}
                     ]
                 },
                 {
@@ -568,8 +636,7 @@
                     ]
                 },
                 {
-                    "name": "Auto-Interact with Target",
-                    "enable": false,
+                    "name": "Melee Interact with Target",
                     "hold": true,
                     "steps": [
                         {
@@ -578,6 +645,10 @@
                                     "type": "mappable",
                                     "name": "Click to Move On",
                                     "sheet": "ISBPW - WoW"
+                                },
+                                {
+                                    "type": "game key binding",
+                                    "name": "Move Backward"
                                 },
                                 {
                                     "type": "game key binding",
@@ -618,12 +689,6 @@
                                 }
                             ]
                         }
-                    ]
-                },
-                {
-                    "name": "------------------------------------------------------",
-                    "steps": [
-                        {}
                     ]
                 },
                 {
@@ -825,12 +890,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -848,12 +908,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -871,12 +926,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -894,12 +944,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -917,12 +962,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -940,12 +980,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -963,12 +998,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -986,12 +1016,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -1009,12 +1034,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -1032,12 +1052,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -1055,12 +1070,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -1078,12 +1088,7 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
-                                    "sheet": "ISBPW - Party"
-                                },
-                                {
-                                    "type": "mappable",
-                                    "name": "Auto-Interact with Target",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
@@ -1101,13 +1106,13 @@
                             "actions": [
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
+                                    "name": "Pre-Combat",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {
                                     "type": "mappable",
-                                    "name": "DPS Rotation",
-                                    "sheet": "Virtual Combat"
+                                    "name": "{U:ISBPW.dps rotation mapping name}",
+                                    "sheet": "{U:ISBPW.dps rotation mapping sheet}"
                                 }
                             ]
                         }
@@ -1212,7 +1217,7 @@
     ],
     "triggers": [
         {
-            "name": "ISBPW - Hotkeys",
+            "name": "OnValueChanged",
             "object": {
                 "type": "variable",
                 "name": "Core.enable hotkeys"
@@ -1262,6 +1267,20 @@
               "type":"boolean"
             },
             "value":true
+          },
+          {
+            "name": "ISBPW.dps rotation mapping name",
+            "value":"DPS Rotation",
+            "schema": {
+                "type":"string"
+            }
+          },
+          {
+            "name": "ISBPW.dps rotation mapping sheet",
+            "value":"Not Configured",
+            "schema": {
+                "type":"string"
+            }
           }
     ]
 }

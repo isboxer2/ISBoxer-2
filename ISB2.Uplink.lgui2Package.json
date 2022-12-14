@@ -1039,9 +1039,10 @@
                                     "type":"expander",
                                     "_dock":"top",
                                     "header":"Region Generator Settings",
-                                    "content":{
+                                    "expanded":false,
+                                    "content":{                                        
                                         "type":"objectview",
-                                        "horizontalAlignment":"stretch",
+                                        "horizontalAlignment":"stretch",                                        
                                         "objectBinding":{
                                             "pullFormat":"${ISB2QuickSetup.RegionGeneratorSettings}"
                                         },
@@ -1252,11 +1253,11 @@
                                                 "editTemplate":"propertyview.checkbox"          
                                             },
                                             {
-                                                "name":"Swap windows on Hotkey",
+                                                "name":"Swap windows on Slot Hotkey",
                                                 "dataBinding":{
-                                                    "pullFormat":"${This.ObjectView.Object.GetBool[swapOnHotkey]}",
+                                                    "pullFormat":"${This.ObjectView.Object.GetBool[swapOnSlotActivate]}",
                                                     "pullReplaceNull":"",
-                                                    "pushFormat":["This.ObjectView.Object:SetBool[swapOnHotkey,\"","\"]"]
+                                                    "pushFormat":["This.ObjectView.Object:SetBool[swapOnSlotActivate,\"","\"]"]
                                                 },
                                                 "editTemplate":"propertyview.checkbox"          
                                             }
@@ -1316,6 +1317,7 @@
                         "content":{
                             "type":"dockpanel",
                             "horizontalAlignment":"stretch",
+                            "verticalAlignment":"top",
                             "children":[
                                 {
                                     "_dock":"top",

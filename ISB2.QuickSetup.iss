@@ -27,7 +27,7 @@ objectdef isb2_quicksetup
     {
         WindowLayoutSettings:SetBool[instantSwap,1]
         WindowLayoutSettings:SetBool[swapOnActivate,1]
-        WindowLayoutSettings:SetBool[swapOnHotkey,1]
+        WindowLayoutSettings:SetBool[swapOnSlotActivate,1]
 
     }
 
@@ -312,8 +312,17 @@ objectdef isb2_quicksetup
         variable uint roamingSlot=${joSettings.GetInteger[roamingSlot]}
         if ${jo.Has[numRegion]}
         {            
-            if ${jo.GetInteger[numRegion]} != ${roamingSlot}
-                jo:SetInteger[slot,${jo.GetInteger[numRegion]}]                
+            if ${roamingSlot}
+            {
+                if ${jo.GetInteger[numRegion]} != ${roamingSlot}
+                    jo:SetInteger[slot,${jo.GetInteger[numRegion]}]                
+            }
+            else
+            {
+                ; leave hole
+                if !${jo.GetBool[mainRegion]}
+                    jo:SetInteger[slot,${jo.GetInteger[numRegion].Dec}]                
+            }
             jo:Erase[numRegion]
         }
 
@@ -348,9 +357,9 @@ objectdef isb2_quicksetup
                 joSettings:SetBool[swapOnActivate,1]
                 joSettings:SetString[swapMode,AlwaysForGames]
             }
-            elseif ${WindowLayoutSettings.GetBool[-default,true,swapOnHotkey]}
+            elseif ${WindowLayoutSettings.GetBool[-default,true,swapOnSlotActivate]}
             {
-                joSettings:SetBool[swapOnHotkey,1]
+                joSettings:SetBool[swapOnSlotActivate,1]
             }
 
             jo:SetByRef[swapGroups,"joSettings.Get[swapGroups]"]
@@ -362,8 +371,8 @@ objectdef isb2_quicksetup
                 joSettings:SetBool[focusFollowsMouse,1]
             if !${joSettings.Has[swapOnActivate]}
                 joSettings:SetBool[swapOnActivate,0]
-            if !${joSettings.Has[swapOnHotkey]}
-                joSettings:SetBool[swapOnHotkey,0]
+            if !${joSettings.Has[swapOnSlotActivate]}
+                joSettings:SetBool[swapOnSlotActivate,0]
             if !${joSettings.Has[swapMode]}
                 joSettings:SetString[swapMode,Never]
             
@@ -488,7 +497,8 @@ objectdef isb2_quicksetup
 
         ; generate team object
         variable jsonvalue joTeam="{}"
-        joTeam:SetString[name,"${TeamName}"]
+        joTeam:SetString[name,"${TeamName}"]        
+        joTeam:Set[guiToggleCombo,"Ctrl+Shift+Alt+G"]
         variable jsonvalue jaSlots="[]"
         Characters:ForEach["This:AddSlot[jaSlots,ForEach.Value]"]
         Characters:ForEach["This:UpdateGameLaunchInfo[ForEach.Value]"]

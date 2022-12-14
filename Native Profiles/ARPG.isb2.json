@@ -3,7 +3,8 @@
     "name": "ARPG",
     "builders":[
         {
-            "name": "ARPG - Standard"
+            "name": "ARPG - Standard",
+            "genre":"ARPG"
         }
     ],
     "hotkeySheets": [

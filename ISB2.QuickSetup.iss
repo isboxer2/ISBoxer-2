@@ -56,11 +56,11 @@ objectdef isb2_quicksetup
     {
         This:DetectMonitors
         This:GenerateGameLaunchInfo
-        This:RefreshBuilders
         
         if !${LGUI2.Element[isb2.QuickSetupWindow].Visibility~.Equal[visible]}
         {
             LGUI2.Element["isb2.QuickSetupWindow.pagecontrol"]:SelectPage[1]
+            Builders:Clear
             TeamName:Set[]
             Error:Set[]
             Characters:Clear
@@ -412,9 +412,14 @@ objectdef isb2_quicksetup
         jaSource:ForEach["This:AddArrayStringTo[joOwner,\"${arrayName~}\","\${ForEach.Value}"]"]
     }
 
-    method ApplyTeamBuilder(jsonvalueref joProfile, jsonvalueref joTeamBuilder)
+    method ApplyTeamBuilder(jsonvalueref joProfile, jsonvalueref joBuilder, jsonvalueref joTeamBuilder)
     {
         echo "\ayApplyTeamBuilder:\ax ${joTeamBuilder~}"
+
+        if ${joBuilder.Has[-array,expandedHotkeys]}
+            joProfile.Get[teams,1]:SetByRef[hotkeys,"joBuilder.Get[expandedHotkeys].Duplicate"]
+        if ${joBuilder.Has[-array,expandedGameKeyBindings]}
+            joProfile.Get[teams,1]:SetByRef[gameKeyBindings,"joBuilder.Get[expandedGameKeyBindings].Duplicate"]
 
         if ${joTeamBuilder.Has[-array,hotkeySheets]}
         {
@@ -449,12 +454,12 @@ objectdef isb2_quicksetup
         }
     }
 
-    method ApplySlotBuilder(jsonvalueref joProfile, jsonvalueref joSlotBuilder)
+    method ApplySlotBuilder(jsonvalueref joProfile, jsonvalueref joBuilder, jsonvalueref joSlotBuilder)
     {
         echo "\arApplySlotBuilder:\ax ${joSlotBuilder~}"
     }
 
-    method ApplyCharacterBuilder(jsonvalueref joProfile, jsonvalueref joCharacterBuilder)
+    method ApplyCharacterBuilder(jsonvalueref joProfile, jsonvalueref joBuilder, jsonvalueref joCharacterBuilder)
     {
         echo "\arApplyCharacterBuilder:\ax ${joCharacterBuilder~}"
     }
@@ -473,13 +478,13 @@ objectdef isb2_quicksetup
         This:AddArrayStringTo["joProfile.Get[teams,1]",profiles,"${joLocatedBuilder.Get[profile]~}"]
 
         if ${joBuilder.Has[-object,team]}
-            This:ApplyTeamBuilder[joProfile,"joBuilder.Get[team]"]
+            This:ApplyTeamBuilder[joProfile,joBuilder,"joBuilder.Get[team]"]
 
         if ${joBuilder.Has[-object,slot]}
-            This:ApplySlotBuilder[joProfile,"joBuilder.Get[slot]"]
+            This:ApplySlotBuilder[joProfile,joBuilder,"joBuilder.Get[slot]"]
 
         if ${joBuilder.Has[-object,slot]}
-            This:ApplyCharacterBuilder[joProfile,"joBuilder.Get[character]"]
+            This:ApplyCharacterBuilder[joProfile,joBuilder,"joBuilder.Get[character]"]
 
         return TRUE
     }
@@ -815,29 +820,105 @@ objectdef isb2_quicksetup
         return ja
     }   
 
-    method PrepareBuilderHotkey(jsonvalueref jo, jsonvalueref joHotkeyBuilder)
+    method PrepareBuilderHotkeyByName(jsonvalueref jo, jsonvalueref joHotkeyBuilder, string sheet, string name)
     {
-        if ${joHotkeyBuilder.Has[-string,keyCombo]}
-            return
-
         variable jsonvalueref joSheet
-        joSheet:SetReference["ISB2.FindOne[HotkeySheets,\"${joHotkeyBuilder.Get[sheet]}\",\"${jo.Get[profile]~}\"]"]
+        joSheet:SetReference["ISB2.FindOne[HotkeySheets,\"${sheet~}\",\"${jo.Get[profile]~}\"]"]
         if !${joSheet.Reference(exists)}
         {
-            echo "PrepareBuilderHotkey: sheet ${joHotkeyBuilder.Get[sheet]~} not found"
+            echo "PrepareBuilderHotkey: sheet ${sheet~} not found"
             return
         }
 
         variable jsonvalueref joHotkey
-        joHotkey:SetReference["ISB2.FindInArray[\"joSheet.Get[hotkeys]\",\"${joHotkeyBuilder.Get[name]~}\"]"]
+        joHotkey:SetReference["ISB2.FindInArray[\"joSheet.Get[hotkeys]\",\"${name~}\"]"]
         if !${joHotkey.Reference(exists)}
         {
-            echo "PrepareBuilderHotkey: hotkey ${joHotkeyBuilder.Get[name]~} not found in sheet"
+            echo "PrepareBuilderHotkey: hotkey ${name~} not found in sheet ${joSheet.Get[hotkeys]~}"
             return
         }
 
         if ${joHotkey.Has[-string,keyCombo]}
-            joHotkeyBuilder:SetString[keyCombo,"${joHotkey.Get[keyCombo]~}"]
+            joHotkeyBuilder:SetString[keyCombo,"${joHotkey.Get[keyCombo]~}"]        
+
+        if !${jo.Get[builder].Has[-array,expandedHotkeys]}
+            jo.Get[builder]:Set[expandedHotkeys,"[]"]
+
+        joHotkeyBuilder:SetString[sheet,"${sheet~}"]
+        joHotkeyBuilder:SetString[name,"${name~}"]
+
+        jo.Get[builder,expandedHotkeys]:AddByRef[joHotkeyBuilder]
+    }
+    
+    method PrepareBuilderHotkey(jsonvalueref jo, jsonvalueref joHotkeyBuilder)
+    {
+        variable string sheet="${joHotkeyBuilder.Get[sheet]~}"
+        variable string name="${joHotkeyBuilder.Get[name]~}"
+
+        if ${sheet.Find["{"]} || ${name.Find["{"]}
+        {
+            ; expand per character...
+            variable uint i
+
+            for (i:Set[1] ; ${i}<=${Characters.Used} ; i:Inc)
+            {
+                sheet:Set["${sheet.ReplaceSubstring["{SLOT}",${i}]~}"]
+                name:Set["${name.ReplaceSubstring["{SLOT}",${i}]~}"]
+                sheet:Set["${sheet.ReplaceSubstring["{CHARACTER}","${Characters.Get[${i},name]~}"]~}"]
+                name:Set["${name.ReplaceSubstring["{CHARACTER}","${Characters.Get[${i},name]~}"]~}"]
+
+                This:PrepareBuilderHotkeyByName[jo,joHotkeyBuilder.Duplicate,"${sheet~}","${name~}"]
+
+                sheet:Set["${joHotkeyBuilder.Get[sheet]~}"]
+                name:Set["${joHotkeyBuilder.Get[name]~}"]
+            }
+        }
+        else
+            This:PrepareBuilderHotkeyByName[jo,joHotkeyBuilder,"${sheet~}","${name~}"]
+    } 
+
+    method PrepareBuilderGameKeyBindingByName(jsonvalueref jo, jsonvalueref joGameKeyBindingBuilder, string name)
+    {
+        variable jsonvalueref joGameKeyBinding
+        joGameKeyBinding:SetReference["ISB2.FindOne[GameKeyBindings,\"${name~}\",\"${jo.Get[profile]~}\"]"]
+        if !${joGameKeyBinding.Reference(exists)}
+        {
+;            echo "PrepareBuilderGameKeyBinding: game key binding ${name~} not found, and I'm okay with that"
+;            return
+        }
+
+        if ${joGameKeyBinding.Has[-string,keyCombo]}
+            joGameKeyBindingBuilder:SetString[keyCombo,"${joGameKeyBinding.Get[keyCombo]~}"]        
+
+        if !${jo.Has[-array,builder,expandedGameKeyBindings]}
+            jo.Get[builder]:Set[expandedGameKeyBindings,"[]"]
+
+        joGameKeyBindingBuilder:SetString[name,"${name~}"]
+
+        jo.Get[builder,expandedGameKeyBindings]:AddByRef[joGameKeyBindingBuilder]
+    }
+
+    method PrepareBuilderGameKeyBinding(jsonvalueref jo, jsonvalueref joGameKeyBindingBuilder)
+    {
+        variable string name="${joGameKeyBindingBuilder.Get[name]~}"
+
+        if ${name.Find["{"]}
+        {
+            ; expand per character...
+            variable uint i
+
+            for (i:Set[1] ; ${i}<=${Characters.Used} ; i:Inc)
+            {
+                name:Set["${name.ReplaceSubstring["{SLOT}",${i}]~}"]
+                name:Set["${name.ReplaceSubstring["{CHARACTER}","${Characters.Get[${i},name]~}"]~}"]
+
+                This:PrepareBuilderGameKeyBindingByName[jo,joGameKeyBindingBuilder.Duplicate,"${name~}"]
+
+                name:Set["${joGameKeyBindingBuilder.Get[name]~}"]
+            }
+        }
+        else
+            This:PrepareBuilderGameKeyBindingByName[jo,joGameKeyBindingBuilder,"${name~}"]
     } 
 
     member:bool CheckGameName(jsonvalueref joGame, string name)
@@ -931,6 +1012,7 @@ objectdef isb2_quicksetup
 
         ; get initial hotkeys
         joBuilder.Get[hotkeys]:ForEach["This:PrepareBuilderHotkey[jo,ForEach.Value]"]
+        joBuilder.Get[gameKeyBindings]:ForEach["This:PrepareBuilderGameKeyBinding[jo,ForEach.Value]"]
 
         Builders:AddByRef[jo]
 

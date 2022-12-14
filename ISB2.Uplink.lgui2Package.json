@@ -5,6 +5,50 @@
         "ISB2.Viewers.lgui2Package.json"
     ],
     "templates": {
+        "isb2.QuickSetup.gameKeyBindingView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "borderThickness":[0,0,0,1],
+            "borderBrush":{
+                "color":"#999999"
+            },
+            "content":{
+                "type":"stackpanel",
+                "padding":[5,0],
+                "orientation":"horizontal",
+                "children":[                    
+                    {
+                        "type":"stackpanel",
+                        "orientation":"horizontal",
+                        "minSize":[200,0],
+                        "children":[                            
+                            {
+                                "type":"textblock",
+                                "verticalAlignment":"bottom",
+                                "font":{
+                                    "heightFactor":1.2,
+                                    "bold":true
+                                },
+                                "textBinding":{
+                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}"
+                                }                        
+                            }
+                        ]
+                    },
+                    {
+                        "type":"inputpicker",
+                        "horizontalAlignment":"stretch",
+                        "multipleControlMode": false,
+                        "comboMode": true,
+                        "valueBinding": {
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[keyCombo]}",
+                            "pullReplaceNull":"",
+                            "pushFormat":["_CONTEXTITEMDATA_:SetString[keyCombo,\"","\"]"]
+                        }
+                    }
+                ]
+            }
+        },
         "isb2.QuickSetup.hotkeyView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -125,7 +169,7 @@
                                 },
                                 "minSize":[0,50],
                                 "itemsBinding":{
-                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,hotkeys]}"
+                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,expandedHotkeys]}"
                                 },
                                 "itemViewGenerators":{
                                     "default":{
@@ -138,7 +182,23 @@
                         {
                             "type":"expander",
                             "header":"Game Key Bindings (as configured in-game)",
-                            "content":"almost"
+                            "content":{
+                                "type":"listbox",
+                                "horizontalAlignment":"stretch",
+                                "contentContainer":{
+                                    "jsonTemplate":"listbox.contentContainerFitWidth"
+                                },
+                                "minSize":[0,50],
+                                "itemsBinding":{
+                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,expandedGameKeyBindings]}"
+                                },
+                                "itemViewGenerators":{
+                                    "default":{
+                                        "type":"template",
+                                        "template":"isb2.QuickSetup.gameKeyBindingView"
+                                    }
+                                }
+                            }
                         }
                     ]
                 },

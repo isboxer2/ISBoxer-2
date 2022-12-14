@@ -927,9 +927,15 @@
                                     "children":[
                                         {
                                             "type":"listbox",
+                                            "contentContainer":{
+                                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                                            },
                                             "content":{
                                                 "jsonTemplate":"listbox.content",
-                                                "orientation":"horizontal"
+                                                "type":"wrappanel",
+                                                "childSize":[300,100],
+                                                "orientation":"horizontal",
+                                                "horizontalAlignment":"stretch"
                                             },
                                             "_dock":"top",
                                             "minSize":[100,50],

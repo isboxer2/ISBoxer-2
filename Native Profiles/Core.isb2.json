@@ -278,7 +278,7 @@
                         {
                             "actions": [
                                 {
-                                    "type":"broadcasting state",
+                                    "type":"broadcast state",
                                     "keyboardState": "On",
                                     "mouseState": "On"                                    
                                 },
@@ -296,7 +296,7 @@
                         {
                             "actions": [
                                 {
-                                    "type":"broadcasting state",
+                                    "type":"broadcast state",
                                     "keyboardState": "Off",
                                     "mouseState": "Off"                                    
                                 },
@@ -369,7 +369,7 @@
     ],
     "triggers": [
         {
-            "name": "Core.enable hotkeys",
+            "name": "OnValueChanged",
             "object": {
                 "type": "variable",
                 "name": "Core.enable hotkeys"
@@ -396,7 +396,7 @@
             }
         },
         {
-            "name": "Core.enable broadcasting",
+            "name": "OnValueChanged",
             "object": {
                 "type": "variable",
                 "name": "Core.enable broadcasting"
@@ -425,7 +425,7 @@
             }
         },
         {
-            "name": "Core.allow broadcasting",
+            "name": "OnValueChanged",
             "object": {
                 "type": "variable",
                 "name": "Core.allow broadcasting"

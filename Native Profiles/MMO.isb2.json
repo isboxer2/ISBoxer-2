@@ -4,10 +4,14 @@
     "builders":[
         {
             "name": "MMO - Standard",
+            "builderGroup": "Main Combat Hotkeys",
+            "description": "Standard Combat Hotkeys 1 through =, optionally with follow/assist/interact",
             "genre":"MMO"
         },
         {
             "name":"MMO - Pro",
+            "builderGroup": "Main Combat Hotkeys",
+            "description": "Pro Combat Hotkeys 1 through =, optionally with follow/assist/interact",
             "genre":"MMO"
         }
     ],

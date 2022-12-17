@@ -40,6 +40,7 @@
         {
             "name": "Core Slot Activation Hotkeys",
             "description": "Per-slot activation hotkeys Ctrl+Alt+1, etc",
+            "builderGroup":"Slot Activation Hotkeys",
             "team":{
                 "slots": [
                     {
@@ -84,6 +85,7 @@
         {
             "name": "Core Slot Activation Hotkeys (AltGr friendly)",
             "description": "Per-slot activation hotkeys Shift+Alt+1, etc",
+            "builderGroup":"Slot Activation Hotkeys",
             "team":{
                 "slots": [
                     {

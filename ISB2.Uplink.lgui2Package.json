@@ -104,7 +104,7 @@
                 ]
             }
         },
-        "isb2.QuickSetup.builderView":{
+        "isb2.QuickSetup.builderGroupView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "borderThickness":[0,0,0,1],
@@ -112,100 +112,258 @@
                 "color":"#999999"
             },
             "content":{
-                "type":"checkbox",
-                "margin":[10,0,0,0],
-                "content":{
-                    "type":"stackpanel",
-                    "margin":[10,0,0,0],
-                    "orientation":"vertical",
-                    "uniform":false,
-                    "horizontalContentAlignment":"left",
-                    "children":[
-                        {
-                            "type":"stackpanel",
-                            "orientation":"horizontal",
-                            "children":[
-                                {
-                                    "type":"textblock",
-                                    "verticalAlignment":"bottom",
-                                    "textBinding":{
-                                        "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,name]}",
-                                        "pullReplaceNull":""
-                                    },
-                                    "font":{
-                                        "heightFactor":1.4,
-                                        "bold":true
-                                    }
+                "type":"stackpanel",
+                "orientation":"vertical",
+                "children":[
+                    {
+                        "type":"stackpanel",          
+                        "orientation":"horizontal",
+                        "margin":[10,3],      
+                        "children":[
+                            {
+                                "type":"textblock",
+                                "textBinding":{
+                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                                    "pullReplaceNull":""
                                 },
-                                {
-                                    "type":"textblock",
-                                    "verticalAlignment":"bottom",
-                                    "textBinding":{
-                                        "pullFormat":" (${_CONTEXTITEMDATA_.Get[profile]})",
-                                        "pullReplaceNull":"built-in"
-                                    },
-                                    "font":{
-                                        "heightFacotr":0.8
-                                    }
-                                }
-                            ]
-                        },                       
-                        {
-                            "type":"textblock",
-                            "textBinding":{
-                                "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,description]}",
-                                "pullReplaceNull":""
+                                "minSize":[200,0]        
                             },
-                            "color":"#cccccc"
-                        },
-                        {
-                            "type":"expander",
-                            "header":"ISBoxer 2 Hotkeys (you press)",
-                            "content":{
-                                "type":"listbox",
+                            {
+                                "type":"combobox",
                                 "horizontalAlignment":"stretch",
-                                "contentContainer":{
-                                    "jsonTemplate":"listbox.contentContainerFitWidth"
-                                },
-                                "minSize":[0,50],
+                                "name":"builderGroup.BuilderList",
                                 "itemsBinding":{
-                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,expandedHotkeys]}"
+                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[builders]}"                    
+                                },
+                                "selectedItemBinding":{
+                                    "pullFormat":"${_CONTEXTITEMDATA_.GetInteger[selectedBuilder]}"
                                 },
                                 "itemViewGenerators":{
                                     "default":{
                                         "type":"template",
-                                        "template":"isb2.QuickSetup.hotkeyView"
+                                        "template":"isb2.QuickSetup.builderListCompactView"
                                     }
+                                },
+                                "eventHandlers":{
+                                    "onSelectionChanged":{
+                                        "type":"method",
+                                        "object":"ISB2QuickSetup",
+                                        "method":"OnBuilderGroupSelectionChanged"
+                                    }
+                                }                                
+                            }
+                        ]
+                    },
+                    {
+                        "type":"dynamic",
+                        "contentBinding":{
+                            "pullFormat":"${ISB2QuickSetup.GetSelectedBuilderView[${This.ID}]}",
+                            "pullHook":{
+                                "elementType":"combobox",
+                                "elementName":"builderGroup.BuilderList",
+                                "flags":"cousin",
+                                "event":"onSelectionChanged"
+                            }
+                        }
+                    }
+                ]
+            }            
+        },
+        "isb2.QuickSetup.builderListCompactView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "type":"dockpanel",
+                "children":[
+                    {
+                        "_dock":"left",
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,name]}",
+                            "pullReplaceNull":""
+                        }
+                    },
+                    {
+                        "_dock":"right",
+                        "type":"textblock",
+                        "verticalAlignment":"bottom",
+                        "textBinding":{
+                            "pullFormat":" (${_CONTEXTITEMDATA_.Get[profile]})",
+                            "pullReplaceNull":"built-in"
+                        },
+                        "font":{
+                            "heightFacotr":0.8
+                        }
+                    }
+                ]
+            }
+        },
+        "isb2.QuickSetup.builderView":{
+            "type":"checkbox",
+            "jsonTemplate":"checkbox",
+            "margin":[10,0,0,0],
+            "content":{
+                "type":"stackpanel",
+                "margin":[10,0,0,0],
+                "orientation":"vertical",
+                "uniform":false,
+                "horizontalContentAlignment":"left",
+                "children":[
+                    {
+                        "type":"stackpanel",
+                        "orientation":"horizontal",
+                        "children":[
+                            {
+                                "type":"textblock",
+                                "verticalAlignment":"bottom",
+                                "textBinding":{
+                                    "pullFormat":"${This.Context.Get[builder,name]}",
+                                    "pullReplaceNull":""
+                                },
+                                "font":{
+                                    "heightFactor":1.4,
+                                    "bold":true
+                                }
+                            },
+                            {
+                                "type":"textblock",
+                                "verticalAlignment":"bottom",
+                                "textBinding":{
+                                    "pullFormat":" (${This.Context.Get[profile]})",
+                                    "pullReplaceNull":"built-in"
+                                },
+                                "font":{
+                                    "heightFacotr":0.8
                                 }
                             }
+                        ]
+                    },                       
+                    {
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${This.Context.Get[builder,description]}",
+                            "pullReplaceNull":""
                         },
-                        {
-                            "type":"expander",
-                            "header":"Game Key Bindings (as configured in-game)",
-                            "content":{
-                                "type":"listbox",
-                                "horizontalAlignment":"stretch",
-                                "contentContainer":{
-                                    "jsonTemplate":"listbox.contentContainerFitWidth"
-                                },
-                                "minSize":[0,50],
-                                "itemsBinding":{
-                                    "pullFormat":"${_CONTEXTITEMDATA_.Get[builder,expandedGameKeyBindings]}"
-                                },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.QuickSetup.gameKeyBindingView"
-                                    }
+                        "color":"#cccccc"
+                    },
+                    {
+                        "type":"expander",
+                        "header":"ISBoxer 2 Hotkeys (you press)",
+                        "name":"builderView.Hotkeys",
+                        "content":{
+                            "type":"listbox",
+                            "horizontalAlignment":"stretch",
+                            "contentContainer":{
+                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                            },
+                            "minSize":[0,50],
+                            "itemsBinding":{
+                                "pullFormat":"${This.Context.Get[builder,expandedHotkeys]}"
+                            },
+                            "itemViewGenerators":{
+                                "default":{
+                                    "type":"template",
+                                    "template":"isb2.QuickSetup.hotkeyView"
                                 }
                             }
                         }
-                    ]
-                },
-                "checkedBinding":{
-                    "pullFormat":"${_CONTEXTITEMDATA_.GetBool[enable]}",
-                    "pushFormat":["_CONTEXTITEMDATA_:SetBool[enable,\"","\"]"]
+                    },
+                    {
+                        "type":"expander",
+                        "header":"Game Key Bindings (as configured in-game)",
+                        "name":"builderView.GameKeyBindings",
+                        "content":{
+                            "type":"listbox",
+                            "horizontalAlignment":"stretch",
+                            "contentContainer":{
+                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                            },
+                            "minSize":[0,50],
+                            "itemsBinding":{
+                                "pullFormat":"${This.Context.Get[builder,expandedGameKeyBindings]}"
+                            },
+                            "itemViewGenerators":{
+                                "default":{
+                                    "type":"template",
+                                    "template":"isb2.QuickSetup.gameKeyBindingView"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "checkedBinding":{
+                "pullFormat":"${This.Context.GetBool[enable]}",
+                "pushFormat":["This.Context:SetBool[enable,\"","\"]"]
+            },
+            "eventHandlers":{
+                "onVisualAttached":{
+                    "type":"method",
+                    "object":"ISB2QuickSetup",
+                    "method":"OnBuilderViewCreated"
                 }
+            }
+        },
+        "isb2.QuickSetup.builderListView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "borderThickness":[0,0,0,1],
+            "borderBrush":{
+                "color":"#999999"
+            },
+            "content":{
+                "jsonTemplate":"isb2.QuickSetup.builderView",
+                "contextBinding":{
+                    "pullFormat":"${This.Parent.Context.Data}"
+                }
+            }
+        },
+        "isb2.QuickSetup.detectedCharacterView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "tooltip":"${This.Context.Data.Get[foundPath].Replace[/,\"\\\\\"]}",
+            "content":{
+                "type":"dockpanel",
+                "orientation":"horizontal",
+                "horizontalAlignment":"stretch",
+                "children":[
+                    {
+                        "_dock":"left",
+                        "type":"textblock",
+                        "verticalAlignment":"center",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                            "pullReplaceNull":""
+                        },
+                        "font":{
+                            "heightFactor":1.4,
+                            "bold":true
+                        },
+                        "margin":[5,0]
+                    },
+                    {
+                        "_dock":"left",
+                        "type":"textblock",
+                        "verticalAlignment":"center",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[gameServer]}",
+                            "pullReplaceNull":""
+                        }
+                    },    
+                    {
+                        "_dock":"right",
+                        "type":"textblock",
+                        "verticalAlignment":"center",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[accountName]}",
+                            "pullReplaceNull":""
+                        },
+                        "font":{
+                            "heightFactor":0.8
+                        },
+                        "color":"#999999",
+                        "margin":[5,0]
+                    }    
+                ]    
             }
         },
         "isb2.QuickSetup.characterView":{
@@ -723,7 +881,7 @@
             "horizontalAlignment":"center",
             "verticalAlignment":"center",
             "width":800,
-            "height":500,
+            "height":675,
             "minSize":[800,500],
             "visibility": "hidden",
             "content":{
@@ -912,17 +1070,7 @@
                                     ]
                                 },
                                 {
-                                    "_dock":"top",
-                                    "type":"expander",
-                                    "expanded":false,
-                                    "header":"Detected Characters",
-                                    "content":{
-                                        "type":"textblock",
-                                        "text":"Surprise!"
-                                    }
-                                },
-                                {
-                                    "_dock":"top",
+                                    "_dock":"bottom",
                                     "type":"expander",
                                     "margin":[0,5,0,0],
                                     "header":"Manual Entry",
@@ -1047,6 +1195,48 @@
                                                 ]
                                             }
                                         ]                                                    
+                                    }
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"expander",
+                                    "expanded":false,
+                                    "header":"Detected Characters",
+                                    "content":{
+                                        "type":"listbox",
+                                        "_dock":"top",
+                                        "contentContainer":{
+                                            "jsonTemplate":"listbox.contentContainerFitWidth"
+                                        },
+                                        "minSize":[0,200],
+                                        "maxSize":[-1,300],
+                                        "horizontalAlignment":"stretch",
+                                        "itemsBinding":{
+                                            "pullFormat":"${ISB2QuickSetup.DetectedCharacters}",
+                                            "pullHook": {
+                                                "elementName": "isb2.QuickSetupWindow",
+                                                "flags": "global",
+                                                "event": "onDetectedCharactersUpdated"
+                                            }
+                                        },
+                                        "itemViewGenerators":{
+                                            "default":{
+                                                "type":"template",
+                                                "template":"isb2.QuickSetup.detectedCharacterView"
+                                            }
+                                        },
+                                        "eventHandlers":{
+                                            "onSelectionChanged":{
+                                                "type":"method",
+                                                "object":"ISB2QuickSetup",
+                                                "method":"OnDetectedCharacterSelection"
+                                            },
+                                            "onItemMouse1DoubleClick": {
+                                                "type": "method",
+                                                "object":"ISB2QuickSetup",
+                                                "method":"OnDetectedCharacterDoubleClick"
+                                            }
+                                        }
                                     }
                                 }
                             ]
@@ -1343,7 +1533,30 @@
                                         "bold":true
                                     },
                                     "margin":[0,0,0,5]
-                                },                                
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"listbox",
+                                    "name":"isb2.QuickSetup.BuilderGroups",
+                                    "horizontalAlignment":"stretch",
+                                    "contentContainer":{
+                                        "jsonTemplate":"listbox.contentContainerFitWidth"
+                                    },
+                                    "itemsBinding":{
+                                        "pullFormat":"${ISB2QuickSetup.BuilderGroups}",
+                                        "pullHook": {
+                                            "elementName": "isb2.QuickSetupWindow",
+                                            "flags": "global",
+                                            "event": "onBuildersUpdated"
+                                        }
+                                    },
+                                    "itemViewGenerators":{
+                                        "default":{
+                                            "type":"template",
+                                            "template":"isb2.QuickSetup.builderGroupView"
+                                        }
+                                    }
+                                },                             
                                 {
                                     "_dock":"top",
                                     "type":"listbox",
@@ -1364,7 +1577,7 @@
                                     "itemViewGenerators":{
                                         "default":{
                                             "type":"template",
-                                            "template":"isb2.QuickSetup.builderView"
+                                            "template":"isb2.QuickSetup.builderListView"
                                         }
                                     }
                                 }

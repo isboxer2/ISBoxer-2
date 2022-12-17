@@ -3,8 +3,12 @@
 objectdef isb2_quicksetup
 {
     variable jsonvalueref Builders="[]"
+    variable jsonvalueref BuilderGroups="[]"
     variable jsonvalueref EditingCharacter="{}"
     variable jsonvalueref Characters="[]"
+
+    variable set DetectedGameFolders
+    variable jsonvalueref DetectedCharacters="[]"
 
     variable jsonvalueref GameLaunchInfo="[]"
     variable jsonvalueref WindowLayoutSettings="{}"
@@ -63,6 +67,7 @@ objectdef isb2_quicksetup
             Builders:Clear
             TeamName:Set[]
             Error:Set[]
+            DetectedCharacters:Clear
             Characters:Clear
             EditingCharacter:SetReference["{}"]
             WindowLayouts:Clear
@@ -93,7 +98,26 @@ objectdef isb2_quicksetup
 
     method OnAddedCharacterSelection()
     {
-        echo "Added Character Selected: ${Context.Source(type)} ${Context.Args~}"
+        echo "Added Character Selected: ${Context.Source(type)} ${Context.Source.SelectedItem.Data~}"
+    }
+
+    method OnDetectedCharacterSelection()
+    {
+        echo "Detected Character Selected: ${Context.Source(type)} ${Context.Source.SelectedItem.Data~}"
+
+        variable jsonvalueref joDetected="Context.Source.SelectedItem.Data"
+
+        if !${joDetected.Reference(exists)}
+            return
+
+        EditingCharacter:Merge[joDetected,1]
+        EditingCharacter:Erase[foundPath]
+    }
+
+    method OnDetectedCharacterDoubleClick()
+    {
+        echo "Detected Character Double Click: ${Context.Source(type)} ${Context.Source.Item.Data~}"
+        This:AddCharacter
     }
 
     method OnSelectedTabChanged()
@@ -106,6 +130,7 @@ objectdef isb2_quicksetup
             case Game Selection
                 break
             case Character Selection
+                This:DetectCharacters
                 LGUI2.Element[isb2.QuickSetup.EditingCharacter.name]:KeyboardFocus
                 break
             case Window Layout
@@ -386,7 +411,7 @@ objectdef isb2_quicksetup
     {
         if !${joOwner.Has[-array,virtualFiles]}
         {
-            joOwner:SetByRef[jaVirtualFiles.Duplicate]
+            joOwner:SetByRef[virtualFiles,jaVirtualFiles.Duplicate]
             return
         }
 
@@ -489,8 +514,18 @@ objectdef isb2_quicksetup
         return TRUE
     }
 
+    method ApplyBuilderGroup(jsonvalueref joProfile, jsonvalueref joBuilderGroup)
+    {
+        variable jsonvalueref joLocatedBuilder="joBuilderGroup.Get[builders,${joBuilderGroup.GetInteger[selectedBuilder]}]"
+        if !${joLocatedBuilder.Reference(exists)}
+            return
+
+        This:ApplyBuilder[joProfile,joLocatedBuilder]        
+    }
+
     method ApplyBuilders(jsonvalueref joProfile)
     {
+        BuilderGroups:ForEach["This:ApplyBuilderGroup[joProfile,ForEach.Value]"]      
         Builders:ForEach["This:ApplyBuilder[joProfile,ForEach.Value]"]
     }
 
@@ -503,7 +538,7 @@ objectdef isb2_quicksetup
         ; generate team object
         variable jsonvalue joTeam="{}"
         joTeam:SetString[name,"${TeamName}"]        
-        joTeam:Set[guiToggleCombo,"Ctrl+Shift+Alt+G"]
+        joTeam:SetString[guiToggleCombo,"Ctrl+Shift+Alt+G"]
         variable jsonvalue jaSlots="[]"
         Characters:ForEach["This:AddSlot[jaSlots,ForEach.Value]"]
         Characters:ForEach["This:UpdateGameLaunchInfo[ForEach.Value]"]
@@ -518,6 +553,7 @@ objectdef isb2_quicksetup
         joTeam:SetByRef[slots,jaSlots]
         joProfile.Get[teams]:AddByRef[joTeam]
         joProfile:SetByRef[characters,Characters]
+
 
         variable jsonvalueref jaVirtualFiles
         ; add Virtual Files ...
@@ -995,6 +1031,85 @@ objectdef isb2_quicksetup
         }        
         
         return TRUE
+    }    
+
+    member:jsonvalueref GetBuilderGroup(string name, bool autoCreate)
+    {
+        variable jsonvalueref joGroup="ISB2.FindInArray[BuilderGroups,\"${name~}\"]"
+
+        if !${joGroup.Reference(exists)}
+        {
+            if !${autoCreate}
+                return NULL
+
+            joGroup:SetReference["{}"]
+            joGroup:SetString[name,"${name~}"]
+            joGroup:Set[builders,"[]"]
+            BuilderGroups:AddByRef[joGroup]
+        }
+
+        return joGroup
+    }
+
+    method SetElementVisibility(lgui2elementref element, bool newValue)
+    {
+        echo "SetElementVisibility ${element.ID} ${newValue}"
+        if ${newValue}
+            element:SetVisibility[visible]
+        else
+            element:SetVisibility[collapsed]
+    }
+
+    method OnBuilderViewCreated()
+    {
+        echo "\ayOnBuilderViewCreated\ax ${Context(type)} ${Context.Source(type)} ${Context.Source.ID} ${Context.Source.Context~}"
+
+        variable jsonvalueref jo
+    
+        if ${Context.Source.Context(type)~.Equal[lgui2item]}
+            jo:SetReference["Context.Source.Context.Data"]
+        else
+            jo:SetReference["Context.Source.Context"]
+            
+        This:SetElementVisibility["${Context.Source.Locate["builderView.Hotkeys","",descendant].ID}",${jo.Get[builder,expandedHotkeys].Used}]
+        This:SetElementVisibility["${Context.Source.Locate["builderView.GameKeyBindings","",descendant].ID}",${jo.Get[builder,expandedGameKeyBindings].Used}]
+    }
+
+    member:jsonvalueref GetSelectedBuilderView(lgui2elementref someElement)
+    {
+        echo "\ayGetSelectedBuilderView\ax ${someElement.ID} context=${someElement.Context(type)}"
+
+;        echo "Located=${someElement.Parent.Locate["builderGroup.BuilderList","",descendant].ID}"
+
+        variable jsonvalueref joBuilder="someElement.Parent.Locate["builderGroup.BuilderList","",descendant].SelectedItem.Data"
+
+
+        variable jsonvalueref joView="{}"
+        if !${joBuilder.Reference(exists)}
+        {
+            joView:SetString[type,panel]
+;            joView:SetString[text,"Dynamic content here"]
+        }
+        else
+        {
+            joView:SetString[jsonTemplate,isb2.QuickSetup.builderView]
+            joView:SetString[horizontalAlignment,stretch]
+            someElement:SetContext[joBuilder]
+          ;  joView:Set[contextBinding,"{\"pullFormat\":\"\${This.Parent.Locate[builderGroup.BuilderList,\"\",descendant].SelectedItem.Data}\"}"]
+        }
+
+        return joView
+    }
+
+    method AddToBuilderGroup(string name, jsonvalueref joEntry)
+    {
+        variable jsonvalueref joGroup="This.GetBuilderGroup[\"${name~}\",1]"
+        if !${joGroup.Reference(exists)}
+            return FALSE
+
+        joGroup.Get[builders]:AddByRef[joEntry]
+
+        return TRUE
     }
 
     method AddLocatedBuilder(jsonvalueref joLocated)
@@ -1014,22 +1129,158 @@ objectdef isb2_quicksetup
         joBuilder.Get[hotkeys]:ForEach["This:PrepareBuilderHotkey[jo,ForEach.Value]"]
         joBuilder.Get[gameKeyBindings]:ForEach["This:PrepareBuilderGameKeyBinding[jo,ForEach.Value]"]
 
-        Builders:AddByRef[jo]
+        if ${joBuilder.Has[-string,"builderGroup"]}
+            This:AddToBuilderGroup["${joBuilder.Get[builderGroup]~}",jo]
+        else
+            Builders:AddByRef[jo]
 
         return TRUE
     }
 
-    method RefreshBuilders()
+    method MoveSingleBuilders(jsonvalueref joBuilderGroup, jsonvalueref ja, int key)
     {
+        if ${joBuilderGroup.Get[builders].Used}==1
+        {
+            Builders:AddByRef["joBuilderGroup.Get[builders,1]"]
+            joBuilderGroup.Get[builders]:Clear
+
+            ja:AddInteger[${key}]
+        }
+    }
+
+    method OnBuilderGroupSelectionChanged()
+    {
+        variable jsonvalueref joBuilderGroup="Context.Source.Context.Data"
+        if !${joBuilderGroup.Reference(exists)}
+            return
+        echo "\ayOnBuilderGroupSelectionChanged\ax ${Context.Source(type)} ${Context.Source.ID} ${Context.Source.Context(type)}"
+
+        joBuilderGroup.Get[builders,"${joBuilderGroup.GetInteger[selectedBuilder]}"]:SetBool[enable,0]
+
+        ; located builders...
+        if !${Context.Source.SelectedItem(exists)}
+        {
+            joBuilderGroup:Erase[selectedBuilder]
+            return
+        }
+
+        joBuilderGroup:Set["selectedBuilder",${Context.Source.SelectedItem.Index}]
+        joBuilderGroup.Get[builders,"${Context.Source.SelectedItem.Index}"]:SetBool[enable,1]
+    }
+
+    method RefreshBuilders()
+    {            
         echo "\ayRefreshBuilders\ax"
+        variable jsonvalueref ja="[]"        
         Builders:Clear
+        BuilderGroups:Clear
 
         ISB2.LocateAll[Builders]:ForEach["This:AddLocatedBuilder[ForEach.Value]"]
         
+        BuilderGroups:ForEach["This:MoveSingleBuilders[ForEach.Value,ja,\${ForEach.Key~}]"]
+        ja:Reverse
+        ja:ForEach["BuilderGroups:Erase[\"\${ForEach.Value~}\"]"]
 
         LGUI2.Element[isb2.QuickSetupWindow]:FireEventHandler[onBuildersUpdated]
     }
 
+    member:int CompareDetectedCharacter(jsonvalueref joA, jsonvalueref joB)
+    {
+        variable int res            
+        res:Set[${joA.Get[gameServer]~.Compare["${joB.Get[gameServer]~}"]}]
+        if ${res}
+            return ${res}
+
+        res:Set[${joA.Get[name]~.Compare["${joB.Get[name]~}"]}]
+
+
+;        echo "CompareDetectedCharacter ${joA~} ${joB~} ${res}"
+        return ${res}
+    }
+
+    ; for performing an insert sort
+    member:uint GetDetectedCharacterInsertPosition(jsonvalueref joDetected)
+    {        
+        if !${DetectedCharacters.Used}
+        {
+            ; add to end.
+            return 0
+        }
+
+        variable uint i
+        variable int cmp
+        for (i:Set[1] ; ${i}<=${DetectedCharacters.Used} ; i:Inc)
+        {
+            if ${This.CompareDetectedCharacter["DetectedCharacters.Get[${i}]",joDetected]}>0
+            {
+                ; insert before this bad boy
+                return ${i}
+            }
+        }
+
+        ; add to end
+        return 0
+    }
+
+    method AddDetectedCharacter(jsonvalueref joDetected)
+    {
+        variable uint pos=${This.GetDetectedCharacterInsertPosition[joDetected]}
+;        echo "AddDetectedCharacter position ${pos}"            
+        if ${pos}
+        {
+            DetectedCharacters:InsertByRef[${pos},joDetected]
+        }
+        else
+            DetectedCharacters:AddByRef[joDetected]
+    }
+
+    method DetectCharactersFrom(jsonvalueref joGameLaunchInfo)
+    {
+        variable filepath gameFolder
+
+        if ${joGameLaunchInfo.Has[-string,path]}
+        {
+            gameFolder:Set["${joGameLaunchInfo.Get[path]~}"]
+        }
+        else
+        {
+            ; game/gameProfile
+            gameFolder:Set["${ISUplink.Game["${joGameLaunchInfo.Get[game]~}"].Get[Profiles,"${joGameLaunchInfo.Get[gameProfile]~}",Path]~}"]
+        }
+
+        if !${gameFolder~.NotNULLOrEmpty}
+            return
+
+
+        if ${DetectedGameFolders.Contains["${gameFolder~}"]}
+            return
+        DetectedGameFolders:Add["${gameFolder~}"]
+        echo "\ayDetectCharactersFrom\ax ${joGameLaunchInfo~}"
+        
+        variable weakref gameRef
+        gameRef:SetReference["ISB2.Games.Get[\"${GameName~}\"]"]
+
+        variable jsonvalueref ja
+        ja:SetReference["gameRef.DetectCharacters[\"${gameFolder~}\"]"]
+
+        echo "Detected Characters: ${ja~}"
+        ja.Get[characters]:ForEach["This:AddDetectedCharacter[ForEach.Value]"]
+    }
+
+    method DetectCharacters()
+    {
+        echo "\ayDetect Characters\ax ${GameName~}"
+        variable weakref gameRef="ISB2.Games.Get[\"${GameName~}\"]"
+        DetectedCharacters:Clear
+        DetectedGameFolders:Clear
+        if !${gameRef.CanDetectCharacters}
+        {
+            echo "game ${gameRef.Name~} cant detect characters"
+            return
+        }       
+        ; collect game folders for the current game, based on available GameLaunchInfo
+        GameLaunchInfo:ForEach["This:DetectCharactersFrom[ForEach.Value]"]
+    }
 }
 
 variable(global) isb2_quicksetup ISB2QuickSetup

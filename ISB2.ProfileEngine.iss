@@ -1284,8 +1284,9 @@ objectdef isb2_profileengine
         Character.Get[clickBars]:ForEach["ClickBars.Get[\"\${ForEach.Value~}\"]:Enable"]
         Character.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
-        Character.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Activate"]
-        Character.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Activate"]
+        Character.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Enable"]
+        Character.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
+        echo "enabling ${Team.Get[hotkeySheets].Used} hotkeySheets, ${Team.Get[mappableSheets].Used} mappableShets"        
         Team.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Activate"]
         Team.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Activate"]
 
@@ -4143,6 +4144,40 @@ objectdef isb2_profileengine
         }
         
         return "obj.TriggerChains.Get[\"${jo.Get[name]}\",${autoCreate}]"
+    }
+
+    member:jsonvalueref FindHotkeyOverride(string sheet, string name)
+    {
+        variable jsonvalue joQuery
+        joQuery:SetValue["$$>
+        {
+            "op":"&&",
+            "list":[
+                {
+                    "eval":"Select.Get[sheet\]",
+                    "op":"==",
+                    "value":${sheet.AsJSON~}
+                },
+                {
+                    "eval":"Select.Get[name\]",
+                    "op":"==",
+                    "value":${name.AsJSON~}
+                }
+            \]
+        }
+        <$$"]
+        variable jsonvalueref joRef
+        joRef:SetReference["Team.Get[hotkeys].SelectValue[joQuery]"]
+        if !${joRef.Reference(exists)}
+            joRef:SetReference["SlotRef.Get[hotkeys].SelectValue[joQuery]"]
+        if !${joRef.Reference(exists)}
+            joRef:SetReference["Character.Get[hotkeys].SelectValue[joQuery]"]
+
+        if ${joRef.Reference(exists)}
+        {
+            echo "\agHotkey Override Found\ax: ${joRef~}"
+        }
+        return joRef
     }
 
     method ApplyGUIModeTo(lgui2elementref element)

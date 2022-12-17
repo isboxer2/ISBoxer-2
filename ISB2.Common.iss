@@ -1596,17 +1596,36 @@ objectdef isb2_hotkeysheet
             Enable:Set[1]
     }
 
+    member:jsonvalueref AsJSON()
+    {
+        variable jsonvalue jo="{}"
+        jo:SetString[name,"${Name~}"]
+        jo:SetBool[enabled,${Enabled}]
+        jo:SetBool[wasEnabled,${WasEnabled}]
+        jo:SetByRef[hotkeys,Hotkeys]
+
+        return jo
+    }
+
     method Add(jsonvalueref jo)
     {
         if !${jo.Type.Equal[object]}
             return FALSE
 
         jo:SetString[sheet,"${Name~}"]
+
+        variable jsonvalueref joOverride
+        joOverride:SetReference["ISB2.FindHotkeyOverride[\"${Name~}\",\"${jo.Get[name]~}\"]"]
+
+        if ${joOverride.Reference(exists)}
+            jo:Set[keyCombo,"${joOverride.Get[keyCombo].AsJSON~}"]
+
         Hotkeys:SetByRef["${jo.Get[name]~}",jo]
     }
 
     method Activate()
     {
+        echo "hotkey sheet ${Name~} Activate"
         if !${Enable}
             return FALSE
 

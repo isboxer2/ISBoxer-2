@@ -1,4 +1,5 @@
 #include "ISB2.Common.iss"
+#include "ISB2.Games.iss"
 #include "ISB2.Importer.iss"
 #include "ISB2.QuickSetup.iss"
 
@@ -11,6 +12,8 @@ objectdef isb2 inherits isb2_profilecollection
     variable filepath ProfilesFolder
 
     variable jsonvalueref Settings="{}"
+
+    variable isb2_games Games
 
     variable isb2_importer Importer
     variable isb2_slotmanager SlotManager
@@ -44,6 +47,7 @@ objectdef isb2 inherits isb2_profilecollection
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
         LGUI2:PopSkin["${UseSkin~}"]
 
+        This:LoadGames
         This:LoadNativeProfiles
         This:LoadPreviousProfiles
 
@@ -79,6 +83,14 @@ objectdef isb2 inherits isb2_profilecollection
         Settings:SetByRef[loadedProfiles,ja]
 
         This:AutoStoreSettings
+    }
+
+    method LoadGames()
+    {
+        variable jsonvalue ja
+        ja:SetValue["${LGUI2.Skin[default].Template[isb2.data].Get[games]~}"]
+
+        Games:FromJSON[ja]
     }
 
     method DetectSettingsFolder()

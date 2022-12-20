@@ -489,6 +489,32 @@ objectdef isb2_quicksetup
         echo "\arApplyCharacterBuilder:\ax ${joCharacterBuilder~}"
     }
 
+    member:jsonvalueref GetBuilderDiff(jsonvalueref joBuilder)
+    {
+        variable jsonvalueref joOriginal="joBuilder.Get[original]"
+        if !${joOriginal.Reference(exists)}
+            return NULL
+
+        joBuilder:Erase[original]
+
+        variable jsonvalueref joDiff
+
+        echo "\ayGetBuilderDiff\ax ${joOriginal~} => ${joBuilder~}"
+        joDiff:SetReference["joOriginal.Diff[joBuilder]"]        
+        if ${joDiff.Has[-array,expandedHotkeys]} 
+        {
+            joDiff:Erase[hotkeys]              
+            joDiff:SetByRef[hotkeys,"joDiff.Get[expandedHotkeys]"]
+        }
+
+        joDiff:Erase[expandedHotkeys]
+
+        joBuilder:SetByRef[original,joOriginal]
+
+        echo "diff = ${joDiff~}"
+        return joDiff
+    }
+
     method ApplyBuilder(jsonvalueref joProfile, jsonvalueref joLocatedBuilder)
     {
         if !${joLocatedBuilder.GetBool[enable]}
@@ -499,18 +525,19 @@ objectdef isb2_quicksetup
         variable jsonvalueref joBuilder
         joBuilder:SetReference["joLocatedBuilder.Get[builder]"]
 
-        ; attach builder profile to team...
-        This:AddArrayStringTo["joProfile.Get[teams,1]",profiles,"${joLocatedBuilder.Get[profile]~}"]
+        if !${joProfile.Get[teams,1].Has[-array,builders]}  
+            joProfile.Get[teams,1]:Set[builders,"[]"]
+            
+    
+        variable jsonvalueref joBuilderConfig
+        joBuilderConfig:SetReference["{}"]
 
-        if ${joBuilder.Has[-object,team]}
-            This:ApplyTeamBuilder[joProfile,joBuilder,"joBuilder.Get[team]"]
-
-        if ${joBuilder.Has[-object,slot]}
-            This:ApplySlotBuilder[joProfile,joBuilder,"joBuilder.Get[slot]"]
-
-        if ${joBuilder.Has[-object,slot]}
-            This:ApplyCharacterBuilder[joProfile,joBuilder,"joBuilder.Get[character]"]
-
+        joBuilderConfig:SetString[profile,"${joLocatedBuilder.Get[profile]~}"]
+        joBuilderConfig:SetString[name,"${joBuilder.Get[name]~}"]
+        joBuilderConfig:SetBool[enable,1]
+        joBuilderConfig:SetByRef[overrides,"This.GetBuilderDiff[joBuilder]"]
+    
+        joProfile.Get[teams,1,builders]:AddByRef[joBuilderConfig]
         return TRUE
     }
 
@@ -1123,6 +1150,10 @@ objectdef isb2_quicksetup
         jo:SetBool[enable,${joBuilder.GetBool[enable]}]        
 
         jo:SetString[profile,"${joLocated.Get[profile]~}"]
+
+        if !${joBuilder.Has[-object,original]}
+            joBuilder:SetByRef[original,joBuilder.Duplicate]
+
         jo:SetByRef[builder,joBuilder]
 
         ; get initial hotkeys

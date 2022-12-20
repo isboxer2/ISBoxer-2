@@ -169,6 +169,37 @@
                 ]
             }            
         },
+        "isb2.QuickSetup.presetView":{
+            "jsonTemplate":"listboxitem",
+            "content":{
+                "type":"stackpanel",
+                "orientation":"vertical",
+                "uniform":false,                
+                "children":[
+                    {
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                            "pullReplaceNull":""
+                        },
+                        "font":{
+                            "bold":true
+                        }
+                    },
+                    {
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[description]}",
+                            "pullReplaceNull":""
+                        },
+                        "font":{
+                            "heightFacotr":0.7
+                        },
+                        "color":"#aaaaaa"
+                    }
+                ]
+            }
+        },
         "isb2.QuickSetup.builderListCompactView":{
             "jsonTemplate":"listboxitem",
             "content":{
@@ -993,6 +1024,37 @@
                                         "pushFormat":["ISB2QuickSetup:SelectGame[\"","\"]"]
                                     },
                                     "selectedItemBindingProperty":"name"
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"textblock",
+                                    "margin":[0,20,0,0],
+                                    "font":{
+                                        "heightFactor":1.2,
+                                        "bold":true
+                                    },
+                                    "text":"Configuration Pre-sets",
+                                    "horizontalAlignment":"center"
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"combobox",
+                                    "horizontalAlignment":"stretch",
+                                    "margin":5,
+                                    "itemsBinding":{
+                                        "pullFormat":"${ISB2QuickSetup.BuilderPresets}"
+                                    },
+                                    "itemViewGenerators":{
+                                        "default":{
+                                            "type":"template",
+                                            "template":"isb2.QuickSetup.presetView"
+                                        }
+                                    },
+                                    "selectedItemBinding":{
+                                        "pullFormat":"${ISB2QuickSetup.SelectedBuilderPreset.Get[name]}",
+                                        "pushFormat":["ISB2QuickSetup:SelectBuilderPreset[\"","\"]"]
+                                    },
+                                    "selectedItemBindingProperty":"name"
                                 }
                             ]
                         }
@@ -1526,12 +1588,108 @@
                             "children":[
                                 {
                                     "_dock":"top",
-                                    "type":"textblock",
-                                    "text":"Select configuration to apply",
-                                    "font":{
-                                        "heightFactor":1.4,
-                                        "bold":true
-                                    },
+                                    "type":"dockpanel",
+                                    "horizontalAlignment":"stretch",
+                                    "children":[
+                                        {
+                                            "_dock":"bottom",
+                                            "type":"dockpanel",
+                                            "visibility":"collapsed",
+                                            "borderThickness":1,
+                                            "borderBrush":{
+                                                "color":"#cccccc"
+                                            },
+                                            "horizontalAlignment":"stretch",
+                                            "name":"isb2.QuickSetup.PresetPopup",
+                                            "margin":10,
+                                            "padding":5,
+                                            "children":[
+                                                {
+                                                    "type":"stackpanel",
+                                                    "_dock":"top",
+                                                    "orientation":"horizontal",
+                                                    "children":[
+                                                        {
+                                                            "type":"textblock",
+                                                            "text":"Name: "
+                                                        },
+                                                        {
+                                                            "type":"textbox",
+                                                            "name":"isb2.QuickSetup.PresetName",
+                                                            "horizontalAlignment":"stretch"
+                                                        }        
+                                                    ]
+                                                },
+                                                {
+                                                    "type":"stackpanel",
+                                                    "_dock":"top",
+                                                    "orientation":"horizontal",
+                                                    "children":[
+                                                        {
+                                                            "type":"textblock",
+                                                            "text":"Description: "
+                                                        },
+                                                        {
+                                                            "type":"textbox",
+                                                            "name":"isb2.QuickSetup.PresetDescription",
+                                                            "horizontalAlignment":"stretch"
+                                                        }        
+                                                    ]
+                                                },
+                                                {
+                                                    "type":"checkbox",
+                                                    "_dock":"top",
+                                                    "name":"isb2.QuickSetup.PresetRestrictToGame",
+                                                    "content":"Restrict to Game: ${ISB2QuickSetup.GameName}"
+                                                },
+                                                {
+                                                    "type":"checkbox",
+                                                    "_dock":"top",
+                                                    "name":"isb2.QuickSetup.PresetRestrictToGenre",
+                                                    "content":"Restrict to Genre: ${ISB2QuickSetup.SelectedGame.Get[genre]}"
+                                                },
+                                                {
+                                                    "type":"button",
+                                                    "_dock":"top",
+                                                    "horizontalAlignment":"right",
+                                                    "content":"Save",
+                                                    "eventHandlers":{
+                                                        "onRelease":{
+                                                            "type":"method",
+                                                            "object":"ISB2QuickSetup",
+                                                            "method":"OnSavePreset"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "_dock":"left",
+                                            "type":"textblock",
+                                            "text":"Select configuration to apply",
+                                            "font":{
+                                                "heightFactor":1.4,
+                                                "bold":true
+                                            }
+                                        },        
+                                        {
+                                            "_dock":"right",
+                                            "type":"button",
+                                            "content":"Save as Pre-Set ...",
+                                            "margin":[10,0],
+                                            "eventHandlers":{
+                                                "onRelease":{
+                                                    "type":"code",
+                                                    "code":[
+                                                        "if ${LGUI2.Element[isb2.QuickSetup.PresetPopup].Visibility~.Equal[visible]}",
+                                                        "LGUI2.Element[isb2.QuickSetup.PresetPopup]:SetVisibility[collapsed]",
+                                                        "else",
+                                                        "LGUI2.Element[isb2.QuickSetup.PresetPopup]:SetVisibility[visible]"
+                                                    ]
+                                                }
+                                            }
+                                        }                                        
+                                    ],
                                     "margin":[0,0,0,5]
                                 },
                                 {

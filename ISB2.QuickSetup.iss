@@ -4,6 +4,8 @@ objectdef isb2_quicksetup
 {
     variable jsonvalueref Builders="[]"
     variable jsonvalueref BuilderGroups="[]"
+    variable jsonvalueref BuilderPresets="[]"
+
     variable jsonvalueref EditingCharacter="{}"
     variable jsonvalueref Characters="[]"
 
@@ -26,6 +28,7 @@ objectdef isb2_quicksetup
     variable string GameName
 
     variable jsonvalueref SelectedGame
+    variable jsonvalueref SelectedBuilderPreset
 
     method Initialize()
     {
@@ -56,10 +59,16 @@ objectdef isb2_quicksetup
         SelectedGame:SetReference["ISB2.FindInArray[jaGames,\"${gameName~}\"]"]
     }
 
+    method SelectBuilderPreset(string name)
+    {
+        SelectedBuilderPreset:SetReference["ISB2.FindInArray[BuilderPresets,\"${name~}\"]"]
+    }
+
     method Start()
     {
         This:DetectMonitors
         This:GenerateGameLaunchInfo
+        This:RefreshBuilderPresets
         
         if !${LGUI2.Element[isb2.QuickSetupWindow].Visibility~.Equal[visible]}
         {
@@ -444,7 +453,7 @@ objectdef isb2_quicksetup
         return joDiff
     }
 
-    method ApplyBuilder(jsonvalueref joProfile, jsonvalueref joLocatedBuilder)
+    method ApplyBuilder(jsonvalueref ja, jsonvalueref joLocatedBuilder)
     {
         if !${joLocatedBuilder.GetBool[enable]}
             return FALSE
@@ -453,10 +462,6 @@ objectdef isb2_quicksetup
 
         variable jsonvalueref joBuilder
         joBuilder:SetReference["joLocatedBuilder.Get[builder]"]
-
-        if !${joProfile.Get[teams,1].Has[-array,builders]}  
-            joProfile.Get[teams,1]:Set[builders,"[]"]
-            
     
         variable jsonvalueref joBuilderConfig
         joBuilderConfig:SetReference["{}"]
@@ -466,23 +471,36 @@ objectdef isb2_quicksetup
         joBuilderConfig:SetBool[enable,1]
         joBuilderConfig:SetByRef[overrides,"This.GetBuilderDiff[joBuilder]"]
     
-        joProfile.Get[teams,1,builders]:AddByRef[joBuilderConfig]
+        ja:AddByRef[joBuilderConfig]
         return TRUE
     }
 
-    method ApplyBuilderGroup(jsonvalueref joProfile, jsonvalueref joBuilderGroup)
+    method ApplyBuilderGroup(jsonvalueref ja, jsonvalueref joBuilderGroup)
     {
         variable jsonvalueref joLocatedBuilder="joBuilderGroup.Get[builders,${joBuilderGroup.GetInteger[selectedBuilder]}]"
         if !${joLocatedBuilder.Reference(exists)}
             return
 
-        This:ApplyBuilder[joProfile,joLocatedBuilder]        
+        This:ApplyBuilder[ja,joLocatedBuilder]        
     }
 
     method ApplyBuilders(jsonvalueref joProfile)
     {
-        BuilderGroups:ForEach["This:ApplyBuilderGroup[joProfile,ForEach.Value]"]      
-        Builders:ForEach["This:ApplyBuilder[joProfile,ForEach.Value]"]
+        variable jsonvalueref ja="[]"
+
+        BuilderGroups:ForEach["This:ApplyBuilderGroup[ja,ForEach.Value]"]      
+        Builders:ForEach["This:ApplyBuilder[ja,ForEach.Value]"]
+
+        if ${ja.Used}
+            joProfile.Get[teams,1]:SetByRef[builders,ja]
+    }
+
+    member:jsonvalueref GetAppliedBuilders()
+    {
+        variable jsonvalueref ja="[]"
+        BuilderGroups:ForEach["This:ApplyBuilderGroup[ja,ForEach.Value]"]      
+        Builders:ForEach["This:ApplyBuilder[ja,ForEach.Value]"]
+        return ja
     }
 
     method Finish()
@@ -833,9 +851,11 @@ objectdef isb2_quicksetup
             return
         }
 
-        if ${joHotkey.Has[-string,keyCombo]}
-            joHotkeyBuilder:SetString[keyCombo,"${joHotkey.Get[keyCombo]~}"]        
-
+        if !${joHotkeyBuilder.Has[-string,keyCombo]}
+        {
+            if ${joHotkey.Has[-string,keyCombo]}
+                joHotkeyBuilder:SetString[keyCombo,"${joHotkey.Get[keyCombo]~}"]        
+        }
         if !${jo.Get[builder].Has[-array,expandedHotkeys]}
             jo.Get[builder]:Set[expandedHotkeys,"[]"]
 
@@ -1079,18 +1099,34 @@ objectdef isb2_quicksetup
         if !${This.ShouldShowBuilder[joBuilder]}
             return FALSE
 
-        jo:SetBool[enable,${joBuilder.GetBool[enable]}]        
+        ; grab pre-set
+        variable jsonvalueref joPreset
+        joPreset:SetReference["ISB2.FindInArray[\"SelectedBuilderPreset.Get[builders]\",\"${joBuilder.Get[name]~}\"]"]
+
+        if ${joPreset.Reference(exists)}
+            jo:SetBool[enable,${joPreset.GetBool[enable]}]
+        else
+            jo:SetBool[enable,${joBuilder.GetBool[enable]}]
 
         jo:SetString[profile,"${joLocated.Get[profile]~}"]
+        jo:SetString[name,"${joBuilder.Get[name]~}"]
 
         if !${joBuilder.Has[-object,original]}
             joBuilder:SetByRef[original,joBuilder.Duplicate]
+
+        if ${joPreset.Has[-object,overrides]}
+        {
+            joBuilder:Merge["joPreset.Get[overrides]",1]
+            echo "\atBuilder after merged overrides\ax: ${joBuilder~}"
+        }
 
         jo:SetByRef[builder,joBuilder]
 
         ; get initial hotkeys
         joBuilder.Get[hotkeys]:ForEach["This:PrepareBuilderHotkey[jo,ForEach.Value]"]
         joBuilder.Get[gameKeyBindings]:ForEach["This:PrepareBuilderGameKeyBinding[jo,ForEach.Value]"]
+
+            echo "\apBuilder after hotkeys and gameKeyBindings\ax: ${joBuilder~}"
 
         if ${joBuilder.Has[-string,"builderGroup"]}
             This:AddToBuilderGroup["${joBuilder.Get[builderGroup]~}",jo]
@@ -1127,8 +1163,48 @@ objectdef isb2_quicksetup
             return
         }
 
-        joBuilderGroup:Set["selectedBuilder",${Context.Source.SelectedItem.Index}]
+        joBuilderGroup:SetInteger["selectedBuilder",${Context.Source.SelectedItem.Index}]
         joBuilderGroup.Get[builders,"${Context.Source.SelectedItem.Index}"]:SetBool[enable,1]
+    }
+
+    method AddBuilderPreset(jsonvalueref joPreset)
+    {
+        ; todo: filter out presets for other games, genres
+        BuilderPresets:AddByRef[joPreset]
+    }
+
+    method RefreshBuilderPresets()
+    {
+        echo "\ayRefreshBuilderPresets\ax"
+        BuilderPresets:Clear
+        ISB2.Settings.Get[builderPresets]:ForEach["This:AddBuilderPreset[ForEach.Value]"]
+    }
+
+    method AutoSelectBuilder(jsonvalueref joBuilderInstance)
+    {
+        variable jsonvalueref joBuilder="ISB2.FindOne[Builders,\"${joBuilderInstance.Get[name]~}\",\"${joBuilderInstance.Get[profile]~}\"]"
+        echo "\arAutoSelectBuilder\ax ${joBuilderInstance~} ${joBuilder~}"
+        if !${joBuilder.Has[-string,builderGroup]}
+            return FALSE
+
+        variable jsonvalueref joBuilderGroup
+        joBuilderGroup:SetReference["ISB2.FindInArray[BuilderGroups,\"${joBuilder.Get[builderGroup]~}\"]"]
+        if !${joBuilderGroup.Reference(exists)}
+        {
+            echo "AutoSelectBuilder: Group ${joBuilder.Get[builderGroup]~} not found"
+            return FALSE
+        }
+
+        variable int64 numBuilder
+        numBuilder:Set[${ISB2.FindKeyInArray["joBuilderGroup.Get[builders]","${joBuilder.Get[name]~}"]}]
+        if !${numBuilder}
+        {
+            echo "AutoSelectBuilder: Builder ${joBuilder.Get[name]~} not found in ${joBuilderGroup~}"
+            return FALSE
+        }
+
+        joBuilderGroup:SetInteger["selectedBuilder",${numBuilder}]
+        echo "AutoSelectBuilder: ${numBuilder}"
     }
 
     method RefreshBuilders()
@@ -1143,6 +1219,8 @@ objectdef isb2_quicksetup
         BuilderGroups:ForEach["This:MoveSingleBuilders[ForEach.Value,ja,\${ForEach.Key~}]"]
         ja:Reverse
         ja:ForEach["BuilderGroups:Erase[\"\${ForEach.Value~}\"]"]
+
+        SelectedBuilderPreset.Get[builders]:ForEach["This:AutoSelectBuilder[ForEach.Value]"]
 
         LGUI2.Element[isb2.QuickSetupWindow]:FireEventHandler[onBuildersUpdated]
     }
@@ -1183,6 +1261,54 @@ objectdef isb2_quicksetup
 
         ; add to end
         return 0
+    }
+
+    method OnSavePreset()
+    {
+        variable string name=${LGUI2.Element["isb2.QuickSetup.PresetName"].Text~}
+        variable jsonvalueref jo
+        variable bool existing
+        if !${name.NotNULLOrEmpty}
+        {
+            LGUI2.Element["isb2.QuickSetup.PresetName"]:KeyboardFocus
+            return FALSE
+        }
+
+        jo:SetReference["ISB2.FindInArray[\"ISB2.Settings.Get[builderPresets]\",\"${name~}\"]"]
+        if ${jo.Reference(exists)}
+            existing:Set[1]
+        else
+        {
+            jo:SetReference["{}"]    
+            jo:SetString[name,"${name~}"]
+        }
+
+        if ${LGUI2.Element["isb2.QuickSetup.PresetName"].Text.NotNULLOrEmpty}
+            jo:SetString[description,"${LGUI2.Element["isb2.QuickSetup.PresetDescription"].Text~}"]
+        else
+            jo:Erase[description]
+
+        if ${LGUI2.Element["isb2.QuickSetup.PresetRestrictToGame"].Checked}
+            jo:SetString[game,"${GameName~}"]
+        else
+            jo:Erase[game]
+
+        if ${SelectedGame.Has[-string,genre]} && ${LGUI2.Element["isb2.QuickSetup.PresetRestrictToGenre"].Checked}
+            jo:SetString[genre,"${SelectedGame.Get[genre]~}"]
+        else
+            jo:Erase[genre]
+
+        jo:SetByRef[builders,This.GetAppliedBuilders]
+
+        if !${existing}
+        {
+            if !${ISB2.Settings.Has[-array,builderPresets]}
+                ISB2.Settings:Set[builderPresets,"[]"]
+            ISB2.Settings.Get[builderPresets]:AddByRef[jo]
+        }
+
+        ISB2:AutoStoreSettings
+        This:RefreshBuilderPresets
     }
 
     method AddDetectedCharacter(jsonvalueref joDetected)

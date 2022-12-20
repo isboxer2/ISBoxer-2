@@ -4460,6 +4460,33 @@ objectdef isb2_profileengine
     {
         jaBuilders:ForEach["This:ApplyBuilder[ForEach.Value]"]
     }
+
+    member:jsonvalueref FindInArray(jsonvalueref ja, string name, string fieldName="name")
+    {
+        if !${ja.Type.Equal[array]}
+            return NULL
+
+        variable jsonvalue joQuery="{}"
+        joQuery:SetString[eval,"Select.Get[\"${fieldName~}\"]"]
+        joQuery:SetString[op,"=="]
+        joQuery:SetString[value,"${name~}"]
+
+        return "ja.SelectValue[joQuery]"
+    }
+
+    member:int FindKeyInArray(jsonvalueref ja, string name, string fieldName="name")
+    {
+        if !${ja.Type.Equal[array]}
+            return NULL
+
+        variable jsonvalue joQuery="{}"
+        joQuery:SetString[eval,"Select.Get[\"${fieldName~}\"]"]
+        joQuery:SetString[op,"=="]
+        joQuery:SetString[value,"${name~}"]
+
+        return "${ja.SelectKey[joQuery]}"
+    }
+
 }
 
 

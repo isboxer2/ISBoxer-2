@@ -374,6 +374,7 @@ objectdef isb2_managedSlot
 
         This:AddProfile[ja,"${joLaunchInfo.Get[teamProfile]~}"]
         This:AddProfiles[ja,"joTeam"]
+        joTeam.Get[builders]:ForEach["This:AddProfile[ja,\"\${ForEach.Value.Get[profile]~}\"]"]
         This:AddProfiles[ja,"joTeam.Get[slots,${NumSlot}]"]
         This:AddProfile[ja,"${joLaunchInfo.Get[characterProfile]~}"]
         This:AddProfiles[ja,"joCharacter"]

@@ -510,7 +510,9 @@ objectdef isb2_quicksetup
         joProfile.Get[teams]:AddByRef[joTeam]
         joProfile:SetByRef[characters,Characters]
 
+        Characters:ForEach["ForEach.Value:SetBool[useGameVirtualFiles,1]"]
 
+        /*
         variable jsonvalueref jaVirtualFiles
         ; add Virtual Files ...
         if ${SelectedGame.Has[-array,virtualFiles]}
@@ -518,6 +520,7 @@ objectdef isb2_quicksetup
             jaVirtualFiles:SetReference["SelectedGame.Get[virtualFiles]"]
             Characters:ForEach["This:AddVirtualFiles[ForEach.Value,jaVirtualFiles]"]
         }
+        /**/
 
         variable jsonvalueref joWindowLayout
         if ${WindowLayout.Reference(exists)}

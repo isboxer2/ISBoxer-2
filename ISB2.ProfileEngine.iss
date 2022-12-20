@@ -50,6 +50,7 @@ objectdef isb2_profileengine
     variable jsonvalue WindowLayouts="{}"
     variable jsonvalue BroadcastProfiles="{}"
 
+    variable jsonvalueref ActiveGame
     variable jsonvalueref Character
     variable jsonvalueref Team
     variable jsonvalueref SlotRef
@@ -1301,6 +1302,26 @@ objectdef isb2_profileengine
 
         This:SetRelayGroup["${Character.Get[name]~}",1]
         This:SetRelayGroups["Character.Get[targetGroups]",1]
+
+
+        if ${Character.Has[-string,game]}
+        {
+            variable jsonvalueref jaGames
+            jaGames:SetReference["LGUI2.Skin[default].Template[isb2.data].Get[games]"]
+
+            ActiveGame:SetReference["ISB2.FindInArray[jaGames,\"${Character.Get[game]~}\"]"]
+        }
+        else
+        {
+            ActiveGame:SetReference[NULL]
+        }
+
+        if ${Character.GetBool[useGameVirtualFiles]}
+        {
+            ; get the game
+            This:InstallVirtualFiles["ActiveGame.Get[virtualFiles]"]    
+        }
+
         This:InstallVirtualFiles["Character.Get[virtualFiles]"]
         This:InstallVariables["Character.Get[variables]"]
         This:VirtualizeMappables["Character.Get[virtualMappables]"]

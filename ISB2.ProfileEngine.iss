@@ -43,6 +43,7 @@ objectdef isb2_profileengine
     variable jsonvalue GameKeyBindings="{}"
     variable jsonvalue ActionTypes="{}"
 
+    variable jsonvalue Builders="{}"
     variable jsonvalue Characters="{}"
     variable jsonvalue ClickBarTemplates="{}"
     variable jsonvalue Teams="{}"
@@ -789,6 +790,18 @@ objectdef isb2_profileengine
             ja:ForEach["This:UninstallProfile[ForEach.Value]"]
     }    
 
+    method InstallBuilders(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallBuilder[ForEach.Value]"]
+    }    
+
+    method UninstallBuilders(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:UninstallBuilder[ForEach.Value]"]
+    }    
+
     method InstallVirtualFiles(jsonvalueref ja)
     {
         if ${ja.Type.Equal[array]}
@@ -947,6 +960,19 @@ objectdef isb2_profileengine
         if ${ja.Type.Equal[array]}
             ja:ForEach["This:UninstallVFXSheet[ForEach.Value]"]
     }    
+
+    method InstallBuilder(jsonvalueref joBuilder)
+    {
+        echo "\agInstallBuilder\ax ${joBuilder.Get[name]~}: ${joBuilder}"
+        Builders:SetByRef["${joBuilder.Get[name]~}",joBuilder]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onBuildersUpdated]        
+    }
+
+    method UninstallBuilder(string name)
+    {
+        Builders:Erase[name]
+    }
 
      method InstallInputMapping(string name,jsonvalueref joMapping)
     {
@@ -1286,9 +1312,9 @@ objectdef isb2_profileengine
 
         Character.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Enable"]
         Character.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
-        echo "enabling ${Team.Get[hotkeySheets].Used} hotkeySheets, ${Team.Get[mappableSheets].Used} mappableShets"        
-        Team.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Activate"]
-        Team.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Activate"]
+;        echo "enabling ${Team.Get[hotkeySheets].Used} hotkeySheets, ${Team.Get[mappableSheets].Used} mappableShets"        
+        Team.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Enable"]
+        Team.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
         This:SetGUIMode[0]
 
@@ -1329,6 +1355,7 @@ objectdef isb2_profileengine
         This:SetRelayGroup["${qualifiedName~}",1]
         
         This:ActivateProfilesByName["Team.Get[profiles]"]
+        This:ApplyBuilders["Team.Get[builders]"]
 
         ; white/black lists
         switch ${jo.Get[mappableSheetWhiteOrBlackListType]}
@@ -1404,6 +1431,7 @@ objectdef isb2_profileengine
         Profiles:Add["${_profile.Name~}"]
 
         This:InstallProfiles[_profile.Profiles]
+        This:InstallBuilders[_profile.Builders]
         This:InstallImageSheets[_profile.ImageSheets]
         This:InstallGameMacroSheets[_profile.GameMacroSheets]
         This:InstallVirtualFiles[_profile.VirtualFiles]
@@ -1440,6 +1468,7 @@ objectdef isb2_profileengine
         Profiles:Remove["${_profile.Name~}"]
 
         This:UninstallProfiles[_profile.Profiles]
+        This:UninstallBuilders[_profile.Builders]
         This:UninstallGameMacroSheets[_profile.GameMacroSheets]
         This:UninstallVirtualFiles[_profile.VirtualFiles]
         This:UninstallWindowLayouts[_profile.WindowLayouts]
@@ -1458,6 +1487,28 @@ objectdef isb2_profileengine
 
         LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated]
     }
+
+    method ActivateProfilesByName(jsonvalueref jaProfiles)
+    {
+        if !${jaProfiles.Type.Equal[array]}
+            return
+
+        jaProfiles:ForEach["This:ActivateProfileByName[\"\${ForEach.Value~}\"]"]
+    }
+
+    method ActivateProfileByName(string name)
+    {
+        variable weakref useProfile="ProfileDB.Profiles.Get[\"${name~}\"]"
+;        echo "ActivateProfileByName ${name} = ${useProfile.AsJSON~}"
+        return "${This:ActivateProfile[useProfile](exists)}"
+    }
+
+    method DeactivateProfileByName(string name)
+    {
+        variable weakref useProfile="ProfileDB.Profiles.Get[\"${name~}\"]"
+;        echo "DeactivateProfileByName ${name} = ${useProfile.AsJSON~}"
+        return "${This:DeactivateProfile[useProfile](exists)}"
+    }    
 #endregion
 
 #region Variable Processors
@@ -4272,6 +4323,121 @@ objectdef isb2_profileengine
         ja:ForEach["This:SetRelayGroup[\"\${ForEach.Value~}\",${newState}]"]
 
         return TRUE
+    }
+
+    method AddArrayStringTo(jsonvalueref joOwner, string arrayName, string name)
+    {
+        if !${joOwner.Has[-array,"${arrayName~}"]}
+        {
+            joOwner:Set["${arrayName~}","[]"]
+            joOwner.Get["${arrayName~}"]:AddString["${name~}"]
+            return
+        }
+
+        if ${joOwner.Get["${arrayName~}"].Contains["${name.AsJSON~}"]}
+            return
+        joOwner.Get["${arrayName~}"]:AddString["${name~}"]
+    }
+
+    method AddArrayStringsTo(jsonvalueref joOwner, string arrayName, jsonvalueref jaSource)
+    {
+        jaSource:ForEach["This:AddArrayStringTo[joOwner,\"${arrayName~}\","\${ForEach.Value}"]"]
+    }
+
+
+    method ApplyTeamBuilder(jsonvalueref joBuilder, jsonvalueref joTeamBuilder)
+    {
+        echo "\ayApplyTeamBuilder:\ax ${joTeamBuilder~}"
+
+        if ${joBuilder.Has[-array,expandedHotkeys]}
+            Team:SetByRef[hotkeys,"joBuilder.Get[expandedHotkeys].Duplicate"]
+        if ${joBuilder.Has[-array,expandedGameKeyBindings]}
+            Team:SetByRef[gameKeyBindings,"joBuilder.Get[expandedGameKeyBindings].Duplicate"]
+
+        if ${joTeamBuilder.Has[-array,hotkeySheets]}
+        {
+            This:AddArrayStringsTo[Team,"hotkeySheets","joTeamBuilder.Get[hotkeySheets]"]
+        }
+        if ${joTeamBuilder.Has[-array,mappableSheets]}
+        {
+            This:AddArrayStringsTo[Team,"mappableSheets","joTeamBuilder.Get[mappableSheets]"]
+        }
+        if ${joTeamBuilder.Has[-array,clickBars]}
+        {
+            This:AddArrayStringsTo[Team,"clickBars","joTeamBuilder.Get[clickBars]"]
+        }        
+        if ${joTeamBuilder.Has[-array,gameMacroSheets]}
+        {
+            This:AddArrayStringsTo[Team,"gameMacroSheets","joTeamBuilder.Get[gameMacroSheets]"]
+        }        
+
+        if ${joTeamBuilder.Has[-array,slots]}
+        {
+            variable jsonvalueref jaTeamSlots
+            variable jsonvalueref jaBuilderSlots
+            variable uint i 
+
+            jaTeamSlots:SetReference["Team.Get[slots]"]
+            jaBuilderSlots:SetReference["joTeamBuilder.Get[slots]"]
+
+            for ( i:Set[1] ; ${i} <= ${jaTeamSlots.Used} && ${i} <= ${jaBuilderSlots.Used} ; i:Inc)
+            {
+                jaTeamSlots.Get[${i}]:Merge["jaBuilderSlots.Get[${i}]",FALSE]
+            }
+        }
+    }
+
+    method ApplySlotBuilder(jsonvalueref joBuilder, jsonvalueref joSlotBuilder)
+    {
+        echo "\arApplySlotBuilder:\ax ${joSlotBuilder~}"
+    }
+
+    method ApplyCharacterBuilder(jsonvalueref joBuilder, jsonvalueref joCharacterBuilder)
+    {
+        echo "\arApplyCharacterBuilder:\ax ${joCharacterBuilder~}"
+    }
+
+    method ApplyBuilder(jsonvalueref joSettings)
+    {
+        ; activate builder profile ....
+        This:ActivateProfileByName["${joSettings.Get[profile]~}"]
+
+        ; find the builder using the specified profile
+        variable jsonvalueref joBuilder
+        joBuilder:SetReference["Builders.Get[\"${joSettings.Get[name]~}\"]"]
+
+        if !${joBuilder.Reference(exists)}
+        {
+            echo "\arApplyBuilder\ax: Builder ${joSettings.Get[name]~} not found"
+            return FALSE
+        }
+
+        ; merge overrides into builder
+        if ${joBuilder.Has[-object,overrides]}
+        {
+            joBuilder:SetReference[joBuilder.Duplicate]
+            joBuilder:Merge["joBuilder.Get[overrides]"]
+        }
+        
+        ; apply finalized builder
+        echo "\arApplyBuilder:\ax ${joBuilder~}"
+
+        if ${joBuilder.Has[-object,team]}
+            This:ApplyTeamBuilder[joBuilder,"joBuilder.Get[team]"]
+
+        if ${joBuilder.Has[-object,slot]}
+            This:ApplySlotBuilder[joBuilder,"joBuilder.Get[slot]"]
+
+        if ${joBuilder.Has[-object,slot]}
+            This:ApplyCharacterBuilder[joBuilder,"joBuilder.Get[character]"]
+
+        return TRUE
+
+    }
+
+    method ApplyBuilders(jsonvalueref jaBuilders)
+    {
+        jaBuilders:ForEach["This:ApplyBuilder[ForEach.Value]"]
     }
 }
 

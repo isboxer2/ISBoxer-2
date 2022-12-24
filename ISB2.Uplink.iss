@@ -2,6 +2,7 @@
 #include "ISB2.Games.iss"
 #include "ISB2.Importer.iss"
 #include "ISB2.QuickSetup.iss"
+#include "ISB2.ProfileEditor.iss"
 
 objectdef isb2 inherits isb2_profilecollection
 {
@@ -21,6 +22,8 @@ objectdef isb2 inherits isb2_profilecollection
 
     variable bool bAutoStoreSettings=TRUE
     variable string SelectedTeamName
+
+    variable collection:isb2_profileeditor Editors
 
     method Initialize()
     {
@@ -72,6 +75,18 @@ objectdef isb2 inherits isb2_profilecollection
     {
         Script:DumpStack
     }
+
+
+    method OpenEditor(string profileName)
+    {
+        if ${Editors.Get["${profileName~}"](exists)}
+            return
+
+        if !${Profiles.Get["${profileName~}"](exists)}
+            return
+
+        Editors:Set["${profileName~}","Profiles.Get[\"${profileName~}\"]"]
+    }    
 
     method OnProfilesUpdated()
     {

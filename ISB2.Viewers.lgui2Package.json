@@ -43,6 +43,17 @@
                 ]
             }
         },        
+        "isb2.slotView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${This.Context.Index}: ${_CONTEXTITEMDATA_.Get[character]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
         "isb2.profileView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -152,6 +163,17 @@
                 }
             }
         },
+        "isb2.hotkeySheetView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
         "isb2.mappableSheetView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -170,6 +192,17 @@
                 "type":"textblock",
                 "textBinding":{
                     "pullFormat":"${_CONTEXTITEMDATA_.Get[pattern]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.vfxSheetView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
                     "pullReplaceNull":""
                 }
             }

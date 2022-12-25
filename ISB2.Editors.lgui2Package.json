@@ -5,6 +5,7 @@
         "isb2.draggerWidths":{
             "default":200,
             "isb2.characterEditor":200,
+            "isb2.main":200,
             "isb2.teamEditor":200,
             "isb2.mappableSheetEditor":200
         },
@@ -13,6 +14,7 @@
             "_pane":"default",
             "type":"dragger",
             "width":200,
+            "verticalAlignment":"stretch",
             "allowMove":false,
             "allowResize":true,
             "borderThickness":[0,0,5,0],
@@ -20,13 +22,47 @@
             "eventHandlers":{
                 "onVisualAttached":{
                     "type":"code",
-                    "code":"This:SetSize[${LGUI2.Template[isb2.draggerWidths].Get[${This.Metadata.Get[pane]}]},-1]"
+                    "code":"This:SetSize[${LGUI2.Template[isb2.draggerWidths].Get[\"${This.Metadata.Get[pane]~}\"]},-1]"
                 },
                 "lostMouseCapture":{
                     "type":"code",
-                    "code":"LGUI2.Skin[default].Template[isb2.draggerWidths]:Set[${This.Metadata.Get[pane]},${This.Width}]"
+                    "code":"LGUI2.Skin[default].Template[isb2.draggerWidths]:Set[\"${This.Metadata.Get[pane]~}\",${This.Width}]"
                 }
             }
+        },
+        "isb2.topPane":{
+            "_dock":"left",
+            "_pane":"default",
+            "type":"dragger",
+            "width":200,
+            "verticalAlignment":"stretch",
+            "allowMove":false,
+            "allowResize":true,
+            "borderThickness":[0,0,5,0],
+            "borderBrush":{"color":[0.5,0.5,0.5]},
+            "eventHandlers":{
+                "onVisualAttached":{
+                    "type":"code",
+                    "code":"This:SetSize[-1,${LGUI2.Template[isb2.draggerHeights].Get[\"${This.Metadata.Get[pane]~}\"]}]"
+                },
+                "lostMouseCapture":{
+                    "type":"code",
+                    "code":"LGUI2.Skin[default].Template[isb2.draggerHeights]:Set[\"${This.Metadata.Get[pane]~}\",${This.Height}]"
+                }
+            }
+        },
+        "isb2.leftPaneExpander":{
+            "jsonTemplate":"expander",
+            "type":"expander",
+            "horizontalAlignment":"stretch",
+            "margin":3
+        },
+        "isb2.leftPaneList":{
+            "jsonTemplate":"listbox",
+            "type":"listbox",
+            "horizontalAlignment":"stretch",
+            "margin":3,
+            "borderThickness":[0,0,0,1]
         },
         "isb2.characterEditor":{
             "type":"dockpanel",
@@ -36,9 +72,14 @@
                     "jsonTemplate":"isb2.leftPane",
                     "_pane":"isb2.characterEditor",
                     "content":{
-                        "type":"treepanel",
+                        "type":"listbox",
+                        "jsonTemplate":"isb2.leftPaneList",
                         "verticalAlignment":"stretch",
-                        "horizontalAlignment":"stretch"
+                        "horizontalAlignment":"stretch",
+                        "items":[
+                            "General",
+                            "Game Launch Info"
+                        ]
                     }        
                 },
                 {
@@ -90,9 +131,9 @@
                         {
                             "name":"Server",
                             "dataBinding":{
-                              "pullFormat":"${This.Object.Get[serverName]}",
+                              "pullFormat":"${This.Object.Get[gameServer]}",
                               "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[serverName,\"","\"]"]
+                              "pushFormat":["This.Object:SetString[gameServer,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
                         },
@@ -104,6 +145,48 @@
                               "pushFormat":["This.Object:SetString[game,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Clip cursor to window",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.GetBool[clipCursor]}",
+                                "pushFormat":["This.Object:SetBool[clipCursor,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[clipCursor]"
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "tooltip":"Enabling this feature will generally lock the cursor into the window",
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }
+                        },
+                        {
+                            "name":"VFX Viewers are Permanent",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.GetBool[vfxViewersPermanent]}",
+                                "pushFormat":["This.Object:SetBool[vfxViewersPermanent,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[vfxViewersPermanent]"
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "tooltip":"Enabling this feature will block VFX Sources from the Character's window",
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }
+                        },
+                        {
+                            "name":"Mute Broadcasts",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.GetBool[muteBroadcasts]}",
+                                "pushFormat":["This.Object:SetBool[muteBroadcasts,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[muteBroadcasts]"
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "tooltip":"Enabling this feature will prevent broadcast inputs from reaching the window",
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }
                         }
                     ]
                 }
@@ -117,9 +200,45 @@
                     "jsonTemplate":"isb2.leftPane",
                     "_pane":"isb2.teamEditor",
                     "content":{
-                        "type":"treepanel",
+                        "type":"listbox",
+                        "jsonTemplate":"isb2.leftPaneList",
                         "verticalAlignment":"stretch",
-                        "horizontalAlignment":"stretch"
+                        "horizontalAlignment":"stretch",
+                        "contentContainer":{
+                            "jsonTemplate":"listbox.contentContainerFitWidth"
+                        },
+                        "items":[
+                            {
+                                "type":"textblock",
+                                "text":"General"
+                            },
+                            {
+                                "type":"expander",
+                                "header":"Slots",
+                                "content":{
+                                    "margin":[20,0,0,0],
+                                    "type":"listbox",
+                                    "borderThickness":0,
+                                    "contentContainer":{
+                                        "jsonTemplate":"listbox.contentContainerFitWidth"
+                                    },
+                                    "horizontalAlignment":"stretch",
+                                    "itemsBinding":{
+                                        "pullFormat": "${This.Locate[\"\",listbox,ancestor].Context.Get[slots]}"
+                                    },
+                                    "itemViewGenerators":{
+                                        "default":{
+                                            "type":"template",
+                                            "template":"isb2.slotView"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "type":"textblock",
+                                "text":"Configuration Builders"
+                            }
+                        ]
                     }        
                 },
                 {
@@ -140,6 +259,24 @@
                               "pushFormat":["This.Object:SetString[name,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"GUI Toggle Hotkey",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[guiToggleCombo]}",
+                                "pushFormat":["This.Object:SetString[guiToggleCombo,\"","\"]"],
+                                "pushNullFormat":["This.Object:Erase[guiToggleCombo]"]
+                            },
+                            "editTemplate":"propertyview.inputCombo"
+                        },
+                        {
+                            "name":"Window Layout",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[windowLayout]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:SetString[windowLayout,\"","\"]"]
+                              },
+                              "editTemplate":"propertyview.textbox"                              
                         }
                     ]
                 }
@@ -178,6 +315,29 @@
                             "editTemplate":"propertyview.textbox"                            
                         }
                     ]
+                }
+            ]
+        },
+        "isb2.missingEditor":{
+            "type":"dockpanel",
+            "padding":5,
+            "jsonTemplate":"dockpanel",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "children":[
+                {
+                    "type":"textblock",
+                    "text":"Editor Missing",
+                    "_dock":"top"
+                },
+                {
+                    "type":"textbox",
+                    "_dock":"top",
+                    "horizontalAlignment":"stretch",
+                    "verticalAlignment":"stretch",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.AsJSON[multiline]}"
+                    }
                 }
             ]
         },
@@ -294,33 +454,38 @@
             "width":750,
             "height":400,
             "minSize":[600,300],
+            "eventHandlers":{
+                "onVisualDetached":{
+                    "type":"method",
+                    "object":"This.Context",
+                    "method":"OnWindowClosed"
+                }        
+            },
             "content":{
                 "type":"dockpanel",
                 "horizontalAlignment": "stretch",
                 "verticalAlignment": "stretch",
                 "children":[
                     {
-                        "type":"scrollviewer",
-                        "_dock":"top",
-                        "horizontalAlignment": "stretch",
-                        "verticalScroll": "fit",
-                        "heightFactor":0.4,
+                        "jsonTemplate":"isb2.leftPane",
+                        "_pane":"isb2.main",
                         "content":{
-                            "type":"stackpanel",
-                            "orientation": "horizontal",
-                            "verticalContentAlignment":"stretch",
-                            "children":[
-                                {
-                                    "type":"stackpanel",
-                                    "orientation":"vertical",
-                                    "margin":[0,0,5,0],
-                                    "children":[
-                                        {
-                                            "type":"textblock",
-                                            "text":"Characters"
-                                        },
-                                        {
+                            "type":"scrollviewer",
+                            "horizontalAlignment":"stretch",
+                            "verticalAlignment":"stretch",
+                            "horizontalScroll":"fitparent",
+                            "content":{
+                                "type":"stackpanel",
+                                "orientation":"vertical",
+                                "uniform":true,
+                                "children":[
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"Characters",
+                                        "content":{
                                             "type":"listbox",
+                                            "jsonTemplate":"isb2.leftPaneList",
                                             "name":"profile.characters",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.Characters}"
@@ -335,24 +500,21 @@
                                                 "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
-                                                    "method":"OnCharacterSelected"
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["Character"]
                                                 }
                                             }
-                                        }        
-                                    ]
-                                },
-                                {
-                                    "type":"stackpanel",
-                                    "orientation":"vertical",
-                                    "margin":[0,0,5,0],
-                                    "children":[
-                                        {
-                                            "type":"textblock",
-                                            "text":"Teams"
-                                        },
+                                        }
+                                    },
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"Teams",
+                                        "content":                                    
                                         {
                                             "type":"listbox",
                                             "name":"profile.teams",
+                                            "jsonTemplate":"isb2.leftPaneList",
                                             "itemsBinding":{
                                                 "pullFormat": "${This.Context.Editing.Teams}"
                                             },
@@ -366,22 +528,45 @@
                                                 "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
-                                                    "method":"OnTeamSelected"
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["Team"]
+                                                }
+                                            }
+                                        }        
+                                    },
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"Hotkey Sheets",
+                                        "content":{
+                                            "jsonTemplate":"isb2.leftPaneList",
+                                            "type":"listbox",
+                                            "name":"profile.hotkeySheets",
+                                            "itemsBinding":{
+                                                "pullFormat": "${This.Context.Editing.HotkeySheets}"
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.hotkeySheetView"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onItemSelected":{
+                                                    "type":"method",
+                                                    "object":"This.Context",
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["HotkeySheet"]
                                                 }
                                             }
                                         }
-                                    ]
-                                },
-                                {
-                                    "type":"stackpanel",
-                                    "orientation":"vertical",
-                                    "margin":[0,0,5,0],
-                                    "children":[
-                                        {
-                                            "type":"textblock",
-                                            "text":"Mappable Sheets"
-                                        },
-                                        {
+                                    },
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"Mappable Sheets",
+                                        "content":{
+                                            "jsonTemplate":"isb2.leftPaneList",
                                             "type":"listbox",
                                             "name":"profile.mappableSheets",
                                             "itemsBinding":{
@@ -397,22 +582,18 @@
                                                 "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
-                                                    "method":"OnKMappableSheetSelected"
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["MappableSheet"]
                                                 }
                                             }
                                         }
-                                    ]
-                                },
-                                {
-                                    "type":"stackpanel",
-                                    "orientation":"vertical",
-                                    "margin":[0,0,5,0],
-                                    "children":[
-                                        {
-                                            "type":"textblock",
-                                            "text":"Game Key Bindings"
-                                        },
-                                        {
+                                    },
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"Game Key Bindings",
+                                        "content":{
+                                            "jsonTemplate":"isb2.leftPaneList",
                                             "type":"listbox",
                                             "name":"profile.gameKeyBindings",
                                             "itemsBinding":{
@@ -428,22 +609,18 @@
                                                 "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
-                                                    "method":"OnGameKeyBindingSelected"
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["GameKeyBinding"]
                                                 }
                                             }
                                         }
-                                    ]
-                                },
-                                {
-                                    "type":"stackpanel",
-                                    "orientation":"vertical",                                    
-                                    "margin":[0,0,5,0],
-                                    "children":[
-                                        {
-                                            "type":"textblock",
-                                            "text":"Window Layouts"
-                                        },
-                                        {
+                                    },
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"Window Layouts",
+                                        "content":{
+                                            "jsonTemplate":"isb2.leftPaneList",
                                             "type":"listbox",
                                             "name":"profile.windowLayouts",
                                             "itemsBinding":{
@@ -459,22 +636,18 @@
                                                 "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
-                                                    "method":"OnWindowLayoutSelected"
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["WindowLayout"]
                                                 }
                                             }
                                         }
-                                    ]
-                                },
-                                {
-                                    "type":"stackpanel",
-                                    "orientation":"vertical",
-                                    "margin":[0,0,5,0],
-                                    "children":[
-                                        {
-                                            "type":"textblock",
-                                            "text":"Virtual Files"
-                                        },
-                                        {
+                                    },
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"Virtual Files",
+                                        "content":{
+                                            "jsonTemplate":"isb2.leftPaneList",
                                             "type":"listbox",
                                             "name":"profile.virtualFiles",
                                             "itemsBinding":{
@@ -490,21 +663,52 @@
                                                 "onItemSelected":{
                                                     "type":"method",
                                                     "object":"This.Context",
-                                                    "method":"OnVirtualFileSelected"
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["VirtualFile"]
                                                 }
                                             }
                                         }
-                                    ]
-                                }
-                            ]
+                                    },
+                                    {
+                                        "jsonTemplate":"isb2.leftPaneExpander",
+                                        "type":"expander",
+                                        "header":"VFX Sheets",
+                                        "content":{
+                                            "jsonTemplate":"isb2.leftPaneList",
+                                            "type":"listbox",
+                                            "name":"profile.vfxSheets",
+                                            "itemsBinding":{
+                                                "pullFormat": "${This.Context.Editing.VFXSheets}"
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"isb2.vfxSheetView"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onItemSelected":{
+                                                    "type":"method",
+                                                    "object":"This.Context",
+                                                    "method":"OnLeftPaneSelection",
+                                                    "args":["VFXSheet"]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
                         }
                     },
                     {
                         "type":"border",
-                        "_dock":"bottom",
+                        "_dock":"right",
                         "name":"profile.editorContainer",
                         "horizontalAlignment":"stretch",
                         "verticalAlignment":"stretch",
+                        "contextBinding":{
+                            "pullFormat":"${This.Parent.Context.EditingItem}"
+                        },
                         "margin":2,
                         "borderThickness":1,
                         "borderBrush":{

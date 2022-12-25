@@ -9,13 +9,6 @@ objectdef isb2_profileeditor
         Editing:SetReference[_profile]
         LGUI2:PushSkin["${ISB2.UseSkin~}"]
         Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2.profileEditor]",This].ID}"]
-        Window:AddHook["onVisualDetached","$$>
-        {
-            "type":"method",
-            "object":"This.Context",
-            "method":"OnWindowClosed"
-        }
-        <$$"]
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
     }
 
@@ -38,6 +31,8 @@ objectdef isb2_profileeditor
     {
         if ${editingType.NotEqual["Character"]}
             Window.Locate["profile.characters"]:ClearSelection
+        if ${editingType.NotEqual["HotkeySheet"]}
+            Window.Locate["profile.hotkeySheets"]:ClearSelection
         if ${editingType.NotEqual["MappableSheet"]}
             Window.Locate["profile.mappableSheets"]:ClearSelection
         if ${editingType.NotEqual["Team"]}
@@ -46,18 +41,45 @@ objectdef isb2_profileeditor
             Window.Locate["profile.gameKeyBindings"]:ClearSelection
         if ${editingType.NotEqual["VirtualFile"]}
             Window.Locate["profile.virtualFiles"]:ClearSelection
+        if ${editingType.NotEqual["WindowLayout"]}
+            Window.Locate["profile.windowLayouts"]:ClearSelection
+        if ${editingType.NotEqual["VFXSheet"]}
+            Window.Locate["profile.vfxSheets"]:ClearSelection
     }
 
     method SetEditingItem(string editingType, uint editingNumber)
     {
+       ; echo "SetEditingItem ${editingType~} ${editingNumber}"
         EditingItem:SetReference["Editing.${editingType~}s.Get[${editingNumber}]"]
-        Window.Locate["profile.editorContainer"]:SetChild["${LGUI2.Template[isb2.${This.GetLowerCamelCase["${editingType~}"]}Editor]~}","EditingItem"]
+        ;echo "EditingItem = ${EditingItem(type)} Container=${Window.Locate["profile.editorContainer"](type)}"
+
+        variable jsonvalueref joEditor
+        joEditor:SetReference["LGUI2.Template[isb2.${This.GetLowerCamelCase["${editingType~}"]}Editor]"]
+        if !${joEditor.Reference(exists)}
+            joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
+
+        if ${joEditor.Reference(exists)}
+            Window.Locate["profile.editorContainer"]:SetChild["joEditor","EditingItem"]        
+        else
+            Window.Locate["profile.editorContainer"]:ClearChildren
+    }
+
+    method OnLeftPaneSelection(string itemType)
+    {
+        This:ResetSelections["${itemType~}"]
+        This:SetEditingItem["${itemType~}",${Context.Source.SelectedItem.Index}]
     }
 
     method OnCharacterSelected()
     {
         This:ResetSelections[Character]
         This:SetEditingItem[Character,${Context.Source.SelectedItem.Index}]
+    }
+
+    method OnHotkeySheetSelected()
+    {
+        This:ResetSelections[HotkeySheet]
+        This:SetEditingItem[HotkeySheet,${Context.Source.SelectedItem.Index}]
     }
 
     method OnMappableSheetSelected()

@@ -4,6 +4,7 @@
     "templates": {
         "isb2.draggerWidths":{
             "default":200,
+            "isb2.subPages":200,
             "isb2.characterEditor":200,
             "isb2.main":200,
             "isb2.teamEditor":200,
@@ -64,221 +65,237 @@
             "margin":3,
             "borderThickness":[0,0,0,1]
         },
-        "isb2.characterEditor":{
-            "type":"dockpanel",
-            "jsonTemplate":"dockpanel",
-            "children":[
+        "isb2.characterEditor.General":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context}",
+                "pullOnce":true
+            },
+            "properties":[
                 {
-                    "jsonTemplate":"isb2.leftPane",
-                    "_pane":"isb2.characterEditor",
-                    "content":{
-                        "type":"listbox",
-                        "jsonTemplate":"isb2.leftPaneList",
-                        "verticalAlignment":"stretch",
-                        "horizontalAlignment":"stretch",
-                        "items":[
-                            "General",
-                            "Game Launch Info"
-                        ]
-                    }        
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
                 },
                 {
-                    "_dock":"top",
-                    "type":"objectview",
-                    "verticalAlignment":"stretch",
-                    "horizontalAlignment":"stretch",
-                    "objectBinding":{
-                      "pullFormat":"${This.Context}",
-                      "pullOnce":true
+                    "name":"Actual Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[actualName]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[actualName,\"","\"]"]
                     },
-                    "properties":[
-                        {
-                            "name":"Name",
-                            "dataBinding":{
-                              "pullFormat":"${This.Object.Get[name]}",
-                              "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
-                            },
-                            "editTemplate":"propertyview.textbox"                            
-                        },
-                        {
-                            "name":"Actual Name",
-                            "dataBinding":{
-                              "pullFormat":"${This.Object.Get[actualName]}",
-                              "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[actualName,\"","\"]"]
-                            },
-                            "editTemplate":"propertyview.textbox"                            
-                        },
-                        {
-                            "name":"Account Name",
-                            "dataBinding":{
-                              "pullFormat":"${This.Object.Get[accountName]}",
-                              "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[accountName,\"","\"]"]
-                            },
-                            "editTemplate":"propertyview.textbox"                            
-                        },
-                        {
-                            "name":"Email",
-                            "dataBinding":{
-                              "pullFormat":"${This.Object.Get[email]}",
-                              "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[email,\"","\"]"]
-                            },
-                            "editTemplate":"propertyview.textbox"                            
-                        },
-                        {
-                            "name":"Server",
-                            "dataBinding":{
-                              "pullFormat":"${This.Object.Get[gameServer]}",
-                              "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[gameServer,\"","\"]"]
-                            },
-                            "editTemplate":"propertyview.textbox"                            
-                        },
-                        {
-                            "name":"Game",
-                            "dataBinding":{
-                              "pullFormat":"${This.Object.Get[game]}",
-                              "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[game,\"","\"]"]
-                            },
-                            "editTemplate":"propertyview.textbox"                            
-                        },
-                        {
-                            "name":"Clip cursor to window",
-                            "dataBinding":{
-                                "pullFormat":"${This.Object.GetBool[clipCursor]}",
-                                "pushFormat":["This.Object:SetBool[clipCursor,\"","\"]"],
-                                "pushNullFormat":"This.Object:Erase[clipCursor]"
-                            },
-                            "editTemplate":"propertyview.checkbox",
-                            "controlData":{
-                                "tooltip":"Enabling this feature will generally lock the cursor into the window",
-                                "useIndeterminate":true,
-                                "pushAsBool":true
-                            }
-                        },
-                        {
-                            "name":"VFX Viewers are Permanent",
-                            "dataBinding":{
-                                "pullFormat":"${This.Object.GetBool[vfxViewersPermanent]}",
-                                "pushFormat":["This.Object:SetBool[vfxViewersPermanent,\"","\"]"],
-                                "pushNullFormat":"This.Object:Erase[vfxViewersPermanent]"
-                            },
-                            "editTemplate":"propertyview.checkbox",
-                            "controlData":{
-                                "tooltip":"Enabling this feature will block VFX Sources from the Character's window",
-                                "useIndeterminate":true,
-                                "pushAsBool":true
-                            }
-                        },
-                        {
-                            "name":"Mute Broadcasts",
-                            "dataBinding":{
-                                "pullFormat":"${This.Object.GetBool[muteBroadcasts]}",
-                                "pushFormat":["This.Object:SetBool[muteBroadcasts,\"","\"]"],
-                                "pushNullFormat":"This.Object:Erase[muteBroadcasts]"
-                            },
-                            "editTemplate":"propertyview.checkbox",
-                            "controlData":{
-                                "tooltip":"Enabling this feature will prevent broadcast inputs from reaching the window",
-                                "useIndeterminate":true,
-                                "pushAsBool":true
-                            }
-                        }
-                    ]
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Account Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[accountName]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[accountName,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Email",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[email]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[email,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Server",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[gameServer]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[gameServer,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Game",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[game]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[game,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Clip cursor to window",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetBool[clipCursor]}",
+                        "pushFormat":["This.Object:SetBool[clipCursor,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[clipCursor]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "tooltip":"Enabling this feature will generally lock the cursor into the window",
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
+                },
+                {
+                    "name":"VFX Viewers are Permanent",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetBool[vfxViewersPermanent]}",
+                        "pushFormat":["This.Object:SetBool[vfxViewersPermanent,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[vfxViewersPermanent]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "tooltip":"Enabling this feature will block VFX Sources from the Character's window",
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
+                },
+                {
+                    "name":"Mute Broadcasts",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetBool[muteBroadcasts]}",
+                        "pushFormat":["This.Object:SetBool[muteBroadcasts,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[muteBroadcasts]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "tooltip":"Enabling this feature will prevent broadcast inputs from reaching the window",
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
                 }
             ]
         },
-        "isb2.teamEditor":{
-            "type":"dockpanel",
-            "jsonTemplate":"dockpanel",
-            "children":[
+        "isb2.characterEditor.List":{
+            "items":[
                 {
-                    "jsonTemplate":"isb2.leftPane",
-                    "_pane":"isb2.teamEditor",
-                    "content":{
-                        "type":"listbox",
-                        "jsonTemplate":"isb2.leftPaneList",
-                        "verticalAlignment":"stretch",
-                        "horizontalAlignment":"stretch",
-                        "contentContainer":{
-                            "jsonTemplate":"listbox.contentContainerFitWidth"
-                        },
-                        "items":[
-                            {
-                                "type":"textblock",
-                                "text":"General"
-                            },
-                            {
-                                "type":"expander",
-                                "header":"Slots",
-                                "content":{
-                                    "margin":[20,0,0,0],
-                                    "type":"listbox",
-                                    "borderThickness":0,
-                                    "contentContainer":{
-                                        "jsonTemplate":"listbox.contentContainerFitWidth"
-                                    },
-                                    "horizontalAlignment":"stretch",
-                                    "itemsBinding":{
-                                        "pullFormat": "${This.Locate[\"\",listbox,ancestor].Context.Get[slots]}"
-                                    },
-                                    "itemViewGenerators":{
-                                        "default":{
-                                            "type":"template",
-                                            "template":"isb2.slotView"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "type":"textblock",
-                                "text":"Configuration Builders"
-                            }
-                        ]
-                    }        
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.characterEditor.General"
                 },
                 {
-                    "_dock":"top",
-                    "type":"objectview",
-                    "verticalAlignment":"stretch",
-                    "horizontalAlignment":"stretch",
-                    "objectBinding":{
-                      "pullFormat":"${This.Context}",
-                      "pullOnce":true
+                    "type":"textblock",
+                    "text":"Game Launch Info",
+                    "template":"isb2.characterEditor.GameLaunchInfo"
+                }
+            ]
+        },
+        "isb2.hotkeySheetEditor.List":{
+            "items":[
+                {
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.hotkeySheetEditor.General"
+                }
+            ]
+        },
+        "isb2.mappableSheetEditor.List":{
+            "items":[
+                {
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.mappableSheetEditor.General"
+                }
+            ]
+        },
+        "isb2.vfxSheetEditor.List":{
+            "items":[
+                {
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.vfxSheetEditor.General"
+                }
+            ]
+        },
+        "isb2.virtualFileEditor.List":{
+            "items":[
+                {
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.virtualFileEditor.General"
+                }
+            ]
+        },
+        "isb2.gameKeyBindingEditor.List":{
+            "items":[
+                {
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.gameKeyBindingEditor.General"
+                }
+            ]
+        },
+        "isb2.windowLayoutEditor.List":{
+            "items":[
+                {
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.windowLayoutEditor.General"
+                }
+            ]
+        },
+        "isb2.teamEditor.List":{
+            "items":[
+                {
+                    "type":"textblock",
+                    "text":"General",
+                    "template":"isb2.teamEditor.General"
+                },
+                {
+                    "type":"textblock",
+                    "text":"Configuration Builders",
+                    "template":"isb2.teamEditor.ConfigurationBuilders"
+                }
+            ]
+        },
+        "isb2.teamEditor.ConfigurationBuilders":{
+            "jsonTemplate":"isb2.missingEditor",
+            "contextBinding":{
+                "pullFormat":"${This.Parent.Context.Get[builders]}"
+            }
+        },
+        "isb2.teamEditor.General":{
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
                     },
-                    "properties":[
-                        {
-                            "name":"Name",
-                            "dataBinding":{
-                              "pullFormat":"${This.Object.Get[name]}",
-                              "pullReplaceNull":"",
-                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
-                            },
-                            "editTemplate":"propertyview.textbox"                            
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"GUI Toggle Hotkey",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[guiToggleCombo]}",
+                        "pushFormat":["This.Object:SetString[guiToggleCombo,\"","\"]"],
+                        "pushNullFormat":["This.Object:Erase[guiToggleCombo]"]
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Window Layout",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[windowLayout]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[windowLayout,\"","\"]"]
                         },
-                        {
-                            "name":"GUI Toggle Hotkey",
-                            "dataBinding":{
-                                "pullFormat":"${This.Object.Get[guiToggleCombo]}",
-                                "pushFormat":["This.Object:SetString[guiToggleCombo,\"","\"]"],
-                                "pushNullFormat":["This.Object:Erase[guiToggleCombo]"]
-                            },
-                            "editTemplate":"propertyview.inputCombo"
-                        },
-                        {
-                            "name":"Window Layout",
-                            "dataBinding":{
-                                "pullFormat":"${This.Object.Get[windowLayout]}",
-                                "pullReplaceNull":"",
-                                "pushFormat":["This.Object:SetString[windowLayout,\"","\"]"]
-                              },
-                              "editTemplate":"propertyview.textbox"                              
-                        }
-                    ]
+                        "editTemplate":"propertyview.textbox"                              
                 }
             ]
         },
@@ -701,6 +718,28 @@
                         }
                     },
                     {
+                        "jsonTemplate":"isb2.leftPane",
+                        "_pane":"isb2.subPages",            
+                        "content":{
+                            "type":"listbox",
+                            "jsonTemplate":"isb2.leftPaneList",
+                            "name":"isb2.subPage.List",
+                            "verticalAlignment":"stretch",
+                            "horizontalAlignment":"stretch",
+                            "selectedItemBinding":{
+                                "pullFormat":"${This.Context.SubPage}",
+                                "pushFormat":["This.Context.SubPage:Set[","]"]
+                            },
+                            "eventHandlers":{
+                                "onSelectionChanged":{
+                                    "type":"method",
+                                    "object":"This.Locate[\"\",window,ancestor].Context",
+                                    "method":"OnSubPageSelected"
+                                }
+                            }
+                        }        
+                    },
+                    {
                         "type":"border",
                         "_dock":"right",
                         "name":"profile.editorContainer",
@@ -710,7 +749,7 @@
                             "pullFormat":"${This.Parent.Context.EditingItem}"
                         },
                         "margin":2,
-                        "borderThickness":1,
+                        "borderThickness":0,
                         "borderBrush":{
                             "color":"#ff7f7f7f"
                         }

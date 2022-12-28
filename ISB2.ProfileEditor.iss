@@ -3,6 +3,9 @@ objectdef isb2_profileeditor
     variable weakref Editing
     variable weakref EditingItem
     variable lgui2elementref Window
+    
+    variable uint SubPage
+    variable string EditingType
 
     method Initialize(weakref _profile)
     {
@@ -48,20 +51,26 @@ objectdef isb2_profileeditor
     }
 
     method SetEditingItem(string editingType, uint editingNumber)
-    {
+    {        
        ; echo "SetEditingItem ${editingType~} ${editingNumber}"
         EditingItem:SetReference["Editing.${editingType~}s.Get[${editingNumber}]"]
         ;echo "EditingItem = ${EditingItem(type)} Container=${Window.Locate["profile.editorContainer"](type)}"
 
-        variable jsonvalueref joEditor
-        joEditor:SetReference["LGUI2.Template[isb2.${This.GetLowerCamelCase["${editingType~}"]}Editor]"]
-        if !${joEditor.Reference(exists)}
-            joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
+        variable jsonvalueref joList
+        joList:SetReference["LGUI2.Template[isb2.${This.GetLowerCamelCase["${editingType~}"]}Editor.List]"]
 
-        if ${joEditor.Reference(exists)}
-            Window.Locate["profile.editorContainer"]:SetChild["joEditor","EditingItem"]        
-        else
-            Window.Locate["profile.editorContainer"]:ClearChildren
+;        echo selected before = ${LGUI2.Element[isb2.subPage.List].SelectedItem.Index}
+
+        if ${editingType.NotEqual["${EditingType~}"]}
+        {
+            EditingType:Set["${editingType~}"]
+            SubPage:Set[1]
+        }
+
+        LGUI2.Element[isb2.subPage.List]:ApplyStyleJSON["joList"]
+
+        ; echo selected after = ${LGUI2.Element[isb2.subPage.List].SelectedItem.Index}
+
     }
 
     method OnLeftPaneSelection(string itemType)
@@ -70,43 +79,23 @@ objectdef isb2_profileeditor
         This:SetEditingItem["${itemType~}",${Context.Source.SelectedItem.Index}]
     }
 
-    method OnCharacterSelected()
+    method OnSubPageSelected()
     {
-        This:ResetSelections[Character]
-        This:SetEditingItem[Character,${Context.Source.SelectedItem.Index}]
-    }
+;        echo "OnSubPageSelected ${Context(type)} ${Context.Source} ${Context.Source.SelectedItem(type)} ${Context.Source.SelectedItem.Data}" 
 
-    method OnHotkeySheetSelected()
-    {
-        This:ResetSelections[HotkeySheet]
-        This:SetEditingItem[HotkeySheet,${Context.Source.SelectedItem.Index}]
-    }
+        variable jsonvalueref joData="Context.Source.SelectedItem.Data"
 
-    method OnMappableSheetSelected()
-    {
-        This:ResetSelections[MappableSheet]
-        This:SetEditingItem[MappableSheet,${Context.Source.SelectedItem.Index}]
-    }
 
-    method OnTeamSelected()
-    {
-        This:ResetSelections[Team]
-        This:SetEditingItem[Team,${Context.Source.SelectedItem.Index}]
-    }
+        variable jsonvalueref joEditor
+        if ${joData.Reference(exists)}
+            joEditor:SetReference["LGUI2.Template[\"${joData.Get[template]~}\"]"]
 
-    method OnGameKeyBindingSelected()
-    {
-        This:ResetSelections[GameKeyBinding]
-        This:SetEditingItem[GameKeyBinding,${Context.Source.SelectedItem.Index}]        
-    }
+        if !${joEditor.Reference(exists)}
+            joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
 
-    method OnVirtualFileSelected()
-    {
-;        echo "OnVirtualFileSelected Context(type)=${Context(type)} Source(type)=${Context.Source(type)} Args=${Context.Args~}"
-;        echo "SelectedItem.Index=${Context.Source.SelectedItem.Index} SelectedItem.Data=${Context.Source.SelectedItem.Data~}"
-
-        This:ResetSelections[VirtualFile]
-        This:SetEditingItem[VirtualFile,${Context.Source.SelectedItem.Index}]
-;        echo "OnVirtualFileSelected. EditingItem = ${EditingItem~}"        
+        if ${joEditor.Reference(exists)}
+            Window.Locate["profile.editorContainer"]:SetChild["joEditor"]        
+        else
+            Window.Locate["profile.editorContainer"]:ClearChildren        
     }
 }

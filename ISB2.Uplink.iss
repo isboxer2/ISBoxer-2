@@ -1,6 +1,7 @@
 #include "ISB2.Common.iss"
 #include "ISB2.Games.iss"
 #include "ISB2.Importer.iss"
+#include "ISB2.Building.iss"
 #include "ISB2.QuickSetup.iss"
 #include "ISB2.ProfileEditor.iss"
 

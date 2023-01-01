@@ -1,4 +1,4 @@
-objectdef isb2_profileeditor
+objectdef isb2_profileeditor inherits isb2_building
 {
     variable weakref Editing
     variable weakref EditingItem

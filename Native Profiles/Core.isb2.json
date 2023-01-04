@@ -186,7 +186,8 @@
                                 {
                                     "type":"set variable",
                                     "name": "Core.enable hotkeys",
-                                    "rotate": "forward"
+                                    "rotate": "forward",
+                                    "target":"{U:Core.hotkey toggle target}"
                                 }
                             ]
                         }
@@ -233,7 +234,8 @@
                                     "true": {
                                         "type":"set variable",
                                         "name": "Core.enable broadcasting",
-                                        "rotate": "forward"
+                                        "rotate": "forward",
+                                        "target":"{U:Core.broadcast toggle target}"
                                     }
                                 }
                             ]
@@ -286,7 +288,8 @@
                                 },
                                 {
                                     "type":"popup text",
-                                    "text": "Broadcasting Ensabled"        
+                                    "text": "Broadcasting Ensabled",
+                                    "color": "#00ff00"                
                                 }
                             ]
                         }
@@ -304,7 +307,8 @@
                                 },
                                 {
                                     "type":"popup text",
-                                    "text": "Broadcasting Disabled"        
+                                    "text": "Broadcasting Disabled",
+                                    "color": "#ff0000"        
                                 }
                             ]
                         }
@@ -367,6 +371,22 @@
             "schema": {
                 "type":"boolean"
             }
+        },
+        {
+            "name":"Core.hotkey toggle target",
+            "value":"all",
+            "schema":{
+                "type":"string",
+                "enum": ["all","self"]
+            }
+        },
+        {
+            "name":"Core.broadcast toggle target",
+            "value":"all",
+            "schema":{
+                "type":"string",
+                "enum": ["all","self"]
+            }
         }
     ],
     "triggers": [
@@ -387,11 +407,13 @@
                         "value":true,
                         "true":{
                             "type":"popup text",
-                            "text": "Hotkeys Enabled"
+                            "text": "Hotkeys Enabled",
+                            "color": "#00ff00"
                         },
                         "false": {
                             "type":"popup text",
-                            "text": "Hotkeys Disabled"
+                            "text": "Hotkeys Disabled",
+                            "color": "#ff0000"
                         }
                     }
                 }

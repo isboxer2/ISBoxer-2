@@ -5,6 +5,9 @@ objectdef isb2_building
     variable jsonvalueref BuilderGroups="[]"
     variable jsonvalueref BuilderPresets="[]"
 
+    ; SelectedGame
+    ; Characters
+
     method Initialize()
     {
 
@@ -472,9 +475,14 @@ objectdef isb2_building
         {
             joDiff:Erase[hotkeys]              
             joDiff:SetByRef[hotkeys,"joDiff.Get[expandedHotkeys]"]
+            joDiff:Erase[expandedHotkeys]
         }
-
-        joDiff:Erase[expandedHotkeys]
+        if ${joDiff.Has[-array,expandedGameKeyBindings]} 
+        {
+            joDiff:Erase[gameKeyBindings]              
+            joDiff:SetByRef[gameKeyBindings,"joDiff.Get[expandedGameKeyBindings]"]
+            joDiff:Erase[expandedGameKeyBindings]
+        }
 
         joBuilder:SetByRef[original,joOriginal]
 
@@ -513,7 +521,7 @@ objectdef isb2_building
         This:ApplyBuilder[ja,joLocatedBuilder]        
     }
 
-    method ApplyBuilders(jsonvalueref joProfile)
+    method ApplyBuilders(jsonvalueref joTeam)
     {
         variable jsonvalueref ja="[]"
 
@@ -521,7 +529,7 @@ objectdef isb2_building
         Builders:ForEach["This:ApplyBuilder[ja,ForEach.Value]"]
 
         if ${ja.Used}
-            joProfile.Get[teams,1]:SetByRef[builders,ja]
+            joTeam:SetByRef[builders,ja]
     }
 
     member:jsonvalueref GetAppliedBuilders()

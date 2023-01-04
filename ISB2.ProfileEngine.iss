@@ -4368,12 +4368,42 @@ objectdef isb2_profileengine
 
     method ApplyTeamBuilder(jsonvalueref joBuilder, jsonvalueref joTeamBuilder)
     {
-        echo "\ayApplyTeamBuilder:\ax ${joTeamBuilder~}"
+        echo "\ayApplyTeamBuilder:\ax ${joBuilder~} ${joTeamBuilder~}"
 
-        if ${joBuilder.Has[-array,expandedHotkeys]}
-            Team:SetByRef[hotkeys,"joBuilder.Get[expandedHotkeys].Duplicate"]
-        if ${joBuilder.Has[-array,expandedGameKeyBindings]}
-            Team:SetByRef[gameKeyBindings,"joBuilder.Get[expandedGameKeyBindings].Duplicate"]
+        if ${joBuilder.Has[-array,hotkeys]}
+        {
+            if ${Team.Has[-array,hotkeys]}
+            {
+                Team:SetByRef[hotkeys,"joBuilder.Get[hotkeys].Duplicate"]
+            }
+            else
+            {
+                joBuilder.Get[hotkeys]:ForEach["Team.Get[hotkeys]:AddByRef[ForEach.Value.Duplicate]"]
+            }
+        }
+        if ${joBuilder.Has[-array,gameKeyBindings]}
+        {
+            This:InstallGameKeyBindings["joBuilder.Get[gameKeyBindings]"]
+        }
+
+        if ${joBuilder.Has[-array,overrides,hotkeys]}
+        {
+            if ${Team.Has[-array,overrides,hotkeys]}
+            {
+                Team:SetByRef[hotkeys,"joBuilder.Get[overrides,hotkeys].Duplicate"]
+            }
+            else
+            {
+                joBuilder.Get[hotkeys]:ForEach["Team.Get[overrides,hotkeys]:AddByRef[ForEach.Value.Duplicate]"]
+            }
+        }
+        if ${joBuilder.Has[-array,overrides,gameKeyBindings]}
+        {
+            This:InstallGameKeyBindings["joBuilder.Get[overrides,gameKeyBindings]"]
+        }
+
+        if !${joTeamBuilder.Reference(exists)}
+            return
 
         if ${joTeamBuilder.Has[-array,hotkeySheets]}
         {
@@ -4420,6 +4450,7 @@ objectdef isb2_profileengine
 
     method ApplyBuilder(jsonvalueref joSettings)
     {
+        echo "\arApplyBuilder:\ax settings ${joSettings~}"
         ; activate builder profile ....
         This:ActivateProfileByName["${joSettings.Get[profile]~}"]
 
@@ -4434,17 +4465,16 @@ objectdef isb2_profileengine
         }
 
         ; merge overrides into builder
-        if ${joBuilder.Has[-object,overrides]}
+        if ${joSettings.Has[-object,overrides]}
         {
             joBuilder:SetReference[joBuilder.Duplicate]
-            joBuilder:Merge["joBuilder.Get[overrides]"]
+            joBuilder:Merge["joSettings.Get[overrides]"]
+            joBuilder:SetByRef[overrides,"joSettings.Get[overrides]"]
         }
         
         ; apply finalized builder
-        echo "\arApplyBuilder:\ax ${joBuilder~}"
-
-        if ${joBuilder.Has[-object,team]}
-            This:ApplyTeamBuilder[joBuilder,"joBuilder.Get[team]"]
+        echo "\arApplyBuilder:\ax final ${joBuilder~}"
+        This:ApplyTeamBuilder[joBuilder,"joBuilder.Get[team]"]
 
         if ${joBuilder.Has[-object,slot]}
             This:ApplySlotBuilder[joBuilder,"joBuilder.Get[slot]"]
@@ -4457,7 +4487,7 @@ objectdef isb2_profileengine
     }
 
     method ApplyBuilders(jsonvalueref jaBuilders)
-    {
+    {        
         jaBuilders:ForEach["This:ApplyBuilder[ForEach.Value]"]
     }
 

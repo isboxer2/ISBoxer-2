@@ -4,7 +4,11 @@
     "builders":[
         {
             "name": "ARPG - Standard",
-            "genre":"ARPG"
+            "genre":"ARPG",
+            "team": {
+                "hotkeySheets": ["ARPG - Base Hotkeys"],
+                "mappableSheets": ["ARPG - Base Hotkeys"]
+            }
         }
     ],
     "hotkeySheets": [

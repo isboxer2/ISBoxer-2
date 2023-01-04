@@ -109,28 +109,6 @@ objectdef isb2session inherits isb2_profileengine
         echo "\ayInstallFromSessionMetadata complete\ax"
     }
 
-    method ActivateProfilesByName(jsonvalueref jaProfiles)
-    {
-        if !${jaProfiles.Type.Equal[array]}
-            return
-
-        jaProfiles:ForEach["This:ActivateProfileByName[\"\${ForEach.Value~}\"]"]
-    }
-
-    method ActivateProfileByName(string name)
-    {
-        variable weakref useProfile="ProfileDB.Profiles.Get[\"${name~}\"]"
-;        echo "ActivateProfileByName ${name} = ${useProfile.AsJSON~}"
-        return "${This:ActivateProfile[useProfile](exists)}"
-    }
-
-    method DeactivateProfileByName(string name)
-    {
-        variable weakref useProfile="ProfileDB.Profiles.Get[\"${name~}\"]"
-;        echo "DeactivateProfileByName ${name} = ${useProfile.AsJSON~}"
-        return "${This:DeactivateProfile[useProfile](exists)}"
-    }
-
     method BeginTest()
     {
         echo "ISB1=${This.DetectISBoxer1~}"

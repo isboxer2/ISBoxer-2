@@ -26,6 +26,11 @@
                     "name": "Assist Master"
                 }
             ],
+            "gameKeyBindings": [
+                {
+                    "name": "Interact with Target"
+                }
+            ],
             "team": {
                 "hotkeySheets":["ISBPW - Base Hotkeys"],
                 "mappableSheets": ["ISBPW - Master Switching"]
@@ -516,6 +521,7 @@
                                     "type":"if",
                                     "variableName": "ISBPW.assist on combat",
                                     "op": "==",
+                                    "value":true,
                                     "true":{
                                         "type":"mappable",
                                         "sheet": "ISBPW - Party",
@@ -535,6 +541,7 @@
                                     "type":"if",
                                     "variableName": "ISBPW.follow on combat",
                                     "op": "==",
+                                    "value":true,
                                     "true":{
                                         "type":"mappable",
                                         "sheet": "ISBPW - Party",
@@ -618,7 +625,7 @@
                                 },
                                 {
                                     "type": "mappable",
-                                    "name": "Auto-Assist Master",
+                                    "name": "Assist Master",
                                     "sheet": "ISBPW - Party"
                                 },
                                 {

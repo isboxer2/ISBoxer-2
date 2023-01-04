@@ -14,7 +14,6 @@ objectdef isb2_quicksetup inherits isb2_building
 
     variable windowLayoutGenerators WindowLayoutGenerators
     variable jsonvalueref WindowLayouts="[]"
-
     variable jsonvalueref WindowLayout
 
     variable bool ExistingCharacter
@@ -285,6 +284,31 @@ objectdef isb2_quicksetup inherits isb2_building
     {
         variable jsonvalue joSlot="{}"
         joSlot:SetString[character,"${joCharacter.Get[name]~}"]
+        ; left-only version
+        switch ${jaSlots.Used}
+        {
+            case 0
+                joSlot:Set[ftlModifiers,"[\"lShift\"]"]
+                break
+            case 1
+                joSlot:Set[ftlModifiers,"[\"lAlt\"]"]
+                break
+            case 2
+                joSlot:Set[ftlModifiers,"[\"lCtrl\"]"]
+                break
+            case 3
+                joSlot:Set[ftlModifiers,"[\"lShift\",\"lAlt\"]"]
+                break
+            case 4
+                joSlot:Set[ftlModifiers,"[\"lShift\",\"lCtrl\"]"]
+                break
+            case 5
+                joSlot:Set[ftlModifiers,"[\"lCtrl\",\"lAlt\"]"]
+                break
+            case 6
+                joSlot:Set[ftlModifiers,"[\"lShift\",\"lAlt\",\"lCtrl\"]"]
+                break
+        }
 
         jaSlots:AddByRef[joSlot]
     }
@@ -392,6 +416,9 @@ objectdef isb2_quicksetup inherits isb2_building
                 joSettings:SetBool[swapOnSlotActivate,1]
             }
 
+            if !${joSettings.Has[focusFollowsMouse]}
+                joSettings:SetBool[focusFollowsMouse,${WindowLayoutSettings.GetBool[-default,false,focusFollowsMouse]}]
+
             jo:SetByRef[swapGroups,"joSettings.Get[swapGroups]"]
             joSettings:Erase[swapGroups]
         }
@@ -474,7 +501,7 @@ objectdef isb2_quicksetup inherits isb2_building
         }
 
         ; apply builders
-        This:ApplyBuilders[joProfile]
+        This:ApplyBuilders["joTeam"]
 
         variable string fileName
         fileName:Set["Team.${This.GetSanitizedName["${TeamName~}"]}.isb2.json"]

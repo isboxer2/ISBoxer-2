@@ -54,6 +54,39 @@
                 }
             }
         },
+        "isb2.windowLayout.regionView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${This.Context.Index}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.mappable.stepView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${This.Context.Index}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.mappable.actionView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${This.Context.Index}: ${_CONTEXTITEMDATA_.Get[type]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
         "isb2.profileView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -61,6 +94,50 @@
                 "type":"textblock",
                 "textBinding":{
                     "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.clickBarView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.variableView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.gameMacroSheetView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.gameMacroView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[displayName]}",
                     "pullReplaceNull":""
                 }
             }
@@ -174,7 +251,40 @@
                 }
             }
         },
+        "isb2.hotkeyView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]} (${_CONTEXTITEMDATA_.Get[keyCombo]})",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.broadcastProfileView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
         "isb2.mappableSheetView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.mappableView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{

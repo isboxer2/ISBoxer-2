@@ -23,7 +23,6 @@ objectdef isb2_quicksetup inherits isb2_building
     variable string GameName
 
     variable jsonvalueref SelectedGame
-    variable jsonvalueref SelectedBuilderPreset
 
     method Initialize()
     {
@@ -44,6 +43,7 @@ objectdef isb2_quicksetup inherits isb2_building
         if !${gameName.NotNULLOrEmpty}
         {
             SelectedGame:SetReference[NULL]
+            BuildingGame:SetReference[NULL]
             return
         }
 
@@ -52,11 +52,7 @@ objectdef isb2_quicksetup inherits isb2_building
         jaGames:SetReference["LGUI2.Skin[default].Template[isb2.data].Get[games]"]
 
         SelectedGame:SetReference["ISB2.FindInArray[jaGames,\"${gameName~}\"]"]
-    }
-
-    method SelectBuilderPreset(string name)
-    {
-        SelectedBuilderPreset:SetReference["ISB2.FindInArray[BuilderPresets,\"${name~}\"]"]
+        BuildingGame:SetReference[SelectedGame]
     }
 
     method Start()
@@ -72,6 +68,7 @@ objectdef isb2_quicksetup inherits isb2_building
             TeamName:Set[]
             Error:Set[]
             DetectedCharacters:Clear
+            BuildingCharacters:SetReference[Characters]
             Characters:Clear
             EditingCharacter:SetReference["{}"]
             WindowLayouts:Clear
@@ -144,6 +141,7 @@ objectdef isb2_quicksetup inherits isb2_building
                 LGUI2.Element[isb2.QuickSetup.TeamName]:KeyboardFocus
                 break
             case Configuration Builder
+                Context.Source.SelectedTab:SetContext[This]
                 This:RefreshBuilders
                 break
         }

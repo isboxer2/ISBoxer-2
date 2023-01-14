@@ -5,8 +5,10 @@ objectdef isb2_building
     variable jsonvalueref BuilderGroups="[]"
     variable jsonvalueref BuilderPresets="[]"
 
-    ; SelectedGame
-    ; Characters
+    variable jsonvalueref SelectedBuilderPreset
+
+    variable jsonvalueref BuildingGame
+    variable jsonvalueref BuildingCharacters
 
     method Initialize()
     {
@@ -16,6 +18,33 @@ objectdef isb2_building
     method Shutdown()
     {
 
+    }
+
+    method SelectBuilderPreset(string name)
+    {
+        SelectedBuilderPreset:SetReference["ISB2.FindInArray[BuilderPresets,\"${name~}\"]"]
+    }
+
+    member:jsonvalueref FindSheetObjectInArray(jsonvalueref ja, string sheet, string name)
+    {
+        variable jsonvalue joSelect="$$>
+        {
+            "op":"&&",
+            "list":[
+                {
+                    "op":"==",
+                    "eval":"Select.Get[name]",
+                    "value":${name.AsJSON~}
+                },
+                {
+                    "op":"==",
+                    "eval":"Select.Get[sheet]",
+                    "value":${sheet.AsJSON~}
+                }
+            ]
+        }
+        <$$"
+        return "ja.SelectValue[joSelect]"        
     }
 
     method PrepareBuilderHotkeyByName(jsonvalueref jo, jsonvalueref joHotkeyBuilder, string sheet, string name)
@@ -47,7 +76,14 @@ objectdef isb2_building
         joHotkeyBuilder:SetString[sheet,"${sheet~}"]
         joHotkeyBuilder:SetString[name,"${name~}"]
 
-        jo.Get[builder,expandedHotkeys]:AddByRef[joHotkeyBuilder]
+        ; find existing builder
+        variable jsonvalueref joExisting        
+        joExisting:SetReference["This.FindSheetObjectInArray[\"jo.Get[builder,expandedHotkeys]\",\"${sheet~}\",\"${name~}\"]"] 
+
+        if ${joExisting.Reference(exists)}
+            joExisting:Merge[joHotkeyBuilder]
+        else
+            jo.Get[builder,expandedHotkeys]:AddByRef[joHotkeyBuilder]
     }
     
     method PrepareBuilderHotkey(jsonvalueref jo, jsonvalueref joHotkeyBuilder)
@@ -60,12 +96,12 @@ objectdef isb2_building
             ; expand per character...
             variable uint i
 
-            for (i:Set[1] ; ${i}<=${Characters.Used} ; i:Inc)
+            for (i:Set[1] ; ${i}<=${BuildingCharacters.Used} ; i:Inc)
             {
                 sheet:Set["${sheet.ReplaceSubstring["{SLOT}",${i}]~}"]
                 name:Set["${name.ReplaceSubstring["{SLOT}",${i}]~}"]
-                sheet:Set["${sheet.ReplaceSubstring["{CHARACTER}","${Characters.Get[${i},name]~}"]~}"]
-                name:Set["${name.ReplaceSubstring["{CHARACTER}","${Characters.Get[${i},name]~}"]~}"]
+                sheet:Set["${sheet.ReplaceSubstring["{CHARACTER}","${BuildingCharacters.Get[${i},name]~}"]~}"]
+                name:Set["${name.ReplaceSubstring["{CHARACTER}","${BuildingCharacters.Get[${i},name]~}"]~}"]
 
                 This:PrepareBuilderHotkeyByName[jo,joHotkeyBuilder.Duplicate,"${sheet~}","${name~}"]
 
@@ -95,7 +131,15 @@ objectdef isb2_building
 
         joGameKeyBindingBuilder:SetString[name,"${name~}"]
 
-        jo.Get[builder,expandedGameKeyBindings]:AddByRef[joGameKeyBindingBuilder]
+
+        ; find existing builder
+        variable jsonvalueref joExisting        
+        joExisting:SetReference["ISB2.FindInArray[\"jo.Get[builder,expandedGameKeyBindings]\",\"${name~}\"]"] 
+
+        if ${joExisting.Reference(exists)}
+            joExisting:Merge[joGameKeyBindingBuilder]
+        else
+            jo.Get[builder,expandedGameKeyBindings]:AddByRef[joGameKeyBindingBuilder]
     }
 
     method PrepareBuilderGameKeyBinding(jsonvalueref jo, jsonvalueref joGameKeyBindingBuilder)
@@ -107,10 +151,10 @@ objectdef isb2_building
             ; expand per character...
             variable uint i
 
-            for (i:Set[1] ; ${i}<=${Characters.Used} ; i:Inc)
+            for (i:Set[1] ; ${i}<=${BuildingCharacters.Used} ; i:Inc)
             {
                 name:Set["${name.ReplaceSubstring["{SLOT}",${i}]~}"]
-                name:Set["${name.ReplaceSubstring["{CHARACTER}","${Characters.Get[${i},name]~}"]~}"]
+                name:Set["${name.ReplaceSubstring["{CHARACTER}","${BuildingCharacters.Get[${i},name]~}"]~}"]
 
                 This:PrepareBuilderGameKeyBindingByName[jo,joGameKeyBindingBuilder.Duplicate,"${name~}"]
 
@@ -136,7 +180,7 @@ objectdef isb2_building
         {
             case string
                 {
-                    if !${This.CheckGameName[SelectedGame,"${joBuilder.Get[game]~}"]}
+                    if !${This.CheckGameName[BuildingGame,"${joBuilder.Get[game]~}"]}
                     {
                         return FALSE
                     }
@@ -150,7 +194,7 @@ objectdef isb2_building
         {
             case string
                 {
-                    if ${This.CheckGameName[SelectedGame,"${joBuilder.Get[notGame]~}"]}
+                    if ${This.CheckGameName[BuildingGame,"${joBuilder.Get[notGame]~}"]}
                     {
                         return FALSE
                     }
@@ -164,9 +208,9 @@ objectdef isb2_building
         {
             case string
             {
-                if ${SelectedGame.Has[-string,genre]}
+                if ${BuildingGame.Has[-string,genre]}
                 {
-                    if !${joBuilder.Get[genre]~.Equal["${SelectedGame.Get[genre]~}"]}
+                    if !${joBuilder.Get[genre]~.Equal["${BuildingGame.Get[genre]~}"]}
                     {
                         return FALSE
                     }
@@ -181,9 +225,9 @@ objectdef isb2_building
         {
             case string
             {
-                if ${SelectedGame.Has[-string,notGenre]}
+                if ${BuildingGame.Has[-string,notGenre]}
                 {
-                    if ${joBuilder.Get[genre]~.Equal["${SelectedGame.Get[notGenre]~}"]}
+                    if ${joBuilder.Get[genre]~.Equal["${BuildingGame.Get[notGenre]~}"]}
                     {
                         return FALSE
                     }
@@ -441,8 +485,8 @@ objectdef isb2_building
         else
             jo:Erase[game]
 
-        if ${SelectedGame.Has[-string,genre]} && ${LGUI2.Element["isb2.QuickSetup.PresetRestrictToGenre"].Checked}
-            jo:SetString[genre,"${SelectedGame.Get[genre]~}"]
+        if ${BuildingGame.Has[-string,genre]} && ${LGUI2.Element["isb2.QuickSetup.PresetRestrictToGenre"].Checked}
+            jo:SetString[genre,"${BuildingGame.Get[genre]~}"]
         else
             jo:Erase[genre]
 
@@ -539,5 +583,4 @@ objectdef isb2_building
         Builders:ForEach["This:ApplyBuilder[ja,ForEach.Value]"]
         return ja
     }
-
 }

@@ -868,6 +868,16 @@
                                                             "method":"Start"
                                                         }
                                                     }
+                                                },
+                                                {
+                                                    "type":"checkbox",
+                                                    "_dock":"top",
+                                                    "margin":[0,5,0,0],
+                                                    "content":"Show Hidden",
+                                                    "checkedBinding":{
+                                                        "pullFormat":"${ISB2.ShowHiddenProfiles}",
+                                                        "pushFormat":["ISB2:SetShowHiddenProfiles[\"","\"]"]        
+                                                    }
                                                 }
                                             ]
                                         },
@@ -877,7 +887,7 @@
                                             "horizontalAlignment": "stretch",
                                             "verticalAlignment": "stretch",
                                             "itemsBinding":{
-                                                "pullFormat": "${ISB2.GetUserProfilesArray}",
+                                                "pullFormat": "${ISB2.GetFilteredProfilesArray}",
                                                 "pullHook": {
                                                     "elementName": "isb2.events",
                                                     "flags": "global",

@@ -206,6 +206,18 @@ objectdef isb2 inherits isb2_profilecollection
         This:LoadFile["Tests/WoW.isb2.json"]
     }
 
+    member:bool ShowHiddenProfiles()
+    {
+        return ${Settings.GetBool[showHiddenProfiles]}
+    }
+
+    method SetShowHiddenProfiles(bool newValue=TRUE)
+    {
+        Settings:SetBool[showHiddenProfiles,${newValue}]
+        This:AutoStoreSettings
+        LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated]
+    }
+
     member:bool QuickLaunch()
     {
         return ${Settings.GetBool[quickLaunch]}
@@ -304,6 +316,16 @@ objectdef isb2 inherits isb2_profilecollection
         Context.Args.Get[files]:ForEach["This:FilteredLoadFile[\"\${ForEach.Value~}\"]"]
 
         Context:SetHandled[1]
+    }
+
+    member:jsonvalueref GetFilteredProfilesArray()
+    {
+        if !${ISB2.Settings.GetBool[showHiddenProfiles]}
+            return "This.GetUserProfilesArray"
+
+        variable jsonvalue ja="[]"
+        Profiles:ForEach["ja:AddByRef[ForEach.Value.AsJSON]"]
+        return ja
     }
 
     member:jsonvalueref GetUserProfilesArray()

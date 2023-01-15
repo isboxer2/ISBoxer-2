@@ -15,7 +15,13 @@
                 "contexts":[
                 {
                     "name":"main",
+                    "title":"",
                     "subItems":[
+                        {
+                            "name":"Profile",
+                            "item":"EditingItem",
+                            "context":"profile"
+                        },
                         {
                             "name":"Characters",
                             "list":{
@@ -171,7 +177,33 @@
                     ]
                 },
                 {
+                    "name":"profile",
+                    "title":"Profile: ${EditingItem.Name}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.profileEditor.General"
+                        },
+                        {
+                            "name":"Configuration Builders",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Builders}"
+                                },
+                                "itemViewGenerators":{
+                                    "default":{
+                                        "type":"template",
+                                        "template":"isb2.builderView"
+                                    }
+                                },
+                                "context":"builder"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name":"character",
+                    "title":"Character: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -186,6 +218,7 @@
                 },
                 {
                     "name":"team",
+                    "title":"Team: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -210,11 +243,36 @@
                                 },
                                 "context":"slot"
                             }    
+                        },
+                        {
+                            "name":"Hotkey Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[hotkeySheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Mappable Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[mappableSheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Game Macro Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[gameMacroSheets]}"
+                                }
+                            }
                         }
                     ]
                 },
                 {
                     "name":"windowLayout",
+                    "title":"Window Layout: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -239,6 +297,7 @@
                 },
                 {
                     "name":"mappableSheet",
+                    "title":"Mappable Sheet: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -263,6 +322,7 @@
                 },
                 {
                     "name":"hotkeySheet",
+                    "title":"Hotkey Sheet: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -286,7 +346,13 @@
                     ]
                 },
                 {
+                    "name":"hotkey",
+                    "title":"Hotkey: ${EditingItem.Get[name]}",
+                    "template":"isb2.hotkeyEditor.General"
+                },
+                {
                     "name":"mappable",
+                    "title":"Mappable: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -311,6 +377,7 @@
                 },
                 {
                     "name":"mappableStep",
+                    "title":"Step",
                     "subItems":[
                         {
                             "name":"General",
@@ -335,6 +402,7 @@
                 },
                 {
                     "name":"gameMacroSheet",
+                    "title":"Game Macro Sheet: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -359,6 +427,7 @@
                 },
                 {
                     "name":"clickBar",
+                    "title":"Click Bar: ${EditingItem.Get[name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -373,34 +442,82 @@
                             "template":"isb2.clickBarEditor.ButtonLayout"
                         }
                     ]                                    
+                },
+                {
+                    "name":"slot",
+                    "title":"Slot",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.slotEditor.General"
+                        },
+                        {
+                            "name":"VFX Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[vfxSheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Game Key Bindings",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[gameKeyBindings]}"
+                                },
+                                "itemViewGenerators":{
+                                    "default":{
+                                        "type":"template",
+                                        "template":"isb2.gameKeyBindingInstanceView"
+                                    }
+                                },
+                                "context":"gameKeyBindingInstance"
+                            }
+                        }
+                    ]
                 }
             ]
+        },
+        "isb2.editorContext.title":{
+            "type":"textblock",
+            "text":"${This.Context.Title}",
+            "-horizontalAlignment":"center",
+            "margin":[15,0,0,5],
+            "font":{
+                "bold":true,
+                "heightFactor":1.2
+            }
         },
         "isb2.editorContext.leftPane":{
             "jsonTemplate":"isb2.leftPane",
             "content":{
-                "type":"scrollviewer",
-                "horizontalAlignment":"stretch",
-                "verticalAlignment":"stretch",
-                "horizontalScroll":"fitparent",
-                "content":{
-                    "type":"listbox",
-                    "jsonTemplate":"isb2.leftPaneList",
-                    "name":"editorContext.leftPane.container",
-                    "eventHandlers":{
-                        "onItemSelected":{
-                            "type":"method",
-                            "object":"This.Context",
-                            "method":"OnTreeItemSelected"
+                "type":"dockpanel",
+                "children":[
+                    {
+                        "jsonTemplate":"isb2.editorContext.title",
+                        "_dock":"top",
+                        "visibility":"collapsed"
+                    },
+                    {
+                        "_dock":"top",
+                        "type":"scrollviewer",
+                        "horizontalAlignment":"stretch",
+                        "verticalAlignment":"stretch",
+                        "horizontalScroll":"fitparent",
+                        "content":{
+                            "type":"listbox",
+                            "jsonTemplate":"isb2.leftPaneList",
+                            "name":"editorContext.leftPane.container",
+                            "eventHandlers":{
+                                "onItemSelected":{
+                                    "type":"method",
+                                    "object":"This.Context",
+                                    "method":"OnTreeItemSelected"
+                                }
+                            }    
                         }
-                    }    
-                },
-                "-content":{
-                    "type":"stackpanel",
-                    "name":"editorContext.leftPane.container",
-                    "orientation":"vertical",
-                    "uniform":true
-                }
+                    }
+                ]
             }
         },
         "isb2.leftPane":{
@@ -477,6 +594,17 @@
                         "type":"method",
                         "object":"This.Context",
                         "method":"OnSubTreeItemSelected"
+                    }
+                },
+                "hooks":{
+                    "onOtherItemSelected":{
+                        "elementType":"listbox",
+                        "flags":"ancestor",
+                        "event":"onSubTreeItemSelected",
+                        "eventHandler":{
+                            "type":"code",
+                            "code":"This.Context:OnOtherSubTreeItemSelected[${This.ID},\"${Context.Args.Get[id]}\"]"
+                        }
                     }
                 }
             }
@@ -604,113 +732,7 @@
                     }
                 ]
             }
-        },
-        "isb2.builderView":{
-            "type":"checkbox",
-            "jsonTemplate":"checkbox",
-            "margin":[10,0,0,0],
-            "content":{
-                "type":"stackpanel",
-                "margin":[10,0,0,0],
-                "orientation":"vertical",
-                "uniform":false,
-                "horizontalContentAlignment":"left",
-                "children":[
-                    {
-                        "type":"stackpanel",
-                        "orientation":"horizontal",
-                        "children":[
-                            {
-                                "type":"textblock",
-                                "verticalAlignment":"bottom",
-                                "textBinding":{
-                                    "pullFormat":"${This.Context.Get[builder,name]}",
-                                    "pullReplaceNull":""
-                                },
-                                "font":{
-                                    "heightFactor":1.4,
-                                    "bold":true
-                                }
-                            },
-                            {
-                                "type":"textblock",
-                                "verticalAlignment":"bottom",
-                                "textBinding":{
-                                    "pullFormat":" (${This.Context.Get[profile]})",
-                                    "pullReplaceNull":"built-in"
-                                },
-                                "font":{
-                                    "heightFacotr":0.8
-                                }
-                            }
-                        ]
-                    },                       
-                    {
-                        "type":"textblock",
-                        "textBinding":{
-                            "pullFormat":"${This.Context.Get[builder,description]}",
-                            "pullReplaceNull":""
-                        },
-                        "color":"#cccccc"
-                    },
-                    {
-                        "type":"expander",
-                        "header":"ISBoxer 2 Hotkeys (you press)",
-                        "name":"builderView.Hotkeys",
-                        "content":{
-                            "type":"listbox",
-                            "horizontalAlignment":"stretch",
-                            "contentContainer":{
-                                "jsonTemplate":"listbox.contentContainerFitWidth"
-                            },
-                            "minSize":[0,50],
-                            "itemsBinding":{
-                                "pullFormat":"${This.Context.Get[builder,expandedHotkeys]}"
-                            },
-                            "itemViewGenerators":{
-                                "default":{
-                                    "type":"template",
-                                    "template":"isb2.QuickSetup.hotkeyView"
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "type":"expander",
-                        "header":"Game Key Bindings (as configured in-game)",
-                        "name":"builderView.GameKeyBindings",
-                        "content":{
-                            "type":"listbox",
-                            "horizontalAlignment":"stretch",
-                            "contentContainer":{
-                                "jsonTemplate":"listbox.contentContainerFitWidth"
-                            },
-                            "minSize":[0,50],
-                            "itemsBinding":{
-                                "pullFormat":"${This.Context.Get[builder,expandedGameKeyBindings]}"
-                            },
-                            "itemViewGenerators":{
-                                "default":{
-                                    "type":"template",
-                                    "template":"isb2.QuickSetup.gameKeyBindingView"
-                                }
-                            }
-                        }
-                    }
-                ]
-            },
-            "checkedBinding":{
-                "pullFormat":"${This.Context.GetBool[enable]}",
-                "pushFormat":["This.Context:SetBool[enable,\"","\"]"]
-            },
-            "eventHandlers":{
-                "onVisualAttached":{
-                    "type":"method",
-                    "object":"ISB2QuickSetup",
-                    "method":"OnBuilderViewCreated"
-                }
-            }
-        },
+        },       
         "isb2.QuickSetup.builderListView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -725,13 +747,69 @@
                 }
             }
         },
+        "isb2.profileEditor.General":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context.EditingItem}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Name}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object.Name:Set[\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"ISB2 Version",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Version}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object.Version:Set[\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Description",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Description}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object.Description:Set[\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Source",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Source}",
+                        "pullReplaceNull":""
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Minimum Build",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.MinimumBuild}",
+                        "pullReplaceNull":""
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                }
+
+            ]
+        },
         "isb2.mappableEditor.General":{
             "jsonTemplate":"objectview",
             "type":"objectview",
             "verticalAlignment":"stretch",
             "horizontalAlignment":"stretch",
             "objectBinding":{
-                "pullFormat":"${This.Context.GetContextEditingItem[mappableEditor]}",
+                "pullFormat":"${This.Context.EditingItem}",
                 "pullOnce":true
             },
             "properties":[
@@ -867,185 +945,7 @@
                     }
                 }
             ]
-        },
-        "isb2.mappableEditor":{
-            "type":"dockpanel",
-            "horizontalAlignment": "stretch",
-            "verticalAlignment": "stretch",
-            "name":"mappableEditor",
-            "children":[
-                {
-                    "jsonTemplate":"isb2.leftPane",
-                    "_pane":"isb2.mappablePages",  
-                    "content":{
-                        "type":"listbox",
-                        "jsonTemplate":"isb2.leftPaneList",
-                        "name":"isb2.mappableEditor.List",
-                        "verticalAlignment":"stretch",
-                        "horizontalAlignment":"stretch",
-                        "--eventHandlers":{
-                            "onVisualAttached":{
-                                "type":"code",
-                                "code":"echo onVisualAttached ${This.Context(type)} ${This.Parent.Context(type)}",
-                                "object":"This.Context",
-                                "method":"StartEditingContext",
-                                "args":["mappableEditor"]
-                            }
-                        },
-                        "hooks":{
-                            "editorAttached":{
-                                "elementType": "dockpanel",
-                                "event": "onContextChanged",
-                                "eventHandler": {
-                                  "type": "code",
-                                  "code":"This.Context:SetEditingContextElement[mappableEditor,${This.ID}]"
-                                }                      
-                            }
-                        },
-                        "items":[
-                            {
-                                "type":"textblock",
-                                "text":"General",
-                                "template":"isb2.mappableEditor.General"
-                            }
-                        ],                
-                        "selectedItemBinding":{
-                            "pullFormat":"${This.Locate[\"\",window,ancestor].Context.GetEditingContextIndex[mappableEditor]}",
-                            "pushFormat":["This.Locate[\"\",window,ancestor].Context:SetEditingContextIndex[mappableEditor,","]"]
-                        },
-                        "-eventHandlers":{
-                            "onSelectionChanged":{
-                                "type":"method",
-                                "object":"This.Locate[\"\",window,ancestor].Context",
-                                "method":"OnMappablePageSelected"
-                            }
-                        }
-                    }        
-                },
-                {
-                    "type":"border",
-                    "_dock":"right",
-                    "name":"mappableEditor.editorContainer",
-                    "horizontalAlignment":"stretch",
-                    "verticalAlignment":"stretch",
-                    "contextBinding":{
-                        "pullFormat":"${This.Parent.Context.GetEditingContextItem[mappableEditor]}"
-                    },
-                    "margin":2,
-                    "borderThickness":0,
-                    "borderBrush":{
-                        "color":"#ff7f7f7f"
-                    }
-                }
-            ]
-        },        
-        "isb2.characterEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.characterEditor.General"
-                },
-                {
-                    "type":"textblock",
-                    "text":"Game Launch Info",
-                    "template":"isb2.characterEditor.GameLaunchInfo"
-                }
-            ]
-        },
-        "isb2.hotkeySheetEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.hotkeySheetEditor.General"
-                }
-            ]
-        },
-        "isb2.mappableSheetEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.mappableSheetEditor.General"
-                },
-                {
-                    "type":"expander",
-                    "header":"Mappables",
-                    "content":{
-                        "type":"listbox",
-                        "jsonTemplate":"isb2.leftPaneList",
-                        "itemsBinding":{
-                            "pullFormat": "${This.Context.ItemList.Context.EditingItem.Get[mappables]}"
-                        },
-                        "itemViewGenerators":{
-                            "default":{
-                                "type":"template",
-                                "template":"isb2.mappableView"
-                            }
-                        },
-                        "eventHandlers":{
-                            "onItemSelected":{
-                                "type":"method",
-                                "object":"This.Context.ItemList.Context",
-                                "method":"OnSubPageSelected",
-                                "args":["isb2.mappableEditor"]
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "isb2.vfxSheetEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.vfxSheetEditor.General"
-                }
-            ]
-        },
-        "isb2.virtualFileEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.virtualFileEditor.General"
-                }
-            ]
-        },
-        "isb2.gameKeyBindingEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.gameKeyBindingEditor.General"
-                }
-            ]
-        },
-        "isb2.windowLayoutEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.windowLayoutEditor.General"
-                }
-            ]
-        },
-        "isb2.teamEditor.List":{
-            "items":[
-                {
-                    "type":"textblock",
-                    "text":"General",
-                    "template":"isb2.teamEditor.General"
-                },
-                {
-                    "type":"textblock",
-                    "text":"Configuration Builders",
-                    "template":"isb2.teamEditor.ConfigurationBuilders"
-                }
-            ]
-        },
+        },           
         "isb2.teamEditor.ConfigurationBuilders":{
             "type":"dockpanel",
             "horizontalAlignment":"stretch",
@@ -1235,11 +1135,29 @@
                     "editTemplate":"propertyview.textbox"                            
                 },
                 {
+                    "name":"Description",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[description]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[description,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
                     "name":"GUI Toggle Hotkey",
                     "dataBinding":{
                         "pullFormat":"${This.Object.Get[guiToggleCombo]}",
                         "pushFormat":["This.Object:SetString[guiToggleCombo,\"","\"]"],
                         "pushNullFormat":["This.Object:Erase[guiToggleCombo]"]
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Console Toggle Hotkey",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[consoleToggleCombo]}",
+                        "pushFormat":["This.Object:SetString[consoleToggleCombo,\"","\"]"],
+                        "pushNullFormat":["This.Object:Erase[consoleToggleCombo]"]
                     },
                     "editTemplate":"propertyview.inputCombo"
                 },

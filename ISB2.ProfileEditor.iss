@@ -2,6 +2,7 @@
 objectdef isb2_profileEditorContext
 {
     variable string Name
+    variable string Title
     variable weakref Editor
     variable weakref Parent
 
@@ -23,7 +24,7 @@ objectdef isb2_profileEditorContext
 
     method AddSubItem(jsonvalueref joContainer, jsonvalueref joItem)
     {
-        echo "AddSubItem ${joContainer~} ${joItem~}"
+;        echo "AddSubItem ${joContainer~} ${joItem~}"
         variable jsonvalueref joSubItem="{}"
 
         if ${joItem.Has[-object,list]}
@@ -49,7 +50,7 @@ objectdef isb2_profileEditorContext
             
             joContainer.Get[items]:AddByRef[joSubItem]
 
-            echo "modified ${joContainer~}"
+;            echo "modified ${joContainer~}"
             
             return
         }
@@ -61,6 +62,8 @@ objectdef isb2_profileEditorContext
 
         if ${joItem.Has[-string,template]}
             joSubItem:SetString[template,"${joItem.Get[template]~}"]
+        if ${joItem.Has[-string,context]}
+            joSubItem:SetString[context,"${joItem.Get[context]~}"]
         if ${joItem.Has[-string,item]}
             joSubItem:SetString[item,"${joItem.Get[item]~}"]
 
@@ -92,12 +95,27 @@ objectdef isb2_profileEditorContext
 
         variable jsonvalueref joLeftPaneContainer
 
+        if ${Data.Has[-string,title]}
+        {
+            Title:Set[${Data.Get[title].AsJSON}]
+        }
+
+        ; adding editor title
+        variable jsonvalueref joEditorTitle="{}"
+        if ${Title.NotNULLOrEmpty}
+        {
+    ;        joEditorTitle:SetReference["LGUI2.Template[isb2.editorContext.title]"]
+            joEditorTitle:SetString[jsonTemplate,isb2.editorContext.title]
+            joEditorTitle:SetString[_dock,top]
+            Element:AddChild[joEditorTitle]
+        }
+
         if ${Data.Has[-array,subItems]}
         {
             joLeftPane:SetReference["LGUI2.Template[isb2.editorContext.leftPane]"]
             joLeftPane:SetString["_pane","isb2.subPages"]
             echo "joLeftPane ${joLeftPane~}"
-            joLeftPaneContainer:SetReference["joLeftPane.Get[content,content]"]
+            joLeftPaneContainer:SetReference["joLeftPane.Get[content,children,2,content]"]
             Data.Get[subItems]:ForEach["This:AddSubItem[joLeftPaneContainer,ForEach.Value]"]          
         }
 
@@ -116,9 +134,10 @@ objectdef isb2_profileEditorContext
 
         if ${joLeftPane.Reference(exists)}
         {
-            echo "adding left pane ${joLeftPane.AsJSON[multiline]~}"
+;            echo "adding left pane ${joLeftPane.AsJSON[multiline]~}"
             Element:AddChild[joLeftPane]
         }
+
 
         variable jsonvalueref joEditorContainer
         joEditorContainer:SetReference["LGUI2.Template[isb2.profileEditor.container]"]
@@ -185,16 +204,19 @@ objectdef isb2_profileEditorContext
         ; Context.Source.SelectedItem.Data
 
         variable jsonvalueref joData="Context.Source.SelectedItem.Data"
-        echo "data=${joData~}"
+;        echo "data=${joData~}"
 
         variable string useName
-        useName:Set["${Context.Source.Metadata.Get[context]~}"]
+        if ${joData.Has[-string,context]}
+            useName:Set["${joData.Get[context]~}"]
+        else
+            useName:Set["${Context.Source.Metadata.Get[context]~}"]
         if !${useName.NotNULLOrEmpty}
         {
             useName:Set["${Name~}.${joData.Get[itemName]~}"]
         }
 
-        variable weakref useContext        
+        variable weakref useContext                
         useContext:SetReference["Editor.GetContext[\"${useName~}\"]"]
         if ${useContext.Reference(exists)}
         {
@@ -221,6 +243,14 @@ objectdef isb2_profileEditorContext
         {
  ;           echo "context ${useName~} not found???"
         }
+
+        Context.Source:FireEventHandler[onSubTreeItemSelected,"{\"name\":\"${useName~}\",\"id\":${Context.Source.ID}}"]
+    }
+
+    method OnOtherSubTreeItemSelected(lgui2elementref subList, uint sourceID)
+    {
+        if ${subList.ID}!=${sourceID}
+            subList:ClearSelection
     }
 
     method OnSubTreeItemSelected()
@@ -233,7 +263,10 @@ objectdef isb2_profileEditorContext
         echo "data=${joData~}"
 
         variable string useName
-        useName:Set["${Context.Source.Metadata.Get[context]~}"]
+        if ${joData.Has[-string,context]}
+            useName:Set["${joData.Get[context]~}"]
+        else
+            useName:Set["${Context.Source.Metadata.Get[context]~}"]
         if !${useName.NotNULLOrEmpty}
         {
             useName:Set["${Name~}.${joData.Get[itemName]~}"]
@@ -268,7 +301,8 @@ objectdef isb2_profileEditorContext
         }
 
 
-
+        Context.Source.Locate["",listbox,ancestor]:FireEventHandler[onSubTreeItemSelected,"{\"name\":\"${useName~}\",\"id\":${Context.Source.ID}}"]
+        Context.Source.Locate["",listbox,ancestor]:ClearSelection
     }
 }
 

@@ -251,7 +251,29 @@
                 }
             }
         },
+        "isb2.builderView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
         "isb2.hotkeyView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]} (${_CONTEXTITEMDATA_.Get[keyCombo]})",
+                    "pullReplaceNull":""
+                }
+            }
+        },
+        "isb2.gameKeyBindingInstanceView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{

@@ -10,6 +10,7 @@ objectdef isb2_profile
     variable string Name
     variable string Description
     variable string Version
+    variable string Source
     variable uint MinimumBuild
     variable jsonvalueref Metadata
 
@@ -55,6 +56,8 @@ objectdef isb2_profile
             Name:Set["${jo.Get[name]~}"]
         if ${jo.Has[-notnull,description]}
             Description:Set["${jo.Get[description]~}"]
+        if ${jo.Has[-notnull,source]}
+            Source:Set["${jo.Get[source]~}"]
         if ${jo.Has[-notnull,isb2Version]}
             Version:Set["${jo.Get[isb2Version]~}"]
         if ${jo.Has[minimumBuild]}
@@ -117,6 +120,8 @@ objectdef isb2_profile
             jo:SetString["description","${Description~}"]
         if ${Version.NotNULLOrEmpty}
             jo:SetString["isb2Version","${Version~}"]
+        if ${Source.NotNULLOrEmpty}
+            jo:SetString["source","${Source~}"]
         if ${MinimumBuild}
             jo:SetInteger["minimumBuild","${MinimumBuild}"]
         if ${Metadata.Type.Equal[object]}

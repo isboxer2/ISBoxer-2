@@ -3,6 +3,8 @@ objectdef isb2_profileEditorContext
 {
     variable string Name
     variable string Title
+    variable string MissingEditor
+
     variable weakref Editor
     variable weakref Parent
 
@@ -12,6 +14,7 @@ objectdef isb2_profileEditorContext
     variable jsonvalueref Data
     variable lgui2elementref Element
     variable lgui2elementref Container
+    variable uint SelectedItem=1
 
     method Initialize(weakref _editor, jsonvalueref jo)
     {
@@ -24,7 +27,8 @@ objectdef isb2_profileEditorContext
 
     method AddSubItem(jsonvalueref joContainer, jsonvalueref joItem)
     {
-;        echo "AddSubItem ${joContainer~} ${joItem~}"
+        echo "\ayAddSubItem container\ax=${joContainer~}"
+        echo "\ayAddSubItem item\ax=${joItem~}"
         variable jsonvalueref joSubItem="{}"
 
         if ${joItem.Has[-object,list]}
@@ -35,6 +39,7 @@ objectdef isb2_profileEditorContext
             {
                 joItem.Get[list]:SetString["_context","${joItem.Get[list,context]~}"]
             }
+            joItem.Get[list]:SetString["_name","${joItem.Get[name]~}"]
 
             joSubItem.Get[content]:Merge["joItem.Get[list]"]
             joSubItem:SetString[contextBinding,"This.Locate[\"\",listbox,ancestor].Context"]
@@ -85,6 +90,12 @@ objectdef isb2_profileEditorContext
         Element:Set["${element.ID}"]
         echo "Attach: ${element} ${element.ID} template=${useTemplate~} ${Data~}"
 
+        if !${element.Element(exists)}
+        {
+            Script:DumpStack
+            return
+        }
+
         Element:SetContext[This]
 
         Element:ClearChildren
@@ -130,14 +141,20 @@ objectdef isb2_profileEditorContext
         {
             joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
             echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
+            if !${MissingEditor.NotNULLOrEmpty}
+            {
+                if ${useTemplate.NotNULLOrEmpty}
+                    MissingEditor:Set["Missing template ${useTemplate~}"]
+                else
+                    MissingEditor:Set["Editor template missing from ${Name~}"]
+            }
         }
 
         if ${joLeftPane.Reference(exists)}
         {
 ;            echo "adding left pane ${joLeftPane.AsJSON[multiline]~}"
-            Element:AddChild[joLeftPane]
+            Element:AddChild[joLeftPane]            
         }
-
 
         variable jsonvalueref joEditorContainer
         joEditorContainer:SetReference["LGUI2.Template[isb2.profileEditor.container]"]
@@ -150,11 +167,30 @@ objectdef isb2_profileEditorContext
 
             Container:Set["${Element.AddChild[joEditorContainer].ID}"]
 
-            echo "container = ${Container.ID}"
+;            echo "container = ${Container.ID}"
 ;            Element:AddChild["joEditorContainer"]
+        }
+
+        if ${joLeftPane.Reference(exists)}
+        {
+            Element.Locate[editorContext.leftPane.container,listbox,descendant]:SetItemSelected[1,1]
+        }
+
+    }
+
+    method UpdateFromJSON(string _json)
+    {
+        variable jsonvalue jo
+        jo:SetValue["${_json~}"]
+
+        if ${jo.Type.Equal[object]}
+        {
+            EditingItem:Clear
+            EditingItem:Merge[jo]
         }
     }
 
+#region Configuration Builders
     method InitConfigurationBuilders()
     {
         echo "\ayInitConfigurationBuilders\ax ${EditingItem~}"
@@ -175,27 +211,63 @@ objectdef isb2_profileEditorContext
         
         Editor:ApplyBuilders[EditingItem]
     }
+#endregion
 
-    method ResetSelections(string editingType)
+#region Actions
+    member:jsonvalueref GetActionTypeEditor()
+    {        
+        variable string useTemplate="isb2.actionEditor.${EditingItem.Get[type]~}"
+        variable jsonvalueref joEditor
+
+
+        if ${EditingItem.Get[type].NotNULLOrEmpty}
+            joEditor:SetReference["LGUI2.Skin[default].Template[\"${useTemplate~}\"]"]
+        else
+            return NULL
+;            joEditor:SetReference["{\"type\":\"panel\"}"]
+
+        echo "\ayGetActionTypeEditor\ax ${EditingItem~} ${useTemplate~}=${joEditor~}"
+
+        if !${joEditor.Reference(exists)} || !${joEditor.Used}
+        {
+            joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
+            echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
+            if ${EditingItem.Get[type].NotNULLOrEmpty}
+                MissingEditor:Set["Missing template ${useTemplate~}"]
+        }
+
+        return joEditor
+    }
+    
+    member:jsonvalueref GetActionAutoComplete(string _type, string name, string subList)
     {
-        if ${editingType.NotEqual["Character"]}
-            Window.Locate["profile.characters"]:ClearSelection
-        if ${editingType.NotEqual["HotkeySheet"]}
-            Window.Locate["profile.hotkeySheets"]:ClearSelection
-        if ${editingType.NotEqual["MappableSheet"]}
-            Window.Locate["profile.mappableSheets"]:ClearSelection
-        if ${editingType.NotEqual["Team"]}
-            Window.Locate["profile.teams"]:ClearSelection
-        if ${editingType.NotEqual["GameKeyBinding"]}
-            Window.Locate["profile.gameKeyBindings"]:ClearSelection
-        if ${editingType.NotEqual["VirtualFile"]}
-            Window.Locate["profile.virtualFiles"]:ClearSelection
-        if ${editingType.NotEqual["WindowLayout"]}
-            Window.Locate["profile.windowLayouts"]:ClearSelection
-        if ${editingType.NotEqual["VFXSheet"]}
-            Window.Locate["profile.vfxSheets"]:ClearSelection
-    }    
+        echo "\ayGetActionAutoComplete\ax \"${_type~}\" \"${name~}\" \"${subList~}\""
 
+        variable jsonvalueref joMain="ISB2.FindOne[\"${_type~}\",\"${name~}\"]"
+        if !${joMain.Reference(exists)}        
+        {
+            echo "${_type~} named ${name~} not found"
+            return NULL
+        }
+
+;        echo "joMain=${joMain~}"
+
+        variable jsonvalueref ja
+        ja:SetReference["joMain.Get[\"${subList~}\"]"]
+        if !${ja.Reference(exists)}
+        {
+            echo "joMain did not contain ${subList~}"            
+            return NULL
+        }
+
+        echo "ja ${ja.Used} ${ja~}"
+        variable jsonvalueref jo="{}"
+
+        ja:ForEach["jo:SetByRef[\"\${ForEach.Value.Get[name]}\",ForEach.Value]"]
+        echo "providing dictionary ${jo.Used} ${jo~}"
+        return jo
+    }
+#endregion
 
     method OnTreeItemSelected()
     {
@@ -206,6 +278,7 @@ objectdef isb2_profileEditorContext
         variable jsonvalueref joData="Context.Source.SelectedItem.Data"
 ;        echo "data=${joData~}"
 
+        variable string missingEditor
         variable string useName
         if ${joData.Has[-string,context]}
             useName:Set["${joData.Get[context]~}"]
@@ -213,6 +286,11 @@ objectdef isb2_profileEditorContext
             useName:Set["${Context.Source.Metadata.Get[context]~}"]
         if !${useName.NotNULLOrEmpty}
         {
+            if !${joData.Has[-string,itemName]}
+            {
+                echo "\arMissing context and itemName\ax in ${Name~}.${Context.Source.Metadata.Get[name]~}"
+                missingEditor:Set["Context missing from ${Name~}.${Context.Source.Metadata.Get[name]~}"]
+            }
             useName:Set["${Name~}.${joData.Get[itemName]~}"]
         }
 
@@ -221,7 +299,7 @@ objectdef isb2_profileEditorContext
         if ${useContext.Reference(exists)}
         {
 ;            echo "useContext: ${useContext.Name~}"
-
+            useContext.MissingEditor:Set["${missingEditor~}"]
             useContext.Parent:SetReference[This]
 
             if ${joData.Has[-string,item]}
@@ -259,6 +337,7 @@ objectdef isb2_profileEditorContext
         
         ; Context.Source.SelectedItem.Data
 
+        variable string missingEditor
         variable jsonvalueref joData="Context.Source.SelectedItem.Data"
         echo "data=${joData~}"
 
@@ -269,6 +348,11 @@ objectdef isb2_profileEditorContext
             useName:Set["${Context.Source.Metadata.Get[context]~}"]
         if !${useName.NotNULLOrEmpty}
         {
+            if !${joData.Has[-string,itemName]}
+            {
+                echo "\arMissing context and itemName\ax in ${Name~}.${Context.Source.Metadata.Get[name]~}"
+                missingEditor:Set["Context missing from ${Name~}.${Context.Source.Metadata.Get[name]~}"]
+            }
             useName:Set["${Name~}.${joData.Get[itemName]~}"]
         }
 
@@ -278,6 +362,7 @@ objectdef isb2_profileEditorContext
         {
 ;            echo "useContext: ${useContext.Name~}"
 
+            useContext.MissingEditor:Set["${missingEditor~}"]
             useContext.Parent:SetReference[This]
 
             if ${joData.Has[-string,item]}
@@ -329,6 +414,7 @@ objectdef isb2_profileeditor inherits isb2_building
         MainContext.EditingItem:SetReference[Editing]              
 
         MainContext:Attach[${Window.Locate["editor.container"].ID}]
+        This:BuildAutoComplete
     }
 
     method Shutdown()
@@ -336,9 +422,31 @@ objectdef isb2_profileeditor inherits isb2_building
         Window:Destroy
     }
 
+    method BuildAutoComplete()
+    {
+        ISB2:BuildAutoComplete[Characters]
+        ISB2:BuildAutoComplete[MappableSheets]
+        ISB2:BuildActionsAutoComplete
+        
+    }
+
     method OnWindowClosed()
     {
         ISB2.Editors:Erase["${Editing.Name~}"]
+    }
+
+    method OnSaveButton()
+    {
+        echo "\ayOnSaveButton\ax"
+        MainContext:Attach[${Window.Locate["editor.container"].ID}]
+        if ${This.Editing:Store(exists)}
+        {
+            echo "\agSaved.\ax"
+        }
+        else
+        {
+            echo "\arCould not save.\ax"
+        }
     }
 
     member:weakref GetContext(string name)
@@ -362,81 +470,6 @@ objectdef isb2_profileeditor inherits isb2_building
     {
         return "${fromString.Lower.Left[1]}${fromString.Right[-1]}"
     }
-
-/*
-    method SetEditingItem(string editingType, uint editingNumber)
-    {        
-       ; echo "SetEditingItem ${editingType~} ${editingNumber}"
-        EditingItem:SetReference["Editing.${editingType~}s.Get[${editingNumber}]"]
-        ;echo "EditingItem = ${EditingItem(type)} Container=${Window.Locate["profile.editorContainer"](type)}"
-
-        variable jsonvalueref joList
-        joList:SetReference["LGUI2.Template[isb2.${This.GetLowerCamelCase["${editingType~}"]}Editor.List]"]
-
-;        echo selected before = ${LGUI2.Element[isb2.subPage.List].SelectedItem.Index}
-
-        if ${editingType.NotEqual["${EditingType~}"]}
-        {
-            EditingType:Set["${editingType~}"]
-            SubPage:Set[1]
-        }
-
-        LGUI2.Element[isb2.subPage.List]:ApplyStyleJSON["joList"]
-
-        ; echo selected after = ${LGUI2.Element[isb2.subPage.List].SelectedItem.Index}
-    }
-
-    method OnLeftPaneSelection(string itemType)
-    {
-        This:ResetSelections["${itemType~}"]
-        This:SetEditingItem["${itemType~}",${Context.Source.SelectedItem.Index}]
-    }
-
-    method OnSubPageSelected(string useTemplate)
-    {
-        echo "OnSubPageSelected[${useTemplate~}] ${Context(type)} ${Context.Source} ${Context.Source.SelectedItem(type)} ${Context.Source.SelectedItem.Data}" 
-
-        echo "EditingItem ${MainContext.EditingItem~}"
-
-        variable jsonvalueref joData="Context.Source.SelectedItem.Data"
-
-        variable jsonvalueref joEditor
-        if !${useTemplate.NotNULLOrEmpty} && ${joData.Reference(exists)}
-        {
-            useTemplate:Set["${joData.Get[template]~}"]
-        }
-
-        if ${useTemplate.NotNULLOrEmpty}
-            joEditor:SetReference["LGUI2.Template[\"${useTemplate~}\"]"]
-
-        if !${joEditor.Reference(exists)}
-            joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
-
-        if ${joEditor.Reference(exists)}
-        {
-            Window.Locate["profile.editorContainer"]:SetChild["joEditor"]
-            
-            if ${joData.Get[text]~.Equal[Configuration Builders]}
-            {
-                SelectedBuilderPreset:SetReference["MainContext.EditingItem"]
-                BuildingCharacters:SetReference["This.GetCharactersFromTeam[MainContext.EditingItem]"]
-                
-                variable jsonvalueref jaGames
-                jaGames:SetReference["LGUI2.Skin[default].Template[isb2.data].Get[games]"]
-
-                BuildingGame:SetReference["ISB2.FindInArray[jaGames,\"${BuildingCharacters.Get[1,game]~}\"]"]
-
-                This:RefreshBuilders
-;                Window.Locate["profile.editorContainer"].Child:SetContext[This]
-            }
-
-            Window.Locate["profile.editorContainer"].Child:SetContext["MainContext"]            
-        }
-        else
-            Window.Locate["profile.editorContainer"]:ClearChildren        
-    }
-/**/
-
 
     member:jsonvalueref GetCharacters()
     {

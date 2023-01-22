@@ -10,7 +10,36 @@
             "isb2.main":200,
             "isb2.teamEditor":200,
             "isb2.mappableSheetEditor":200
-        },
+        },       
+        "propertyview.cancelabletextbox": {
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[           
+                {
+                    "_dock":"right",
+                    "type":"button",
+                    "content":"x",
+                    "eventHandlers":{
+                        "onPress":{
+                            "type":"code",
+                            "code":"This.Locate[\"\",propertyview,ancestor]:SetValue[NULL]"
+                        }
+                    }
+                },  
+                {
+                    "_dock":"left",
+                    "type": "textbox",
+                    "horizontalAlignment":"stretch",
+                    "textBinding": {
+                        "linkBinding": {
+                        "flags": "ancestor",
+                        "elementType": "propertyview",
+                        "member": "ValueBinding"
+                        }
+                    }        
+                }
+            ]
+          },        
         "isb2.editorContexts":{
                 "contexts":[
                 {
@@ -261,10 +290,32 @@
                             }
                         },
                         {
+                            "name":"Click Bars",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[clickBars]}"
+                                }
+                            }
+                        },
+                        {
                             "name":"Game Macro Sheets",
                             "list":{
                                 "itemsBinding":{
                                     "pullFormat":"${This.Context.EditingItem.Get[gameMacroSheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Virtual Mappables",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[virtualMappables]}"
+                                },
+                                "itemViewGenerators":{
+                                    "default":{
+                                        "type":"template",
+                                        "template":"isb2.virtualMappableView"
+                                    }
                                 }
                             }
                         }
@@ -351,6 +402,10 @@
                     "template":"isb2.hotkeyEditor.General"
                 },
                 {
+                    "name":"action",
+                    "template":"isb2.actionEditor.General"
+                },
+                {
                     "name":"mappable",
                     "title":"Mappable: ${EditingItem.Get[name]}",
                     "subItems":[
@@ -424,6 +479,11 @@
                             }    
                         }
                     ]                                    
+                },
+                {
+                    "name":"gameMacro",
+                    "title":"Game Macro: ${EditingItem.Get[name]}",
+                    "template":"isb2.gameMacroEditor.General"
                 },
                 {
                     "name":"clickBar",
@@ -508,6 +568,12 @@
                             "type":"listbox",
                             "jsonTemplate":"isb2.leftPaneList",
                             "name":"editorContext.leftPane.container",
+                            "selectedItemBinding":{
+                                "pullFormat":"${This.Context.SelectedItem}",
+                                "pushFormat":["This.Context.SelectedItem:Set[\",","\"]"],
+                                "autoPull":false,
+                                "autoPush":false
+                            },
                             "eventHandlers":{
                                 "onItemSelected":{
                                     "type":"method",
@@ -801,6 +867,359 @@
                     "editTemplate":"propertyview.textbox"                            
                 }
 
+            ]
+        },
+        "isb2.gameMacroEditor.General":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context.EditingItem}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },               
+                {
+                    "name":"Display Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[displayName]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[displayName,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },               
+                {
+                    "name":"Description",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[description]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[description,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },               
+                {
+                    "name":"Commands",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[commands]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[commands,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox",
+                    "controlData":{
+                        "multiline":true
+                    }                            
+                },
+                {
+                    "name":"Key Combo",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[keyCombo]}",
+                        "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[keyCombo]"
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Use FTL Modifiers",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetBool[useFTLModifiers]}",
+                        "pushFormat":["This.Object:SetBool[useFTLModifiers,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[useFTLModifiers]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
+                }
+            ]
+        },
+        "isb2.gameMacroSheetEditor.General":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context.EditingItem}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },               
+                {
+                    "name":"Description",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[description]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[description,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },               
+                {
+                    "name":"Game",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[game]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[game,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                }
+            ]
+        },
+        "isb2.actionEditor.mappable":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context.EditingItem}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[sheet]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[sheet,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                        },
+                        "hooks":{                           
+                            "textChanged":{
+                                "flags":"self",
+                                "event":"onTextChanged",
+                                "eventHandler":{
+                                    "type":"forward",
+                                    "elementType":"objectview",
+                                    "flags":"ancestor",
+                                    "event":"onMappableSheetChanged"
+                                }
+                            }
+                        }
+                    }                            
+                },
+                {
+                    "name":"Mappable",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${This.Context.ObjectView.Context.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",mappables]}",
+                            "pullOnce":true,
+                            "pullHook":{
+                                "elementType":"objectview",
+                                "flags":"ancestor",
+                                "event":"onMappableSheetChanged"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name":"Target",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[target]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[target,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[target]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox",
+                }
+            ]
+        },
+        "isb2.actionEditor.game macro":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context.EditingItem}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[sheet]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[sheet,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[GameMacroSheets]}"
+                        },
+                        "hooks":{                           
+                            "textChanged":{
+                                "flags":"self",
+                                "event":"onTextChanged",
+                                "eventHandler":{
+                                    "type":"forward",
+                                    "elementType":"objectview",
+                                    "flags":"ancestor",
+                                    "event":"onGameMacroSheetChanged"
+                                }
+                            }
+                        }
+                    }                            
+                },
+                {
+                    "name":"Game Macro",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${This.Context.ObjectView.Context.GetActionAutoComplete[GameMacroSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",macros]}",
+                            "pullOnce":true,
+                            "pullHook":{
+                                "elementType":"objectview",
+                                "flags":"ancestor",
+                                "event":"onGameMacroSheetChanged"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name":"Target",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[target]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[target,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox",
+                }
+            ]
+        },
+        "isb2.actionEditor.General":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "name":"actionEditor.General.container",
+            "children":[
+                {
+                    "_dock":"top",
+                    "type":"stackpanel",
+                    "padding":5,
+                    "orientation":"horizontal",
+                    "children":[
+                        {
+                            "type":"textblock",
+                            "text":"Action Type",
+                            "margin":[0,0,5,0]
+                        },
+                        {
+                            "type":"autocompletebox",
+                            "name":"actionEditor.autocompletebox",
+                            "dictionaryBinding":{
+                                "pullFormat":"${ISB2.AutoComplete.Get[Actions]}"
+                            },
+                            "textBinding":{
+                                "pullFormat":"${This.Context.EditingItem.Get[type]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Context.EditingItem:SetString[type,\"","\"]"]
+                            },
+                            "eventHandlers":{
+                                "onTextChanged":{
+                                    "type":"forward",
+                                    "elementName":"actionEditor.General.container",
+                                    "flags":"ancestor",                                    
+                                    "event":"onActionTypeChanged"
+                                }
+                            }
+                        }        
+                    ]
+                },
+                {
+                    "_dock":"bottom",
+                    "type":"textbox",
+                    "horizontalAlignment":"stretch",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.EditingItem.AsJSON[multiline]}",
+                        "pushFormat":["This.Context:UpdateFromJSON[\"","\"]"]
+                    },
+                    "textBindingUsesFocus":true
+                },
+                {
+                    "_dock":"top",
+                    "type":"dynamic",
+                    "contentBinding":{
+                        "pullFormat":"${This.Context.GetActionTypeEditor}",
+                        "pullHook":{
+                            "elementName":"actionEditor.General.container",
+                            "flags":"ancestor",
+                            "event":"onActionTypeChanged"
+                        }
+                    }
+                }
+            ]
+        },
+        "isb2.slotEditor.General":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context.EditingItem}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Slot Activation Hotkey",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[switchToCombo]}",
+                        "pushFormat":["This.Object:SetString[switchToCombo,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[switchToCombo]"
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Character",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[character]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[character,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[Characters]}"
+                        }
+                    }
+                },               
+                {
+                    "name":"Custom Window Title",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[windowTitle]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[windowTitle,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                }
             ]
         },
         "isb2.mappableEditor.General":{
@@ -1148,7 +1567,7 @@
                     "dataBinding":{
                         "pullFormat":"${This.Object.Get[guiToggleCombo]}",
                         "pushFormat":["This.Object:SetString[guiToggleCombo,\"","\"]"],
-                        "pushNullFormat":["This.Object:Erase[guiToggleCombo]"]
+                        "pushNullFormat":"This.Object:Erase[guiToggleCombo]"
                     },
                     "editTemplate":"propertyview.inputCombo"
                 },
@@ -1157,7 +1576,7 @@
                     "dataBinding":{
                         "pullFormat":"${This.Object.Get[consoleToggleCombo]}",
                         "pushFormat":["This.Object:SetString[consoleToggleCombo,\"","\"]"],
-                        "pushNullFormat":["This.Object:Erase[consoleToggleCombo]"]
+                        "pushNullFormat":"This.Object:Erase[consoleToggleCombo]"
                     },
                     "editTemplate":"propertyview.inputCombo"
                 },
@@ -1167,6 +1586,15 @@
                         "pullFormat":"${This.Object.Get[windowLayout]}",
                         "pullReplaceNull":"",
                         "pushFormat":["This.Object:SetString[windowLayout,\"","\"]"]
+                        },
+                        "editTemplate":"propertyview.textbox"                              
+                },
+                {
+                    "name":"Broadcast Profile",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[broadcastProfile]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[broadcastProfile,\"","\"]"]
                         },
                         "editTemplate":"propertyview.textbox"                              
                 }
@@ -1209,7 +1637,7 @@
             "children":[
                 {
                     "type":"textblock",
-                    "text":"Editor Missing",
+                    "text":"${This.Context.MissingEditor}",
                     "_dock":"top"
                 },
                 {
@@ -1218,8 +1646,10 @@
                     "horizontalAlignment":"stretch",
                     "verticalAlignment":"stretch",
                     "textBinding":{
-                        "pullFormat":"${This.Context.EditingItem.AsJSON[multiline]}"
-                    }
+                        "pullFormat":"${This.Context.EditingItem.AsJSON[multiline]}",
+                        "pushFormat":["This.Context:UpdateFromJSON[\"","\"]"]
+                    },
+                    "textBindingUsesFocus":true
                 }
             ]
         },
@@ -1362,27 +1792,8 @@
             "jsonTemplate":"window",
             "title":"ISBoxer Profile: ${This.Context.Editing.Name}",
             "visibility":"visible",
-            "width":750,
-            "height":400,
-            "minSize":[600,300],
-            "eventHandlers":{
-                "onVisualDetached":{
-                    "type":"method",
-                    "object":"This.Context",
-                    "method":"OnWindowClosed"
-                }        
-            },
-            "content":{
-                "jsonTemplate":"isb2.profileEditor.container"
-            }
-        },
-        "isb2.profileEditor.old":{
-            "type":"window",
-            "jsonTemplate":"window",
-            "title":"ISBoxer Profile: ${This.Context.Editing.Name}",
-            "visibility":"visible",
-            "width":750,
-            "height":400,
+            "width":1280,
+            "height":600,
             "minSize":[600,300],
             "eventHandlers":{
                 "onVisualDetached":{
@@ -1397,277 +1808,24 @@
                 "verticalAlignment": "stretch",
                 "children":[
                     {
-                        "jsonTemplate":"isb2.leftPane",
-                        "_pane":"isb2.main",
-                        "content":{
-                            "type":"scrollviewer",
-                            "horizontalAlignment":"stretch",
-                            "verticalAlignment":"stretch",
-                            "horizontalScroll":"fitparent",
-                            "content":{
-                                "type":"stackpanel",
-                                "orientation":"vertical",
-                                "uniform":true,
-                                "children":[
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"Characters",
-                                        "content":{
-                                            "type":"listbox",
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "name":"profile.characters",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.Characters}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.characterView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["Character"]
-                                                }
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"Teams",
-                                        "content":                                    
-                                        {
-                                            "type":"listbox",
-                                            "name":"profile.teams",
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.Teams}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.teamView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["Team"]
-                                                }
-                                            }
-                                        }        
-                                    },
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"Hotkey Sheets",
-                                        "content":{
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "type":"listbox",
-                                            "name":"profile.hotkeySheets",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.HotkeySheets}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.hotkeySheetView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["HotkeySheet"]
-                                                }
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"Mappable Sheets",
-                                        "content":{
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "type":"listbox",
-                                            "name":"profile.mappableSheets",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.MappableSheets}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.mappableSheetView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["MappableSheet"]
-                                                }
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"Game Key Bindings",
-                                        "content":{
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "type":"listbox",
-                                            "name":"profile.gameKeyBindings",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.GameKeyBindings}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.gameKeyBindingView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["GameKeyBinding"]
-                                                }
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"Window Layouts",
-                                        "content":{
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "type":"listbox",
-                                            "name":"profile.windowLayouts",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.WindowLayouts}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.windowLayoutView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["WindowLayout"]
-                                                }
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"Virtual Files",
-                                        "content":{
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "type":"listbox",
-                                            "name":"profile.virtualFiles",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.VirtualFiles}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.virtualFileView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["VirtualFile"]
-                                                }
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "jsonTemplate":"isb2.leftPaneExpander",
-                                        "type":"expander",
-                                        "header":"VFX Sheets",
-                                        "content":{
-                                            "jsonTemplate":"isb2.leftPaneList",
-                                            "type":"listbox",
-                                            "name":"profile.vfxSheets",
-                                            "itemsBinding":{
-                                                "pullFormat": "${This.Context.Editing.VFXSheets}"
-                                            },
-                                            "itemViewGenerators":{
-                                                "default":{
-                                                    "type":"template",
-                                                    "template":"isb2.vfxSheetView"
-                                                }
-                                            },
-                                            "eventHandlers":{
-                                                "onItemSelected":{
-                                                    "type":"method",
-                                                    "object":"This.Context",
-                                                    "method":"OnLeftPaneSelection",
-                                                    "args":["VFXSheet"]
-                                                }
-                                            }
-                                        }
-                                    }
-                                ]
+                        "_dock":"bottom",
+                        "type":"button",
+                        "horizontalAlignment":"right",
+                        "content":"Save",
+                        "eventHandlers":{
+                            "onPress":{
+                                "type":"method",
+                                "object":"This.Context",
+                                "method":"OnSaveButton"
                             }
                         }
                     },
                     {
-                        "jsonTemplate":"isb2.leftPane",
-                        "_pane":"isb2.subPages",            
-                        "content":{
-                            "type":"listbox",
-                            "jsonTemplate":"isb2.leftPaneList",
-                            "name":"isb2.subPage.List",
-                            "verticalAlignment":"stretch",
-                            "horizontalAlignment":"stretch",
-                            "selectedItemBinding":{
-                                "pullFormat":"${This.Context.MainContext.SubPage}",
-                                "pushFormat":["This.Context.MainContext.SubPage:Set[","]"]
-                            },
-                            "eventHandlers":{
-                                "onSelectionChanged":{
-                                    "type":"method",
-                                    "object":"This.Locate[\"\",window,ancestor].Context",
-                                    "method":"OnSubPageSelected"
-                                }
-                            }
-                        }        
-                    },
-                    {
-                        "type":"border",
-                        "_dock":"right",
-                        "name":"profile.editorContainer",
-                        "horizontalAlignment":"stretch",
-                        "verticalAlignment":"stretch",
-                        "contextBinding":{
-                            "pullFormat":"${This.Parent.Context.EditingItem}"
-                        },
-                        "margin":2,
-                        "borderThickness":0,
-                        "borderBrush":{
-                            "color":"#ff7f7f7f"
-                        }
+                        "_dock":"top",
+                        "jsonTemplate":"isb2.profileEditor.container"
                     }
-                ]
+                ]    
+                
             }
         }
     }

@@ -409,7 +409,7 @@ objectdef isb2_profileeditor inherits isb2_building
 
         This:RefreshBuilderPresets
 
-        LGUI2.Template[isb2.editorContexts].Get[contexts]:ForEach["Contexts:Set[\"\${ForEach.Value.Get[name]~}\",This,ForEach.Value]"]
+        LGUI2.Skin[default].Template[isb2.editorContexts].Get[contexts]:ForEach["Contexts:Set[\"\${ForEach.Value.Get[name]~}\",This,ForEach.Value]"]
         MainContext:SetReference["Contexts.Get[main]"]
         MainContext.EditingItem:SetReference[Editing]              
 

@@ -176,8 +176,7 @@ objectdef isb2_profile
         }
         if ${LocalFilename.NotNULLOrEmpty}
         {
-            This.AsJSON:WriteFile["${LocalFilename~}",multiline]
-            return TRUE
+            return ${This.AsJSON:WriteFile["${LocalFilename~}",multiline](exists)}
         }
         return FALSE
     }
@@ -220,6 +219,7 @@ objectdef isb2_profilecollection
 {
     ; The variable that contains the actual list
     variable collection:isb2_profile Profiles
+    variable collection:autocomplete AutoComplete
 
     variable uint LoadCount
 
@@ -230,6 +230,47 @@ objectdef isb2_profilecollection
         return "filePath.GetFiles[*.isb2.json]"
     }
     /**/
+
+    method BuildActionsAutoComplete()
+    {
+        variable jsonvalueref ja="LGUI2.Skin[default].Template[isb2.data].Get[defaultActionTypes]"
+
+        variable jsonvalueref jo="{}"
+        ja:ForEach["jo:SetByRef[\"\${ForEach.Value.Get[name]}\",ForEach.Value]"]
+
+        if !${AutoComplete.Get[Actions](exists)}
+        {
+            AutoComplete:Set[Actions]
+        }
+
+        AutoComplete.Get[Actions]:SetDictionary[jo]
+    }
+
+    method BuildAutoComplete(string name, string fieldName="name")
+    {
+        variable jsonvalueref ja="This.LocateAll[\"${name~}\"]"
+
+        variable jsonvalueref jo="{}"
+
+        ja:ForEach["jo:SetByRef[\"\${ForEach.Value.Get[object,\"${fieldName~}\"]}\",ForEach.Value]"]
+
+        if !${AutoComplete.Get["${name~}"](exists)}
+        {
+            AutoComplete:Set[${name~}]
+        }
+
+        AutoComplete.Get["${name~}"]:SetDictionary[jo]
+    }
+
+    member:autocomplete GetAutoComplete(string name, string fieldName="name")
+    {
+        if !${AutoComplete.Get["${name~}"](exists)}
+        {
+            This:BuildAutoComplete["${name~}","${fieldName~}"]
+        }
+
+        return "AutoComplete.Get[\"${name~}\"]"
+    }
 
     member:jsonvalueref GetLoadedFilenames()
     {

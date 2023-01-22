@@ -175,17 +175,6 @@
                 }
             }
         },
-        "isb2.hotkeyView":{
-            "jsonTemplate":"listboxitem",
-            "padding":2,
-            "content":{
-                "type":"textblock",
-                "textBinding":{
-                    "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
-                    "pullReplaceNull":""
-                }
-            }
-        },
         "isb2.gameView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -196,7 +185,18 @@
                     "pullReplaceNull":""
                 }
             }
-        },        
+        },   
+        "isb2.virtualMappableView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_.Get[from,sheet]}: ${_CONTEXTITEMDATA_.Get[from,name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },  
         "isb2.gameLaunchInfoView":{
             "jsonTemplate":"listboxitem",
             "padding":2,

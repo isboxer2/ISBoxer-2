@@ -209,8 +209,8 @@ objectdef isb2_profileengine
 ;        Actions:InstallActionType["Keystroke","Action_Keystroke"]
 
 
-        variable jsonvalue ja
-        ja:SetValue["${LGUI2.Skin[default].Template[isb2.data].Get[defaultActionTypes]~}"]
+        variable jsonvalueref ja
+        ja:SetReference["LGUI2.Skin[default].Template[isb2.data].Get[defaultActionTypes]"]
 
 ;        echo "InstallDefaultActionTypes ${ja~}"
         This:InstallActionTypes[ja]

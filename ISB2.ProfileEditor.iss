@@ -331,6 +331,55 @@ objectdef isb2_profileEditorContext
             subList:ClearSelection
     }
 
+    method OnDragDrop()
+    {
+        echo "\apcontext:OnDragDrop\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~}"        
+        echo "dragdropitem=${LGUI2.DragDropItem~}"
+
+        variable jsonvalueref joDragDrop
+        joDragDrop:SetReference["Data.Get[dragDrop,\"${LGUI2.DragDropItem.Get[dragDropItemType]~}\"]"]
+
+        if !${joDragDrop.Reference(exists)}
+        {
+            echo "dragdrop: ${Name} does not handle ${LGUI2.DragDropItem.Get[dragDropItemType]~}"
+            ; we don't handle this drag drop type
+            return
+        }
+
+        switch ${joDragDrop.Get[type]}
+        {
+            case copy
+                EditingItem:Set["${joDragDrop.Get[outProperty]~}","${LGUI2.DragDropItem.Get[item,"${joDragDrop.Get[inProperty]~}"].AsJSON~}"]
+                break
+        }
+        Context:SetHandled[1]
+    }
+
+    method OnSubTreeItemMouse1Press()
+    {
+        ; handle drag-drop. but only if we're holding shift...
+        if !${Context.Args.GetBool[lShift]} && !${Context.Args.GetBool[rShift]}
+            return
+
+        echo "\apcontext:OnSubTreeItemMouse1Press\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~} ${Context.Element.Metadata.Get[context]~} ${Context.Source.Item.Data~}"
+        variable jsonvalueref joItem
+        joItem:SetReference["Context.Source.Item.Data"]
+        variable jsonvalueref joDragDrop="{}"
+        joDragDrop:SetByRef["item","joItem"]
+        joDragDrop:SetString["profile","${Editor.Editing.Name~}"]
+
+        if ${joItem.Has[name]}
+        {
+            joDragDrop:SetString["icon","${Context.Element.Metadata.Get[context]~}: ${joItem.Get[name]~}"]
+        }
+        else
+        {
+            joDragDrop:SetString["icon","${Context.Element.Metadata.Get[context]~}"]
+        }
+        joDragDrop:SetString["dragDropItemType","${Context.Element.Metadata.Get[context]~}"]
+        Context.Source:SetDragDropItem[joDragDrop]
+    }
+
     method OnSubTreeItemSelected()
     {
         echo "context:OnSubTreeItemSelected ${Context.Source} ${Context.Source.ID} ${Context.Source.Metadata.Get[context]~}"

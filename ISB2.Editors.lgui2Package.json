@@ -319,7 +319,14 @@
                                 }
                             }
                         }
-                    ]
+                    ],
+                    "dragDrop":{
+                        "windowLayout":{
+                            "type":"copy",
+                            "inProperty":"name",
+                            "outProperty":"windowLayout"
+                        }
+                    }
                 },
                 {
                     "name":"windowLayout",
@@ -534,7 +541,14 @@
                                 "context":"gameKeyBindingInstance"
                             }
                         }
-                    ]
+                    ],
+                    "dragDrop":{
+                        "character":{
+                            "type":"copy",
+                            "inProperty":"name",
+                            "outProperty":"character"
+                        }
+                    }
                 }
             ]
         },
@@ -656,6 +670,11 @@
                     "jsonTemplate":"listbox.contentContainerFitWidth"
                 },
                 "eventHandlers":{
+                    "onItemMouse1Press":{
+                        "type":"method",
+                        "object":"This.Context",
+                        "method":"OnSubTreeItemMouse1Press"
+                    },
                     "onItemSelected":{
                         "type":"method",
                         "object":"This.Context",
@@ -1045,7 +1064,7 @@
                         "pushFormat":["This.Object:SetString[target,\"","\"]"],
                         "pushNullFormat":"This.Object:Erase[target]"
                     },
-                    "editTemplate":"propertyview.cancelabletextbox",
+                    "editTemplate":"propertyview.cancelabletextbox"
                 }
             ]
         },
@@ -1112,7 +1131,7 @@
                         "pullReplaceNull":"",
                         "pushFormat":["This.Object:SetString[target,\"","\"]"]
                     },
-                    "editTemplate":"propertyview.textbox",
+                    "editTemplate":"propertyview.textbox"
                 }
             ]
         },
@@ -1785,7 +1804,14 @@
             "type":"dockpanel",
             "name":"editor.container",
             "horizontalAlignment": "stretch",
-            "verticalAlignment": "stretch"
+            "verticalAlignment": "stretch",
+            "eventHandlers":{
+                "onDragDrop":{
+                    "type":"method",
+                    "object":"This.Context",
+                    "method":"OnDragDrop"
+                }
+            }
         },
         "isb2.profileEditor":{
             "type":"window",

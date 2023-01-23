@@ -39,8 +39,34 @@
                     }        
                 }
             ]
-          },        
-        "isb2.editorContexts":{
+          },       
+          "isb2.editorContext.itemviewcontainer":{
+            "type":"panel",
+            "horizontalContentAlignment": "stretch",
+            "verticalContentAlignment": "stretch",
+            "contextMenu":{
+                "jsonTemplate":"isb2.editorContext.Menu"
+            }    
+          },
+          "isb2.editorContext.Menu":{
+            "type":"contextmenu",
+            "jsonTemplate": "contextmenu",
+            "eventHandlers": {
+                "onItemSelected": {
+                  "type": "method",
+                  "object":"This.Context.ItemList.Context",
+                  "method": "OnContextMenu"
+                }
+              },
+              "items": [
+                "Copy",
+                "Cut",
+                "Delete",
+                "Move Up",
+                "Move Down"
+              ]
+          },
+            "isb2.editorContexts":{
                 "contexts":[
                 {
                     "name":"main",
@@ -57,12 +83,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.Characters}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.characterView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.characterView",
                                 "context":"character"
                             }
                         },
@@ -72,12 +93,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.Teams}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.teamView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.teamView",
                                 "context":"team"
                             }
                         },
@@ -87,12 +103,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.WindowLayouts}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.windowLayoutView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.windowLayoutView",
                                 "context":"windowLayout"
                             }
                         },
@@ -102,12 +113,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.ClickBars}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.clickBarView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.clickBarView",
                                 "context":"clickBar"
                             },
                             "subItems":[
@@ -117,13 +123,8 @@
                                     "itemsBinding":{
                                         "pullFormat": "${This.Context.Editor.Editing.ClickBarTemplates}"
                                     },
-                                    "itemViewGenerators":{
-                                        "default":{
-                                            "type":"template",
-                                            "template":"isb2.mappableSheetView"
-                                        }
-                                    },
-                                    "context":"mappableSheet"
+                                    "viewTemplate":"isb2.clickBarTemplateView",
+                                    "context":"clickBarTemplate"
                                 }
                             }
                         ]
@@ -134,12 +135,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.HotkeySheets}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.hotkeySheetView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.hotkeySheetView",
                                 "context":"hotkeySheet"
                             }
                         },
@@ -149,12 +145,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.BroadcastProfiles}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.broadcastProfileView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.broadcastProfileView",
                                 "context":"broadcastProfile"
                             }
                         },
@@ -164,12 +155,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.MappableSheets}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.mappableSheetView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.mappableSheetView",
                                 "context":"mappableSheet"
                             }
                         },
@@ -179,12 +165,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.GameMacroSheets}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.gameMacroSheetView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.gameMacroSheetView",
                                 "context":"gameMacroSheet"
                             }
                         },
@@ -194,12 +175,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.Editor.Editing.Variables}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.variableView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.variableView",
                                 "context":"variable"
                             }
                         }
@@ -219,12 +195,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Builders}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.builderView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.builderView",
                                 "context":"builder"
                             }
                         }
@@ -264,12 +235,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Get[slots]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.slotView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.slotView",
                                 "context":"slot"
                             }    
                         },
@@ -311,12 +277,7 @@
                                 "itemsBinding":{
                                     "pullFormat":"${This.Context.EditingItem.Get[virtualMappables]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.virtualMappableView"
-                                    }
-                                }
+                                "viewTemplate":"isb2.virtualMappableView"
                             }
                         }
                     ],
@@ -342,12 +303,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Get[regions]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.windowLayout.regionView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.windowLayout.regionView",
                                 "context":"windowLayout.region"
                             }            
                         }
@@ -367,12 +323,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Get[mappables]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.mappableView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.mappableView",
                                 "context":"mappable"
                             }            
                         }
@@ -392,12 +343,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Get[hotkeys]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.hotkeyView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.hotkeyView",
                                 "context":"hotkey"
                             }    
                         }
@@ -426,12 +372,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Get[steps]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.mappable.stepView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.mappable.stepView",
                                 "context":"mappableStep"
                             }    
                         }
@@ -451,12 +392,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Get[actions]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.mappable.actionView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.mappable.actionView",
                                 "context":"action"
                             }    
                         }
@@ -476,12 +412,7 @@
                                 "itemsBinding":{
                                     "pullFormat": "${This.Context.EditingItem.Get[macros]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.gameMacroView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.gameMacroView",
                                 "context":"gameMacro"
                             }    
                         }
@@ -532,12 +463,7 @@
                                 "itemsBinding":{
                                     "pullFormat":"${This.Context.EditingItem.Get[gameKeyBindings]}"
                                 },
-                                "itemViewGenerators":{
-                                    "default":{
-                                        "type":"template",
-                                        "template":"isb2.gameKeyBindingInstanceView"
-                                    }
-                                },
+                                "viewTemplate":"isb2.gameKeyBindingInstanceView",
                                 "context":"gameKeyBindingInstance"
                             }
                         }
@@ -662,6 +588,20 @@
             "jsonTemplate":"isb2.leftPaneExpander",
             "type":"expander",
             "horizontalAlignment":"stretch",
+            "contextMenu":{
+                "jsonTemplate":"contextmenu",
+                "eventHandlers": {
+                    "onItemSelected": {
+                      "type": "method",
+                      "object":"This.Context",
+                      "method": "OnListContextMenu"
+                    }
+                  },
+                  "items": [
+                    "Paste",
+                    "Clear"
+                  ]
+            },
             "content":{
                 "type":"listbox",
                 "jsonTemplate":"isb2.leftPaneList",

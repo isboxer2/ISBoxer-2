@@ -33,17 +33,38 @@ objectdef isb2_profileEditorContext
 
         if ${joItem.Has[-object,list]}
         {
-            joSubItem:Merge["LGUI2.Template[isb2.profileEditor.Context.List]"]
+            joSubItem:Merge["LGUI2.Skin[default].Template[isb2.profileEditor.Context.List]"]
 
             if ${joItem.Get[list].Has[-string,context]}
             {
                 joItem.Get[list]:SetString["_context","${joItem.Get[list,context]~}"]
+                joSubItem:SetString["_context","${joItem.Get[list,context]~}"]
             }
+
+            variable string useTemplate
+            variable jsonvalueref joNewTemplate
+            if ${joItem.Get[list].Has[-string,viewTemplate]}
+            {
+                useTemplate:Set["${joItem.Get[list,viewTemplate]~}"]
+                joNewTemplate:SetReference["LGUI2.Template[\"${useTemplate~}\"]"]
+;                if !${joNewTemplate.Reference(exists)}
+                {
+                    if !${joNewTemplate.Reference(exists)}
+                    {
+                        joNewTemplate:SetReference["LGUI2.Template[\"isb2.commonView\"]"]
+                        useTemplate:Set[isb2.commonView]
+                    }
+                    joNewTemplate:Set[contentContainer,"{\"jsonTemplate\":\"isb2.editorContext.itemviewcontainer\"}"]
+                    LGUI2.Skin[default]:SetTemplate["${useTemplate~}.context",joNewTemplate]
+                    joItem.Get[list]:Set["itemViewGenerators","{\"default\":{\"type\":\"template\",\"template\":\"${joItem.Get[list,viewTemplate]~}.context\"}}"]
+                }
+            }
+
             joItem.Get[list]:SetString["_name","${joItem.Get[name]~}"]
 
             joSubItem.Get[content]:Merge["joItem.Get[list]"]
             joSubItem:SetString[contextBinding,"This.Locate[\"\",listbox,ancestor].Context"]
-
+        
 
             joSubItem:SetString[header,"${joItem.Get[name]~}"]
             joSubItem:SetString[itemName,"${joItem.Get[name]~}"]
@@ -74,7 +95,6 @@ objectdef isb2_profileEditorContext
 
         if ${joItem.Has[-string,init]}
             joSubItem:SetString[init,"${joItem.Get[init]~}"]
-
 
         if !${joContainer.Has[items]}
             joContainer:Set[items,"[]"]
@@ -331,6 +351,62 @@ objectdef isb2_profileEditorContext
             subList:ClearSelection
     }
 
+    method OnListContextMenu()
+    {
+        echo "\apcontext[${Name~}]:OnListContextMenu\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~} ${Context.Source.SelectedItem.Data~} ${Context.Source.Parent[l].Metadata~} ${Context.Source.Context.Data~}"
+
+        switch ${Context.Source.SelectedItem.Data}
+        {
+            case Paste
+                {
+                    echo "paste=${System.ClipboardText~}"
+                    variable jsonvalue jo
+                    jo:SetValue["${System.ClipboardText~}"]
+                    if !${jo.Type.Equal[object]}
+                    {
+                        echo "parsing JSON object from clipboard text failed"
+                        return
+                    }
+                }
+                break
+            case Clear
+                break
+        }
+    }
+
+    method OnContextMenu()
+    {
+        echo "\apcontext[${Name~}]:OnContextMenu\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~} ${Context.Source.SelectedItem.Data~} ${Context.Source.Context.ItemList.Metadata~} ${Context.Source.Context.Data~}"
+        switch ${Context.Source.SelectedItem.Data}
+        {
+            case Copy
+                {
+                    variable jsonvalueref joDragDrop
+                    joDragDrop:SetReference["This.GetDragDropItem[\"${Context.Source.Context.ItemList.Metadata.Get[context]~}\",Context.Source.Context.Data]"]
+
+                    if ${joDragDrop.Reference(exists)}
+                    {
+                        System:SetClipboardText["${joDragDrop.AsJSON[multiline]~}"]
+                    }                    
+                    else
+                    {
+                        System:SetClipboardText[""]
+                    }
+
+                    echo "Copied to clipboard. ${joDragDrop~}"
+                }
+                break
+            case Cut
+                break
+            case Delete
+                break
+            case Move Up
+                break
+            case Move Down
+                break
+        }
+    }
+
     method OnDragDrop()
     {
         echo "\apcontext:OnDragDrop\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~}"        
@@ -355,6 +431,25 @@ objectdef isb2_profileEditorContext
         Context:SetHandled[1]
     }
 
+    member:jsonvalueref GetDragDropItem(string itemType, jsonvalueref joItem)
+    {
+        variable jsonvalueref joDragDrop="{}"
+        joDragDrop:SetByRef["item","joItem"]
+        joDragDrop:SetString["profile","${Editor.Editing.Name~}"]
+
+        if ${joItem.Has[name]}
+        {
+            joDragDrop:SetString["icon","${itemType~}: ${joItem.Get[name]~}"]
+        }
+        else
+        {
+            joDragDrop:SetString["icon","${itemType~}"]
+        }
+        joDragDrop:SetString["dragDropItemType","${itemType~}"]
+
+        return joDragDrop
+    }
+
     method OnSubTreeItemMouse1Press()
     {
         ; handle drag-drop. but only if we're holding shift...
@@ -364,19 +459,8 @@ objectdef isb2_profileEditorContext
         echo "\apcontext:OnSubTreeItemMouse1Press\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~} ${Context.Element.Metadata.Get[context]~} ${Context.Source.Item.Data~}"
         variable jsonvalueref joItem
         joItem:SetReference["Context.Source.Item.Data"]
-        variable jsonvalueref joDragDrop="{}"
-        joDragDrop:SetByRef["item","joItem"]
-        joDragDrop:SetString["profile","${Editor.Editing.Name~}"]
-
-        if ${joItem.Has[name]}
-        {
-            joDragDrop:SetString["icon","${Context.Element.Metadata.Get[context]~}: ${joItem.Get[name]~}"]
-        }
-        else
-        {
-            joDragDrop:SetString["icon","${Context.Element.Metadata.Get[context]~}"]
-        }
-        joDragDrop:SetString["dragDropItemType","${Context.Element.Metadata.Get[context]~}"]
+        variable jsonvalueref joDragDrop
+        joDragDrop:SetReference["This.GetDragDropItem[\"${Context.Element.Metadata.Get[context]~}\",joItem]"]
         Context.Source:SetDragDropItem[joDragDrop]
     }
 

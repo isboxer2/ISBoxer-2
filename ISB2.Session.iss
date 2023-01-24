@@ -148,8 +148,22 @@ objectdef isb2session inherits isb2_profileengine
         return jo
     }
 
+    method SetEnableMIDI(bool newValue=TRUE)
+    {
+        Settings:SetBool[enableMidi,${newValue}]
+        This:AutoStoreSettings
 
+        if ${newValue}
+        {
+            MIDI:OpenAllDevicesIn
+        }
+        else
+        {
+            MIDI:CloseAllDevicesIn
+        }
 
+        relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
+    }
 
     method Unicast(string relay_target, string command)
     {

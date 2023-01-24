@@ -5,9 +5,11 @@
 #include "ISB2.QuickSetup.iss"
 #include "ISB2.ProfileEditor.iss"
 
-objectdef isb2 inherits isb2_profilecollection
+objectdef(global) isb2 inherits isb2_profilecollection
 {
     ; Reference to the currently selected Profile in the main window
+    static variable weakref Instance
+
     variable weakref SelectedProfile
 
     variable filepath SettingsFolder
@@ -28,6 +30,7 @@ objectdef isb2 inherits isb2_profilecollection
 
     method Initialize()
     {
+        isb2.Instance:SetReference[This]
         if !${agent.Get[ISBoxer 2](exists)}
         {
             echo "ISBoxer 2 inactive; Agent not found..."
@@ -216,6 +219,28 @@ objectdef isb2 inherits isb2_profilecollection
         Settings:SetBool[showHiddenProfiles,${newValue}]
         This:AutoStoreSettings
         LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated]
+    }
+
+    member:bool EnableMIDI()
+    {
+        return ${Settings.GetBool[enableMidi]}
+    }
+
+    method SetEnableMIDI(bool newValue=TRUE)
+    {
+        Settings:SetBool[enableMidi,${newValue}]
+        This:AutoStoreSettings
+
+        if ${newValue}
+        {
+            MIDI:OpenAllDevicesIn
+        }
+        else
+        {
+            MIDI:CloseAllDevicesIn
+        }
+
+        relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
     }
 
     member:bool QuickLaunch()
@@ -463,6 +488,7 @@ objectdef isb2_managedSlot
 
         joLaunchInfo:SetBool[isb2,1]
         joLaunchInfo:SetByRef["isb2profiles",This.CollectProfiles]
+        joLaunchInfo:SetBool[enableMidi,${Settings.GetBool[enableMidi]}]
         joGLI:SetByRef[metadata,joLaunchInfo]
 
         Script:SetLastError        

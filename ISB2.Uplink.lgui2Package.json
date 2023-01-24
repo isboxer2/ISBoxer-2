@@ -823,6 +823,17 @@
                                             "content":"Dynamic Launch Mode",
                                             "tooltip":"This is a decoy",
                                             "margin":[15,5,0,0]
+                                        },
+                                        {
+                                            "type":"checkbox",
+                                            "_dock":"top",
+                                            "horizontalAlignment":"right",
+                                            "content":"Enable MIDI devices",
+                                            "margin":[15,5,0,0],
+                                            "checkedBinding":{
+                                                "pullFormat":"${ISB2.EnableMIDI}",
+                                                "pushFormat":["ISB2:SetEnableMIDI[\"","\"]"]
+                                            }
                                         }
                                     ]         
                                 }                                

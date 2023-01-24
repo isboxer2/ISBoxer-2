@@ -51,6 +51,12 @@ objectdef isb2_profileEditorContext
                 joSubItem:SetString["_source","${joList.Get[source]~}"]
             }
 
+            if ${joList.Has[new]}
+            {
+                joList:Set["_new","${joList.Get[new].AsJSON~}"]
+                joSubItem:Set["_new","${joList.Get[new].AsJSON~}"]
+            }
+
             variable string useTemplate
             variable jsonvalueref joNewTemplate
             if ${joList.Has[-string,viewTemplate]}
@@ -367,14 +373,23 @@ objectdef isb2_profileEditorContext
     method OnListContextMenu()
     {
         echo "\apcontext[${Name~}]:OnListContextMenu\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~} ${Context.Source.SelectedItem.Data~} ${Context.Source.Parent[l].Metadata~} ${Context.Source.Context.Data~}"
+        variable weakref listElement
+        listElement:SetReference["Context.Source.Parent[l].Content"]
 
         switch ${Context.Source.SelectedItem.Data}
         {
             case New
                 {
-                    Context.Source.Parent[l].Content.ItemsSource:Add["{}"]
-                    Context.Source.Parent[l].Content:RefreshItems
-                    Context.Source.Parent[l].Content:SetItemSelected[${ja.Used},1]
+
+                    if ${listElement.Metadata.Has[new]}
+                    {
+                        listElement.ItemsSource:Add["${listElement.Metadata.Get[new].AsJSON~}"]
+                    }
+                    else
+                        listElement.ItemsSource:Add["{}"]
+
+                    listElement:RefreshItems
+                    listElement:SetItemSelected[${ja.Used},1]
                 }
                 break
             case Paste
@@ -387,9 +402,26 @@ objectdef isb2_profileEditorContext
                         echo "parsing JSON object from clipboard text failed"
                         return
                     }
+
+                    echo "pasted item type=${jo.Get[dragDropItemType]~}"
+
+                    if ${jo.Get[dragDropItemType]~.Equal["${Context.Source.Parent[l].Metadata.Get[context]~}"]}
+                    {
+                        ; is good.
+                        listElement.ItemsSource:Add["${jo.Get[item].AsJSON~}"]
+                    }
+                    else
+                    {
+                        ; is not good.
+                        echo "expected paste item type ${Context.Source.Parent[l].Metadata.Get[context]~}"
+                    }
                 }
                 break
             case Clear
+                {
+                    listElement.ItemsSource:Clear
+                    listElement:RefreshItems                                        
+                }
                 break
         }
     }

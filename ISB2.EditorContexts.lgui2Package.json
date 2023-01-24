@@ -43,17 +43,7 @@
                                 "source":"Editor.Editing.ClickBars",
                                 "viewTemplate":"isb2.clickBarView",
                                 "context":"clickBar"
-                            },
-                            "subItems":[
-                            {
-                                "name":"Click Bar Templates",
-                                "list":{
-                                    "source":"Editor.Editing.ClickBarTemplates",
-                                    "viewTemplate":"isb2.clickBarTemplateView",
-                                    "context":"clickBarTemplate"
-                                }
                             }
-                        ]
                         },
                         {
                             "name":"Hotkey Sheets",
@@ -61,6 +51,14 @@
                                 "source":"Editor.Editing.HotkeySheets",
                                 "viewTemplate":"isb2.hotkeySheetView",
                                 "context":"hotkeySheet"
+                            }
+                        },
+                        {
+                            "name":"Game Key Bindings",
+                            "list":{
+                                "source":"Editor.Editing.GameKeyBindings",
+                                "viewTemplate":"isb2.gameKeyBindingView",
+                                "context":"gameKeyBinding"
                             }
                         },
                         {
@@ -93,6 +91,30 @@
                                 "source":"Editor.Editing.Variables",
                                 "viewTemplate":"isb2.variableView",
                                 "context":"variable"
+                            }
+                        },
+                        {
+                            "name":"VFX Sheets",
+                            "list":{
+                                "source":"Editor.Editing.VFXSheets",
+                                "viewTemplate":"isb2.vfxSheetView",
+                                "context":"vfxsheet"
+                            }
+                        },
+                        {
+                            "name":"Click Bar Templates",
+                            "list":{
+                                "source":"Editor.Editing.ClickBarTemplates",
+                                "viewTemplate":"isb2.clickBarTemplateView",
+                                "context":"clickBarTemplate"
+                            }
+                        },
+                        {
+                            "name":"Image Sheets",
+                            "list":{
+                                "source":"Editor.Editing.ImageSheets",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"imageSheet"
                             }
                         }
                     ]
@@ -179,25 +201,29 @@
                         {
                             "name":"Hotkey Sheets",
                             "list":{
-                                "source":"EditingItem.Get[hotkeySheets]"
+                                "source":"EditingItem.Get[hotkeySheets]",
+                                "new":""
                             }
                         },
                         {
                             "name":"Mappable Sheets",
                             "list":{
-                                "source":"EditingItem.Get[mappableSheets]"
+                                "source":"EditingItem.Get[mappableSheets]",
+                                "new":""
                             }
                         },
                         {
                             "name":"Click Bars",
                             "list":{
-                                "source":"EditingItem.Get[clickBars]"
+                                "source":"EditingItem.Get[clickBars]",
+                                "new":""
                             }
                         },
                         {
                             "name":"Game Macro Sheets",
                             "list":{
-                                "source":"EditingItem.Get[gameMacroSheets]"
+                                "source":"EditingItem.Get[gameMacroSheets]",
+                                "new":""
                             }
                         },
                         {

@@ -811,6 +811,30 @@
                         "pushFormat":["This.Object:SetString[windowTitle,\"","\"]"]
                     },
                     "editTemplate":"propertyview.textbox"                            
+                },               
+                {
+                    "name":"Foreground FPS",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[foregroundFPS]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetInteger[foregroundFPS,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox",
+                    "controlData":{
+                        "textBindingUsesFocus":true
+                    }                            
+                },               
+                {
+                    "name":"Background FPS",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[backgroundFPS]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetInteger[backgroundFPS,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox",
+                    "controlData":{
+                        "textBindingUsesFocus":true
+                    }                                                        
                 }
             ]
         },

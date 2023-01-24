@@ -1,5 +1,5 @@
 
-objectdef isb2_profileEditorContext
+objectdef(global) isb2_profileEditorContext
 {
     variable string Name
     variable string Title
@@ -249,6 +249,32 @@ objectdef isb2_profileEditorContext
         echo "\ayOnConfigurationBuildersDetached\ax"
         
         Editor:ApplyBuilders[EditingItem]
+    }
+#endregion
+
+#region Input Mappings    
+    static member:jsonvalueref GetInputMappingTypeEditor(lgui2elementref element)
+    {        
+        variable string useTemplate="isb2.inputMappingEditor.${element.Context.Get[type]~}"
+        variable jsonvalueref joEditor
+        echo "\ayGetInputMappingTypeEditor\ax ${element} ${element.ID} ${element.Context~} ${useTemplate~}=${joEditor~}"
+
+
+        if ${element.Context.Get[type].NotNULLOrEmpty}
+            joEditor:SetReference["LGUI2.Skin[default].Template[\"${useTemplate~}\"]"]
+        else
+            return NULL
+;            joEditor:SetReference["{\"type\":\"panel\"}"]
+
+        if !${joEditor.Reference(exists)} || !${joEditor.Used}
+        {
+            joEditor:SetReference["LGUI2.Template[isb2.missingContextEditor]"]
+            echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
+            if ${element.Context.Get[type].NotNULLOrEmpty}
+                MissingEditor:Set["Missing template ${useTemplate~}"]
+        }
+
+        return joEditor
     }
 #endregion
 

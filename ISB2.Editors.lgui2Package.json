@@ -43,6 +43,71 @@
                 }
             ]
           },       
+          "propertyview.inputMapping":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "name":"inputMappingEditor.General.container",
+            "contextBinding":{
+                "linkBinding": {
+                    "flags": "ancestor",
+                    "elementType": "propertyview",
+                    "member": "ValueBinding"
+                    }
+            },
+            "children":[
+                {
+                    "_dock":"top",
+                    "type":"stackpanel",
+                    "padding":5,
+                    "orientation":"horizontal",
+                    "children":[
+                        {
+                            "type":"textblock",
+                            "text":"Input Mapping Type",
+                            "margin":[0,0,5,0]
+                        },
+                        {
+                            "type":"autocompletebox",
+                            "name":"inputMappingEditor.autocompletebox",
+                            "dictionary":{
+                                "mappable":{},
+                                "inputMapping":{},
+                                "gameKeyBinding":{},
+                                "hotkey":{},
+                                "trigger":{},
+                                "action":{},
+                                "actions":{}
+                            },
+                            "textBinding":{
+                                "pullFormat":"${This.Context.Get[type]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Context:SetString[type,\"","\"]"]
+                            },
+                            "eventHandlers":{
+                                "onTextChanged":{
+                                    "type":"forward",
+                                    "elementName":"inputMappingEditor.General.container",
+                                    "flags":"ancestor",                                    
+                                    "event":"onInputMappingTypeChanged"
+                                }
+                            }
+                        }        
+                    ]
+                },               
+                {
+                    "_dock":"top",
+                    "type":"dynamic",
+                    "contentBinding":{
+                        "pullFormat":"${isb2_profileEditorContext.GetInputMappingTypeEditor[${This.ID}]}",
+                        "pullHook":{
+                            "elementName":"inputMappingEditor.General.container",
+                            "flags":"ancestor",
+                            "event":"onInputMappingTypeChanged"
+                        }
+                    }
+                }
+            ]
+          },
           "isb2.editorContext.itemviewcontainer":{
             "type":"panel",
             "horizontalContentAlignment": "stretch",
@@ -552,6 +617,39 @@
                         "pushFormat":["This.Object:SetString[game,\"","\"]"]
                     },
                     "editTemplate":"propertyview.textbox"                            
+                }
+            ]
+        },
+        "isb2.hotkeyEditor.General":{
+            "jsonTemplate":"isb2.editorContext.objectview",
+            "properties":[               
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[name]"
+                    },
+                    "editTemplate":"propertyview.textbox"
+                },
+                {
+                    "name":"Key Combo",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[keyCombo]}",
+                        "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[keyCombo]"
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Input Mapping",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[inputMapping]}",
+                        "-pushFormat":["This.Object:Set[inputMapping,\"","\"]"],
+                        "-pushNullFormat":"This.Object:Erase[inputMapping]"
+                    },
+                    "editTemplate":"propertyview.inputMapping"
                 }
             ]
         },
@@ -1325,7 +1423,6 @@
             "type":"dockpanel",
             "padding":5,
             "jsonTemplate":"dockpanel",
-            "verticalAlignment":"stretch",
             "horizontalAlignment":"stretch",
             "children":[
                 {
@@ -1337,7 +1434,6 @@
                     "type":"textbox",
                     "_dock":"top",
                     "horizontalAlignment":"stretch",
-                    "verticalAlignment":"stretch",
                     "textBinding":{
                         "pullFormat":"${This.Context.AsJSON[multiline]}"
                     }

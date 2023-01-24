@@ -16,9 +16,7 @@
                         {
                             "name":"Characters",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.Characters}"
-                                },
+                                "source":"Editor.Editing.Characters",
                                 "viewTemplate":"isb2.characterView",
                                 "context":"character"
                             }
@@ -26,9 +24,7 @@
                         {
                             "name":"Teams",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.Teams}"
-                                },
+                                "source":"Editor.Editing.Teams",
                                 "viewTemplate":"isb2.teamView",
                                 "context":"team"
                             }
@@ -36,9 +32,7 @@
                         {
                             "name":"Window Layouts",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.WindowLayouts}"
-                                },
+                                "source":"Editor.Editing.WindowLayouts",
                                 "viewTemplate":"isb2.windowLayoutView",
                                 "context":"windowLayout"
                             }
@@ -46,9 +40,7 @@
                         {
                             "name":"Click Bars",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.ClickBars}"
-                                },
+                                "source":"Editor.Editing.ClickBars",
                                 "viewTemplate":"isb2.clickBarView",
                                 "context":"clickBar"
                             },
@@ -56,9 +48,7 @@
                             {
                                 "name":"Click Bar Templates",
                                 "list":{
-                                    "itemsBinding":{
-                                        "pullFormat": "${This.Context.Editor.Editing.ClickBarTemplates}"
-                                    },
+                                    "source":"Editor.Editing.ClickBarTemplates",
                                     "viewTemplate":"isb2.clickBarTemplateView",
                                     "context":"clickBarTemplate"
                                 }
@@ -68,9 +58,7 @@
                         {
                             "name":"Hotkey Sheets",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.HotkeySheets}"
-                                },
+                                "source":"Editor.Editing.HotkeySheets",
                                 "viewTemplate":"isb2.hotkeySheetView",
                                 "context":"hotkeySheet"
                             }
@@ -78,9 +66,7 @@
                         {
                             "name":"Broadcast Profiles",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.BroadcastProfiles}"
-                                },
+                                "source":"Editor.Editing.BroadcastProfiles",
                                 "viewTemplate":"isb2.broadcastProfileView",
                                 "context":"broadcastProfile"
                             }
@@ -88,9 +74,7 @@
                         {
                             "name":"Mappable Sheets",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.MappableSheets}"
-                                },
+                                "source":"Editor.Editing.MappableSheets",
                                 "viewTemplate":"isb2.mappableSheetView",
                                 "context":"mappableSheet"
                             }
@@ -98,9 +82,7 @@
                         {
                             "name":"Game Macro Sheets",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.GameMacroSheets}"
-                                },
+                                "source":"Editor.Editing.GameMacroSheets",
                                 "viewTemplate":"isb2.gameMacroSheetView",
                                 "context":"gameMacroSheet"
                             }
@@ -108,9 +90,7 @@
                         {
                             "name":"Variables",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.Editor.Editing.Variables}"
-                                },
+                                "source":"Editor.Editing.Variables",
                                 "viewTemplate":"isb2.variableView",
                                 "context":"variable"
                             }
@@ -128,9 +108,7 @@
                         {
                             "name":"Configuration Builders",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Builders}"
-                                },
+                                "source":"EditingItem.Builders",
                                 "viewTemplate":"isb2.builderView",
                                 "context":"builder"
                             }
@@ -147,15 +125,18 @@
                         },
                         {
                             "name":"Team",
-                            "context":"team"
+                            "context":"team",
+                            "item":"This.EditingItem.Get[team]"
                         },
                         {
                             "name":"Slot",
-                            "context":"slot"
+                            "context":"slot",
+                            "item":"This.EditingItem.Get[slot]"
                         },
                         {
                             "name":"Character",
-                            "context":"character"
+                            "context":"character",
+                            "item":"This.EditingItem.Get[character]"
                         }
                     ]
                 },
@@ -190,9 +171,7 @@
                         {
                             "name":"Slots",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Get[slots]}"
-                                },
+                                "source":"EditingItem.Get[slots]",
                                 "viewTemplate":"isb2.slotView",
                                 "context":"slot"
                             }    
@@ -200,41 +179,31 @@
                         {
                             "name":"Hotkey Sheets",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat":"${This.Context.EditingItem.Get[hotkeySheets]}"
-                                }
+                                "source":"EditingItem.Get[hotkeySheets]"
                             }
                         },
                         {
                             "name":"Mappable Sheets",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat":"${This.Context.EditingItem.Get[mappableSheets]}"
-                                }
+                                "source":"EditingItem.Get[mappableSheets]"
                             }
                         },
                         {
                             "name":"Click Bars",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat":"${This.Context.EditingItem.Get[clickBars]}"
-                                }
+                                "source":"EditingItem.Get[clickBars]"
                             }
                         },
                         {
                             "name":"Game Macro Sheets",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat":"${This.Context.EditingItem.Get[gameMacroSheets]}"
-                                }
+                                "source":"EditingItem.Get[gameMacroSheets]"
                             }
                         },
                         {
                             "name":"Virtual Mappables",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat":"${This.Context.EditingItem.Get[virtualMappables]}"
-                                },
+                                "source":"EditingItem.Get[virtualMappables]",
                                 "viewTemplate":"isb2.virtualMappableView"
                             }
                         }
@@ -258,9 +227,7 @@
                         {
                             "name":"Regions",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Get[regions]}"
-                                },
+                                "source":"EditingItem.Get[regions]",
                                 "viewTemplate":"isb2.windowLayout.regionView",
                                 "context":"windowLayout.region"
                             }            
@@ -278,9 +245,7 @@
                         {
                             "name":"Mappables",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Get[mappables]}"
-                                },
+                                "source":"EditingItem.Get[mappables]",
                                 "viewTemplate":"isb2.mappableView",
                                 "context":"mappable"
                             }            
@@ -298,9 +263,7 @@
                         {
                             "name":"Hotkeys",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Get[hotkeys]}"
-                                },
+                                "source":"EditingItem.Get[hotkeys]",
                                 "viewTemplate":"isb2.hotkeyView",
                                 "context":"hotkey"
                             }    
@@ -327,9 +290,7 @@
                         {
                             "name":"Steps",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Get[steps]}"
-                                },
+                                "source":"EditingItem.Get[steps]",
                                 "viewTemplate":"isb2.mappable.stepView",
                                 "context":"mappableStep"
                             }    
@@ -347,9 +308,7 @@
                         {
                             "name":"Actions",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Get[actions]}"
-                                },
+                                "source":"EditingItem.Get[actions]",
                                 "viewTemplate":"isb2.mappable.actionView",
                                 "context":"action"
                             }    
@@ -367,9 +326,7 @@
                         {
                             "name":"Macros",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat": "${This.Context.EditingItem.Get[macros]}"
-                                },
+                                "source":"EditingItem.Get[macros]",
                                 "viewTemplate":"isb2.gameMacroView",
                                 "context":"gameMacro"
                             }    
@@ -410,17 +367,13 @@
                         {
                             "name":"VFX Sheets",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat":"${This.Context.EditingItem.Get[vfxSheets]}"
-                                }
+                                "source":"EditingItem.Get[vfxSheets]"
                             }
                         },
                         {
                             "name":"Game Key Bindings",
                             "list":{
-                                "itemsBinding":{
-                                    "pullFormat":"${This.Context.EditingItem.Get[gameKeyBindings]}"
-                                },
+                                "source":"EditingItem.Get[gameKeyBindings]",
                                 "viewTemplate":"isb2.gameKeyBindingInstanceView",
                                 "context":"gameKeyBindingInstance"
                             }

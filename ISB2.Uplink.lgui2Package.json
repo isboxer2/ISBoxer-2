@@ -397,6 +397,23 @@
                 ]    
             }
         },
+        "isb2.QuickSetup.characterPreview":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"panel",
+                "horizontalAlignment":"stretch",
+                "children":[
+                    {
+                        "type":"textblock",
+                        "textBinding":{
+                            "pullFormat":"${_CONTEXTITEMDATA_.Get[name]}",
+                            "pullReplaceNull":""
+                        }
+                    }    
+                ]    
+            }
+        },
         "isb2.QuickSetup.characterView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -1792,7 +1809,29 @@
                                     "_dock":"top",
                                     "type":"expander",
                                     "header":"Characters (${ISB2QuickSetup.Characters.Used})",
-                                    "content":"This is a decoy"
+                                    "content":{
+                                        "type":"listbox",
+                                        "_dock":"top",
+                                        "contentContainer":{
+                                            "jsonTemplate":"listbox.contentContainerFitWidth"
+                                        },
+                                        "minSize":[0,200],
+                                        "horizontalAlignment":"stretch",
+                                        "itemsBinding":{
+                                            "pullFormat":"${ISB2QuickSetup.Characters}",
+                                            "pullHook": {
+                                                "elementName": "isb2.QuickSetupWindow",
+                                                "flags": "global",
+                                                "event": "onCharactersUpdated"
+                                            }
+                                        },
+                                        "itemViewGenerators":{
+                                            "default":{
+                                                "type":"template",
+                                                "template":"isb2.QuickSetup.characterPreview"
+                                            }
+                                        }
+                                    }
                                 },
                                 {
                                     "_dock":"top",

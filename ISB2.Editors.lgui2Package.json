@@ -1216,6 +1216,83 @@
                 }
             ]
         },
+        "isb2.windowLayoutEditor.General":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "_dock":"top",
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context.EditingItem}",
+                      "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Description",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[description]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[description,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                }
+            ]
+        },
+        "isb2.hotkeySheetEditor.General":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "_dock":"top",
+                    "type":"objectview",
+                    "verticalAlignment":"stretch",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                      "pullFormat":"${This.Context.EditingItem}",
+                      "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[name]}",
+                              "pullReplaceNull":"",
+                              "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Enable",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.GetBool[enable]}",
+                                "pushFormat":["This.Object:SetBool[enable,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[enable]"
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true,
+                                "tooltip":"Enable blah blah blah"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },        
         "isb2.mappableSheetEditor.General":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",

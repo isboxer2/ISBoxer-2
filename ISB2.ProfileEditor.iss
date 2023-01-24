@@ -304,7 +304,7 @@ objectdef(global) isb2_profileEditorContext
         return joEditor
     }
     
-    member:jsonvalueref GetActionAutoComplete(string _type, string name, string subList)
+    static member:jsonvalueref GetActionAutoComplete(string _type, string name, string subList)
     {
         echo "\ayGetActionAutoComplete\ax \"${_type~}\" \"${name~}\" \"${subList~}\""
 
@@ -643,6 +643,7 @@ objectdef isb2_profileeditor inherits isb2_building
     {
         ISB2:BuildAutoComplete[Characters]
         ISB2:BuildAutoComplete[MappableSheets]
+        ISB2:BuildAutoComplete[GameKeyBindings]
         ISB2:BuildActionsAutoComplete
         
     }

@@ -42,7 +42,77 @@
                     }        
                 }
             ]
+          },
+          "isb2.inputMappingEditor.gameKeyBinding":{
+            "jsonTemplate":"isb2.inputMappingContext.objectview",
+            "properties":[                
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[GameKeyBindings]}"
+                        }
+                    }
+                }
+            ]
           },       
+          "isb2.inputMappingEditor.mappable":{
+            "jsonTemplate":"isb2.inputMappingContext.objectview",
+            "properties":[
+                {
+                    "name":"Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[sheet]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[sheet,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                        },
+                        "hooks":{                           
+                            "textChanged":{
+                                "flags":"self",
+                                "event":"onTextChanged",
+                                "eventHandler":{
+                                    "type":"forward",
+                                    "elementType":"objectview",
+                                    "flags":"ancestor",
+                                    "event":"onMappableSheetChanged"
+                                }
+                            }
+                        }
+                    }                            
+                },
+                {
+                    "name":"Mappable",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.Get[sheet]~}\",mappables]}",
+                            "pullOnce":true,
+                            "pullHook":{
+                                "elementType":"objectview",
+                                "flags":"ancestor",
+                                "event":"onMappableSheetChanged"
+                            }
+                        }
+                    }
+                }
+            ]
+          },
           "propertyview.inputMapping":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
@@ -142,6 +212,15 @@
             "font":{
                 "bold":true,
                 "heightFactor":1.2
+            }
+        },
+        "isb2.inputMappingContext.objectview":{
+            "type":"objectview",
+            "jsonTemplate":"objectview",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context}",
+                "pullOnce":true
             }
         },
         "isb2.editorContext.objectview":{
@@ -716,7 +795,7 @@
                     "editTemplate":"propertyview.autocompletebox",
                     "controlData":{
                         "dictionaryBinding":{
-                            "pullFormat":"${This.Context.ObjectView.Context.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",mappables]}",
+                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",mappables]}",
                             "pullOnce":true,
                             "pullHook":{
                                 "elementType":"objectview",
@@ -777,7 +856,7 @@
                     "editTemplate":"propertyview.autocompletebox",
                     "controlData":{
                         "dictionaryBinding":{
-                            "pullFormat":"${This.Context.ObjectView.Context.GetActionAutoComplete[GameMacroSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",macros]}",
+                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[GameMacroSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",macros]}",
                             "pullOnce":true,
                             "pullHook":{
                                 "elementType":"objectview",

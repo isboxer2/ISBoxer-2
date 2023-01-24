@@ -189,6 +189,7 @@
                     }
                   },
                   "items": [
+                    "New",
                     "Paste",
                     "Clear"
                   ]
@@ -417,6 +418,47 @@
                     "editTemplate":"propertyview.textbox"                            
                 }
 
+            ]
+        },
+        "isb2.builderEditor.General":{
+            "jsonTemplate":"objectview",
+            "type":"objectview",
+            "verticalAlignment":"stretch",
+            "horizontalAlignment":"stretch",
+            "objectBinding":{
+                "pullFormat":"${This.Context.EditingItem}",
+                "pullOnce":true
+            },
+            "properties":[
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:Set[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Description",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[description]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:Set[description,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[description]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox"                            
+                },
+                {
+                    "name":"Builder Group",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[builderGroup]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:Set[builderGroup,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[builderGroup]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox"                            
+                }
             ]
         },
         "isb2.gameMacroEditor.General":{

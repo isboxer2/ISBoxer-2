@@ -31,21 +31,31 @@ objectdef isb2_profileEditorContext
         echo "\ayAddSubItem item\ax=${joItem~}"
         variable jsonvalueref joSubItem="{}"
 
+        variable jsonvalueref joList
+
         if ${joItem.Has[-object,list]}
         {
+            joList:SetReference["joItem.Get[list]"]
             joSubItem:Merge["LGUI2.Skin[default].Template[isb2.profileEditor.Context.List]"]
 
-            if ${joItem.Get[list].Has[-string,context]}
+            if ${joList.Has[-string,context]}
             {
-                joItem.Get[list]:SetString["_context","${joItem.Get[list,context]~}"]
-                joSubItem:SetString["_context","${joItem.Get[list,context]~}"]
+                joList:SetString["_context","${joList.Get[context]~}"]
+                joSubItem:SetString["_context","${joList.Get[context]~}"]
+            }
+
+            if ${joList.Has[-string,source]}
+            {
+                joList:Set[itemsBinding,"{\"pullFormat\":\"\${This.Context.${joList.Get[source]~}}\"}"]
+                joList:SetString["_source","${joList.Get[source]~}"]
+                joSubItem:SetString["_source","${joList.Get[source]~}"]
             }
 
             variable string useTemplate
             variable jsonvalueref joNewTemplate
-            if ${joItem.Get[list].Has[-string,viewTemplate]}
+            if ${joList.Has[-string,viewTemplate]}
             {
-                useTemplate:Set["${joItem.Get[list,viewTemplate]~}"]
+                useTemplate:Set["${joList.Get[viewTemplate]~}"]
                 joNewTemplate:SetReference["LGUI2.Template[\"${useTemplate~}\"]"]
 ;                if !${joNewTemplate.Reference(exists)}
                 {
@@ -56,13 +66,13 @@ objectdef isb2_profileEditorContext
                     }
                     joNewTemplate:Set[contentContainer,"{\"jsonTemplate\":\"isb2.editorContext.itemviewcontainer\"}"]
                     LGUI2.Skin[default]:SetTemplate["${useTemplate~}.context",joNewTemplate]
-                    joItem.Get[list]:Set["itemViewGenerators","{\"default\":{\"type\":\"template\",\"template\":\"${joItem.Get[list,viewTemplate]~}.context\"}}"]
+                    joList:Set["itemViewGenerators","{\"default\":{\"type\":\"template\",\"template\":\"${joList.Get[viewTemplate]~}.context\"}}"]
                 }
             }
 
-            joItem.Get[list]:SetString["_name","${joItem.Get[name]~}"]
+            joList:SetString["_name","${joItem.Get[name]~}"]
 
-            joSubItem.Get[content]:Merge["joItem.Get[list]"]
+            joSubItem.Get[content]:Merge["joList"]
             joSubItem:SetString[contextBinding,"This.Locate[\"\",listbox,ancestor].Context"]
         
 
@@ -360,6 +370,13 @@ objectdef isb2_profileEditorContext
 
         switch ${Context.Source.SelectedItem.Data}
         {
+            case New
+                {
+                    Context.Source.Parent[l].Content.ItemsSource:Add["{}"]
+                    Context.Source.Parent[l].Content:RefreshItems
+                    Context.Source.Parent[l].Content:SetItemSelected[${ja.Used},1]
+                }
+                break
             case Paste
                 {
                     echo "paste=${System.ClipboardText~}"
@@ -402,6 +419,10 @@ objectdef isb2_profileEditorContext
             case Cut
                 break
             case Delete
+                {
+                    Context.Source.Context.ItemList.ItemsSource:Erase["${Context.Source.Context.Index}"]
+                    Context.Source.Context.ItemList:RefreshItems
+                }
                 break
             case Move Up
                 break

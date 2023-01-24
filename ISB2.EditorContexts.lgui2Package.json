@@ -1,0 +1,440 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
+    "skin":"ISBoxer 2",
+    "templates": {
+            "isb2.editorContexts":{
+                "contexts":[
+                {
+                    "name":"main",
+                    "title":"",
+                    "subItems":[
+                        {
+                            "name":"Profile",
+                            "item":"EditingItem",
+                            "context":"profile"
+                        },
+                        {
+                            "name":"Characters",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.Characters}"
+                                },
+                                "viewTemplate":"isb2.characterView",
+                                "context":"character"
+                            }
+                        },
+                        {
+                            "name":"Teams",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.Teams}"
+                                },
+                                "viewTemplate":"isb2.teamView",
+                                "context":"team"
+                            }
+                        },
+                        {
+                            "name":"Window Layouts",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.WindowLayouts}"
+                                },
+                                "viewTemplate":"isb2.windowLayoutView",
+                                "context":"windowLayout"
+                            }
+                        },
+                        {
+                            "name":"Click Bars",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.ClickBars}"
+                                },
+                                "viewTemplate":"isb2.clickBarView",
+                                "context":"clickBar"
+                            },
+                            "subItems":[
+                            {
+                                "name":"Click Bar Templates",
+                                "list":{
+                                    "itemsBinding":{
+                                        "pullFormat": "${This.Context.Editor.Editing.ClickBarTemplates}"
+                                    },
+                                    "viewTemplate":"isb2.clickBarTemplateView",
+                                    "context":"clickBarTemplate"
+                                }
+                            }
+                        ]
+                        },
+                        {
+                            "name":"Hotkey Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.HotkeySheets}"
+                                },
+                                "viewTemplate":"isb2.hotkeySheetView",
+                                "context":"hotkeySheet"
+                            }
+                        },
+                        {
+                            "name":"Broadcast Profiles",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.BroadcastProfiles}"
+                                },
+                                "viewTemplate":"isb2.broadcastProfileView",
+                                "context":"broadcastProfile"
+                            }
+                        },
+                        {
+                            "name":"Mappable Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.MappableSheets}"
+                                },
+                                "viewTemplate":"isb2.mappableSheetView",
+                                "context":"mappableSheet"
+                            }
+                        },
+                        {
+                            "name":"Game Macro Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.GameMacroSheets}"
+                                },
+                                "viewTemplate":"isb2.gameMacroSheetView",
+                                "context":"gameMacroSheet"
+                            }
+                        },
+                        {
+                            "name":"Variables",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.Editor.Editing.Variables}"
+                                },
+                                "viewTemplate":"isb2.variableView",
+                                "context":"variable"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name":"profile",
+                    "title":"Profile: ${EditingItem.Name}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.profileEditor.General"
+                        },
+                        {
+                            "name":"Configuration Builders",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Builders}"
+                                },
+                                "viewTemplate":"isb2.builderView",
+                                "context":"builder"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name":"builder",
+                    "title":"Builder: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.builderEditor.General"
+                        },
+                        {
+                            "name":"Team",
+                            "context":"team"
+                        },
+                        {
+                            "name":"Slot",
+                            "context":"slot"
+                        },
+                        {
+                            "name":"Character",
+                            "context":"character"
+                        }
+                    ]
+                },
+                {
+                    "name":"character",
+                    "title":"Character: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.characterEditor.General"
+                        },
+                        {
+                            "name":"Game Launch Info",
+                            "template":"isb2.characterEditor.GameLaunchInfo",
+                            "item":"EditingItem.Get[gameLaunchInfo]"
+                        }
+                    ]
+                },
+                {
+                    "name":"team",
+                    "title":"Team: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.teamEditor.General"
+                        },
+                        {
+                            "name":"Configuration Builders",
+                            "template":"isb2.teamEditor.ConfigurationBuilders",
+                            "init":"InitConfigurationBuilders"
+                        },
+                        {
+                            "name":"Slots",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Get[slots]}"
+                                },
+                                "viewTemplate":"isb2.slotView",
+                                "context":"slot"
+                            }    
+                        },
+                        {
+                            "name":"Hotkey Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[hotkeySheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Mappable Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[mappableSheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Click Bars",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[clickBars]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Game Macro Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[gameMacroSheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Virtual Mappables",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[virtualMappables]}"
+                                },
+                                "viewTemplate":"isb2.virtualMappableView"
+                            }
+                        }
+                    ],
+                    "dragDrop":{
+                        "windowLayout":{
+                            "type":"copy",
+                            "inProperty":"name",
+                            "outProperty":"windowLayout"
+                        }
+                    }
+                },
+                {
+                    "name":"windowLayout",
+                    "title":"Window Layout: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.windowLayoutEditor.General"
+                        },
+                        {
+                            "name":"Regions",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Get[regions]}"
+                                },
+                                "viewTemplate":"isb2.windowLayout.regionView",
+                                "context":"windowLayout.region"
+                            }            
+                        }
+                    ]
+                },
+                {
+                    "name":"mappableSheet",
+                    "title":"Mappable Sheet: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.mappableSheetEditor.General"
+                        },
+                        {
+                            "name":"Mappables",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Get[mappables]}"
+                                },
+                                "viewTemplate":"isb2.mappableView",
+                                "context":"mappable"
+                            }            
+                        }
+                    ]
+                },
+                {
+                    "name":"hotkeySheet",
+                    "title":"Hotkey Sheet: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.hotkeySheetEditor.General"
+                        },
+                        {
+                            "name":"Hotkeys",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Get[hotkeys]}"
+                                },
+                                "viewTemplate":"isb2.hotkeyView",
+                                "context":"hotkey"
+                            }    
+                        }
+                    ]
+                },
+                {
+                    "name":"hotkey",
+                    "title":"Hotkey: ${EditingItem.Get[name]}",
+                    "template":"isb2.hotkeyEditor.General"
+                },
+                {
+                    "name":"action",
+                    "template":"isb2.actionEditor.General"
+                },
+                {
+                    "name":"mappable",
+                    "title":"Mappable: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.mappableEditor.General"
+                        },
+                        {
+                            "name":"Steps",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Get[steps]}"
+                                },
+                                "viewTemplate":"isb2.mappable.stepView",
+                                "context":"mappableStep"
+                            }    
+                        }
+                    ]
+                },
+                {
+                    "name":"mappableStep",
+                    "title":"Step",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.mappableStepEditor.General"
+                        },
+                        {
+                            "name":"Actions",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Get[actions]}"
+                                },
+                                "viewTemplate":"isb2.mappable.actionView",
+                                "context":"action"
+                            }    
+                        }
+                    ]
+                },
+                {
+                    "name":"gameMacroSheet",
+                    "title":"Game Macro Sheet: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.gameMacroSheetEditor.General"
+                        },
+                        {
+                            "name":"Macros",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat": "${This.Context.EditingItem.Get[macros]}"
+                                },
+                                "viewTemplate":"isb2.gameMacroView",
+                                "context":"gameMacro"
+                            }    
+                        }
+                    ]                                    
+                },
+                {
+                    "name":"gameMacro",
+                    "title":"Game Macro: ${EditingItem.Get[name]}",
+                    "template":"isb2.gameMacroEditor.General"
+                },
+                {
+                    "name":"clickBar",
+                    "title":"Click Bar: ${EditingItem.Get[name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.clickBarEditor.General"
+                        },
+                        {
+                            "name":"Template",
+                            "template":"isb2.clickBarEditor.Template"
+                        },
+                        {
+                            "name":"Button Layout",
+                            "template":"isb2.clickBarEditor.ButtonLayout"
+                        }
+                    ]                                    
+                },
+                {
+                    "name":"slot",
+                    "title":"Slot",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.slotEditor.General"
+                        },
+                        {
+                            "name":"VFX Sheets",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[vfxSheets]}"
+                                }
+                            }
+                        },
+                        {
+                            "name":"Game Key Bindings",
+                            "list":{
+                                "itemsBinding":{
+                                    "pullFormat":"${This.Context.EditingItem.Get[gameKeyBindings]}"
+                                },
+                                "viewTemplate":"isb2.gameKeyBindingInstanceView",
+                                "context":"gameKeyBindingInstance"
+                            }
+                        }
+                    ],
+                    "dragDrop":{
+                        "character":{
+                            "type":"copy",
+                            "inProperty":"name",
+                            "outProperty":"character"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

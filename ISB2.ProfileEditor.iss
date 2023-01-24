@@ -150,9 +150,12 @@ objectdef isb2_profileEditorContext
             Data.Get[subItems]:ForEach["This:AddSubItem[joLeftPaneContainer,ForEach.Value]"]          
         }
 
-        if !${useTemplate.NotNULLOrEmpty} && ${Data.Has[-string,template]}
+        if !${useTemplate.NotNULLOrEmpty}
         {
-            useTemplate:Set["${Data.Get[template]~}"]
+            if ${Data.Has[-string,template]}
+                useTemplate:Set["${Data.Get[template]~}"]
+            else
+                useTemplate:Set["isb2.${Name}Editor.General"]
         }
 
         joEditor:SetReference["LGUI2.Template[\"${useTemplate~}\"]"]
@@ -548,6 +551,8 @@ objectdef isb2_profileeditor inherits isb2_building
 
         MainContext:Attach[${Window.Locate["editor.container"].ID}]
         This:BuildAutoComplete
+
+        LGUI2.Element[isb2.events]:FireEventHandler[profileEditorOpened]
     }
 
     method Shutdown()
@@ -574,6 +579,7 @@ objectdef isb2_profileeditor inherits isb2_building
         MainContext:Attach[${Window.Locate["editor.container"].ID}]
         if ${This.Editing:Store(exists)}
         {
+            LGUI2.Element[isb2.events]:FireEventHandler[profileSaved]
             echo "\agSaved.\ax"
         }
         else
@@ -584,7 +590,7 @@ objectdef isb2_profileeditor inherits isb2_building
 
     member:weakref GetContext(string name)
     {
-        echo "\arGetContext\ax ${name~}"
+        echo "\ayGetContext\ax ${name~}"
         if !${name.NotNULLOrEmpty}
             return NULL
 
@@ -592,6 +598,7 @@ objectdef isb2_profileeditor inherits isb2_building
         useContext:SetReference["Contexts.Get[\"${name~}\"]"]
         if !${useContext.Reference(exists)}
         {
+            echo "\atGetContext: Missing/new context\ax ${name~}"
             Contexts:Set["${name~}",This,"{\"name\":\"${name~}\"}"]
             useContext:SetReference["Contexts.Get[\"${name~}\"]"]
         }

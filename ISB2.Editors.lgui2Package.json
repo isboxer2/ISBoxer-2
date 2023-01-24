@@ -732,6 +732,40 @@
                 }
             ]
         },
+        "isb2.gameKeyBindingEditor.General":{
+            "jsonTemplate":"isb2.editorContext.objectview",
+            "properties":[               
+                {
+                    "name":"Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[name]"
+                    },
+                    "editTemplate":"propertyview.textbox"
+                },
+                {
+                    "name":"Key Combo",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[keyCombo]}",
+                        "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[keyCombo]"
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Category",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[category]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[category,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[category]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox"
+                }
+            ]
+        },
         "isb2.actionEditor.keystroke":{
             "jsonTemplate":"isb2.editorContext.objectview",
             "properties":[               

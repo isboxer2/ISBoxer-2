@@ -555,6 +555,30 @@
                 }
             ]
         },
+        "isb2.actionEditor.keystroke":{
+            "jsonTemplate":"isb2.editorContext.objectview",
+            "properties":[               
+                {
+                    "name":"Key Combo",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[keyCombo]}",
+                        "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[keyCombo]"
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Target",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[target]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[target,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[target]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox"
+                }
+            ]
+        },
         "isb2.actionEditor.mappable":{
             "jsonTemplate":"isb2.editorContext.objectview",
             "properties":[
@@ -810,6 +834,20 @@
                         "pushFormat":["This.Object:SetString[name,\"","\"]"]
                     },
                     "editTemplate":"propertyview.textbox"                            
+                },
+                {
+                    "name":"Hold",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetBool[hold]}",
+                        "pushFormat":["This.Object:SetBool[hold,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[hold]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "tooltip":"Enabling this will Hold any outputs (e.g. key or mouse button) while the input (e.g. hotkey, click bar button) is held\nIf not specified, the Mappable Sheet's value will be used.",
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
                 }
             ]
         },
@@ -1238,6 +1276,20 @@
                               "pushFormat":["This.Object:SetString[name,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
+                        },
+                        {
+                            "name":"Hold",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.GetBool[hold]}",
+                                "pushFormat":["This.Object:SetBool[hold,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[hold]"
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "tooltip":"Enabling this will Hold any outputs (e.g. key or mouse button) while the input (e.g. hotkey, click bar button) is held",
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }
                         }
                     ]
                 }

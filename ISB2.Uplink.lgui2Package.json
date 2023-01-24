@@ -852,6 +852,7 @@
                                                     "type":"button",
                                                     "_dock":"top",
                                                     "content":"Import ...",
+                                                    "tooltip":"Import an ISBoxer 1 Toolkit profile into ISBoxer 2",
                                                     "eventHandlers":{
                                                         "onPress":{
                                                             "type":"method",
@@ -865,6 +866,7 @@
                                                     "_dock":"top",
                                                     "margin":[0,5,0,0],
                                                     "content":"Load ...",
+                                                    "tooltip":"Load an existing ISBoxer 2 Profile",
                                                     "eventHandlers":{
                                                         "onPress":{
                                                             "type":"method",

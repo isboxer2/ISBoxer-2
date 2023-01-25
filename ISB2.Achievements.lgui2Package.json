@@ -26,6 +26,25 @@
                     "flavor":"You think you're getting good then?",
                     "count":10,
                     "hook":"profileEditorOpened"
+                },
+                {
+                    "id":4,
+                    "name":"Profile Saved!",
+                    "flavor":"Your first time is the one you will never forget!",
+                    "hook":"profileSaved"
+                },
+                {
+                    "id":5,
+                    "name":"Do you REALLY want to make these changes?",
+                    "flavor":"Click Yes to format your computer.",
+                    "count":10,
+                    "hook":"profileSaved"
+                },
+                {
+                    "id":6,
+                    "name":"Team Launched!",
+                    "flavor":"Hold on to your butts!",
+                    "hook":"onTeamLaunched"
                 }
             ]
         }

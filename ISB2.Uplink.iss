@@ -1006,6 +1006,7 @@ objectdef isb2_slotmanager
             if ${This.Active}
                 return TRUE
             This:Stop
+            LGUI2.Element[isb2.events]:FireEventHandler[onTeamLaunched]
             return FALSE
         }
 
@@ -1022,6 +1023,7 @@ objectdef isb2_slotmanager
                     return TRUE
 
                 This:Stop
+                LGUI2.Element[isb2.events]:FireEventHandler[onTeamLaunched]
                 return FALSE
             }
 

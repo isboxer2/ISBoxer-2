@@ -460,7 +460,7 @@ objectdef(global) isb2_profileEditorContext
             case Copy
                 {
                     variable jsonvalueref joDragDrop
-                    joDragDrop:SetReference["This.GetDragDropItem[\"${Context.Source.Context.ItemList.Metadata.Get[context]~}\",Context.Source.Context.Data]"]
+                    joDragDrop:SetReference["This.GetDragDropItem[\"${Context.Source.Context.ItemList.Metadata.Get[context]~}\",Context.Source.Context]"]
 
                     if ${joDragDrop.Reference(exists)}
                     {
@@ -513,20 +513,35 @@ objectdef(global) isb2_profileEditorContext
         Context:SetHandled[1]
     }
 
-    member:jsonvalueref GetDragDropItem(string itemType, jsonvalueref joItem)
+    member:jsonvalueref GetDragDropItem(string itemType, weakref listItem)
     {
+        echo "GetDragDropItem ${listItem.Data~}"
         variable jsonvalueref joDragDrop="{}"
-        joDragDrop:SetByRef["item","joItem"]
+
+        switch ${listItem.Data(type)}
+        {
+            case jsonobject
+                if ${joItem.Has[name]}
+                {
+                    joDragDrop:SetString["icon","${itemType~}: ${joItem.Get[name]~}"]
+                }
+                else
+                {
+                    joDragDrop:SetString["icon","${itemType~}"]
+                }
+                joDragDrop:SetByRef["item","listItem.Data"]
+                break
+            case jsonarray
+                joDragDrop:SetString["icon","${itemType~}"]
+                joDragDrop:SetByRef["item","listItem.Data"]
+                break
+            default
+                joDragDrop:Set["item","${listItem.Data.AsJSON~}"]
+                joDragDrop:SetString["icon","${itemType~}: ${listItem.Data~}"]
+                break
+        }
         joDragDrop:SetString["profile","${Editor.Editing.Name~}"]
 
-        if ${joItem.Has[name]}
-        {
-            joDragDrop:SetString["icon","${itemType~}: ${joItem.Get[name]~}"]
-        }
-        else
-        {
-            joDragDrop:SetString["icon","${itemType~}"]
-        }
         joDragDrop:SetString["dragDropItemType","${itemType~}"]
 
         return joDragDrop
@@ -539,10 +554,8 @@ objectdef(global) isb2_profileEditorContext
             return
 
         echo "\apcontext:OnSubTreeItemMouse1Press\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~} ${Context.Element.Metadata.Get[context]~} ${Context.Source.Item.Data~}"
-        variable jsonvalueref joItem
-        joItem:SetReference["Context.Source.Item.Data"]
         variable jsonvalueref joDragDrop
-        joDragDrop:SetReference["This.GetDragDropItem[\"${Context.Element.Metadata.Get[context]~}\",joItem]"]
+        joDragDrop:SetReference["This.GetDragDropItem[\"${Context.Element.Metadata.Get[context]~}\",Context.Source.Item]"]
         Context.Source:SetDragDropItem[joDragDrop]
     }
 

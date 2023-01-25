@@ -178,6 +178,82 @@
                 }
             ]
           },
+          "propertyview.gameLaunchInfo":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "name":"gameLaunchInfoEditor.General.container",
+            "contextBinding":{
+                "linkBinding": {
+                    "flags": "ancestor",
+                    "elementType": "propertyview",
+                    "member": "ValueBinding"
+                    }
+            },
+            "children":[
+                {
+                    "type":"objectview",
+                    "jsonTemplate":"objectview",
+                    "horizontalAlignment":"stretch",
+                    "objectBinding":{
+                        "pullFormat":"${This.Context}",
+                        "pullOnce":true
+                    },
+                    "properties":[
+                        {
+                            "name":"Game",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[game]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:Set[game,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[game]"
+                            },
+                            "editTemplate":"propertyview.cancelabletextbox"                            
+                        },
+                        {
+                            "name":"Game Profile",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[gameProfile]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:Set[gameProfile,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[gameProfile]"
+                            },
+                            "editTemplate":"propertyview.cancelabletextbox"                            
+                        },
+                        {
+                            "name":"Executable",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[executable]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:Set[executable,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[executable]"
+                            },
+                            "editTemplate":"propertyview.cancelabletextbox"                            
+                        },
+                        {
+                            "name":"Path",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[path]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:Set[executable,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[executable]"
+                            },
+                            "editTemplate":"propertyview.cancelabletextbox"                            
+                        },
+                        {
+                            "name":"Parameters",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[parameters]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:Set[parameters,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[parameters]"
+                            },
+                            "editTemplate":"propertyview.cancelabletextbox"                            
+                        }
+        
+                    ]        
+                }
+            ]
+          },
           "isb2.editorContext.itemviewcontainer":{
             "type":"panel",
             "horizontalContentAlignment": "stretch",
@@ -724,7 +800,7 @@
                 {
                     "name":"Input Mapping",
                     "dataBinding":{
-                        "pullFormat":"${This.Object.Get[inputMapping]}",
+                        "pullFormat":"${This.Object.Get[-init,{},inputMapping]}",
                         "-pushFormat":["This.Object:Set[inputMapping,\"","\"]"],
                         "-pushNullFormat":"This.Object:Erase[inputMapping]"
                     },
@@ -1174,6 +1250,15 @@
                         "useIndeterminate":true,
                         "pushAsBool":true
                     }
+                },
+                {
+                    "name":"Game Launch Info",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[-init,{},gameLaunchInfo]}",
+                        "pushFormat":["This.Object:Set[gameLaunchInfo,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[gameLaunchInfo]"
+                    },
+                    "editTemplate":"propertyview.gameLaunchInfo"
                 }
             ]
         },           

@@ -509,6 +509,12 @@ objectdef(global) isb2_profileEditorContext
             case copy
                 EditingItem:Set["${joDragDrop.Get[outProperty]~}","${LGUI2.DragDropItem.Get[item,"${joDragDrop.Get[inProperty]~}"].AsJSON~}"]
                 break
+            case add
+                if ${joDragDrop.Has[-string,inProperty]}
+                    EditingItem.Get[-init,"[]","${joDragDrop.Get[outProperty]~}"]:Add["${LGUI2.DragDropItem.Get[item,"${joDragDrop.Get[inProperty]~}"].AsJSON~}"]
+                else
+                    EditingItem.Get[-init,"[]","${joDragDrop.Get[outProperty]~}"]:Add["${LGUI2.DragDropItem.Get[item].AsJSON~}"]
+                break
         }
         Context:SetHandled[1]
     }

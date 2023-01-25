@@ -116,6 +116,24 @@
             }
         }
     ],
+    "brushes": {
+        "isb2.logo-32":{
+            "imageFile": "Images/ISBoxer 2-32.png",
+            "color":"#ffffff"
+        },
+        "isb2.logo-48":{
+            "imageFile": "Images/ISBoxer 2-48.png",
+            "color":"#ffffff"
+        },
+        "isb2.logo-256":{
+            "imageFile": "Images/ISBoxer 2-256.png",
+            "color":"#ffffff"
+        },
+        "isb2.logo-blank":{
+            "imageFile": "Images/ISBoxer 2-blank.png",
+            "color":"#ffffff"
+        }
+    },
     "templates":{
         "isb2.data":{
             "games":[

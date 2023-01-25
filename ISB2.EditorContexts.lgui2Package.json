@@ -105,7 +105,7 @@
                             "name":"Click Bar Templates",
                             "list":{
                                 "source":"Editor.Editing.ClickBarTemplates",
-                                "viewTemplate":"isb2.clickBarTemplateView",
+                                "viewTemplate":"isb2.commonView",
                                 "context":"clickBarTemplate"
                             }
                         },

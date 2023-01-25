@@ -1110,6 +1110,65 @@
                 }
             ]
         },
+        "isb2.mappableStepEditor.General":{
+            "jsonTemplate":"isb2.editorContext.objectview",
+            "properties":[
+                {
+                    "name":"Enable",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetBool[enable]}",
+                        "pushFormat":["This.Object:SetBool[enable,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[enable]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "tooltip":"Explicitly enable/disable this Step, allowing the mappable to skip it entirely. ENABLED if not specified.",
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
+                },
+                {
+                    "name":"Do Not Advance",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetNumber[stickyTime].Between[-10,-1]}",
+                        "pushFormat":["This.Object:SetNumber[stickyTime,${If[\"","\",-1,0]}]"],
+                        "pushNullFormat":"This.Object:Erase[stickyTime]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "tooltip":"Prevent the mappable from advancing past this Step",
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
+                },
+                {
+                    "name":"Sticky Time (secs)",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetNumber[stickyTime]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetNumber[stickyTime,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.textbox",
+                    "controlData":{
+                        "textBindingUsesFocus":true
+                    }                                                        
+                },
+                {
+                    "name":"Trigger Once",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetBool[triggerOnce]}",
+                        "pushFormat":["This.Object:SetBool[triggerOnce,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[triggerOnce]"
+                    },
+                    "editTemplate":"propertyview.checkbox",
+                    "controlData":{
+                        "tooltip":"For Sticky steps, ",
+                        "useIndeterminate":true,
+                        "pushAsBool":true
+                    }
+                }                        
+            ]
+        },
         "isb2.mappableEditor.General":{
             "jsonTemplate":"isb2.editorContext.objectview",
             "properties":[

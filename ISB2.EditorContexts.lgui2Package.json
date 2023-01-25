@@ -169,11 +169,6 @@
                         {
                             "name":"General",
                             "template":"isb2.characterEditor.General"
-                        },
-                        {
-                            "name":"Game Launch Info",
-                            "template":"isb2.characterEditor.GameLaunchInfo",
-                            "item":"EditingItem.Get[gameLaunchInfo]"
                         }
                     ]
                 },
@@ -202,6 +197,8 @@
                             "name":"Hotkey Sheets",
                             "list":{
                                 "source":"EditingItem.Get[hotkeySheets]",
+                                "viewTemplate":"isb2.stringView",
+                                "context":"hotkeySheetName",
                                 "new":""
                             }
                         },
@@ -209,6 +206,8 @@
                             "name":"Mappable Sheets",
                             "list":{
                                 "source":"EditingItem.Get[mappableSheets]",
+                                "viewTemplate":"isb2.stringView",
+                                "context":"mappableSheetName",
                                 "new":""
                             }
                         },
@@ -216,6 +215,8 @@
                             "name":"Click Bars",
                             "list":{
                                 "source":"EditingItem.Get[clickBars]",
+                                "viewTemplate":"isb2.clickBarView",
+                                "context":"clickBarName",
                                 "new":""
                             }
                         },
@@ -223,6 +224,8 @@
                             "name":"Game Macro Sheets",
                             "list":{
                                 "source":"EditingItem.Get[gameMacroSheets]",
+                                "viewTemplate":"isb2.stringView",
+                                "context":"gameMacroSheetName",
                                 "new":""
                             }
                         },
@@ -235,6 +238,24 @@
                         }
                     ],
                     "dragDrop":{
+                        "hotkeySheet":{
+                            "type":"add",
+                            "inProperty":"name",
+                            "outProperty":"hotkeySheets"
+                        },
+                        "hotkeySheetName":{
+                            "type":"add",
+                            "outProperty":"hotkeySheets"
+                        },
+                        "mappableSheet":{
+                            "type":"add",
+                            "inProperty":"name",
+                            "outProperty":"mappableSheets"
+                        },
+                        "mappableSheetName":{
+                            "type":"add",
+                            "outProperty":"mappableSheets"
+                        },
                         "windowLayout":{
                             "type":"copy",
                             "inProperty":"name",

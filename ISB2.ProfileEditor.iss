@@ -489,6 +489,14 @@ objectdef(global) isb2_profileEditorContext
         }
     }
 
+    method AddUnique(jsonvalueref ja, string value)
+    {
+        if ${ja.Contains["${value~}"]}
+            return
+
+        ja:Add["${value~}"]
+    }
+
     method OnDragDrop()
     {
         echo "\apcontext:OnDragDrop\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~}"        
@@ -504,16 +512,19 @@ objectdef(global) isb2_profileEditorContext
             return
         }
 
+        variable jsonvalueref ja
+
         switch ${joDragDrop.Get[type]}
         {
             case copy
                 EditingItem:Set["${joDragDrop.Get[outProperty]~}","${LGUI2.DragDropItem.Get[item,"${joDragDrop.Get[inProperty]~}"].AsJSON~}"]
                 break
             case add
+                ja:SetReference["EditingItem.Get[-init,\"[]\",\"${joDragDrop.Get[outProperty]~}\"]"]
                 if ${joDragDrop.Has[-string,inProperty]}
-                    EditingItem.Get[-init,"[]","${joDragDrop.Get[outProperty]~}"]:Add["${LGUI2.DragDropItem.Get[item,"${joDragDrop.Get[inProperty]~}"].AsJSON~}"]
+                    This:AddUnique[ja,"${LGUI2.DragDropItem.Get[item,"${joDragDrop.Get[inProperty]~}"].AsJSON~}"]
                 else
-                    EditingItem.Get[-init,"[]","${joDragDrop.Get[outProperty]~}"]:Add["${LGUI2.DragDropItem.Get[item].AsJSON~}"]
+                    This:AddUnique[ja,"${LGUI2.DragDropItem.Get[item].AsJSON~}"]
                 break
         }
         Context:SetHandled[1]

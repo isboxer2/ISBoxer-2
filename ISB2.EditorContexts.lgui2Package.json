@@ -238,6 +238,15 @@
                         }
                     ],
                     "dragDrop":{
+                        "clickBar":{
+                            "type":"add",
+                            "inProperty":"name",
+                            "outProperty":"clickBars"
+                        },
+                        "clickBarName":{
+                            "type":"add",
+                            "outProperty":"clickBars"
+                        },
                         "hotkeySheet":{
                             "type":"add",
                             "inProperty":"name",
@@ -255,6 +264,15 @@
                         "mappableSheetName":{
                             "type":"add",
                             "outProperty":"mappableSheets"
+                        },
+                        "gameMacroSheet":{
+                            "type":"add",
+                            "inProperty":"name",
+                            "outProperty":"gameMacroSheets"
+                        },
+                        "gameMacroSheetName":{
+                            "type":"add",
+                            "outProperty":"gameMacroSheets"
                         },
                         "windowLayout":{
                             "type":"copy",

@@ -687,6 +687,7 @@
                         "type":"dockpanel",
                         "_dock":"bottom",
                         "horizontalAlignment": "stretch",
+                        "visibility":"collapsed",
                         "children":[
                             {
                                 "type":"button",

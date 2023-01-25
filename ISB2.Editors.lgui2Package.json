@@ -360,11 +360,32 @@
             "eventHandlers":{
                 "onVisualAttached":{
                     "type":"code",
-                    "code":"This:SetSize[${LGUI2.Template[isb2.draggerWidths].Get[\"${This.Metadata.Get[pane]~}\"]},-1]"
+                    "code":"This:SetSize[${LGUI2.Template[isb2.draggerWidths].Get[-default,200,\"${This.Metadata.Get[pane]~}\"]},-1]"
                 },
                 "lostMouseCapture":{
                     "type":"code",
                     "code":"LGUI2.Skin[default].Template[isb2.draggerWidths]:Set[\"${This.Metadata.Get[pane]~}\",${This.Width}]"
+                }
+            }
+        },
+        "isb2.bottomPane":{
+            "_dock":"bottom",
+            "_pane":"default",
+            "type":"dragger",
+            "height":200,
+            "horizontalAlignment":"stretch",
+            "allowMove":false,
+            "allowResize":true,
+            "borderThickness":[0,5,0,0],
+            "borderBrush":{"color":[0.5,0.5,0.5]},
+            "eventHandlers":{
+                "onVisualAttached":{
+                    "type":"code",
+                    "code":"This:SetSize[-1,${LGUI2.Template[isb2.draggerWidths].Get[-default,200,\"${This.Metadata.Get[pane]~}\"]}]"
+                },
+                "lostMouseCapture":{
+                    "type":"code",
+                    "code":"LGUI2.Skin[default].Template[isb2.draggerWidths]:Set[\"${This.Metadata.Get[pane]~}\",${This.Height}]"
                 }
             }
         },
@@ -1790,6 +1811,21 @@
         "isb2.profileEditor.container":{
             "type":"dockpanel",
             "name":"editor.container",
+            "padding":3,
+            "horizontalAlignment": "stretch",
+            "verticalAlignment": "stretch",
+            "eventHandlers":{
+                "onDragDrop":{
+                    "type":"method",
+                    "object":"This.Context",
+                    "method":"OnDragDrop"
+                }
+            }
+        },
+        "isb2.profileEditor.bottomcontainer":{
+            "type":"dockpanel",
+            "name":"editor.bottomcontainer",
+            "padding":3,
             "horizontalAlignment": "stretch",
             "verticalAlignment": "stretch",
             "eventHandlers":{
@@ -1822,15 +1858,43 @@
                 "children":[
                     {
                         "_dock":"bottom",
-                        "type":"button",
-                        "horizontalAlignment":"right",
-                        "content":"Save",
-                        "eventHandlers":{
-                            "onPress":{
-                                "type":"method",
-                                "object":"This.Context",
-                                "method":"OnSaveButton"
-                            }
+                        "type":"dockpanel",
+                        "horizontalAlignment":"stretch",
+                        "margin":[0,5,0,0],
+                        "children":[
+                            {
+                                "_dock":"right",
+                                "type":"button",
+                                "content":"Save",
+                                "eventHandlers":{
+                                    "onPress":{
+                                        "type":"method",
+                                        "object":"This.Context",
+                                        "method":"OnSaveButton"
+                                    }
+                                }
+                            },
+                            {
+                                "_dock":"right",
+                                "type":"checkbox",
+                                "content":"Split editor",
+                                "verticalAlignment":"center",
+                                "margin":[0,0,10,0],
+                                "checkedBinding":{
+                                    "pullFormat":"${This.Context.SplitEditor}",
+                                    "pushFormat":["This.Context:SetSplitEditor[\"","\"]"]
+                                }
+                            }                
+                        ]
+                    },
+                    {
+                        "_dock":"bottom",
+                        "_pane":"bottomPane",
+                        "jsonTemplate":"isb2.bottomPane",
+                        "name":"editor.bottompane",
+                        "visibility":"collapsed",
+                        "content":{
+                           "jsonTemplate":"isb2.profileEditor.bottomcontainer"
                         }
                     },
                     {

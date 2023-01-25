@@ -640,12 +640,10 @@ objectdef(global) isb2_profileEditorContext
 objectdef isb2_profileeditor inherits isb2_building
 {
     variable weakref Editing
-    variable lgui2elementref Window
-
     variable weakref MainContext
     variable collection:isb2_profileEditorContext Contexts
 
-    method Initialize(weakref _profile)
+    method Init(weakref _profile, lgui2elementref _container)
     {
         Editing:SetReference[_profile]
         LGUI2:PushSkin["${ISB2.UseSkin~}"]
@@ -658,45 +656,11 @@ objectdef isb2_profileeditor inherits isb2_building
         MainContext:SetReference["Contexts.Get[main]"]
         MainContext.EditingItem:SetReference[Editing]              
 
-        MainContext:Attach[${Window.Locate["editor.container"].ID}]
-        This:BuildAutoComplete
+        MainContext:Attach[${_container.ID}]
 
         LGUI2.Element[isb2.events]:FireEventHandler[profileEditorOpened]
     }
 
-    method Shutdown()
-    {
-        Window:Destroy
-    }
-
-    method BuildAutoComplete()
-    {
-        ISB2:BuildAutoComplete[Characters]
-        ISB2:BuildAutoComplete[MappableSheets]
-        ISB2:BuildAutoComplete[GameKeyBindings]
-        ISB2:BuildActionsAutoComplete
-        
-    }
-
-    method OnWindowClosed()
-    {
-        ISB2.Editors:Erase["${Editing.Name~}"]
-    }
-
-    method OnSaveButton()
-    {
-        echo "\ayOnSaveButton\ax"
-        MainContext:Attach[${Window.Locate["editor.container"].ID}]
-        if ${This.Editing:Store(exists)}
-        {
-            LGUI2.Element[isb2.events]:FireEventHandler[profileSaved]
-            echo "\agSaved.\ax"
-        }
-        else
-        {
-            echo "\arCould not save.\ax"
-        }
-    }
 
     member:weakref GetContext(string name)
     {
@@ -755,6 +719,82 @@ objectdef isb2_profileeditor inherits isb2_building
         echo "OnConfigurationBuildersDetached"
         
         This:ApplyBuilders[MainContext.EditingItem]
+    }
+}
+
+objectdef isb2_profileeditorWindow
+{
+    variable weakref Editing
+    variable lgui2elementref Window
+
+    variable isb2_profileeditor TopEditor
+    variable isb2_profileeditor BottomEditor
+    variable bool SplitEditor
+
+    method Initialize(weakref _profile)
+    {
+        echo "isb2_profileeditorWindow:Initialize"
+        Editing:SetReference[_profile]
+        LGUI2:PushSkin["${ISB2.UseSkin~}"]
+        Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2.profileEditor]",This].ID}"]
+        LGUI2:PopSkin["${ISB2.UseSkin~}"]
+
+        This:BuildAutoComplete
+        
+        TopEditor:Init[Editing,"${Window.Locate["editor.container"].ID}"]
+        BottomEditor:Init[Editing,"${Window.Locate["editor.bottomContainer"].ID}"]
+        This:SetSplitEditor[0]
+/*
+        LGUI2.Skin[default].Template[isb2.editorContexts].Get[contexts]:ForEach["Contexts:Set[\"\${ForEach.Value.Get[name]~}\",This,ForEach.Value]"]
+        MainContext:SetReference["Contexts.Get[main]"]
+        MainContext.EditingItem:SetReference[Editing]              
+
+        MainContext:Attach[${Window.Locate["editor.container"].ID}]
+*/
+        LGUI2.Element[isb2.events]:FireEventHandler[profileEditorOpened]
+    }
+
+    method Shutdown()
+    {
+        Window:Destroy
+    }
+
+    method SetSplitEditor(bool newValue)
+    {
+        SplitEditor:Set[${newValue}]
+        if ${newValue}
+            Window.Locate["editor.bottompane"]:SetVisibility[Visible]
+        else
+            Window.Locate["editor.bottompane"]:SetVisibility[Collapsed]
+    }
+
+    method BuildAutoComplete()
+    {
+        ISB2:BuildAutoComplete[Characters]
+        ISB2:BuildAutoComplete[MappableSheets]
+        ISB2:BuildAutoComplete[GameKeyBindings]
+        ISB2:BuildActionsAutoComplete
+        
+    }
+
+    method OnWindowClosed()
+    {
+        ISB2.Editors:Erase["${Editing.Name~}"]
+    }
+
+    method OnSaveButton()
+    {
+        echo "\ayOnSaveButton\ax"
+        MainContext:Attach[${Window.Locate["editor.container"].ID}]
+        if ${This.Editing:Store(exists)}
+        {
+            LGUI2.Element[isb2.events]:FireEventHandler[profileSaved]
+            echo "\agSaved.\ax"
+        }
+        else
+        {
+            echo "\arCould not save.\ax"
+        }
     }
 
 }

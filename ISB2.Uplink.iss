@@ -26,7 +26,7 @@ objectdef(global) isb2 inherits isb2_profilecollection
     variable bool bAutoStoreSettings=TRUE
     variable string SelectedTeamName
 
-    variable collection:isb2_profileeditor Editors
+    variable collection:isb2_profileeditorWindow Editors
 
     method Initialize()
     {
@@ -53,6 +53,11 @@ objectdef(global) isb2 inherits isb2_profilecollection
         LGUI2:PushSkin["${UseSkin~}"]
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
         LGUI2:PopSkin["${UseSkin~}"]
+
+        if ${This.EnableMIDI}
+        {
+            MIDI:OpenAllDevicesIn            
+        }
 
         This:LoadGames
         This:LoadNativeProfiles

@@ -27,8 +27,8 @@ objectdef(global) isb2_profileEditorContext
 
     method AddSubItem(jsonvalueref joContainer, jsonvalueref joItem)
     {
-        echo "\ayAddSubItem container\ax=${joContainer~}"
-        echo "\ayAddSubItem item\ax=${joItem~}"
+;        echo "\ayAddSubItem container\ax=${joContainer~}"
+;        echo "\ayAddSubItem item\ax=${joItem~}"
         variable jsonvalueref joSubItem="{}"
 
         variable jsonvalueref joList
@@ -124,7 +124,7 @@ objectdef(global) isb2_profileEditorContext
     method Attach(lgui2elementref element, string useTemplate)
     {
         Element:Set["${element.ID}"]
-        echo "Attach: ${element} ${element.ID} template=${useTemplate~} ${Data~}"
+;        echo "Attach: ${element} ${element.ID} template=${useTemplate~} ${Data~}"
 
         if !${element.Element(exists)}
         {
@@ -657,8 +657,6 @@ objectdef isb2_profileeditor inherits isb2_building
         MainContext.EditingItem:SetReference[Editing]              
 
         MainContext:Attach[${_container.ID}]
-
-        LGUI2.Element[isb2.events]:FireEventHandler[profileEditorOpened]
     }
 
 

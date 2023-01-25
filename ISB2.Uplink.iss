@@ -4,6 +4,7 @@
 #include "ISB2.Building.iss"
 #include "ISB2.QuickSetup.iss"
 #include "ISB2.ProfileEditor.iss"
+#include "ISB2.Achievements.iss"
 
 objectdef(global) isb2 inherits isb2_profilecollection
 {
@@ -53,6 +54,8 @@ objectdef(global) isb2 inherits isb2_profilecollection
         LGUI2:PushSkin["${UseSkin~}"]
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
         LGUI2:PopSkin["${UseSkin~}"]
+
+        isb2_achievements.Instance:Init
 
         if ${This.EnableMIDI}
         {

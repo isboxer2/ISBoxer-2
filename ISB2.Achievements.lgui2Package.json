@@ -1,0 +1,121 @@
+{
+    "$schema": "http://www.lavishsoft.com/schema/lgui2Package.json",
+    "templates": {
+        "isb2.achievements.eventHandler":{
+            "type":"method",
+            "object":"isb2_achievements.Instance",
+            "method":"OnHookedEvent"
+        },
+        "isb2.achievements":{
+            "achievements":[
+                {
+                    "id":1,
+                    "name":"Profile Editor Opened!",
+                    "flavor":"Way to go, champ!",
+                    "hook":"profileEditorOpened"
+                },
+                {
+                    "id":2,
+                    "name":"Quick Setup Completed!",
+                    "flavor":"You're basically a pro now!",
+                    "hook":"quickSetupCompleted"
+                },
+                {
+                    "id":3,
+                    "name":"Profile Editor Novice",
+                    "flavor":"You think you're getting good then?",
+                    "count":10,
+                    "hook":"profileEditorOpened"
+                }
+            ]
+        }
+    },
+    "elements": [
+        {
+            "name":"isb2.achievements",
+            "type":"panel",
+            "visibility":"hidden",
+            "-hooks":{
+                "quickSetupCompleted":{
+                    "jsonTemplate":"isb2.achievementHook",
+                    "event":"quickSetupCompleted"
+                },
+                "profileEditorOpened":{
+                    "jsonTemplate":"isb2.achievementHook",
+                    "event":"profileEditorOpened"
+                }
+            }
+        },
+        {
+            "name":"isb2.achievementDisplay",
+            "type":"dockpanel",
+            "visibility":"hidden",
+            "borderBrush":{
+                "color":"#66ff00"
+            },
+            "borderThickness":4,
+            "horizontalAlignment": "center",
+            "backgroundBrush":{"color":"#cc111111"},
+            "acceptsMouseFocus": false,
+            "acceptsKeyboardFocus": false,
+            "yFactor":0.2,
+            "padding":[100,25],
+            "strata":1.2,
+            "font":{
+                "heightFactor": 1.5                
+            },
+            "children":[
+                {
+                    "type":"imagebox",
+                    "acceptsMouseFocus": false,
+                    "acceptsKeyboardFocus": false,
+                    "_dock":"left",
+                    "imageBrush":"isb2.logo-48",
+                    "margin":[0,0,75,0],
+                    "verticalAlignment": "center"
+                },
+                {
+                    "type":"stackpanel",
+                    "acceptsMouseFocus": false,
+                    "acceptsKeyboardFocus": false,
+                    "_dock":"left",
+                    "uniform": false,
+                    "orientation": "vertical",
+                    "children":[
+                        {
+                            "type":"textblock",
+                            "text":"Achievement Unlocked",
+                            "color":"#ffff00"
+                        },
+                        {
+                            "horizontalAlignment": "center",
+                            "type":"textblock",
+                            "text":"${This.Context.Get[name]}",
+                            "font":{
+                                "heightFactor": 1.5                
+                            }                
+                        },
+                        {
+                            "horizontalAlignment": "center",
+                            "type":"textblock",
+                            "text":"${This.Context.Get[flavor]}",
+                            "color":"#999999",
+                            "font":{
+                                "heightFactor": 0.8                
+                            }                
+                        }
+                    ]
+                },
+                {
+                    "type":"imagebox",
+                    "acceptsMouseFocus": false,
+                    "acceptsKeyboardFocus": false,
+                    "_dock":"left",
+                    "imageBrush":"isb2.logo-48",
+                    "margin":[75,0,0,0],
+                    "verticalAlignment": "center"
+                }
+            ]
+        }
+    ]
+}

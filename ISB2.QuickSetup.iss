@@ -226,8 +226,11 @@ objectdef isb2_quicksetup inherits isb2_building
 
     method ValidatePage(string pageName)
     {
-;        echo ValidatePage ${pageName} ${Context(type)}
+;        echo "ValidatePage ${pageName} ${Context(type)} ${Context.Source.ID}"
         Context:SetHandled[1]
+        if ${Context.Source.Content.Text.Equal[Back]}
+            return
+
         switch ${pageName}
         {
             case Game
@@ -509,6 +512,7 @@ objectdef isb2_quicksetup inherits isb2_building
 
         ISB2:LoadFile["${ISB2.ProfilesFolder~}/${fileName~}"]
 
+        LGUI2.Element[isb2.events]:FireEventHandler[quickSetupCompleted]
     }
 
     method DetectMonitors()

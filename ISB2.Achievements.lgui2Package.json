@@ -121,6 +121,16 @@
                             "args":{"value":true}
                         }
                     ]
+                },
+                {
+                    "id":10,
+                    "name":"ISBoxer 1 Profile Imported!",
+                    "flavor":"What luck, this thing takes my old profiles?",
+                    "reqs":[
+                        {
+                            "hook":"onProfileImported"                            
+                        }
+                    ]
                 }
             ]
         }

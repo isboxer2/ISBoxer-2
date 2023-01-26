@@ -316,6 +316,10 @@ objectdef(global) isb2 inherits isb2_profilecollection
         Importer:TransformProfileXML["${fileName~}"]
 
         This:LoadFile["${ProfilesFolder~}/${fileName.FilenameOnly~}.isb2.json"]
+
+        variable jsonvalue joArgs="{}"
+        joArgs:SetString[filename,"${fileName~}"]
+        LGUI2.Element[isb2.events]:FireEventHandler[onProfileImported,joArgs]
     }
 
     method OnLoadButton()

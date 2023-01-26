@@ -110,6 +110,17 @@
                             "hook":"onDragDropCompleted"
                         }
                     ]
+                },
+                {
+                    "id":9,
+                    "name":"Profile Editor Split!",
+                    "flavor":"Ooooooh, fancy!",
+                    "reqs":[
+                        {
+                            "hook":"onSplitEditorChanged",
+                            "args":{"value":true}
+                        }
+                    ]
                 }
             ]
         }

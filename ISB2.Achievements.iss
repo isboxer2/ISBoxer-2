@@ -142,6 +142,34 @@ objectdef(global) isb2_achievements
         return TRUE
     }
 
+    member:bool Object_LooseMatch(jsonvalueref joRequired, jsonvalueref joCheck)
+    {
+;        echo "Object_LooseMatch \at${joRequired~}\ax \ay${joCheck~}\ax"
+        if ${joCheck.Used} < ${joRequired.Used}
+        {
+            return FALSE
+        }
+        variable int64 i
+        variable string key
+
+        variable jsonvalueref jaKeys
+        jaKeys:SetReference["joRequired.Keys"]
+
+        for (i:Set[1] ; ${i}<=${jaKeys.Used} ; i:Inc)
+        {
+            key:Set["${jaKeys.Get[${i}]~}"]
+ ;           echo "key ${key~} ${joCheck.Get["${key~}"]~} ${joRequired.Get["${key~}"]~}"
+            if !${joCheck.Assert["${key~}","${joRequired.Get["${key~}"].AsJSON~}"]}
+            {
+  ;              echo "Not Matched"
+                return FALSE
+            }
+        }
+
+;        echo "Matched"
+        return TRUE
+    }
+
     method ApplyAchievementReq(weakref _eventargs, jsonvalueref joAchieve, int64 reqId, jsonvalueref joReq, jsonvalueref joResult, jsonvalueref joUserData)
     {
         variable bool ourEvent=${joReq.Assert[hook,"${_eventargs.Event.AsJSON~}"]}
@@ -152,11 +180,8 @@ objectdef(global) isb2_achievements
         {
             if ${joReq.Has[args]}
             {
-                ; i dunno what other fields we might need, possibly replace this with a loop through all.
-                if ${joReq.Has[args,type]}
-                {
-                    ourEvent:Set["${_eventargs.Args.Assert[type,"${joReq.Get[args,type].AsJSON~}"]}"]
-                }
+                ; args has to match too (at least the required parts)
+                ourEvent:Set["${This.Object_LooseMatch["joReq.Get[args]",_eventargs.Args]}"]
             }
         }
 

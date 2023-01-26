@@ -770,6 +770,8 @@ objectdef isb2_profileeditorWindow
             Window.Locate["editor.bottompane"]:SetVisibility[Visible]
         else
             Window.Locate["editor.bottompane"]:SetVisibility[Collapsed]
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onSplitEditorChanged,"{\"value\":${newValue.AsJSON~}}"]
     }
 
     method BuildAutoComplete()

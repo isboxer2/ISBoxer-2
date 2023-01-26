@@ -97,12 +97,14 @@ objectdef(global) isb2_achievements
         {
             "type":"chain",
             "name":"fade",
-            "animations":[
+            "animations":[                
                 {
-                    "type":"fade",
-                    "name":"fadeIn",
-                    "opacity":1.0,
-                    "duration":0.1,
+                    "type":"value",
+                    "name":"slideIn",
+                    "duration":0.15,
+                    "valueName":"yFactor",
+                    "originalValue":1.1,
+                    "finalValue":0.2
                 },
                 {
                     "type":"delay",

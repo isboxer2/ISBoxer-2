@@ -28,13 +28,9 @@ objectdef(global) isb2_achievements
         This:LoadSettings
     }
 
-    method InstallAchievement(jsonvalueref joAchieve)
+    method InstallAchievementHook(string name, jsonvalueref joAchieve)
     {
-        ; echo "\ayInstallAchievement\ax ${joAchieve~}"
-
-        variable int64 id="${joAchieve.GetInteger[id]}"
-        variable string name="${joAchieve.Get[hook]~}"
-
+;        echo "\ayInstallAchievementHook\ax ${name~} ${joAchieve~}"
         variable jsonvalueref joHook
 
         if !${HookMap.Has["${name~}"]}
@@ -44,11 +40,29 @@ objectdef(global) isb2_achievements
             
             if !${LGUI2.Element[isb2.events]:AddHook["${name~}",joHook](exists)}
             {
-                echo "AddHook failed: ${name~} = ${joHook~}"
+                echo "\arAddHook failed:\ax ${name~} = ${joHook~}"
                 return
             }
         }
         HookMap.Get[-init,"{}","${name~}"].Get[-init,"[]","achievements"]:AddByRef[joAchieve]
+    }
+
+    method InstallAchievementReq(jsonvalueref joReq, jsonvalueref joAchieve)
+    {
+        if ${joReq.Has[hook]}
+            This:InstallAchievementHook["${joReq.Get[hook]~}",joAchieve]        
+    }
+
+    method InstallAchievement(jsonvalueref joAchieve)
+    {
+        ; echo "\ayInstallAchievement\ax ${joAchieve~}"
+
+        variable int64 id="${joAchieve.GetInteger[id]}"
+
+        if ${joAchieve.Has[-array,reqs]}
+        {
+            joAchieve.Get[reqs]:ForEach["This:InstallAchievementReq[ForEach.Value,joAchieve]"]
+        }
         Achievements:SetByRef["${id}",joAchieve]
     }
 
@@ -71,7 +85,7 @@ objectdef(global) isb2_achievements
 
     method OnAchievementCompleted(jsonvalueref joAchieve)
     {
-        echo "\agOnAchievementCompleted\ax ${joAchieve~}"
+;        echo "\agOnAchievementCompleted\ax ${joAchieve~}"
 
         LGUI2.Element[isb2.achievementDisplay]:SetContext[joAchieve]:SetVisibility[Visible]
 
@@ -111,35 +125,101 @@ objectdef(global) isb2_achievements
 
     }
 
-    method ApplyAchievementHook(string eventName, jsonvalueref joAchieve)
+    ; jaCheck must contain all elements from jaRequired
+    member:bool Array_LooseMatch(jsonvalueref jaRequired, jsonvalueref jaCheck)
+    {
+        if ${jaCheck.Used} < ${jaRequired.Used}
+        {
+            return FALSE
+        }
+        variable int64 i
+        for (i:Set[1] ; ${i}<=${jaRequired.Used} ; i:Inc)
+        {
+            if !${jaCheck.Contains["${jaRequired.Get[${i}].AsJSON~}"]}
+                return FALSE
+        }
+
+        return TRUE
+    }
+
+    method ApplyAchievementReq(weakref _eventargs, jsonvalueref joAchieve, int64 reqId, jsonvalueref joReq, jsonvalueref joResult, jsonvalueref joUserData)
+    {
+        variable bool ourEvent=${joReq.Assert[hook,"${_eventargs.Event.AsJSON~}"]}
+        variable bool completed
+        variable jsonvalueref jo="joUserData.Get[-init,\"{}\",reqs].Get[-init,\"{}\",${reqId}]"
+
+        if ${ourEvent}
+        {
+            if ${joReq.Has[args]}
+            {
+                ; i dunno what other fields we might need, possibly replace this with a loop through all.
+                if ${joReq.Has[args,type]}
+                {
+                    ourEvent:Set["${_eventargs.Args.Assert[type,"${joReq.Get[args,type].AsJSON~}"]}"]
+                }
+            }
+        }
+
+        completed:Set[${ourEvent}]
+
+;        echo "ApplyAchievementReq[${ourEvent}] ${joReq~}"
+
+        if ${joReq.Has[count]}
+        {
+            variable int64 count
+            count:Set[${jo.GetInteger[count]}]
+
+            if ${ourEvent}
+            {
+                ShouldSave:Set[1]
+                count:Inc
+                jo:SetInteger[count,${count}]
+            }
+            if ${count} < ${joReq.GetInteger[count]}
+            {
+                completed:Set[0]
+            }                
+
+;            echo "ApplyAchievementReq count = ${count} of ${joReq.GetInteger[count]}"            
+        }
+
+        ; alter result if this requirement is not met.
+        if ${completed}
+        {
+            if !${jo.Has[completed]}
+            {
+                jo:SetInteger[completed,"${time.Now.Timestamp}"]
+                ShouldSave:Set[1]
+            }
+        }
+        else
+        {
+            if !${jo.Has[completed]}
+            {
+                joResult:SetBool[completed,0]
+            }
+        }
+        
+    }
+
+    method ApplyAchievementHook(weakref _eventargs, jsonvalueref joAchieve)
     {
         variable jsonvalueref jo="UserData.Get[-init,{},\"${joAchieve.GetInteger[id]}\"]"
 
-        variable bool completed=1
+  ;      variable bool completed=1
 
         if ${jo.Has[completed]}
         {
             return
         }
-;        echo "ApplyAchievementHook ${eventName~} ${joAchieve~}"
+;        echo "ApplyAchievementHook ${_eventargs.Event~} ${joAchieve~}"
 
-        if ${joAchieve.Has[count]}
-        {
-            variable int64 count
-            ShouldSave:Set[1]
-            count:Set[${jo.GetInteger[count]}]
-            count:Inc
-            jo:SetInteger[count,${count}]
 
-            if ${count} < ${joAchieve.GetInteger[count]}
-            {
-                completed:Set[0]
-            }
+        variable jsonvalueref joResult
+        joResult:SetReference["{\"completed\":true}"]
+        joAchieve.Get[reqs]:ForEach["This:ApplyAchievementReq[\"_eventargs\",joAchieve,\${ForEach.Key},ForEach.Value,joResult,jo]"]
 
- ;           echo "ApplyAchievementHook count = ${count} of ${joAchieve.GetInteger[count]}"
-        }
-
-        if ${completed}
+        if ${joResult.GetBool[completed]}
         {
             ShouldSave:Set[1]
             jo:SetInteger[completed,"${time.Now.Timestamp}"]
@@ -154,7 +234,7 @@ objectdef(global) isb2_achievements
         variable jsonvalueref ja="This.GetAchievementsFromHook[\"${Context.Event~}\"]"
 
 ;        echo "applicable achievements: ${ja~}"
-        ja:ForEach["This:ApplyAchievementHook[\"${Context.Event~}\",ForEach.Value]"]
+        ja:ForEach["This:ApplyAchievementHook[\"Context\",ForEach.Value]"]
 
         This:AutoSave
     }

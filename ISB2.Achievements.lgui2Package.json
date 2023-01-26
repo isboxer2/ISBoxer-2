@@ -12,39 +12,104 @@
                     "id":1,
                     "name":"Profile Editor Opened!",
                     "flavor":"Way to go, champ!",
-                    "hook":"profileEditorOpened"
+                    "reqs":[
+                        {
+                            "hook":"profileEditorOpened"
+                        }
+                    ]
                 },
                 {
                     "id":2,
                     "name":"Quick Setup Completed!",
                     "flavor":"You're basically a pro now!",
-                    "hook":"quickSetupCompleted"
+                    "reqs":[
+                        {
+                            "hook":"quickSetupCompleted"
+                        }
+                    ]
                 },
                 {
                     "id":3,
                     "name":"Profile Editor Novice",
                     "flavor":"You think you're getting good then?",
-                    "count":10,
-                    "hook":"profileEditorOpened"
+                    "reqs":[
+                        {
+                            "count":10,
+                            "hook":"profileEditorOpened"
+                        }
+                    ]
                 },
                 {
                     "id":4,
                     "name":"Profile Saved!",
                     "flavor":"Your first time is the one you will never forget!",
-                    "hook":"profileSaved"
+                    "reqs":[
+                        {
+                            "hook":"profileSaved"
+                        }
+                    ]
                 },
                 {
                     "id":5,
                     "name":"Do you REALLY want to make these changes?",
                     "flavor":"Click Yes to format your computer.",
+                    "reqs":[
+                        {
                     "count":10,
                     "hook":"profileSaved"
+                        }
+                    ]
                 },
                 {
                     "id":6,
                     "name":"Team Launched!",
                     "flavor":"Hold on to your butts!",
+                    "reqs":[
+                        {
                     "hook":"onTeamLaunched"
+                        }
+                    ]
+                },
+                {
+                    "id":7,
+                    "name":"Profile Editor Explorer",
+                    "flavor":"But you still haven't found what you're looking looking for? Bono is that you?",
+                    "reqs":[
+                        {
+                            "hook":"contextLoaded",
+                            "args":{"type":"slot"}
+                        },
+                        {
+                            "hook":"contextLoaded",
+                            "args":{"type":"character"}
+                        },
+                        {
+                            "hook":"contextLoaded",
+                            "args":{"type":"hotkeySheet"}                            
+                        },
+                        {
+                            "hook":"contextLoaded",
+                            "args":{"type":"mappableSheet"}                            
+                        },
+                        {
+                            "hook":"contextLoaded",
+                            "args":{"type":"team"}                            
+                        },
+                        {
+                            "hook":"contextLoaded",
+                            "args":{"type":"windowLayout"}                            
+                        }
+                    ]
+                },
+                {
+                    "id":8,
+                    "name":"Drag-and-Drop Completed!",
+                    "flavor":"Welcome to the Drag (and Drop) Show",
+                    "reqs":[
+                        {
+                            "hook":"onDragDropCompleted"
+                        }
+                    ]
                 }
             ]
         }

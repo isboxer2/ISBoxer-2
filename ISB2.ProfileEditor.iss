@@ -128,6 +128,7 @@ objectdef(global) isb2_profileEditorContext
 
         if !${element.Element(exists)}
         {
+            echo "\arAttach: No element\ax"
             Script:DumpStack
             return
         }
@@ -215,6 +216,8 @@ objectdef(global) isb2_profileEditorContext
             Element.Locate[editorContext.leftPane.container,listbox,descendant]:SetItemSelected[1,1]
         }
 
+        echo "\aycontextLoaded:${Name~}\ax"
+        LGUI2.Element[isb2.events]:FireEventHandler["contextLoaded","{\"type\":\"${Name~}\"}"]
     }
 
     method UpdateFromJSON(string _json)
@@ -489,6 +492,7 @@ objectdef(global) isb2_profileEditorContext
         }
     }
 
+    ; value is already JSON-ified.
     method AddUnique(jsonvalueref ja, string value)
     {
         if ${ja.Contains["${value~}"]}
@@ -527,6 +531,8 @@ objectdef(global) isb2_profileEditorContext
                     This:AddUnique[ja,"${LGUI2.DragDropItem.Get[item].AsJSON~}"]
                 break
         }
+
+        LGUI2.Element[isb2.events]:FireEventHandler["onDragDropCompleted","{\"type\":\"${LGUI2.DragDropItem.Get[dragDropItemType]~}\"}"]
         Context:SetHandled[1]
     }
 

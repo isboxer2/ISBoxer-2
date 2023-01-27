@@ -288,7 +288,7 @@
                                 },
                                 {
                                     "type":"popup text",
-                                    "text": "Broadcasting Ensabled",
+                                    "text": "Broadcasting Enabled",
                                     "color": "#00ff00"                
                                 }
                             ]

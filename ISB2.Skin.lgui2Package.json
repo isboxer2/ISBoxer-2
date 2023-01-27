@@ -140,22 +140,84 @@
                 {
                     "name":"Diablo Immortal",
                     "shortName":"DI",
-                    "genre":"ARPG"
+                    "genre":"ARPG",
+                    "virtualFiles":[
+                        {
+                            "replacement":"{1}/Battle.net-{CHARACTER}.config",
+                            "pattern":"*/Battle.net.config"
+                        },
+                        {
+                            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/{CHARACTER}/",
+                            "pattern":"Software/Blizzard Entertainment/Battle.net/"
+                        }
+                    ]
                 },
                 {
                     "name":"EverQuest",
                     "shortName":"EQ1",
-                    "genre":"MMO"
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/eqclient.ini",
+                            "replacement":"{1}/eqclient-{CHARACTER}.ini"
+                        },
+                        {
+                            "pattern":"*/eqlsPlayerData.ini",
+                            "replacement":"{1}/eqlsPlayerData-{CHARACTER}.ini"
+                        }
+                    ]
+                },
+                {
+                    "name":"EverQuest 2",
+                    "shortName":"EQ2",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {   
+                            "pattern":"*/eq2_recent.ini",
+                            "replacement":"{1}/eq2_recent-{CHARACTER}.ini"
+                        },
+                        {
+                            "pattern":"*/cookies",
+                            "replacement":"{1}/coookies-{CHARACTER}"
+                        }
+                    ]
                 },
                 {
                     "name":"EVE Online",
                     "shortName":"EVE",
-                    "genre":"MMO"
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/cookies",
+                            "replacement":"{1}/coookies-{CHARACTER}"
+                        }
+                    ]
                 },
                 {
                     "name":"Lord of the Rings Online",
                     "shortName":"LOTRO",
-                    "genre":"MMO"
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/UserPreferences.ini",
+                            "replacement":"{1}/UserPreferences-{CHARACTER}.ini"
+                        }
+                    ]
+                },
+                {
+                    "name":"Star Wars The Old Republic",
+                    "shortName":"SWTOR",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/client_settings.ini",
+                            "replacement":"{1}/client_settings-{CHARACTER}.ini"
+                        },
+                        {
+                            "pattern":"*/launcher.settings",
+                            "replacement":"{1}/launcher-{CHARACTER}.settings"
+                        }
+                    ]
                 },
                 {
                     "name":"World of Warcraft",

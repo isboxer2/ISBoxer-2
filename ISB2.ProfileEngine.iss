@@ -4,6 +4,7 @@
 variable(global) weakref ISB2ProfileEngine
 objectdef isb2_profileengine
 {    
+    variable bool Initializing
 
     ; a list of active Profiles
     variable set Profiles
@@ -1337,7 +1338,9 @@ objectdef isb2_profileengine
         Team.Get[hotkeySheets]:ForEach["HotkeySheets.Get[\"\${ForEach.Value~}\"]:Enable"]
         Team.Get[mappableSheets]:ForEach["MappableSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
+        Initializing:Set[1]
         This:SetGUIMode[0]
+        Initializing:Set[0]
 
         This:ExecuteEventAction[Character,onLoad]
 
@@ -4308,7 +4311,8 @@ objectdef isb2_profileengine
             This:ShowTitleBars[0]
         }
         
-        LGUI2.Element[isb2.events]:FireEventHandler[onGUIModeChanged,"{\"value\":${newValue.AsJSON~}}"]
+        if !${Initializing}
+            LGUI2.Element[isb2.events]:FireEventHandler[onGUIModeChanged,"{\"value\":${newValue.AsJSON~}}"]
     }
 
     method ToggleGUIMode()

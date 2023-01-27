@@ -2332,6 +2332,8 @@ objectdef isb2_variable
 
     variable isb2_triggerchains TriggerChains
 
+    variable bool Initializing
+
     method Initialize(jsonvalueref jo)
     {
         This:FromJSON[jo]
@@ -2344,6 +2346,7 @@ objectdef isb2_variable
         if !${jo.Reference(exists)}
             return
 
+        Initializing:Set[1]
         if ${jo.Has[name]}
             Name:Set["${jo.Get[name]~}"]
         if ${jo.Has[description]}
@@ -2354,6 +2357,8 @@ objectdef isb2_variable
 
         if ${jo.Has[value]}
             This:Set["${jo.Get[value].AsJSON~}"]        
+
+        Initializing:Set[0]
     }
 
     member:jsonvalueref AsJSON()
@@ -2379,6 +2384,9 @@ objectdef isb2_variable
         Value:SetValue["${val~}"]
 
         TriggerChains:Fire["OnValueChanged"]
+
+        if !${Initializing}
+            LGUI2.Element[isb2.events]:FireEventHandler["onVariableChanged","{\"name\":\"${Name~}\",\"value\":${Value.AsJSON~}}"]
     }
 
     method Forward()

@@ -158,6 +158,40 @@
                             "source":"session"
                         }
                     ]
+                },
+                {
+                    "id":12,
+                    "name":"Core: Hotkeys Toggled!",
+                    "flavor":"You're almost there, don't stop now!",
+                    "reqs":[
+                        {
+                            "hook":"onVariableChanged",
+                            "args":{"name":"Core.enable hotkeys","value":true},
+                            "source":"session"
+                        },
+                        {
+                            "hook":"onVariableChanged",
+                            "args":{"name":"Core.enable hotkeys","value":false},
+                            "source":"session"
+                        }
+                    ]
+                },
+                {
+                    "id":13,
+                    "name":"Core: Broadcasting Toggled!",
+                    "flavor":"I'm having a good time now, thank you",
+                    "reqs":[
+                        {
+                            "hook":"onVariableChanged",
+                            "args":{"name":"Core.enable broadcasting","value":true},
+                            "source":"session"
+                        },
+                        {
+                            "hook":"onVariableChanged",
+                            "args":{"name":"Core.enable broadcasting","value":false},
+                            "source":"session"
+                        }
+                    ]
                 }
             ]
         }

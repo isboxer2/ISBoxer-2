@@ -284,7 +284,7 @@ objectdef(global) isb2_achievements
 
             if ${joEventArgs.Has[-string,session]}
             {
-                InnerSpace:Relay["${joEventArgs.Get[session]~}","isb2_achievements.Instance:OnRemoteAchievementCompleted[${joAchieve.GetInteger[id]}]"]
+                InnerSpace:Relay["local isboxer","isb2_achievements.Instance:OnRemoteAchievementCompleted[${joAchieve.GetInteger[id]}]"]
             }
         }
     }
@@ -308,10 +308,9 @@ objectdef(global) isb2_achievements
 
     method OnRemoteEvent()
     {
-;        echo "\apOnRemoteEvent\ax ${Context(type)} ${Context~} ${This(type)}"
         variable jsonvalueref joEventArgs="Context.Get[eventargs]"
         joEventArgs:SetString[session,"${Context.Get[source]~}"]
-;        echo "joEventArgs=${joEventArgs~}"
+;        echo "\apOnRemoteEvent\ax ${joEventArgs~}"
         
         variable jsonvalueref ja
 

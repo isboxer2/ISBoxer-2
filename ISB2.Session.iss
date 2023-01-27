@@ -3,6 +3,7 @@
 #include "ISB2.ProfileEngine.iss"
 #include "ISB2.WindowLayoutEngine.iss"
 #include "ISB2.WoWAddon.iss"
+#include "ISB2.Achievements.iss"
 
 objectdef isb2session inherits isb2_profileengine
 {
@@ -45,6 +46,9 @@ objectdef isb2session inherits isb2_profileengine
             LGUI2:PushSkin["${UseSkin~}"]
             LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]
             LGUI2:PopSkin["${UseSkin~}"]
+
+            isb2_achievements.Instance:Init
+
             ISB2BroadcastMode:LateInitialize
             This:InstallDefaultActionTypes
 

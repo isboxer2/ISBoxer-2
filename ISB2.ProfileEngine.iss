@@ -4308,7 +4308,7 @@ objectdef isb2_profileengine
             This:ShowTitleBars[0]
         }
         
-        LGUI2.Element[isb2.events]:FireEventHandler[onGUIModeChanged]
+        LGUI2.Element[isb2.events]:FireEventHandler[onGUIModeChanged,"{\"value\":${newValue.AsJSON~}}"]
     }
 
     method ToggleGUIMode()

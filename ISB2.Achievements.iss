@@ -37,6 +37,9 @@ objectdef(global) isb2_achievements
         {
             joHook:SetReference["LGUI2.Template[isb2.achievements.eventHandler]"]
             joHook:SetString[event,"${name~}"]
+
+            if !${ISUplink(exists)}
+                joHook:SetString[method,ForwardHookedEvent]
             
             if !${LGUI2.Element[isb2.events]:AddHook["${name~}",joHook](exists)}
             {
@@ -50,7 +53,12 @@ objectdef(global) isb2_achievements
     method InstallAchievementReq(jsonvalueref joReq, jsonvalueref joAchieve)
     {
         if ${joReq.Has[hook]}
-            This:InstallAchievementHook["${joReq.Get[hook]~}",joAchieve]        
+        {
+            if ${ISUplink(exists)} || ${joReq.Get[source]~.Equal[session]}
+            {
+                This:InstallAchievementHook["${joReq.Get[hook]~}",joAchieve]
+            }
+        }
     }
 
     method InstallAchievement(jsonvalueref joAchieve)
@@ -172,9 +180,9 @@ objectdef(global) isb2_achievements
         return TRUE
     }
 
-    method ApplyAchievementReq(weakref _eventargs, jsonvalueref joAchieve, int64 reqId, jsonvalueref joReq, jsonvalueref joResult, jsonvalueref joUserData)
+    method ApplyAchievementReq(jsonvalueref joEventArgs, jsonvalueref joAchieve, int64 reqId, jsonvalueref joReq, jsonvalueref joResult, jsonvalueref joUserData)
     {
-        variable bool ourEvent=${joReq.Assert[hook,"${_eventargs.Event.AsJSON~}"]}
+        variable bool ourEvent=${joReq.Assert[hook,"${joEventArgs.Get[event].AsJSON~}"]}
         variable bool completed
         variable jsonvalueref jo="joUserData.Get[-init,\"{}\",reqs].Get[-init,\"{}\",${reqId}]"
 
@@ -183,7 +191,28 @@ objectdef(global) isb2_achievements
             if ${joReq.Has[args]}
             {
                 ; args has to match too (at least the required parts)
-                ourEvent:Set["${This.Object_LooseMatch["joReq.Get[args]",_eventargs.Args]}"]
+                ourEvent:Set["${This.Object_LooseMatch["joReq.Get[args]","joEventArgs.Get[args]"]}"]
+            }
+            if ${ourEvent}
+            {
+                if ${joEventArgs.Has[-string,session]}
+                {
+                    ; remote event
+                    ourEvent:Set[${joReq.Assert[source,"\"session\""]}]
+                }
+                else
+                {
+                    ; local event
+                    switch ${joReq.Get[source]~}
+                    {
+                        case uplink
+                            ourEvent:Set["${ISUplink(exists)}"]
+                            break
+                        case session
+                            ourEvent:Set["!${ISUplink(exists)}"]
+                            break
+                    }
+                }                    
             }
         }
 
@@ -229,7 +258,7 @@ objectdef(global) isb2_achievements
         
     }
 
-    method ApplyAchievementHook(weakref _eventargs, jsonvalueref joAchieve)
+    method ApplyAchievementHook(jsonvalueref joEventArgs, jsonvalueref joAchieve)
     {
         variable jsonvalueref jo="UserData.Get[-init,{},\"${joAchieve.GetInteger[id]}\"]"
 
@@ -239,19 +268,59 @@ objectdef(global) isb2_achievements
         {
             return
         }
-;        echo "ApplyAchievementHook ${_eventargs.Event~} ${joAchieve~}"
+;        echo "ApplyAchievementHook ${joEventargs.Get[event]~} ${joAchieve~}"
 
 
         variable jsonvalueref joResult
         joResult:SetReference["{\"completed\":true}"]
-        joAchieve.Get[reqs]:ForEach["This:ApplyAchievementReq[\"_eventargs\",joAchieve,\${ForEach.Key},ForEach.Value,joResult,jo]"]
+        joAchieve.Get[reqs]:ForEach["This:ApplyAchievementReq[\"joEventArgs\",joAchieve,\${ForEach.Key},ForEach.Value,joResult,jo]"]
 
         if ${joResult.GetBool[completed]}
         {
             ShouldSave:Set[1]
             jo:SetInteger[completed,"${time.Now.Timestamp}"]
+    
             This:OnAchievementCompleted[joAchieve]
+
+            if ${joEventArgs.Has[-string,session]}
+            {
+                InnerSpace:Relay["${joEventArgs.Get[session]~}","isb2_achievements.Instance:OnRemoteAchievementCompleted[${joAchieve.GetInteger[id]}]"]
+            }
         }
+    }
+
+    method ForwardHookedEvent()
+    {
+        variable jsonvalue joRelay="{\"object\":\"isb2_achievements.Instance\",\"method\":\"OnRemoteEvent\"}"
+        joRelay:SetString[target,"uplink"]
+        joRelay:SetByRef[eventargs,"Context.AsJSON"]
+        InnerSpace:Relay["${joRelay~}"]
+    }
+
+    method OnRemoteAchievementCompleted(int64 id)
+    {
+        variable jsonvalueref joAchieve="Achievements.Get[${id}]"
+        if !${joAchieve.Reference(exists)}
+            return
+
+        This:OnAchievementCompleted[joAchieve]
+    }
+
+    method OnRemoteEvent()
+    {
+;        echo "\apOnRemoteEvent\ax ${Context(type)} ${Context~} ${This(type)}"
+        variable jsonvalueref joEventArgs="Context.Get[eventargs]"
+        joEventArgs:SetString[session,"${Context.Get[source]~}"]
+;        echo "joEventArgs=${joEventArgs~}"
+        
+        variable jsonvalueref ja
+
+        ja:SetReference["This.GetAchievementsFromHook[\"${joEventArgs.Get[event]~}\"]"]
+
+;        echo "applicable achievements: ${ja~}"
+        ja:ForEach["This:ApplyAchievementHook[\"joEventArgs\",ForEach.Value]"]
+
+        This:AutoSave
     }
 
     method OnHookedEvent()
@@ -261,7 +330,7 @@ objectdef(global) isb2_achievements
         variable jsonvalueref ja="This.GetAchievementsFromHook[\"${Context.Event~}\"]"
 
 ;        echo "applicable achievements: ${ja~}"
-        ja:ForEach["This:ApplyAchievementHook[\"Context\",ForEach.Value]"]
+        ja:ForEach["This:ApplyAchievementHook[\"Context.AsJSON\",ForEach.Value]"]
 
         This:AutoSave
     }
@@ -278,6 +347,9 @@ objectdef(global) isb2_achievements
     
     method LoadSettings()
     {
+        if !${ISUplink(exists)}
+            return
+
         if ${ISB2.SettingsFolder.FileExists[ISB2.Achievements.json]}
         {
             UserData:SetReference["jsonobject.ParseFile[\"${This.SettingsFilename~}\"]"]
@@ -290,6 +362,8 @@ objectdef(global) isb2_achievements
 
     method StoreSettings()
     {        
+        if !${ISUplink(exists)}
+            return FALSE
         return ${UserData:WriteFile["${This.SettingsFilename~}",multiline](exists)}
     }
 

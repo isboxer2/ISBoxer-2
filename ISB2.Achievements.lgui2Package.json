@@ -14,7 +14,8 @@
                     "flavor":"Way to go, champ!",
                     "reqs":[
                         {
-                            "hook":"profileEditorOpened"
+                            "hook":"profileEditorOpened",
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -24,7 +25,8 @@
                     "flavor":"You're basically a pro now!",
                     "reqs":[
                         {
-                            "hook":"quickSetupCompleted"
+                            "hook":"quickSetupCompleted",
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -35,7 +37,8 @@
                     "reqs":[
                         {
                             "count":10,
-                            "hook":"profileEditorOpened"
+                            "hook":"profileEditorOpened",
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -45,7 +48,8 @@
                     "flavor":"Your first time is the one you will never forget!",
                     "reqs":[
                         {
-                            "hook":"profileSaved"
+                            "hook":"profileSaved",
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -55,8 +59,9 @@
                     "flavor":"Click Yes to format your computer.",
                     "reqs":[
                         {
-                    "count":10,
-                    "hook":"profileSaved"
+                            "count":10,
+                            "hook":"profileSaved",
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -66,7 +71,8 @@
                     "flavor":"Hold on to your butts!",
                     "reqs":[
                         {
-                    "hook":"onTeamLaunched"
+                            "hook":"onTeamLaunched",
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -77,27 +83,33 @@
                     "reqs":[
                         {
                             "hook":"contextLoaded",
-                            "args":{"type":"slot"}
+                            "args":{"type":"slot"},
+                            "source":"uplink"
                         },
                         {
                             "hook":"contextLoaded",
-                            "args":{"type":"character"}
+                            "args":{"type":"character"},
+                            "source":"uplink"
                         },
                         {
                             "hook":"contextLoaded",
-                            "args":{"type":"hotkeySheet"}                            
+                            "args":{"type":"hotkeySheet"},
+                            "source":"uplink"                            
                         },
                         {
                             "hook":"contextLoaded",
-                            "args":{"type":"mappableSheet"}                            
+                            "args":{"type":"mappableSheet"},
+                            "source":"uplink"
                         },
                         {
                             "hook":"contextLoaded",
-                            "args":{"type":"team"}                            
+                            "args":{"type":"team"},
+                            "source":"uplink"                            
                         },
                         {
                             "hook":"contextLoaded",
-                            "args":{"type":"windowLayout"}                            
+                            "args":{"type":"windowLayout"},
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -107,7 +119,8 @@
                     "flavor":"Welcome to the Drag (and Drop) Show",
                     "reqs":[
                         {
-                            "hook":"onDragDropCompleted"
+                            "hook":"onDragDropCompleted",
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -118,7 +131,8 @@
                     "reqs":[
                         {
                             "hook":"onSplitEditorChanged",
-                            "args":{"value":true}
+                            "args":{"value":true},
+                            "source":"uplink"
                         }
                     ]
                 },
@@ -128,7 +142,20 @@
                     "flavor":"What luck, this thing takes my old profiles?",
                     "reqs":[
                         {
-                            "hook":"onProfileImported"                            
+                            "hook":"onProfileImported",
+                            "source":"uplink"                            
+                        }
+                    ]
+                },
+                {
+                    "id":11,
+                    "name":"GUI Mode Toggled!",
+                    "flavor":"This can only mean one thing...",
+                    "reqs":[
+                        {
+                            "hook":"onGUIModeChanged",
+                            "args":{"value":true},
+                            "source":"session"
                         }
                     ]
                 }

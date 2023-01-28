@@ -363,6 +363,7 @@
         },
         "windowLayoutEngine.regionView":{
             "jsonTemplate":"mapitemview",
+            "acceptsMouseFocus":false,
             "type":"mapitemview",
             "virtualAlignment":"corner",
             "virtualSizeBinding":{
@@ -409,6 +410,7 @@
         },
         "windowLayoutEngine.screenView":{
             "jsonTemplate":"mapitemview",
+            "acceptsMouseFocus":false,
             "type":"mapitemview",
             "virtualAlignment":"corner",
             "virtualSizeBinding":{
@@ -425,16 +427,18 @@
                 "color":"#ffffff"
             },
             "strata": 0.4
-        },
+        },                      
         "windowLayoutEngine.layoutPreview":{
             "jsonTemplate":"map",
             "type":"map",
             "fixedAspectRatio":true,
+            "acceptsMouseFocus":false,
             "virtualLocation":[0,0],
             "virtualSize":[1920,1080],
-            "virtualAlignment":"corner",
+            "virtualAlignment":"corner",          
             "content":{
                 "jsonTemplate":"map.content",
+                "acceptsMouseFocus":false,
                 "backgroundBrush":{
                     "color":"#222222"
                 }    
@@ -484,7 +488,13 @@
                         "_dock":"left",
                         "type":"textblock",
                         "text":"Layout ${This.Context.Index}: ${This.Context.Data.Get[name]}",
-                        "minSize":[200,0]
+                        "font":{
+                            "heightFactor":1.2,
+                            "bold":true
+                        },
+                        "minSize":[300,0],
+                        "margin":[10,0],
+                        "verticalAlignment":"center"
                     },
                     {
                         "_dock":"right",

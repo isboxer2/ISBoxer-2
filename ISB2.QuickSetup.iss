@@ -224,6 +224,27 @@ objectdef isb2_quicksetup inherits isb2_building
         LGUI2.Element[isb2.QuickSetup.EditingCharacter.name]:KeyboardFocus
     }
 
+    member:bool ImaginationCheck(string name)
+    {
+        if ${name.Length}<3
+            return FALSE
+
+        variable bool res=0
+        variable int i
+        for ( i:Set[1] ; ${i}<${name.Length} ; i:Inc)
+        {
+            if ${name.GetAt[1]}!=${name.GetAt[${i}]}
+            {
+                res:Set[1]
+                break
+            }
+        }
+        if !${res}
+            return FALSE
+
+        return TRUE
+    }
+
     method ValidatePage(string pageName)
     {
 ;        echo "ValidatePage ${pageName} ${Context(type)} ${Context.Source.ID}"
@@ -270,6 +291,11 @@ objectdef isb2_quicksetup inherits isb2_building
                     LGUI2.Element[isb2.QuickSetup.TeamName]:KeyboardFocus
                     Context.Args:SetBool[pageValid,0]
                     return
+                }
+
+                if !${This.ImaginationCheck["${TeamName~}"]}
+                {
+                    LGUI2.Element[isb2.events]:FireEventHandler[noImagination]
                 }
             }
                 break

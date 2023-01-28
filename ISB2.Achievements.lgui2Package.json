@@ -192,6 +192,17 @@
                             "source":"session"
                         }
                     ]
+                },
+                {
+                    "id":14,
+                    "name":"I have no imagination!",
+                    "flavor":"This is the perfect name for my team!",
+                    "reqs":[
+                        {
+                            "hook":"noImagination",
+                            "source":"uplink"
+                        }
+                    ]
                 }
             ]
         }

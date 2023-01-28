@@ -121,6 +121,18 @@ objectdef isb2_quicksetup inherits isb2_building
         This:AddCharacter
     }
 
+    method SetCharacterDetail(string fieldName, string newValue)
+    {
+;        echo "SetCharacterDetail ${fieldName~} ${newValue~}"
+        if ${EditingCharacter.Assert["${fieldName~}","${newValue.AsJSON~}"]}
+            return
+
+        EditingCharacter:SetString["${fieldName~}","${newValue~}"]
+
+        if ${newValue.NotNULLOrEmpty}
+            LGUI2.Element[isb2.events]:FireEventHandler[onCharacterDetails,"{\"field\":\"${fieldName~}\"}"]
+    }
+
     method OnSelectedTabChanged()
     {
         Error:Set[]

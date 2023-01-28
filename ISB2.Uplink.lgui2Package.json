@@ -1239,18 +1239,24 @@
                                                         "dataBinding":{
                                                             "pullFormat":"${This.ObjectView.Object.Get[email]}",
                                                             "pullReplaceNull":"",
-                                                            "pushFormat":["This.ObjectView.Object:SetString[email,\"","\"]"]
+                                                            "pushFormat":["ISB2QuickSetup:SetCharacterDetail[email,\"","\"]"]
                                                           },
-                                                          "editTemplate":"propertyview.textbox"                              
+                                                          "editTemplate":"propertyview.textbox",
+                                                          "controlData":{
+                                                            "textBindingUsesFocus":true
+                                                        }                              
                                                     },
                                                     {
                                                         "name":"Game Account",
                                                         "dataBinding":{
                                                             "pullFormat":"${This.ObjectView.Object.Get[accountName]}",
                                                             "pullReplaceNull":"",
-                                                            "pushFormat":["This.ObjectView.Object:SetString[accountName,\"","\"]"]
+                                                            "pushFormat":["ISB2QuickSetup:SetCharacterDetail[accountName,\"","\"]"]
                                                           },
-                                                          "editTemplate":"propertyview.textbox"                              
+                                                          "editTemplate":"propertyview.textbox",
+                                                          "controlData":{
+                                                            "textBindingUsesFocus":true
+                                                          }
                                                     },
                                                     {
                                                         "name":"Game Server",

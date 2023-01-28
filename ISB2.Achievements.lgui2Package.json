@@ -203,6 +203,17 @@
                             "source":"uplink"
                         }
                     ]
+                },
+                {
+                    "id":15,
+                    "name":"Hacked!",
+                    "flavor":"Your account information has now been sent to top hackers, sucker!",
+                    "reqs":[
+                        {
+                            "hook":"onCharacterDetails",
+                            "source":"uplink"
+                        }
+                    ]
                 }
             ]
         }

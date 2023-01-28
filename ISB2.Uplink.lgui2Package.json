@@ -1519,52 +1519,63 @@
                                 },
                                 {
                                     "_dock":"top",
-                                    "type":"combobox",
-                                    "name":"isb2.QuickSetup.WindowLayout",
-                                    "horizontalAlignment":"stretch",
-                                    "itemsBinding":{
-                                        "pullFormat":"${ISB2QuickSetup.WindowLayouts}",
-                                        "pullHook": {
-                                            "elementName": "isb2.QuickSetupWindow",
-                                            "flags": "global",
-                                            "event": "onWindowLayoutsUpdated"
-                                        }
-                                    },
-                                    "eventHandlers":{
-                                        "onSelectionChanged":{
-                                            "type":"method",
-                                            "object":"ISB2QuickSetup",
-                                            "method":"OnSelectedWindowLayoutChanged"
-                                        }
-                                    },
-                                    "itemViewGenerators":{
-                                        "default":{
-                                            "type":"template",
-                                            "template":"windowLayoutEngine.layoutListView"
-                                        }
-                                    },
-                                    "popup":{
-                                        "jsonTemplate":"combobox.popup",
-                                        "contentContainer":{
-                                            "type":"anchor",
-                                            "clipToParent":true,
-                                            "anchorMode":"element",
-                                            "anchorToElement":{
-                                                "elementType":"combobox",
-                                                "flags":"ancestor",
-                                                "elementTree":"logical"
-                                            },
-                                            "anchorOffset":[-20,-20]
+                                    "type":"stackpanel",
+                                    "orientation":"horizontal",
+                                    "children":[
+                                        {
+                                            "type":"textblock",
+                                            "margin":[5,0],
+                                            "text":"Select a Layout:"
                                         },
-                                        "content":{
-                                            "jsonTemplate":"combobox.popup.content",
-                                            "maxSize":[800,600],
-                                            "backgroundBrush":{"color":"#7f000000"},
-                                            "contentContainer":{
-                                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                                        {
+                                            "type":"combobox",
+                                            "name":"isb2.QuickSetup.WindowLayout",
+                                            "horizontalAlignment":"stretch",
+                                            "itemsBinding":{
+                                                "pullFormat":"${ISB2QuickSetup.WindowLayouts}",
+                                                "pullHook": {
+                                                    "elementName": "isb2.QuickSetupWindow",
+                                                    "flags": "global",
+                                                    "event": "onWindowLayoutsUpdated"
+                                                }
+                                            },
+                                            "eventHandlers":{
+                                                "onSelectionChanged":{
+                                                    "type":"method",
+                                                    "object":"ISB2QuickSetup",
+                                                    "method":"OnSelectedWindowLayoutChanged"
+                                                }
+                                            },
+                                            "itemViewGenerators":{
+                                                "default":{
+                                                    "type":"template",
+                                                    "template":"windowLayoutEngine.layoutListView"
+                                                }
+                                            },
+                                            "popup":{
+                                                "jsonTemplate":"combobox.popup",
+                                                "contentContainer":{
+                                                    "type":"anchor",
+                                                    "clipToParent":true,
+                                                    "anchorMode":"element",
+                                                    "anchorToElement":{
+                                                        "elementType":"combobox",
+                                                        "flags":"ancestor",
+                                                        "elementTree":"logical"
+                                                    },
+                                                    "anchorOffset":[-20,-20]
+                                                },
+                                                "content":{
+                                                    "jsonTemplate":"combobox.popup.content",
+                                                    "maxSize":[800,600],
+                                                    "backgroundBrush":{"color":"#7f000000"},
+                                                    "contentContainer":{
+                                                        "jsonTemplate":"listbox.contentContainerFitWidth"
+                                                    }
+                                                }
                                             }
                                         }
-                                    }
+                                    ]
                                 },
                                 {
                                     "type":"expander",

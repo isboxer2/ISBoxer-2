@@ -226,6 +226,45 @@
                             "args":{"value":false}
                         }
                     ]
+                },
+                {
+                    "id":17,
+                    "name":"Variables Novice",
+                    "flavor":"Don't forget to change your gender fluid, gotta keep that thing running!",
+                    "reqs":[
+                        {
+                            "hook":"onVariableChanged",
+                            "source":"session",
+                            "unique":"name",
+                            "count":"5"
+                        }
+                    ]
+                },
+                {
+                    "id":18,
+                    "name":"Variables Master",
+                    "flavor":"They're like the spice of life",
+                    "reqs":[
+                        {
+                            "hook":"onVariableChanged",
+                            "source":"session",
+                            "unique":"name",
+                            "count":"25"
+                        }
+                    ]
+                },
+                {
+                    "id":19,
+                    "name":"Drag-and-Drop Novice",
+                    "flavor":"Just bend and snap, works every time!",
+                    "reqs":[
+                        {
+                            "hook":"onDragDropCompleted",
+                            "source":"uplink",
+                            "unique":"type",
+                            "count":5
+                        }
+                    ]
                 }
             ]
         }

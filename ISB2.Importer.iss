@@ -1444,6 +1444,9 @@ objectdef isb2_importer
         if ${jo.Has[-notnull,Description]}
             joNew:SetString[description,"${jo.Get[Description]~}"]
 
+        if ${jo.Has[-notnull,Type]}
+            joNew:SetString[type,"${jo.Get[Type]~}"]
+
         variable jsonvalue joFont="{}"
 
         if ${jo.Has[-notnull,buttonFontName]}

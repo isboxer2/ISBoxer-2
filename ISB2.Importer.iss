@@ -1489,6 +1489,34 @@ objectdef isb2_importer
         if ${jo.Has[-notnull,borderColor]}
             joNew:SetString[borderColor,"${jo.Get[borderColor]~}"]   
 
+        if ${jo.Has[-notnull,buttonBackgroundColor]}
+            joNew:SetString[buttonBackgroundColor,"${jo.Get[buttonBackgroundColor]~}"]   
+
+        if ${jo.Has[-notnull,buttonBorderColor]}
+            joNew:SetString[buttonBorderColor,"${jo.Get[buttonBorderColor]~}"]   
+
+        variable jsonvalueref joRef
+        if ${jo.Has[-notnull,buttonImage]}
+        {
+            joRef:SetReference["This.GetImageReference[\"${jo.Get[buttonImage]~}\"]"]
+            if ${joRef.Reference(exists)}
+                joNew:SetByRef[image,joRef]             
+        }
+
+        if ${jo.Has[-notnull,buttonImageHover]}
+        {
+            joRef:SetReference["This.GetImageReference[\"${jo.Get[buttonImageHover]~}\"]"]
+            if ${joRef.Reference(exists)}
+                joNew:SetByRef[image,joRef]             
+        }
+
+        if ${jo.Has[-notnull,buttonImagePressed]}
+        {
+            joRef:SetReference["This.GetImageReference[\"${jo.Get[buttonImagePressed]~}\"]"]
+            if ${joRef.Reference(exists)}
+                joNew:SetByRef[image,joRef]             
+        }
+
         if ${jo.Has[-notnull,numButtons]}
             joNew:SetInteger[numButtons,"${jo.GetInteger[numButtons]}"]
 

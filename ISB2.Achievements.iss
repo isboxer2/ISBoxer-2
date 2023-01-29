@@ -50,8 +50,15 @@ objectdef(global) isb2_achievements
         HookMap.Get[-init,"{}","${name~}"].Get[-init,"[]","achievements"]:AddByRef[joAchieve]
     }
 
-    method InstallAchievementReq(jsonvalueref joReq, jsonvalueref joAchieve)
+    method InstallAchievementReq(jsonvalueref joReq, jsonvalueref joAchieve, jsonvalueref joUserData)
     {
+        variable jsonvalueref jo="joUserData.Get[reqs,${reqId}]"
+        if ${jo.Reference(exists)} && ${jo.Has[completed]}
+        {
+            ; already completed, don't need to install.
+            return
+        }
+        
         if ${joReq.Has[hook]}
         {
             if ${ISUplink(exists)} || ${joReq.Get[source]~.Equal[session]}
@@ -66,12 +73,20 @@ objectdef(global) isb2_achievements
         ; echo "\ayInstallAchievement\ax ${joAchieve~}"
 
         variable int64 id="${joAchieve.GetInteger[id]}"
+        Achievements:SetByRef["${id}",joAchieve]
+
+        variable jsonvalueref jo
+        jo:SetReference["UserData.Get[-init,{},\"${id}\"]"]        
+        if ${jo.Reference(exists)} && ${jo.Has[completed]}
+        {
+            ; already completed, don't need to install.
+            return
+        }
 
         if ${joAchieve.Has[-array,reqs]}
         {
-            joAchieve.Get[reqs]:ForEach["This:InstallAchievementReq[ForEach.Value,joAchieve]"]
+            joAchieve.Get[reqs]:ForEach["This:InstallAchievementReq[ForEach.Value,joAchieve,jo]"]
         }
-        Achievements:SetByRef["${id}",joAchieve]
     }
 
     method InstallAchievements()
@@ -183,8 +198,8 @@ objectdef(global) isb2_achievements
     method ApplyAchievementReq(jsonvalueref joEventArgs, jsonvalueref joAchieve, int64 reqId, jsonvalueref joReq, jsonvalueref joResult, jsonvalueref joUserData)
     {
         variable bool ourEvent=${joReq.Assert[hook,"${joEventArgs.Get[event].AsJSON~}"]}
-        variable bool completed
         variable jsonvalueref jo="joUserData.Get[-init,\"{}\",reqs].Get[-init,\"{}\",${reqId}]"
+        variable bool completed
 
         if ${ourEvent}
         {
@@ -218,6 +233,7 @@ objectdef(global) isb2_achievements
 
         completed:Set[${ourEvent}]
 
+
 ;        echo "ApplyAchievementReq[${ourEvent}] ${joReq~}"
         if ${completed}
         {
@@ -225,14 +241,17 @@ objectdef(global) isb2_achievements
             {
                 variable string uniqueValue
                 uniqueValue:Set["${joEventArgs.Get[args,"${joReq.Get[unique]~}"].AsJSON~}"]
-;                echo "applying uniqueness requirement... ${uniqueValue~}"
+    ;                echo "applying uniqueness requirement... ${uniqueValue~}"
 
                 if ${jo.Get[-init,"[]",unique].Contains["${uniqueValue~}"]}
                 {
                     completed:Set[0]
                 }
                 else
-                    jo.Get[-init,"[]",unique]:Add["${uniqueValue~}"]
+                {
+                    jo.Get[-init,"[]",unique]:Add["${uniqueValue~}"]        
+                    ShouldSave:Set[1]
+                }
             }
         }
 
@@ -243,12 +262,10 @@ objectdef(global) isb2_achievements
                 variable int64 count
                 count:Set[${jo.GetInteger[count]}]
 
-                if ${ourEvent}
-                {
-                    ShouldSave:Set[1]
-                    count:Inc
-                    jo:SetInteger[count,${count}]
-                }
+                count:Inc
+                jo:SetInteger[count,${count}]
+                ShouldSave:Set[1]
+
                 if ${count} < ${joReq.GetInteger[count]}
                 {
                     completed:Set[0]

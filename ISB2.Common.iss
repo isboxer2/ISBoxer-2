@@ -834,8 +834,8 @@ objectdef isb2_clickbarButton
 
         if ${Data.Has[backgroundColor]}
             joButton:Set["backgroundBrush","{\"color\":\"${Data.Get[backgroundColor]~}\"}"]
-        elseif ${Template.Has[backgroundColor]}
-            joButton:Set["backgroundBrush","{\"color\":\"${Template.Get[backgroundColor]~}\"}"]
+        elseif ${Template.Has[buttonBackgroundColor]}
+            joButton:Set["backgroundBrush","{\"color\":\"${Template.Get[buttonBackgroundColor]~}\"}"]
 
         variable string backgroundColor
         variable string useImage
@@ -844,8 +844,8 @@ objectdef isb2_clickbarButton
 
         if ${Data.Has[backgroundColor]}
             backgroundColor:Set["${Data.Get[backgroundColor]~}"]
-        elseif ${Template.Has[backgroundColor]}
-            backgroundColor:Set["${Template.Get[backgroundColor]~}"]
+        elseif ${Template.Has[buttonBackgroundColor]}
+            backgroundColor:Set["${Template.Get[buttonBackgroundColor]~}"]
 
         if ${Data.Has[image]}
             useImage:Set["${Data.Get[image,sheet]~}.${Data.Get[image,name]~}"]
@@ -862,6 +862,10 @@ objectdef isb2_clickbarButton
         elseif ${Template.Has[imagePressed]}
             useImagePressed:Set["${Template.Get[imagePressed,sheet]~}.${Template.Get[imagePressed,name]~}"]
 
+        if ${Data.Has[borderColor]}
+            joButton:Set[borderBrush,"{\"color\":\"${Data.Get[borderColor]~}\"}"]
+        elseif ${Template.Has[buttonBorderColor]}
+            joButton:Set[borderBrush,"{\"color\":\"${Template.Get[buttonBorderColor]~}\"}"]
 
         variable jsonvalueref joRef
         joRef:SetReference["This.GetBackgroundBrush[\"${backgroundColor~}\",\"${useImage~}\"]"]

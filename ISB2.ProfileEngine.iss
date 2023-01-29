@@ -1937,6 +1937,7 @@ objectdef isb2_profileengine
         else
         {
             ; todo
+            LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
         }
     }
 
@@ -2044,7 +2045,7 @@ objectdef isb2_profileengine
                     },
         */
 
-
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_PopupText(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2154,6 +2155,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_Mappable(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2625,6 +2627,7 @@ objectdef isb2_profileengine
             return
 
         ; text
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_SyncCursor(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2634,6 +2637,7 @@ objectdef isb2_profileengine
             return
 
         ; target
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_WindowStyle(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2642,6 +2646,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_WindowState(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2649,6 +2654,8 @@ objectdef isb2_profileengine
         echo "\arAction_WindowState\ax[${activate}] ${joAction~}"
         if !${joAction.Type.Equal[object]}
             return
+
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_ClickBarStyle(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2657,6 +2664,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_ClickBarHotkeySheet(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2665,6 +2673,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_Sound(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2673,6 +2682,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_Light(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2681,6 +2691,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_Volume(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2689,6 +2700,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_VFX(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2763,6 +2775,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_InputDeviceKeySet(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2771,6 +2784,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_TimerPool(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2779,6 +2793,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_SendNextClick(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2787,6 +2802,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_RegionSheetState(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2795,6 +2811,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_AddTrigger(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -4018,6 +4035,7 @@ objectdef isb2_profileengine
 
         if !${joActionType.Reference(exists)}
         {
+            LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${actionType~}\"}"]
             Script:SetLastError["ExecuteAction: \arUnhandled action type: \"${actionType~}\"\ax"]
             return FALSE
         }

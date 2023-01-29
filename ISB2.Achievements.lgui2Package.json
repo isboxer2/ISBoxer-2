@@ -315,6 +315,43 @@
                             "count":10
                         }
                     ]
+                },
+                {
+                    "id":24,
+                    "name":"Missing Action Type Located!",
+                    "flavor":"Well, that's inconvenient!",
+                    "reqs":[
+                        {
+                            "hook":"onUnhandledActionType",
+                            "source":"session"
+                        }
+                    ]                    
+                },
+                {
+                    "id":25,
+                    "name":"Missing Action Type Hunter",
+                    "flavor":"Your profile is so busted right it's unusable with ISBoxer 2!",
+                    "reqs":[
+                        {
+                            "hook":"onUnhandledActionType",
+                            "source":"session",
+                            "unique":"type",
+                            "count":5
+                        }
+                    ]                    
+                },
+                {
+                    "id":26,
+                    "name":"Missing Action Type Mastery",
+                    "flavor":"At this point you're just doing it on purpose!",
+                    "reqs":[
+                        {
+                            "hook":"onUnhandledActionType",
+                            "source":"session",
+                            "unique":"type",
+                            "count":10
+                        }
+                    ]                    
                 }
             ]
         }

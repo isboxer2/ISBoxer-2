@@ -939,6 +939,36 @@
                                         }
                                     ]
                                 }                                
+                            },
+                            {
+                                "type":"tab",
+                                "header":"ISBoxer 2 Settings",
+                                "content":{
+                                    "type":"dockpanel",
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "children":[
+                                        {
+                                            "type":"objectview",
+                                            "_dock":"top",
+                                            "horizontalAlignment":"stretch",
+                                            "objectBinding":{
+                                                "pullFormat":"${ISB2.Settings}"
+                                            },
+                                            "properties":[
+                                                {
+                                                    "name":"Disable Achievements",
+                                                    "dataBinding":{
+                                                        "pullFormat":"${This.ObjectView.Object.Get[disableAchievements]}",
+                                                        "pullReplaceNull":"0",
+                                                        "pushFormat":["ISB2:SetDisableAchievements[\"","\"]"]
+                                                      },
+                                                      "editTemplate":"propertyview.checkbox"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
                             }                                                        
                         ]
                     }

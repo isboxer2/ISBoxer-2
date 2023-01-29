@@ -308,6 +308,8 @@ objectdef(global) isb2_achievements
 
     method OnRemoteEvent()
     {
+        if !${ISB2.AchievementsEnabled}
+            return
         variable jsonvalueref joEventArgs="Context.Get[eventargs]"
         joEventArgs:SetString[session,"${Context.Get[source]~}"]
 ;        echo "\apOnRemoteEvent\ax ${joEventArgs~}"
@@ -324,6 +326,8 @@ objectdef(global) isb2_achievements
 
     method OnHookedEvent()
     {
+        if !${ISB2.AchievementsEnabled}
+            return
 ;        echo "\ayisb2_achievements:OnHookedEvent\ax ${Context(type)} ${Context.Event} ${Context.Source} ${Context.Args}"
 
         variable jsonvalueref ja="This.GetAchievementsFromHook[\"${Context.Event~}\"]"

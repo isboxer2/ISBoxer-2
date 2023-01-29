@@ -214,6 +214,18 @@
                             "source":"uplink"
                         }
                     ]
+                },
+                {
+                    "id":16,
+                    "name":"Achievements disabled!",
+                    "flavor":"This is the part where you slam your face into the desk!",
+                    "reqs":[
+                        {
+                            "hook":"onAchievementsToggled",
+                            "source":"uplink",
+                            "args":{"value":false}
+                        }
+                    ]
                 }
             ]
         }

@@ -208,6 +208,22 @@ objectdef(global) isb2 inherits isb2_profilecollection
         This:StoreSettings
     }
 
+    member:bool AchievementsEnabled()
+    {
+        if ${Settings.GetBool[disableAchievements]}
+            return FALSE
+        return TRUE
+    }
+
+    method SetDisableAchievements(bool newValue)
+    {
+        LGUI2.Element[isb2.events]:FireEventHandler[onAchievementsToggled,"{\"value\":${newValue.Not.AsJSON~}}"]
+
+        Settings:SetBool[disableAchievements,${newValue}]
+        This:AutoStoreSettings
+
+    }
+
     method LoadTests()
     {
         This:LoadFile["Tests/ISBPW.isb2.json"]

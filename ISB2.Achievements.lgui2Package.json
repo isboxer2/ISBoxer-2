@@ -265,6 +265,56 @@
                             "count":5
                         }
                     ]
+                },
+                {
+                    "id":20,
+                    "name":"Missing Editor Located!",
+                    "flavor":"Keep up the good work, soldier!",
+                    "reqs":[
+                        {
+                            "hook":"onMissingEditor",
+                            "source":"uplink"
+                        }
+                    ]
+                },
+                {
+                    "id":21,
+                    "name":"Missing Editor Hunter",
+                    "flavor":"Tag it and bag it!",
+                    "reqs":[
+                        {
+                            "hook":"onMissingEditor",
+                            "source":"uplink",
+                            "unique":"name",
+                            "count":10
+                        }
+                    ]
+                },
+                {
+                    "id":22,
+                    "name":"Missing Editor Mastery",
+                    "flavor":"What has two thumbs and is great at finding missing editors? THIS GUY!",
+                    "reqs":[
+                        {
+                            "hook":"onMissingEditor",
+                            "source":"uplink",
+                            "unique":"name",
+                            "count":25
+                        }
+                    ]
+                },
+                {
+                    "id":23,
+                    "name":"All Hail the King of No Imagination!",
+                    "flavor":"Insert clever message here!",
+                    "reqs":[
+                        {
+                            "hook":"noImagination",
+                            "source":"uplink",
+                            "unique":"name",
+                            "count":10
+                        }
+                    ]
                 }
             ]
         }

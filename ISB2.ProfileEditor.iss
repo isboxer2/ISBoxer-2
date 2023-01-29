@@ -183,10 +183,18 @@ objectdef(global) isb2_profileEditorContext
             echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
             if !${MissingEditor.NotNULLOrEmpty}
             {
-                if ${useTemplate.NotNULLOrEmpty}
+;                if ${useTemplate.NotNULLOrEmpty}
+                {
                     MissingEditor:Set["Missing template ${useTemplate~}"]
-                else
-                    MissingEditor:Set["Editor template missing from ${Name~}"]
+
+                    if !${useTemplate.Equal[isb2.mainEditor.General]}
+                        LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${useTemplate~}\"}"]
+                }
+;                else
+;                {
+;                    MissingEditor:Set["Editor template missing from ${Name~}"]
+;                    LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${Name~}\"}"]
+;                }
             }
         }
 
@@ -274,7 +282,10 @@ objectdef(global) isb2_profileEditorContext
             joEditor:SetReference["LGUI2.Template[isb2.missingContextEditor]"]
             echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
             if ${element.Context.Get[type].NotNULLOrEmpty}
+            {
                 MissingEditor:Set["Missing template ${useTemplate~}"]
+                LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${useTemplate~}\"}"]
+            }
         }
 
         return joEditor
@@ -301,7 +312,10 @@ objectdef(global) isb2_profileEditorContext
             joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
             echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
             if ${EditingItem.Get[type].NotNULLOrEmpty}
+            {
+                LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${useTemplate~}\"}"]
                 MissingEditor:Set["Missing template ${useTemplate~}"]
+            }
         }
 
         return joEditor
@@ -358,6 +372,8 @@ objectdef(global) isb2_profileEditorContext
             {
                 echo "\arMissing context and itemName\ax in ${Name~}.${Context.Source.Metadata.Get[name]~}"
                 missingEditor:Set["Context missing from ${Name~}.${Context.Source.Metadata.Get[name]~}"]
+
+                LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${Name~}.${Context.Source.Metadata.Get[name]~}\"}"]
             }
             useName:Set["${Name~}.${joData.Get[itemName]~}"]
         }
@@ -603,6 +619,7 @@ objectdef(global) isb2_profileEditorContext
             {
                 echo "\arMissing context and itemName\ax in ${Name~}.${Context.Source.Metadata.Get[name]~}"
                 missingEditor:Set["Context missing from ${Name~}.${Context.Source.Metadata.Get[name]~}"]
+                LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${Name~}.${Context.Source.Metadata.Get[name]~}\"}"]
             }
             useName:Set["${Name~}.${joData.Get[itemName]~}"]
         }

@@ -254,6 +254,26 @@ objectdef isb2_quicksetup inherits isb2_building
         if !${res}
             return FALSE
 
+        if ${name.Equal[main]}
+            return FALSE
+
+        if ${name.Find["${BuildingGame.Get[name]~}"]}
+        {
+            if (${name.Length}-${BuildingGame.Get[name]~.Length}) <= 5
+                return FALSE
+        }
+        if ${name.Find["${BuildingGame.Get[shortName]~}"]}
+        {
+            if (${name.Length}-${BuildingGame.Get[shortName]~.Length}) <= 5
+                return FALSE
+        }
+
+        if ${name.Find["new "]}
+        {
+            if ${name.Length} - 4 <= 5
+                return FALSE
+        }
+
         return TRUE
     }
 
@@ -307,7 +327,7 @@ objectdef isb2_quicksetup inherits isb2_building
 
                 if !${This.ImaginationCheck["${TeamName~}"]}
                 {
-                    LGUI2.Element[isb2.events]:FireEventHandler[noImagination]
+                    LGUI2.Element[isb2.events]:FireEventHandler[noImagination,"{\"name\":\"${TeamName~}\"}"]
                 }
             }
                 break

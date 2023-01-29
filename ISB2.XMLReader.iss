@@ -582,10 +582,11 @@ objectdef isb2_isb1transformer
             newValue:Set["#${Math.Calc64[(${r} << 16) | (${g} << 8) | ${b}].Hex[6]}"]
         }
 
-        if !${newValue.Equal[defaultValue]}
+        if !${newValue.Equal["${defaultValue~}"]}
             joTransform:SetString["${newProperty~}","${newValue~}"]
 
-        joTransform:Erase["${oldProperty~}"]
+        if !${newProperty.EqualCS[${oldProperty~}]}
+            joTransform:Erase["${oldProperty~}"]
     }
 
     method AutoTransform_Color(jsonvalueref joTransform, string newProperty, int r=0,int g=0,int b=0,int a=0)

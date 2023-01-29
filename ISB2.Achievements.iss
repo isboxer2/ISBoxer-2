@@ -219,24 +219,43 @@ objectdef(global) isb2_achievements
         completed:Set[${ourEvent}]
 
 ;        echo "ApplyAchievementReq[${ourEvent}] ${joReq~}"
-
-        if ${joReq.Has[count]}
+        if ${completed}
         {
-            variable int64 count
-            count:Set[${jo.GetInteger[count]}]
-
-            if ${ourEvent}
+            if ${joReq.Has[-string,unique]}
             {
-                ShouldSave:Set[1]
-                count:Inc
-                jo:SetInteger[count,${count}]
+                variable string uniqueValue
+                uniqueValue:Set["${joEventArgs.Get[args,"${joReq.Get[unique]~}"].AsJSON~}"]
+;                echo "applying uniqueness requirement... ${uniqueValue~}"
+
+                if ${joUserData.Get[-init,"[]",unique].Contains["${uniqueValue~}"]}
+                {
+                    completed:Set[0]
+                }
+                else
+                    joUserData.Get[-init,"[]",unique]:Add["${uniqueValue~}"]
             }
-            if ${count} < ${joReq.GetInteger[count]}
-            {
-                completed:Set[0]
-            }                
+        }
 
-;            echo "ApplyAchievementReq count = ${count} of ${joReq.GetInteger[count]}"            
+        if ${completed}
+        {
+            if ${joReq.Has[count]}
+            {
+                variable int64 count
+                count:Set[${jo.GetInteger[count]}]
+
+                if ${ourEvent}
+                {
+                    ShouldSave:Set[1]
+                    count:Inc
+                    jo:SetInteger[count,${count}]
+                }
+                if ${count} < ${joReq.GetInteger[count]}
+                {
+                    completed:Set[0]
+                }                
+
+    ;            echo "ApplyAchievementReq count = ${count} of ${joReq.GetInteger[count]}"            
+            }
         }
 
         ; alter result if this requirement is not met.

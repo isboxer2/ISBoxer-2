@@ -227,12 +227,12 @@ objectdef(global) isb2_achievements
                 uniqueValue:Set["${joEventArgs.Get[args,"${joReq.Get[unique]~}"].AsJSON~}"]
 ;                echo "applying uniqueness requirement... ${uniqueValue~}"
 
-                if ${joUserData.Get[-init,"[]",unique].Contains["${uniqueValue~}"]}
+                if ${jo.Get[-init,"[]",unique].Contains["${uniqueValue~}"]}
                 {
                     completed:Set[0]
                 }
                 else
-                    joUserData.Get[-init,"[]",unique]:Add["${uniqueValue~}"]
+                    jo.Get[-init,"[]",unique]:Add["${uniqueValue~}"]
             }
         }
 

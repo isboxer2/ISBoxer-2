@@ -1489,6 +1489,9 @@ objectdef isb2_importer
         if ${jo.Has[-notnull,numButtons]}
             joNew:SetInteger[numButtons,"${jo.GetInteger[numButtons]}"]
 
+        if ${jo.Has[-notnull,alpha]}
+            joNew:SetNumber[alpha,"${jo.GetNumber[alpha]}"]
+
 ;        joNew:SetByRef[original,jo]
         return joNew
     }

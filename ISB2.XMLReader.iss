@@ -1123,7 +1123,7 @@ objectdef isb2_isb1transformer
         This:TransformColor[joTransform,buttonBorderColor,buttonBorderColor]
         This:TransformColor[joTransform,buttonFontColor,buttonFontColor]
 
-        isb2_isb1transformer:TransformInteger[joTransform,Alpha,alpha]
+        isb2_isb1transformer:TransformNumber[joTransform,Alpha,alpha]
         isb2_isb1transformer:TransformInteger[joTransform,Border,border]
         isb2_isb1transformer:TransformInteger[joTransform,buttonAlpha,buttonAlpha]
         isb2_isb1transformer:TransformInteger[joTransform,buttonBorder,buttonBorder]

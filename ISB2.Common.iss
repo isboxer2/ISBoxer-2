@@ -1301,7 +1301,7 @@ objectdef isb2_clickbar
 
     member:jsonvalueref GetFrameSize()
     {
-        if ${Template.Has[frameSize]}
+        if ${Template.Has[frameSize]} && !${Template.Assert[type,"\"Grid\""]}
             return "Template.Get[frameSize]"
 
         variable jsonvalue ja

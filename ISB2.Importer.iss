@@ -1989,7 +1989,7 @@ objectdef isb2_importer
             joNew:SetString[text,"${jo.Get[Text]~}"]
 
         if ${jo.GetBool[FillClipboard]}
-            joNew:SetBool[FillClipboard,1]
+            joNew:SetBool[fillClipboard,1]
 
         return joNew
     }
@@ -2466,14 +2466,17 @@ objectdef isb2_importer
             joNew:SetString[filename,"${jo.Get[Filename]~}"]
 
         if !${jo.GetBool[DirectXCapture]}
-            joNew:SetBool[DirectXCapture,0]
+            joNew:SetBool[useDirectX,0]
 
         if ${jo.GetBool[UseRect]}
         {
-            joNew:SetInteger[x,${jo.Get[Rect,Left]}]
-            joNew:SetInteger[y,${jo.Get[Rect,Top]}]
-            joNew:SetInteger[width,${jo.Get[Rect,Width]}]
-            joNew:SetInteger[height,${jo.Get[Rect,Height]}]
+            variable jsonvalue joRect
+            joRect:SetValue["{}"]
+            joRect:SetInteger[x,${jo.Get[Rect,Left]}]
+            joRect:SetInteger[y,${jo.Get[Rect,Top]}]
+            joRect:SetInteger[width,${jo.Get[Rect,Width]}]
+            joRect:SetInteger[height,${jo.Get[Rect,Height]}]
+            joNew:SetByRef[rect,joRect]
         }
 
         if !${jo.GetBool[UseClientCoords]}

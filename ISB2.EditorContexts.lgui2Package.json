@@ -215,7 +215,7 @@
                             "name":"Click Bars",
                             "list":{
                                 "source":"EditingItem.Get[clickBars]",
-                                "viewTemplate":"isb2.clickBarView",
+                                "viewTemplate":"isb2.stringView",
                                 "context":"clickBarName",
                                 "new":""
                             }

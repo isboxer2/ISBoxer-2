@@ -46,7 +46,23 @@ objectdef(global) isb2_profileEditorContext
 
             if ${joList.Has[-string,source]}
             {
-                joList:Set[itemsBinding,"{\"pullFormat\":\"\${This.Context.${joList.Get[source]~}}\"}"]
+                variable jsonvalueref joItemsBinding
+                joItemsBinding:SetReference["{}"]
+                joItemsBinding:SetString[pullFormat,"\${This.Context.${joList.Get[source]~}}"]
+                
+
+                ; pull hook
+                joItemsBinding:Set[pullHook,"$$>
+                {
+                    "elementName":"editor.container",
+                    "flags":"ancestor",
+                    "event":"Updated ${joItem.Get[name]~}"
+                }
+                <$$"]
+
+                joList:SetByRef[itemsBinding,joItemsBinding]
+
+;                joList:Set[itemsBinding,"{\"pullFormat\":\"\${This.Context.${joList.Get[source]~}}\"}"]
                 joList:SetString["_source","${joList.Get[source]~}"]
                 joSubItem:SetString["_source","${joList.Get[source]~}"]
             }
@@ -566,6 +582,13 @@ objectdef(global) isb2_profileEditorContext
                 else
                     This:AddUnique[ja,"${LGUI2.DragDropItem.Get[item].AsJSON~}"]
                 break
+        }
+
+        if ${joDragDrop.Has[subItem]}
+        {
+;            echo "\arOnDragDrop\ax \ay${joDragDrop.Get[subItem]~}\ax \atcontainer\ax=${Container} ${Container.ID}"
+
+            Element:FireEventHandler["Updated ${joDragDrop.Get[subItem]~}"]
         }
 
         LGUI2.Element[isb2.events]:FireEventHandler["onDragDropCompleted","{\"type\":\"${LGUI2.DragDropItem.Get[dragDropItemType]~}\"}"]

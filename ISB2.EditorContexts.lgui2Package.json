@@ -247,38 +247,46 @@
                         "clickBar":{
                             "type":"add",
                             "inProperty":"name",
-                            "outProperty":"clickBars"
+                            "outProperty":"clickBars",
+                            "subItem":"Click Bars"
                         },
                         "clickBarName":{
                             "type":"add",
-                            "outProperty":"clickBars"
+                            "outProperty":"clickBars",
+                            "subItem":"Click Bars"
                         },
                         "hotkeySheet":{
                             "type":"add",
                             "inProperty":"name",
-                            "outProperty":"hotkeySheets"
+                            "outProperty":"hotkeySheets",
+                            "subItem":"Hotkey Sheets"
                         },
                         "hotkeySheetName":{
                             "type":"add",
-                            "outProperty":"hotkeySheets"
+                            "outProperty":"hotkeySheets",
+                            "subItem":"Hotkey Sheets"
                         },
                         "mappableSheet":{
                             "type":"add",
                             "inProperty":"name",
-                            "outProperty":"mappableSheets"
+                            "outProperty":"mappableSheets",
+                            "subItem":"Mappable Sheets"
                         },
                         "mappableSheetName":{
                             "type":"add",
-                            "outProperty":"mappableSheets"
+                            "outProperty":"mappableSheets",
+                            "subItem":"Mappable Sheets"
                         },
                         "gameMacroSheet":{
                             "type":"add",
                             "inProperty":"name",
-                            "outProperty":"gameMacroSheets"
+                            "outProperty":"gameMacroSheets",
+                            "subItem":"Game Macro Sheets"
                         },
                         "gameMacroSheetName":{
                             "type":"add",
-                            "outProperty":"gameMacroSheets"
+                            "outProperty":"gameMacroSheets",
+                            "subItem":"Game Macro Sheets"
                         },
                         "windowLayout":{
                             "type":"copy",

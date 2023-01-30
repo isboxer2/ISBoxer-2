@@ -51,6 +51,12 @@ objectdef(global) isb2_profileEditorContext
                 joSubItem:SetString["_source","${joList.Get[source]~}"]
             }
 
+            if ${joList.Has[-string,sourceInit]}
+            {
+                joList:SetString["_sourceInit","${joList.Get[sourceInit]~}"]
+                joSubItem:SetString["_sourceInit","${joList.Get[sourceInit]~}"]
+            }
+
             if ${joList.Has[new]}
             {
                 joList:Set["_new","${joList.Get[new].AsJSON~}"]
@@ -162,7 +168,7 @@ objectdef(global) isb2_profileEditorContext
         {
             joLeftPane:SetReference["LGUI2.Template[isb2.editorContext.leftPane]"]
             joLeftPane:SetString["_pane","isb2.subPages"]
-            echo "joLeftPane ${joLeftPane~}"
+;            echo "joLeftPane ${joLeftPane~}"
             joLeftPaneContainer:SetReference["joLeftPane.Get[content,children,2,content]"]
             Data.Get[subItems]:ForEach["This:AddSubItem[joLeftPaneContainer,ForEach.Value]"]          
         }
@@ -328,7 +334,7 @@ objectdef(global) isb2_profileEditorContext
         variable jsonvalueref joMain="ISB2.FindOne[\"${_type~}\",\"${name~}\"]"
         if !${joMain.Reference(exists)}        
         {
-            echo "${_type~} named ${name~} not found"
+;            echo "${_type~} named ${name~} not found"
             return NULL
         }
 
@@ -338,15 +344,15 @@ objectdef(global) isb2_profileEditorContext
         ja:SetReference["joMain.Get[\"${subList~}\"]"]
         if !${ja.Reference(exists)}
         {
-            echo "joMain did not contain ${subList~}"            
+;            echo "joMain did not contain ${subList~}"            
             return NULL
         }
 
-        echo "ja ${ja.Used} ${ja~}"
+;        echo "ja ${ja.Used} ${ja~}"
         variable jsonvalueref jo="{}"
 
         ja:ForEach["jo:SetByRef[\"\${ForEach.Value.Get[name]}\",ForEach.Value]"]
-        echo "providing dictionary ${jo.Used} ${jo~}"
+;        echo "providing dictionary ${jo.Used} ${jo~}"
         return jo
     }
 #endregion
@@ -425,6 +431,12 @@ objectdef(global) isb2_profileEditorContext
         {
             case New
                 {
+                    if !${listElement.ItemsSource(exists)}
+                    {
+                        echo "listElement.ItemsSource does not exist, trying ${listElement.Metadata.Get[sourceInit]~}"
+                        noop ${${listElement.Metadata.Get[sourceInit]}}
+                        listElement:PullItemsBinding
+                    }
 
                     if ${listElement.Metadata.Has[new]}
                     {
@@ -453,7 +465,15 @@ objectdef(global) isb2_profileEditorContext
                     if ${jo.Get[dragDropItemType]~.Equal["${Context.Source.Parent[l].Metadata.Get[context]~}"]}
                     {
                         ; is good.
+                        if !${listElement.ItemsSource(exists)}
+                        {
+                            noop ${${listElement.Metadata.Get[sourceInit]~}}
+                            listElement:PullItemsBinding
+                        }
+
                         listElement.ItemsSource:Add["${jo.Get[item].AsJSON~}"]
+                        listElement:RefreshItems
+                        listElement:SetItemSelected[${ja.Used},1]
                     }
                     else
                     {

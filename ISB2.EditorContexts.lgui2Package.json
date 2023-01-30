@@ -139,7 +139,7 @@
                 },
                 {
                     "name":"builder",
-                    "title":"Builder: ${EditingItem.Get[name]}",
+                    "title":"Builder: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -148,23 +148,23 @@
                         {
                             "name":"Team",
                             "context":"team",
-                            "item":"This.EditingItem.Get[team]"
+                            "item":"This.EditingItem.Get[-init,{},team]"
                         },
                         {
                             "name":"Slot",
                             "context":"slot",
-                            "item":"This.EditingItem.Get[slot]"
+                            "item":"This.EditingItem.Get[-init,{},slot]"
                         },
                         {
                             "name":"Character",
                             "context":"character",
-                            "item":"This.EditingItem.Get[character]"
+                            "item":"This.EditingItem.Get[-init,{},character]"
                         }
                     ]
                 },
                 {
                     "name":"character",
-                    "title":"Character: ${EditingItem.Get[name]}",
+                    "title":"Character: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -174,7 +174,7 @@
                 },
                 {
                     "name":"team",
-                    "title":"Team: ${EditingItem.Get[name]}",
+                    "title":"Team: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -189,6 +189,7 @@
                             "name":"Slots",
                             "list":{
                                 "source":"EditingItem.Get[slots]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",slots]",
                                 "viewTemplate":"isb2.slotView",
                                 "context":"slot"
                             }    
@@ -197,6 +198,7 @@
                             "name":"Hotkey Sheets",
                             "list":{
                                 "source":"EditingItem.Get[hotkeySheets]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",hotkeySheets]",
                                 "viewTemplate":"isb2.stringView",
                                 "context":"hotkeySheetName",
                                 "new":""
@@ -206,6 +208,7 @@
                             "name":"Mappable Sheets",
                             "list":{
                                 "source":"EditingItem.Get[mappableSheets]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",mappableSheets]",
                                 "viewTemplate":"isb2.stringView",
                                 "context":"mappableSheetName",
                                 "new":""
@@ -215,6 +218,7 @@
                             "name":"Click Bars",
                             "list":{
                                 "source":"EditingItem.Get[clickBars]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",clickBars]",
                                 "viewTemplate":"isb2.stringView",
                                 "context":"clickBarName",
                                 "new":""
@@ -224,6 +228,7 @@
                             "name":"Game Macro Sheets",
                             "list":{
                                 "source":"EditingItem.Get[gameMacroSheets]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",gameMacroSheets]",
                                 "viewTemplate":"isb2.stringView",
                                 "context":"gameMacroSheetName",
                                 "new":""
@@ -233,6 +238,7 @@
                             "name":"Virtual Mappables",
                             "list":{
                                 "source":"EditingItem.Get[virtualMappables]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",virtualMappables]",
                                 "viewTemplate":"isb2.virtualMappableView"
                             }
                         }
@@ -283,7 +289,7 @@
                 },
                 {
                     "name":"windowLayout",
-                    "title":"Window Layout: ${EditingItem.Get[name]}",
+                    "title":"Window Layout: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -293,6 +299,7 @@
                             "name":"Regions",
                             "list":{
                                 "source":"EditingItem.Get[regions]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",regions]",
                                 "viewTemplate":"isb2.windowLayout.regionView",
                                 "context":"windowLayout.region"
                             }            
@@ -301,7 +308,7 @@
                 },
                 {
                     "name":"mappableSheet",
-                    "title":"Mappable Sheet: ${EditingItem.Get[name]}",
+                    "title":"Mappable Sheet: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -311,6 +318,7 @@
                             "name":"Mappables",
                             "list":{
                                 "source":"EditingItem.Get[mappables]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",mappables]",
                                 "viewTemplate":"isb2.mappableView",
                                 "context":"mappable"
                             }            
@@ -319,7 +327,7 @@
                 },
                 {
                     "name":"hotkeySheet",
-                    "title":"Hotkey Sheet: ${EditingItem.Get[name]}",
+                    "title":"Hotkey Sheet: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -329,6 +337,7 @@
                             "name":"Hotkeys",
                             "list":{
                                 "source":"EditingItem.Get[hotkeys]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",hotkeys]",
                                 "viewTemplate":"isb2.hotkeyView",
                                 "context":"hotkey"
                             }    
@@ -337,7 +346,7 @@
                 },
                 {
                     "name":"hotkey",
-                    "title":"Hotkey: ${EditingItem.Get[name]}",
+                    "title":"Hotkey: ${EditingItem.Get[-default,\"\",name]}",
                     "template":"isb2.hotkeyEditor.General"
                 },
                 {
@@ -346,7 +355,7 @@
                 },
                 {
                     "name":"mappable",
-                    "title":"Mappable: ${EditingItem.Get[name]}",
+                    "title":"Mappable: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -356,6 +365,7 @@
                             "name":"Steps",
                             "list":{
                                 "source":"EditingItem.Get[steps]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",steps]",
                                 "viewTemplate":"isb2.mappable.stepView",
                                 "context":"mappableStep"
                             }    
@@ -374,6 +384,7 @@
                             "name":"Actions",
                             "list":{
                                 "source":"EditingItem.Get[actions]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",actions]",
                                 "viewTemplate":"isb2.mappable.actionView",
                                 "context":"action"
                             }    
@@ -382,7 +393,7 @@
                 },
                 {
                     "name":"gameMacroSheet",
-                    "title":"Game Macro Sheet: ${EditingItem.Get[name]}",
+                    "title":"Game Macro Sheet: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -392,6 +403,7 @@
                             "name":"Macros",
                             "list":{
                                 "source":"EditingItem.Get[macros]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",macros]",
                                 "viewTemplate":"isb2.gameMacroView",
                                 "context":"gameMacro"
                             }    
@@ -400,12 +412,12 @@
                 },
                 {
                     "name":"gameMacro",
-                    "title":"Game Macro: ${EditingItem.Get[name]}",
+                    "title":"Game Macro: ${EditingItem.Get[-default,\"\",name]}",
                     "template":"isb2.gameMacroEditor.General"
                 },
                 {
                     "name":"clickBar",
-                    "title":"Click Bar: ${EditingItem.Get[name]}",
+                    "title":"Click Bar: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[
                         {
                             "name":"General",
@@ -432,13 +444,15 @@
                         {
                             "name":"VFX Sheets",
                             "list":{
-                                "source":"EditingItem.Get[vfxSheets]"
+                                "source":"EditingItem.Get[vfxSheets]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",vfxSheets]"
                             }
                         },
                         {
                             "name":"Game Key Bindings",
                             "list":{
                                 "source":"EditingItem.Get[gameKeyBindings]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",gameKeyBindings]",
                                 "viewTemplate":"isb2.gameKeyBindingInstanceView",
                                 "context":"gameKeyBindingInstance"
                             }

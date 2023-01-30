@@ -2170,7 +2170,14 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
-        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
+        ; terminate
+        if ${joAction.GetBool[terminate]}
+        {
+            exit
+            return
+        }
+
+        Display.Window:PostMessage[16]
     }
 
     method Action_Mappable(jsonvalueref joState, jsonvalueref joAction, bool activate)

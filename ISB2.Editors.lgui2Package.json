@@ -679,7 +679,7 @@
                     "dataBinding":{
                         "pullFormat":"${This.Object.Get[name]}",
                         "pullReplaceNull":"",
-                        "pushFormat":["This.Object:Set[name,\"","\"]"]
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
                     },
                     "editTemplate":"propertyview.textbox"                            
                 },
@@ -688,7 +688,7 @@
                     "dataBinding":{
                         "pullFormat":"${This.Object.Get[description]}",
                         "pullReplaceNull":"",
-                        "pushFormat":["This.Object:Set[description,\"","\"]"],
+                        "pushFormat":["This.Object:SetString[description,\"","\"]"],
                         "pushNullFormat":"This.Object:Erase[description]"
                     },
                     "editTemplate":"propertyview.cancelabletextbox"                            
@@ -698,7 +698,7 @@
                     "dataBinding":{
                         "pullFormat":"${This.Object.Get[builderGroup]}",
                         "pullReplaceNull":"",
-                        "pushFormat":["This.Object:Set[builderGroup,\"","\"]"],
+                        "pushFormat":["This.Object:SetString[builderGroup,\"","\"]"],
                         "pushNullFormat":"This.Object:Erase[builderGroup]"
                     },
                     "editTemplate":"propertyview.cancelabletextbox"                            

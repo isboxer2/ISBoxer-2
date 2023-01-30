@@ -1936,6 +1936,21 @@ objectdef isb2_profileengine
         }
         else
         {
+            switch ${joAction.Get[action]}
+            {
+                case Pause
+                    echo "\arAction_ClickBarState\ax Not yet implemented: ${joAction.Get[action]~}"
+                    ; disable hotkey sets assigned to active click bars
+                    break
+                case Unpause
+                    echo "\arAction_ClickBarState\ax Not yet implemented: ${joAction.Get[action]~}"
+                    ; enable hotkey sets assigned to active click bars
+                    break
+                default
+                    echo "\arAction_ClickBarState\ax Not yet implemented: ${joAction.Get[action]~}"
+                    break
+            }
+
             ; todo
             LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
         }
@@ -2626,8 +2641,20 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
+        variable bool fillClipboard
+        fillClipboard:Set["${joAction.GetBool[fillClipboard]]}"]
+
+        if ${fillClipboard}
+        {
+            System:SetClipboardText["${joAction.Get[text]~}"]
+        }
+        else
+        {
+            Display.Window:Paste["${joAction.Get[text]~}"]            
+        }
+
         ; text
-        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
+;        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
     }
 
     method Action_SyncCursor(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2775,7 +2802,39 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
-        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
+        variable string options
+        if ${joAction.GetBool[useDirectX]}
+        {
+            options:Set["-directx,"]
+        }
+        else
+        {
+            options:Set["-desktop,"]
+        }
+
+        if ${joAction.GetBool[useClientCoords]}
+        {
+            options:Concat["-clientcoords,"]
+        }
+        else
+        {
+            options:Concat["-screencoords,"]
+        }
+
+
+        variable int x
+        variable int y
+
+        if ${joAction.Has[-object,rect]}
+        {
+            x:Set["${joAction.GetInteger[rect,x]}"]
+            y:Set["${joAction.GetInteger[rect,y]}"]
+            Display:Screencap[${options}${joAction.Get[filename]~},${x},${y},${joAction.GetInteger[rect,width].Inc[${x}]},${joAction.GetInteger[rect,height].Inc[${y}]}]
+        }
+        else
+        {
+            Display:Screencap[${options}${joAction.Get[filename]~}]
+        }
     }
 
     method Action_InputDeviceKeySet(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -2784,7 +2843,7 @@ objectdef isb2_profileengine
         if !${joAction.Type.Equal[object]}
             return
 
-        LGUI2.Element[isb2.events]:FireEventHandler[onUnhandledActionType,"{\"type\":\"${joAction.Get[type]~}\"}"]
+        Input.Device["${joAction.Get[device]~}"]:SelectKeySet["${joAction.Get[keySet]~}"]
     }
 
     method Action_TimerPool(jsonvalueref joState, jsonvalueref joAction, bool activate)
@@ -3369,7 +3428,7 @@ objectdef isb2_profileengine
         ; is step sticky?
         if ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0
         {
-            echo "\arRotator_PostExecute\ax: stickyTime ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0 ${joRotator~}"
+;            echo "\arRotator_PostExecute\ax: stickyTime ${joRotator.GetNumber[steps,${numStep},stickyTime]}!=0 ${joRotator~}"
             return
         }
 

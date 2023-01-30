@@ -445,6 +445,13 @@
                     "Clear"
                   ]
             },
+            "headerContainer":{
+                "jsonTemplate":"expander.headerContainer",
+                "font":{
+                    "heightFactor":1.2,
+                    "bold":true
+                }
+            },
             "content":{
                 "type":"listbox",
                 "jsonTemplate":"isb2.leftPaneList",

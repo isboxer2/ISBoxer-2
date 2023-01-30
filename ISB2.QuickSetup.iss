@@ -29,7 +29,7 @@ objectdef isb2_quicksetup inherits isb2_building
         WindowLayoutSettings:SetBool[instantSwap,1]
         WindowLayoutSettings:SetBool[swapOnActivate,1]
         WindowLayoutSettings:SetBool[swapOnSlotActivate,1]
-
+        BuilderAutoSelect:Set[1]
     }
 
     method Shutdown()

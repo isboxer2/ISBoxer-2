@@ -10,6 +10,8 @@ objectdef isb2_building
     variable jsonvalueref BuildingGame
     variable jsonvalueref BuildingCharacters
 
+    variable bool BuilderAutoSelect=0
+
     method Initialize()
     {
 
@@ -253,6 +255,8 @@ objectdef isb2_building
             joGroup:SetReference["{}"]
             joGroup:SetString[name,"${name~}"]
             joGroup:Set[builders,"[]"]
+            if ${BuilderAutoSelect}
+                joGroup:SetInteger[selectedBuilder,1]
             BuilderGroups:AddByRef[joGroup]
         }
 

@@ -91,8 +91,8 @@ objectdef isb2_importer
         if ${jRef.Used}
         {
             jo:SetByRef[clickBarButtonLayouts,jRef]
-        }        
-        
+        }
+
         jRef:SetReference[This.ConvertRepeaterProfiles]        
         if ${jRef.Used}
         {
@@ -271,14 +271,6 @@ objectdef isb2_importer
     {
         variable jsonvalue ja="[]"
         ISBProfile.Get[MenuButtonSet]:ForEach["ja:AddByRef[\"This.ConvertMenuButtonSet[ForEach.Value]\"]"]
-
-        return ja
-    }
-
-    member:jsonvalueref ConvertMenuHotkeySets()
-    {
-        variable jsonvalue ja="[]"
-        ISBProfile.Get[MenuHotkeySet]:ForEach["ja:AddByRef[\"This.ConvertMenuHotkeySet[ForEach.Value]\"]"]
 
         return ja
     }
@@ -1411,7 +1403,17 @@ objectdef isb2_importer
         if ${jo.Has[-notnull,ButtonLayout]}
             joNew:SetString[buttonLayout,"${jo.Get[ButtonLayout]~}"]
         if ${jo.Has[-notnull,HotkeyLayout]}
-            joNew:SetString[hotkeyLayout,"${jo.Get[HotkeyLayout]~}"]
+        {
+            ; joNew:SetString[hotkeyLayout,"${jo.Get[HotkeyLayout]~}"]
+
+            ; build hotkey array from the actual hotkey list.
+            variable jsonvalueref joHotkeySet
+            joHotkeySet:SetReference["This.GetMenuHotkeySet[\"${jo.Get[HotkeyLayout]~}\"]"]
+            joNew:SetByRef[hotkeys,"This.ConvertMenuHotkeySet[joHotkeySet]"]
+        }
+
+        if ${jo.Has[-notnull,bindSoft]}
+            joNew:SetBool[softAttachHotkeys,"${jo.GetBool[bindSoft]}"]
 
         if ${jo.Has[-notnull,x]}
             joNew:SetInteger[x,${jo.GetInteger[x]}]
@@ -1421,13 +1423,33 @@ objectdef isb2_importer
         return joNew
     }
 
+    method ConvertMenuHotkeyAsHotkeyInto(jsonvalueref ja, jsonvalueref joMenuHotkey)
+    {
+        variable jsonvalueref joNew="{}"
+        if ${joMenuHotkey.Has[-notnull,Combo]}
+            joNew:SetString[keyCombo,"${joMenuHotkey.Get[Combo]~}"]
+
+        ja:AddByRef[joNew]
+    }
+
     member:jsonvalueref ConvertMenuHotkeySet(jsonvalueref jo)
     {
         echo "\arConvertMenuHotkeySet\ax ${jo~}"
 
-        ; building a mappable sheet
+        ; building a hotkey sheet
+        if !${jo.Get[Hotkeys].Used}
+        {
+            return NULL
+        }
 
-        return NULL
+        variable jsonvalue ja="[]"
+
+        jo.Get[Hotkeys]:ForEach["This:ConvertMenuHotkeyAsHotkeyInto[ja,ForEach.Value]"]
+
+        if !${ja.Used}
+            return NULL
+
+        return ja
     }
 
     member:jsonvalueref ConvertMenuTemplate(jsonvalueref jo)
@@ -2993,6 +3015,13 @@ objectdef isb2_importer
     member:jsonvalueref GetClickBar(string name)
     {
         variable jsonvalueref ja="ISBProfile.Get[ClickBar]"
+
+        return "This.FindInArray[ja,\"${name~}\"]"
+    }
+
+    member:jsonvalueref GetMenuHotkeySet(string name)
+    {
+        variable jsonvalueref ja="ISBProfile.Get[MenuHotkeySet]"
 
         return "This.FindInArray[ja,\"${name~}\"]"
     }

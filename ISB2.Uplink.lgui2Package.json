@@ -1330,6 +1330,19 @@
                                                                 "pushFormat":["This.Locate[\"\",objectview,ancestor].Object:SetInteger[_gameLaunchInfo,\"","\"]"]
                                                             }
                                                         }
+                                                    },
+                                                    {
+                                                        "name":"Party Order ID",
+                                                        "dataBinding":{
+                                                            "pullFormat":"${This.ObjectView.Object.GetInteger[partyOrderID]}",
+                                                            "pullReplaceNull":"",
+                                                            "pushFormat":["This.ObjectView.Object:SetInteger[partyOrderID,\"","\"]"]
+                                                          },
+                                                          "editTemplate":"propertyview.textbox",
+                                                          "controlData":{
+                                                            "textBindingUsesFocus":true,
+                                                            "tooltip":"Star Wars: The Old Republic uses an internal character number to sort the party list. That's what this is for."
+                                                        }                              
                                                     }                                                    
                                                 ]
                                             }
@@ -1585,7 +1598,7 @@
                                             "itemViewGenerators":{
                                                 "default":{
                                                     "type":"template",
-                                                    "template":"windowLayoutEngine.layoutListView"
+                                                    "template":"windowLayoutEngine.generatedLayoutListView"
                                                 }
                                             },
                                             "popup":{
@@ -1920,7 +1933,7 @@
                                     "type":"expander",
                                     "header":"Preview",
                                     "content":{
-                                        "jsonTemplate":"windowLayoutEngine.layoutPreview",
+                                        "jsonTemplate":"windowLayoutEngine.generatedLayoutPreview",
                                         "height":200,
                                         "horizontalAlignment":"stretch",
                                         "contextBinding":{

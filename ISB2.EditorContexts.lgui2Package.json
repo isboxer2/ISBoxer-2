@@ -18,7 +18,8 @@
                             "list":{
                                 "source":"Editor.Editing.Characters",
                                 "viewTemplate":"isb2.characterView",
-                                "context":"character"
+                                "context":"character",
+                                "expanded":false
                             }
                         },
                         {
@@ -58,7 +59,8 @@
                             "list":{
                                 "source":"Editor.Editing.GameKeyBindings",
                                 "viewTemplate":"isb2.gameKeyBindingView",
-                                "context":"gameKeyBinding"
+                                "context":"gameKeyBinding",
+                                "expanded":false
                             }
                         },
                         {
@@ -304,12 +306,25 @@
                             "template":"isb2.windowLayoutEditor.General"
                         },
                         {
+                            "name":"Preview",
+                            "template":"isb2.windowLayoutEditor.Preview"
+                        },
+                        {
                             "name":"Regions",
                             "list":{
                                 "source":"EditingItem.Get[regions]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",regions]",
                                 "viewTemplate":"isb2.windowLayout.regionView",
                                 "context":"windowLayout.region"
+                            }            
+                        },
+                        {
+                            "name":"Swap Groups",
+                            "list":{
+                                "source":"EditingItem.Get[swapGroups]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",swapGroups]",
+                                "viewTemplate":"isb2.indexView",
+                                "context":"windowLayout.swapGroup"
                             }            
                         }
                     ]

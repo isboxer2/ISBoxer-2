@@ -786,11 +786,29 @@ objectdef isb2_quicksetup inherits isb2_building
 
         numMonitors:Set[${joLayout.Get[inputData,monitors].Used}]
 
+        variable jsonvalueref jaMonitors
+
         variable jsonvalueref joMonitor
+        if ${numMonitors}
+        {
+            jaMonitors:SetReference["joLayout.Get[inputData,monitors]"]
+        }
+        else
+        {
+            jaMonitors:SetReference["[]"]
+
+            ; use current system monitors
+            variable uint i
+            for ( i:Set[1] ; ${i}<=${Display.Monitors} ; i:Inc)
+            {
+                jaMonitors:Add["${Display.Monitor[${i}].AsJSON~}"]
+            }
+            numMonitors:Set["${jaMonitors.Used}"]
+        }
 
         for (numMonitor:Set[1] ; ${numMonitor}<=${numMonitors} ; numMonitor:Inc)
         {
-            joMonitor:SetReference["joLayout.Get[inputData,monitors,${numMonitor}]"]
+            joMonitor:SetReference["jaMonitors.Get[${numMonitor}]"]
             if !${joMonitor.Reference(exists)}
                 break
 
@@ -805,7 +823,7 @@ objectdef isb2_quicksetup inherits isb2_building
                 bottom:Set["${joMonitor.GetInteger[bottom]}"]
         }
 
-;        echo GetLayoutPreviewExtents "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
+        ;echo GetLayoutPreviewExtents "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
         return "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
     }
 
@@ -813,7 +831,7 @@ objectdef isb2_quicksetup inherits isb2_building
     {
         variable jsonvalue ja="[]"
 
-;        echo "\ayGetLayoutPreviewItems\ax: element=${element.ID} context=${element.Context~}"
+        ; echo "\ayGetLayoutPreviewItems\ax: element=${element.ID} context=${element.Context~}"
         variable jsonvalueref joLayout
         joLayout:SetReference[element.Context]
         if !${joLayout.Reference(exists)}
@@ -837,7 +855,7 @@ objectdef isb2_quicksetup inherits isb2_building
         ; regions
         joLayout.Get[regions]:ForEach["This:AddRegion[ja,ForEach.Value]"]
 
-;        echo "\ayGetLayoutPreviewItems\ax: ${ja~}"
+       ;  echo "\ayGetLayoutPreviewItems\ax: ${ja~}"
         return ja
     }   
 

@@ -1578,12 +1578,27 @@
                 }
             ]
         },
+        "isb2.windowLayoutEditor.Preview":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[
+                {
+                    "jsonTemplate":"windowLayoutEngine.layoutPreview",
+                    "contextBinding":{
+                        "pullFormat":"${This.Parent.Context.EditingItem}"
+                    },
+                    "horizontalAlignment":"stretch",
+                    "verticalAlignment":"stretch"
+                }
+            ]
+        },
         "isb2.windowLayoutEditor.General":{
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
             "children":[
                 {
                     "jsonTemplate":"isb2.editorContext.objectview",
+                    "verticalAlignment":"top",
                     "_dock":"top",
                     "properties":[
                         {
@@ -1603,6 +1618,120 @@
                               "pushFormat":["This.Object:SetString[description,\"","\"]"]
                             },
                             "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                },
+                {
+                    "jsonTemplate":"isb2.editorContext.objectview",
+                    "objectBinding":{
+                        "pullFormat":"${This.Context.EditingItem.Get[-init,{},settings]}",
+                        "pullOnce":true
+                    },                
+                    "_dock":"top",
+                    "properties":[
+                        {
+                            "name":"Focus Follows Mouse",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[focusFollowsMouse]}",
+                              "pushNullFormat":"This.Object:Erase[focusFollowsMouse]",
+                              "pushFormat":["This.Object:SetBool[focusFollowsMouse,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
+                        },
+                        {
+                            "name":"Instant Swapping",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[instantSwap]}",
+                              "pushNullFormat":"This.Object:Erase[instantSwap]",
+                              "pushFormat":["This.Object:SetBool[instantSwap,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
+                        },
+                        {
+                            "name":"Refresh on Activate",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[refreshOnActivate]}",
+                              "pushNullFormat":"This.Object:Erase[refreshOnActivate]",
+                              "pushFormat":["This.Object:SetBool[refreshOnActivate,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
+                        },
+                        {
+                            "name":"Swap on Activate",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[swapOnActivate]}",
+                              "pushNullFormat":"This.Object:Erase[swapOnActivate]",
+                              "pushFormat":["This.Object:SetBool[swapOnActivate,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
+                        },
+                        {
+                            "name":"Refresh on Internal Activate",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[refreshOnInternalActivate]}",
+                              "pushNullFormat":"This.Object:Erase[refreshOnInternalActivate]",
+                              "pushFormat":["This.Object:SetBool[refreshOnInternalActivate,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
+                        },
+                        {
+                            "name":"Swap on Internal Activate",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[swapOnInternalActivate]}",
+                              "pushNullFormat":"This.Object:Erase[swapOnInternalActivate]",
+                              "pushFormat":["This.Object:SetBool[swapOnInternalActivate,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
+                        },
+                        {
+                            "name":"Refresh on Deactivate",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[refreshOnDeactivate]}",
+                              "pushNullFormat":"This.Object:Erase[refreshOnDeactivate]",
+                              "pushFormat":["This.Object:SetBool[refreshOnDeactivate,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
+                        },
+                        {
+                            "name":"Swap on Deactivate",
+                            "dataBinding":{
+                              "pullFormat":"${This.Object.Get[swapOnDeactivate]}",
+                              "pushNullFormat":"This.Object:Erase[swapOnDeactivate]",
+                              "pushFormat":["This.Object:SetBool[swapOnDeactivate,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.checkbox",
+                            "controlData":{
+                                "useIndeterminate":true,
+                                "pushAsBool":true
+                            }                            
                         }
                     ]
                 }
@@ -1635,8 +1764,7 @@
                             "editTemplate":"propertyview.checkbox",
                             "controlData":{
                                 "useIndeterminate":true,
-                                "pushAsBool":true,
-                                "tooltip":"Enable blah blah blah"
+                                "pushAsBool":true
                             }
                         }
                     ]

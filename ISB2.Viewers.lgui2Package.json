@@ -76,6 +76,17 @@
                 }
             }
         },
+        "isb2.indexView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${This.Context.Index}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
         "isb2.windowLayout.regionView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -427,8 +438,57 @@
                 "color":"#ffffff"
             },
             "strata": 0.4
-        },                      
+        },
         "windowLayoutEngine.layoutPreview":{
+            "jsonTemplate":"map",
+            "type":"map",
+            "fixedAspectRatio":true,
+            "acceptsMouseFocus":false,
+            "virtualLocation":[0,0],
+            "virtualSize":[1920,1080],
+            "virtualAlignment":"corner",          
+            "content":{
+                "jsonTemplate":"map.content",
+                "acceptsMouseFocus":false,
+                "backgroundBrush":{
+                    "color":"#222222"
+                }    
+            },
+            "itemsBinding":{
+                "pullFormat":"${isb2_profileeditor.GetLayoutPreviewItems[${This.ID}]}",
+                "pullHook":{
+                    "flags": "self",
+                    "event": "onContextChanged"
+                }
+            },
+            "itemViewGenerators":{
+                "screen":{
+                    "type":"template",
+                    "template":"windowLayoutEngine.screenView"
+                },
+                "region":{
+                    "type":"template",
+                    "template":"windowLayoutEngine.regionView"
+                },
+                "region1":{
+                    "type":"template",
+                    "template":"windowLayoutEngine.regionView1"
+                },
+                "region2":{
+                    "type":"template",
+                    "template":"windowLayoutEngine.regionView2"
+                },
+                "region3":{
+                    "type":"template",
+                    "template":"windowLayoutEngine.regionView3"
+                },
+                "region4":{
+                    "type":"template",
+                    "template":"windowLayoutEngine.regionView4"
+                }
+            }
+        },                      
+        "windowLayoutEngine.generatedLayoutPreview":{
             "jsonTemplate":"map",
             "type":"map",
             "fixedAspectRatio":true,
@@ -477,7 +537,7 @@
                 }
             }
         },
-        "windowLayoutEngine.layoutListView":{
+        "windowLayoutEngine.generatedLayoutListView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
             "content":{
@@ -498,7 +558,7 @@
                     },
                     {
                         "_dock":"right",
-                       "jsonTemplate":"windowLayoutEngine.layoutPreview",
+                       "jsonTemplate":"windowLayoutEngine.generatedLayoutPreview",
                        "horizontalAlignment":"stretch",
                        "height":100,
                        "contextBinding":{

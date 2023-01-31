@@ -73,6 +73,11 @@ objectdef(global) isb2_profileEditorContext
                 joSubItem:SetString["_sourceInit","${joList.Get[sourceInit]~}"]
             }
 
+            if ${joList.Has[expanded]}
+            {
+                joSubItem:SetBool[expanded,${joList.GetBool[expanded]}]
+            }
+
             if ${joList.Has[new]}
             {
                 joList:Set["_new","${joList.Get[new].AsJSON~}"]
@@ -703,7 +708,7 @@ objectdef(global) isb2_profileEditorContext
 }
 
 
-objectdef isb2_profileeditor inherits isb2_building
+objectdef(global) isb2_profileeditor inherits isb2_building
 {
     variable weakref Editing
     variable weakref MainContext
@@ -784,6 +789,131 @@ objectdef isb2_profileeditor inherits isb2_building
         
         This:ApplyBuilders[MainContext.EditingItem]
     }
+
+
+
+    static method AddScreen(jsonvalueref ja, jsonvalueref joMonitor)
+    {
+        variable jsonvalue jo="{}"
+        
+        jo:SetString["itemType","screen"]
+        jo:SetString["name","${joMonitor.Get[name]~}"]
+        jo:SetInteger["left",${joMonitor.GetInteger[left]}]
+        jo:SetInteger["top",${joMonitor.GetInteger[top]}]
+        jo:SetInteger["width",${joMonitor.GetInteger[width]}]
+        jo:SetInteger["height",${joMonitor.GetInteger[height]}]
+
+        ja:AddByRef[jo]
+    }
+
+    static method AddRegion(jsonvalueref ja, uint numRegion, jsonvalueref joRegion)
+    {
+        variable jsonvalueref jo="joRegion.Duplicate"
+
+        if ${joRegion.Has[numLayout]}
+        {
+            jo:SetString["itemType","region${joRegion.GetInteger[numLayout]}"]
+        }
+        else
+        {
+            jo:SetString["itemType","region"]
+        }
+
+        jo:SetInteger["x",${joRegion.GetInteger[bounds,1]}]
+        jo:SetInteger["y",${joRegion.GetInteger[bounds,2]}]
+        jo:SetInteger["width",${joRegion.GetInteger[bounds,3]}]
+        jo:SetInteger["height",${joRegion.GetInteger[bounds,4]}]
+        jo:SetInteger["numRegion",${numRegion}]
+
+        ja:AddByRef[jo]
+    }    
+
+    static member:jsonvalue GetLayoutPreviewExtents(jsonvalueref joLayout)
+    {
+        variable int left
+        variable int right
+        variable int top
+        variable int bottom
+
+        variable uint numMonitor
+
+        variable uint numMonitors
+
+        numMonitors:Set[${joLayout.Get[inputData,monitors].Used}]
+
+        variable jsonvalueref jaMonitors
+
+        variable jsonvalueref joMonitor
+        if ${numMonitors}
+        {
+            jaMonitors:SetReference["joLayout.Get[inputData,monitors]"]
+        }
+        else
+        {
+            jaMonitors:SetReference["monitor.List"]
+            numMonitors:Set["${jaMonitors.Used}"]
+        }
+
+        for (numMonitor:Set[1] ; ${numMonitor}<=${numMonitors} ; numMonitor:Inc)
+        {
+            joMonitor:SetReference["jaMonitors.Get[${numMonitor}]"]
+            if !${joMonitor.Reference(exists)}
+                break
+
+            if ${joMonitor.GetInteger[left]}<${left}
+                left:Set["${joMonitor.GetInteger[left]}"]
+            if ${joMonitor.GetInteger[top]}<${top}
+                top:Set["${joMonitor.GetInteger[top]}"]
+
+            if ${joMonitor.GetInteger[right]}>${right}
+                right:Set["${joMonitor.GetInteger[right]}"]
+            if ${joMonitor.GetInteger[bottom]}>${bottom}
+                bottom:Set["${joMonitor.GetInteger[bottom]}"]
+        }
+
+        echo GetLayoutPreviewExtents "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
+        return "[${left},${top},${right.Dec[${left}]},${bottom.Dec[${top}]}]"
+    }
+
+    static member:jsonvalueref GetLayoutPreviewItems(lgui2elementref element)
+    {
+        variable jsonvalue ja="[]"
+
+        echo "\ayGetLayoutPreviewItems\ax: element=${element.ID} context=${element.Context~}"
+        variable jsonvalueref joLayout
+        joLayout:SetReference[element.Context]
+        if !${joLayout.Reference(exists)}
+        {
+;            echo "\ayGetLayoutPreviewItems\ax: NULL"
+            return NULL
+        }
+
+;        echo GetLayoutPreviewItems element=${element}
+        if ${element.Element(exists)}
+        {
+            variable jsonvalue jaExtents
+            jaExtents:SetValue["${This.GetLayoutPreviewExtents[joLayout]}"]
+
+            element:SetVirtualOrigin[${jaExtents.GetInteger[1]},${jaExtents.GetInteger[2]}]
+            element:SetVirtualSize[${jaExtents.GetInteger[3]},${jaExtents.GetInteger[4]}]
+        }
+
+        if ${joLayout.Has[inputData,monitors]}
+        {
+        ; screens
+            joLayout.Get[inputData,monitors]:ForEach["This:AddScreen[ja,ForEach.Value]"]
+        }
+        else
+        {
+            monitor.List:ForEach["This:AddScreen[ja,ForEach.Value]"]
+        }
+
+        ; regions
+        joLayout.Get[regions]:ForEach["This:AddRegion[ja,\${ForEach.Key},ForEach.Value]"]
+
+        echo "\ayGetLayoutPreviewItems\ax: ${ja~}"
+        return ja
+    }   
 }
 
 objectdef isb2_profileeditorWindow

@@ -59,7 +59,11 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
         if ${This.EnableMIDI}
         {
-            MIDI:OpenAllDevicesIn            
+            MIDI:OpenAllDevicesIn
+            if ${MIDI.InDevices.Used}
+            {
+                LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnabled]
+            }            
         }
 
         This:LoadGames
@@ -258,13 +262,18 @@ objectdef(global) isb2 inherits isb2_profilecollection
         if ${newValue}
         {
             MIDI:OpenAllDevicesIn
+            if ${MIDI.InDevices.Used}
+            {
+                LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnabled]
+            }            
         }
         else
         {
             MIDI:CloseAllDevicesIn
         }
 
-        relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
+        if ${ISUplink(exists)}
+            relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
     }
 
     member:bool QuickLaunch()

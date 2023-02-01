@@ -352,6 +352,17 @@
                             "count":10
                         }
                     ]                    
+                },
+                {
+                    "id":27,
+                    "name":"MIDI Device Enabled!",
+                    "flavor":"Multiboxing to the beat",
+                    "reqs":[
+                        {
+                            "hook":"onMidiEnabled",
+                            "source":"uplink"                            
+                        }
+                    ]
                 }
             ]
         },

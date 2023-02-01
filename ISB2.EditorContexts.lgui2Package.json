@@ -104,6 +104,14 @@
                             }
                         },
                         {
+                            "name":"Virtual Files",
+                            "list":{
+                                "source":"Editing.Editing.VirtualFiles",
+                                "viewTemplate":"isb2.virtualFileView",
+                                "context":"virtualFile"
+                            }
+                        },
+                        {
                             "name":"Click Bar Button Layouts",
                             "list":{
                                 "source":"Editor.Editing.ClickBarButtonLayouts",
@@ -193,7 +201,8 @@
                             "list":{
                                 "source":"EditingItem.Get[virtualMappables]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",virtualMappables]",
-                                "viewTemplate":"isb2.virtualMappableView"
+                                "viewTemplate":"isb2.virtualMappableView",
+                                "context":"virtualMappable"
                             }
                         },
                         {
@@ -212,6 +221,15 @@
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",triggers]",
                                 "viewTemplate":"isb2.indexNameView",
                                 "context":"trigger"
+                            }
+                        },
+                        {
+                            "name":"Virtual Files",
+                            "list":{
+                                "source":"EditingItem.Get[virtualFiles]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",virtualFiles]",
+                                "viewTemplate":"isb2.virtualFileView",
+                                "context":"virtualFile"
                             }
                         }
                     ]
@@ -283,7 +301,17 @@
                             "list":{
                                 "source":"EditingItem.Get[virtualMappables]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",virtualMappables]",
-                                "viewTemplate":"isb2.virtualMappableView"
+                                "viewTemplate":"isb2.virtualMappableView",
+                                "context":"virtualMappable"
+                            }
+                        },
+                        {
+                            "name":"Virtual Files",
+                            "list":{
+                                "source":"EditingItem.Get[virtualFiles]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",virtualFiles]",
+                                "viewTemplate":"isb2.virtualFileView",
+                                "context":"virtualFile"
                             }
                         },
                         {

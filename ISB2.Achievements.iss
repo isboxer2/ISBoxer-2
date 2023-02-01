@@ -7,6 +7,9 @@ objectdef(global) isb2_achievements
 
     variable jsonvalueref HookMap="{}"
 
+    variable jsonvalueref CompletedAchievements="[]"
+    variable jsonvalueref IncompleteAchievements="[]"
+
     variable bool ShouldSave
 
     method Initialize()
@@ -24,8 +27,8 @@ objectdef(global) isb2_achievements
         LGUI2:LoadPackageFile[ISB2.Achievements.lgui2Package.json]
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
 
-        This:InstallAchievements
         This:LoadSettings
+        This:InstallAchievements
     }
 
     method InstallAchievementHook(string name, jsonvalueref joAchieve)
@@ -70,7 +73,7 @@ objectdef(global) isb2_achievements
 
     method InstallAchievement(jsonvalueref joAchieve)
     {
-        ; echo "\ayInstallAchievement\ax ${joAchieve~}"
+;        echo "\ayInstallAchievement\ax ${joAchieve~}"
 
         variable int64 id="${joAchieve.GetInteger[id]}"
         Achievements:SetByRef["${id}",joAchieve]
@@ -79,9 +82,13 @@ objectdef(global) isb2_achievements
         jo:SetReference["UserData.Get[-init,{},\"${id}\"]"]        
         if ${jo.Reference(exists)} && ${jo.Has[completed]}
         {
+ ;           echo "completed achievement ${joAchieve~}"
+            CompletedAchievements:AddByRef[joAchieve]
             ; already completed, don't need to install.
             return
         }
+
+        IncompleteAchievements:AddByRef[joAchieve]
 
         if ${joAchieve.Has[-array,reqs]}
         {
@@ -109,6 +116,12 @@ objectdef(global) isb2_achievements
     method OnAchievementCompleted(jsonvalueref joAchieve)
     {
 ;        echo "\agOnAchievementCompleted\ax ${joAchieve~}"
+
+
+        CompletedAchievements:AddByRef[joAchieve]
+
+        variable jsonvalueref joQuery="{\"op\":\"==\",\"eval\":\"Select.Get[id]\",\"value\":${joAchieve.GetInteger[id]}}"
+        IncompleteAchievements:Erase[${IncompleteAchievements.SelectKey[joQuery]}]
 
         LGUI2.Element[isb2.achievementDisplay]:SetContext[joAchieve]:SetVisibility[Visible]
 

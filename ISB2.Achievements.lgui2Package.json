@@ -354,6 +354,103 @@
                     ]                    
                 }
             ]
+        },
+        "isb2.completedAchievementListView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"dockpanel",
+                "contextBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_}"
+                },
+                "borderBrush":{
+                    "color":"#66ff00"
+                },
+                "borderThickness":4,
+                "horizontalAlignment": "center",
+                "backgroundBrush":{"color":"#cc111111"},
+                "acceptsMouseFocus": false,
+                "acceptsKeyboardFocus": false,
+                "padding":[25,10],
+                "font":{
+                    "heightFactor": 1.2
+                },
+                "children":[
+                    {
+                        "type":"stackpanel",
+                        "acceptsMouseFocus": false,
+                        "acceptsKeyboardFocus": false,
+                        "_dock":"top",
+                        "horizontalAlignment":"center",
+                        "uniform": false,
+                        "orientation": "vertical",
+                        "children":[
+                            {
+                                "type":"textblock",
+                                "text":"Achievement Unlocked",
+                                "color":"#ffff00"
+                            },
+                            {
+                                "horizontalAlignment": "center",
+                                "type":"textblock",
+                                "text":"${This.Context.Get[name]}",
+                                "font":{
+                                    "heightFactor": 1.5                
+                                }                
+                            },
+                            {
+                                "horizontalAlignment": "center",
+                                "type":"textblock",
+                                "text":"${This.Context.Get[flavor]}",
+                                "color":"#999999"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "isb2.achievementListView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"dockpanel",
+                "contextBinding":{
+                    "pullFormat":"${_CONTEXTITEMDATA_}"
+                },
+                "borderBrush":{
+                    "color":"#666666"
+                },
+                "borderThickness":[0,0,0,1],
+                "horizontalAlignment": "center",
+                "backgroundBrush":{"color":"#cc111111"},
+                "acceptsMouseFocus": false,
+                "acceptsKeyboardFocus": false,
+                "padding":[5,5],
+                "font":{
+                    "heightFactor": 1.2
+                },
+                "children":[
+                    {
+                        "type":"stackpanel",
+                        "acceptsMouseFocus": false,
+                        "acceptsKeyboardFocus": false,
+                        "_dock":"top",
+                        "-horizontalAlignment":"center",
+                        "uniform": false,
+                        "orientation": "vertical",
+                        "children":[
+                            {
+                                "horizontalAlignment": "center",
+                                "type":"textblock",
+                                "text":"${This.Context.Get[name]}",
+                                "font":{
+                                    "heightFactor": 1.5                
+                                }                
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
     "elements": [
@@ -370,6 +467,66 @@
                     "jsonTemplate":"isb2.achievementHook",
                     "event":"profileEditorOpened"
                 }
+            }
+        },
+        {
+            "name":"isb2.achievementsWindow",
+            "type":"window",
+            "title":"ISBoxer 2 Achievements",
+            "hideOnClose": true,
+            "visibility": "hidden",
+            "width":600,
+            "height":600,
+            "content":{
+                "type":"tabcontrol",                
+                "horizontalAlignment": "stretch",
+                "verticalAlignment": "stretch",
+                "tabs":[
+                    {
+                        "type":"tab",
+                        "header":"Completed",
+                        "content":{
+                            "type":"listbox",
+                            "borderThickness":0,
+                            "horizontalAlignment": "stretch",
+                            "verticalAlignment": "stretch",
+                            "contentContainer":{
+                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                            },
+                            "itemsBinding":{
+                                "pullFormat": "${isb2_achievements.Instance.CompletedAchievements}"
+                            },
+                            "itemViewGenerators": {
+                                "default":{
+                                    "type":"template",
+                                    "template": "isb2.completedAchievementListView"
+                                }
+                            }
+                        }                            
+                    },
+                    {
+                        "type":"tab",
+                        "header":"Incomplete",
+                        "content":{
+                            "type":"listbox",
+                            "borderThickness":0,
+                            "horizontalAlignment": "stretch",
+                            "verticalAlignment": "stretch",
+                            "contentContainer":{
+                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                            },
+                            "itemsBinding":{
+                                "pullFormat": "${isb2_achievements.Instance.IncompleteAchievements}"
+                            },
+                            "itemViewGenerators": {
+                                "default":{
+                                    "type":"template",
+                                    "template": "isb2.achievementListView"
+                                }
+                            }
+                        }
+                    }
+                ]
             }
         },
         {

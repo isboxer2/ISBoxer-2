@@ -835,6 +835,19 @@
                                                 "pullFormat":"${ISB2.EnableMIDI}",
                                                 "pushFormat":["ISB2:SetEnableMIDI[\"","\"]"]
                                             }
+                                        },
+                                        {
+                                            "type":"button",
+                                            "_dock":"bottom",
+                                            "horizontalAlignment":"left",
+                                            "content":"Achievements",
+                                            "margin":5,
+                                            "eventHandlers":{
+                                                "onPress":{
+                                                    "type":"code",
+                                                    "code":"LGUI2.Element[isb2.achievementsWindow]:SetVisibility[visible]"
+                                                }
+                                            }
                                         }
                                     ]         
                                 }                                

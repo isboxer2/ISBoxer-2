@@ -110,6 +110,9 @@ objectdef isb2session inherits isb2_profileengine
         if ${joMetadata.Has[character]}
             This:ActivateCharacterByName["${joMetadata.Get[character,name]~}"]
 
+        if ${joMetadata.GetBool[enableMidi]}
+            This:SetEnableMIDI[1]
+
         echo "\ayInstallFromSessionMetadata complete\ax"
     }
 
@@ -160,13 +163,15 @@ objectdef isb2session inherits isb2_profileengine
         if ${newValue}
         {
             MIDI:OpenAllDevicesIn
+            if ${MIDI.InDevices.Used}
+            {
+                LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnabled]
+            }
         }
         else
         {
             MIDI:CloseAllDevicesIn
         }
-
-        relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
     }
 
     method Unicast(string relay_target, string command)

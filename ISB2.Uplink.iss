@@ -64,6 +64,7 @@ objectdef(global) isb2 inherits isb2_profilecollection
             {
                 LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnabled]
             }            
+            relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
         }
 
         This:LoadGames
@@ -272,8 +273,7 @@ objectdef(global) isb2 inherits isb2_profilecollection
             MIDI:CloseAllDevicesIn
         }
 
-        if ${ISUplink(exists)}
-            relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
+        relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
     }
 
     member:bool QuickLaunch()
@@ -525,7 +525,7 @@ objectdef isb2_managedSlot
 
         joLaunchInfo:SetBool[isb2,1]
         joLaunchInfo:SetByRef["isb2profiles",This.CollectProfiles]
-        joLaunchInfo:SetBool[enableMidi,${Settings.GetBool[enableMidi]}]
+        joLaunchInfo:SetBool[enableMidi,${ISB2.Settings.GetBool[enableMidi]}]
         joGLI:SetByRef[metadata,joLaunchInfo]
 
         Script:SetLastError        

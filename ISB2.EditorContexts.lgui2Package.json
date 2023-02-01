@@ -131,7 +131,7 @@
                             "name":"Triggers",
                             "list":{
                                 "source":"Editor.Editing.Triggers",
-                                "viewTemplate":"isb2.commonView",
+                                "viewTemplate":"isb2.indexNameView",
                                 "context":"trigger"
                             }
                         }
@@ -210,7 +210,7 @@
                             "list":{
                                 "source":"EditingItem.Get[triggers]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",triggers]",
-                                "viewTemplate":"isb2.commonView",
+                                "viewTemplate":"isb2.indexNameView",
                                 "context":"trigger"
                             }
                         }
@@ -300,7 +300,7 @@
                             "list":{
                                 "source":"EditingItem.Get[triggers]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",triggers]",
-                                "viewTemplate":"isb2.commonView",
+                                "viewTemplate":"isb2.indexNameView",
                                 "context":"trigger"
                             }
                         }
@@ -386,7 +386,7 @@
                             "list":{
                                 "source":"EditingItem.Get[triggers]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",triggers]",
-                                "viewTemplate":"isb2.commonView",
+                                "viewTemplate":"isb2.indexNameView",
                                 "context":"trigger"
                             }
                         }

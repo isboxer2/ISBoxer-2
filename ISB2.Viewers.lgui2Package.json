@@ -87,6 +87,17 @@
                 }
             }
         },
+        "isb2.indexNameView":{
+            "jsonTemplate":"listboxitem",
+            "padding":2,
+            "content":{
+                "type":"textblock",
+                "textBinding":{
+                    "pullFormat":"${This.Context.Index}: ${_CONTEXTITEMDATA_.Get[name]}",
+                    "pullReplaceNull":""
+                }
+            }
+        },
         "isb2.windowLayout.regionView":{
             "jsonTemplate":"listboxitem",
             "padding":2,

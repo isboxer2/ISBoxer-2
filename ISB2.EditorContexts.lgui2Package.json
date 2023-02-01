@@ -100,7 +100,7 @@
                             "list":{
                                 "source":"Editor.Editing.VFXSheets",
                                 "viewTemplate":"isb2.vfxSheetView",
-                                "context":"vfxsheet"
+                                "context":"vfxSheet"
                             }
                         },
                         {
@@ -202,7 +202,7 @@
                                 "source":"EditingItem.Get[vfxSheets]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",vfxSheets]",
                                 "viewTemplate":"isb2.commonView",
-                                "context":"vfxsheet"
+                                "context":"vfxSheet"
                             }
                         },
                         {
@@ -292,7 +292,7 @@
                                 "source":"EditingItem.Get[vfxSheets]",
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",vfxSheets]",
                                 "viewTemplate":"isb2.commonView",
-                                "context":"vfxsheet"
+                                "context":"vfxSheet"
                             }
                         },
                         {
@@ -531,6 +531,25 @@
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",macros]",
                                 "viewTemplate":"isb2.gameMacroView",
                                 "context":"gameMacro"
+                            }    
+                        }
+                    ]                                    
+                },
+                {
+                    "name":"imageSheet",
+                    "title":"Image Sheet: ${EditingItem.Get[-default,\"\",name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.imageSheetEditor.General"
+                        },
+                        {
+                            "name":"Images",
+                            "list":{
+                                "source":"EditingItem.Get[images]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",images]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"image"
                             }    
                         }
                     ]                                    

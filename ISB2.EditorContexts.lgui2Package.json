@@ -104,6 +104,14 @@
                             }
                         },
                         {
+                            "name":"Click Bar Button Layouts",
+                            "list":{
+                                "source":"Editor.Editing.ClickBarButtonLayouts",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"clickBarButtonLayout"
+                            }
+                        },
+                        {
                             "name":"Click Bar Templates",
                             "list":{
                                 "source":"Editor.Editing.ClickBarTemplates",
@@ -455,6 +463,25 @@
                             "template":"isb2.clickBarEditor.ButtonLayout"
                         }
                     ]                                    
+                },
+                {
+                    "name":"clickBarButtonLayout",
+                    "title":"Click Bar Button Layout: ${EditingItem.Get[-default,\"\",name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.clickBarButtonLayoutEditor.General"
+                        },
+                        {
+                            "name":"Buttons",
+                            "list":{
+                                "source":"EditingItem.Get[buttons]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",buttons]",
+                                "viewTemplate":"isb2.indexView",
+                                "context":"clickBarButton"
+                            }            
+                        }
+                    ]
                 },
                 {
                     "name":"slot",

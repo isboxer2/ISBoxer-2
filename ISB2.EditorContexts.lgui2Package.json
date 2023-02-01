@@ -126,6 +126,14 @@
                                 "viewTemplate":"isb2.commonView",
                                 "context":"imageSheet"
                             }
+                        },
+                        {
+                            "name":"Triggers",
+                            "list":{
+                                "source":"Editor.Editing.Triggers",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"trigger"
+                            }
                         }
                     ]
                 },
@@ -179,6 +187,32 @@
                         {
                             "name":"General",
                             "template":"isb2.characterEditor.General"
+                        },
+                        {
+                            "name":"Virtual Mappables",
+                            "list":{
+                                "source":"EditingItem.Get[virtualMappables]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",virtualMappables]",
+                                "viewTemplate":"isb2.virtualMappableView"
+                            }
+                        },
+                        {
+                            "name":"VFX Sheets",
+                            "list":{
+                                "source":"EditingItem.Get[vfxSheets]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",vfxSheets]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"vfxsheet"
+                            }
+                        },
+                        {
+                            "name":"Triggers",
+                            "list":{
+                                "source":"EditingItem.Get[triggers]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",triggers]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"trigger"
+                            }
                         }
                     ]
                 },
@@ -251,6 +285,24 @@
                                 "sourceInit":"EditingItem.Get[-init,\"[]\",virtualMappables]",
                                 "viewTemplate":"isb2.virtualMappableView"
                             }
+                        },
+                        {
+                            "name":"VFX Sheets",
+                            "list":{
+                                "source":"EditingItem.Get[vfxSheets]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",vfxSheets]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"vfxsheet"
+                            }
+                        },
+                        {
+                            "name":"Triggers",
+                            "list":{
+                                "source":"EditingItem.Get[triggers]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",triggers]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"trigger"
+                            }
                         }
                     ],
                     "dragDrop":{
@@ -302,6 +354,48 @@
                             "type":"copy",
                             "inProperty":"name",
                             "outProperty":"windowLayout"
+                        }
+                    }
+                },
+                {
+                    "name":"slot",
+                    "title":"Slot",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.slotEditor.General"
+                        },
+                        {
+                            "name":"VFX Sheets",
+                            "list":{
+                                "source":"EditingItem.Get[vfxSheets]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",vfxSheets]"
+                            }
+                        },
+                        {
+                            "name":"Game Key Bindings",
+                            "list":{
+                                "source":"EditingItem.Get[gameKeyBindings]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",gameKeyBindings]",
+                                "viewTemplate":"isb2.gameKeyBindingInstanceView",
+                                "context":"gameKeyBindingInstance"
+                            }
+                        },
+                        {
+                            "name":"Triggers",
+                            "list":{
+                                "source":"EditingItem.Get[triggers]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",triggers]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"trigger"
+                            }
+                        }
+                    ],
+                    "dragDrop":{
+                        "character":{
+                            "type":"copy",
+                            "inProperty":"name",
+                            "outProperty":"character"
                         }
                     }
                 },
@@ -482,39 +576,6 @@
                             }            
                         }
                     ]
-                },
-                {
-                    "name":"slot",
-                    "title":"Slot",
-                    "subItems":[
-                        {
-                            "name":"General",
-                            "template":"isb2.slotEditor.General"
-                        },
-                        {
-                            "name":"VFX Sheets",
-                            "list":{
-                                "source":"EditingItem.Get[vfxSheets]",
-                                "sourceInit":"EditingItem.Get[-init,\"[]\",vfxSheets]"
-                            }
-                        },
-                        {
-                            "name":"Game Key Bindings",
-                            "list":{
-                                "source":"EditingItem.Get[gameKeyBindings]",
-                                "sourceInit":"EditingItem.Get[-init,\"[]\",gameKeyBindings]",
-                                "viewTemplate":"isb2.gameKeyBindingInstanceView",
-                                "context":"gameKeyBindingInstance"
-                            }
-                        }
-                    ],
-                    "dragDrop":{
-                        "character":{
-                            "type":"copy",
-                            "inProperty":"name",
-                            "outProperty":"character"
-                        }
-                    }
                 }
             ]
         }

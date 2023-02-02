@@ -583,6 +583,34 @@
                     ]                                    
                 },
                 {
+                    "name":"vfxSheet",
+                    "title":"VFX Sheet: ${EditingItem.Get[-default,\"\",name]}",
+                    "subItems":[
+                        {
+                            "name":"General",
+                            "template":"isb2.vfxSheetEditor.General"
+                        },
+                        {
+                            "name":"Sources",
+                            "list":{
+                                "source":"EditingItem.Get[sources]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",sources]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"vfxSource"
+                            }    
+                        },
+                        {
+                            "name":"Outputs",
+                            "list":{
+                                "source":"EditingItem.Get[outputs]",
+                                "sourceInit":"EditingItem.Get[-init,\"[]\",outputs]",
+                                "viewTemplate":"isb2.commonView",
+                                "context":"vfxOutput"
+                            }    
+                        }
+                    ]                                    
+                },
+                {
                     "name":"gameMacro",
                     "title":"Game Macro: ${EditingItem.Get[-default,\"\",name]}",
                     "template":"isb2.gameMacroEditor.General"

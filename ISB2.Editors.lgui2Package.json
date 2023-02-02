@@ -43,6 +43,36 @@
                 }
             ]
           },
+          "propertyview.cancelabletextbox.usesfocus": {
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[           
+                {
+                    "_dock":"right",
+                    "type":"button",
+                    "content":"x",
+                    "eventHandlers":{
+                        "onPress":{
+                            "type":"code",
+                            "code":"This.Locate[\"\",propertyview,ancestor]:SetValue[NULL]"
+                        }
+                    }
+                },  
+                {
+                    "_dock":"left",
+                    "type": "textbox",
+                    "horizontalAlignment":"stretch",
+                    "textBindingUsesFocus":true,
+                    "textBinding": {
+                        "linkBinding": {
+                        "flags": "ancestor",
+                        "elementType": "propertyview",
+                        "member": "ValueBinding"
+                        }
+                    }        
+                }
+            ]
+          },          
           "isb2.inputMappingEditor.gameKeyBinding":{
             "jsonTemplate":"isb2.inputMappingContext.objectview",
             "properties":[                
@@ -876,7 +906,8 @@
             "children":[],
             "orientation":"vertical",
             "uniform":false,
-            "horizontalAlignment":"stretch"           
+            "horizontalAlignment":"stretch",
+            "verticalAlignment":"stretch"           
         },
         "isb2.actionEditor.objectview":{
             "jsonTemplate":"isb2.editorContext.objectview",
@@ -884,6 +915,7 @@
         },
         "isb2.actionEditor.targetEditor":{
             "jsonTemplate":"isb2.actionEditor.objectview",
+            "margin":[0,5],
             "properties":[               
                 {
                     "name":"Target",
@@ -897,20 +929,86 @@
                 }
             ]
         },
-        "isb2.actionEditor.timerEditor":{
-            "jsonTemplate":"isb2.actionEditor.objectview",
-            "properties":[               
-                {
-                    "name":"Timer",
-                    "dataBinding":{
-                        "pullFormat":"${This.Object.Get[timer]}",
-                        "pullReplaceNull":"",
-                        "pushFormat":["This.Object:SetString[timer,\"","\"]"],
-                        "pushNullFormat":"This.Object:Erase[timer]"
-                    },
-                    "editTemplate":"propertyview.cancelabletextbox"
+        "isb2.actionEditor.variablePropertiesEditor":{
+            "type":"expander",
+            "jsonTemplate":"expander",
+            "margin":[0,5],
+            "expanded":false,
+            "horizontalAlignment": "stretch",
+            "header":{
+                "type":"checkbox",
+                "jsonTemplate":"checkbox",
+                "margin":5,
+                "content":"Use Variable Properties (advanced)",
+                "checkedBinding":{
+                    "pullFormat":"${This.Context.EditingItem.Has[-object,variableProperties]}",
+                    "pushFormat":["This.Context:SetObjectEnabled[variableProperties,\"","\"]"]
                 }
-            ]
+            },
+            "content":{
+                "type":"textbox",
+                "horizontalAlignment":"stretch",
+                "textBinding":{
+                    "pullFormat":"${This.Context.EditingItem.Get[variableProperties].AsJSON[multiline]}",
+                    "pushFormat":["This.Context.EditingItem:Set[variableProperties,\"","\"]"]
+                },
+                "textBindingUsesFocus":true
+            }
+        },
+        "isb2.actionEditor.timerEditor":{
+            "type":"expander",
+            "jsonTemplate":"expander",
+            "horizontalAlignment": "stretch",
+            "margin":[0,5],
+            "expanded":false,
+            "header":{
+                "type":"checkbox",
+                "jsonTemplate":"checkbox",
+                "margin":5,
+                "content":"Use Action Timer",
+                "checkedBinding":{
+                    "pullFormat":"${This.Context.EditingItem.Has[-object,timer]}",
+                    "pushFormat":["This.Context:SetObjectEnabled[timer,\"","\"]"]
+                }
+            },
+            "content":{
+                "jsonTemplate":"isb2.actionEditor.objectview",
+                "properties":[               
+                    {
+                        "name":"Timer Pool",
+                        "dataBinding":{
+                            "pullFormat":"${This.Object.Get[timer,name]}",
+                            "pullReplaceNull":"",
+                            "pushFormat":["This.Object.Get[-init,{},timer]:SetString[name,\"","\"]"],
+                            "pushNullFormat":"This.Object.Get[timer]:Erase[name]"
+                        },
+                        "editTemplate":"propertyview.cancelabletextbox"
+                    },
+                    {
+                        "name":"Time (seconds)",
+                        "dataBinding":{
+                            "pullFormat":"${This.Object.Get[timer,time]}",
+                            "pullReplaceNull":"0.0",
+                            "pushFormat":["This.Object.Get[-init,{},timer]:SetNumber[time,\"","\"]"],
+                            "pushNullFormat":"This.Object.Get[timer]:Erase[time]"
+                        },
+                        "editTemplate":"propertyview.cancelabletextbox.usesfocus"
+                    },
+                    {
+                        "name":"Auto-recurring",
+                        "dataBinding":{
+                            "pullFormat":"${This.Object.GetBool[timer,recur]}",
+                            "pushFormat":["This.Object.Get[-init,{},timer]:SetBool[recur,\"","\"]"],
+                            "pushNullFormat":"This.Object.Get[timer]:Erase[recur]"
+                        },
+                        "editTemplate":"propertyview.checkbox",
+                        "controlData":{
+                            "useIndeterminate":true,
+                            "pushAsBool":true
+                        }
+                    }        
+                ]
+            }
         },
         "isb2.actionEditor.keystroke":{
             "jsonTemplate":"isb2.actionEditor.objectview",
@@ -927,55 +1025,91 @@
             ]
         },
         "isb2.actionEditor.mappable":{
-            "jsonTemplate":"isb2.actionEditor.objectview",
-            "properties":[
+            "jsonTemplate":"stackpanel",
+            "type":"stackpanel",
+            "orientation":"vertical",
+            "uniform": false,
+            "horizontalAlignment":"stretch",
+            "children":[
                 {
-                    "name":"Sheet",
-                    "dataBinding":{
-                        "pullFormat":"${This.Object.Get[sheet]}",
-                        "pullReplaceNull":"",
-                        "pushFormat":["This.Object:SetString[sheet,\"","\"]"]
-                    },
-                    "editTemplate":"propertyview.autocompletebox",
-                    "controlData":{
-                        "dictionaryBinding":{
-                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                    "jsonTemplate":"isb2.actionEditor.objectview",
+                    "verticalAlignment":"top",
+                    "properties":[
+                        {
+                            "name":"Sheet",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[sheet]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:SetString[sheet,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.autocompletebox",
+                            "controlData":{
+                                "dictionaryBinding":{
+                                    "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                                },
+                                "hooks":{                           
+                                    "textChanged":{
+                                        "flags":"self",
+                                        "event":"onTextChanged",
+                                        "eventHandler":{
+                                            "type":"forward",
+                                            "elementType":"objectview",
+                                            "flags":"ancestor",
+                                            "event":"onMappableSheetChanged"
+                                        }
+                                    }
+                                }
+                            }                            
                         },
-                        "hooks":{                           
-                            "textChanged":{
-                                "flags":"self",
-                                "event":"onTextChanged",
-                                "eventHandler":{
-                                    "type":"forward",
-                                    "elementType":"objectview",
-                                    "flags":"ancestor",
-                                    "event":"onMappableSheetChanged"
+                        {
+                            "name":"Mappable",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[name]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.autocompletebox",
+                            "controlData":{
+                                "dictionaryBinding":{
+                                    "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",mappables]}",
+                                    "pullOnce":true,
+                                    "pullHook":{
+                                        "elementType":"objectview",
+                                        "flags":"ancestor",
+                                        "event":"onMappableSheetChanged"
+                                    }
                                 }
                             }
                         }
-                    }                            
+                    ]
                 },
                 {
-                    "name":"Mappable",
-                    "dataBinding":{
-                        "pullFormat":"${This.Object.Get[name]}",
-                        "pullReplaceNull":"",
-                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
-                    },
-                    "editTemplate":"propertyview.autocompletebox",
-                    "controlData":{
-                        "dictionaryBinding":{
-                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",mappables]}",
-                            "pullOnce":true,
-                            "pullHook":{
-                                "elementType":"objectview",
-                                "flags":"ancestor",
-                                "event":"onMappableSheetChanged"
-                            }
+                    "type":"expander",
+                    "jsonTemplate":"expander",
+                    "margin":[0,5],
+                    "expanded":false,
+                    "horizontalAlignment": "stretch",
+                    "header":{
+                        "type":"checkbox",
+                        "jsonTemplate":"checkbox",
+                        "margin":5,
+                        "content":"Use Parameters (advanced)",
+                        "checkedBinding":{
+                            "pullFormat":"${This.Context.EditingItem.Has[-object,params]}",
+                            "pushFormat":["This.Context:SetObjectEnabled[params,\"","\"]"]
                         }
+                    },
+                    "content":{
+                        "type":"textbox",
+                        "horizontalAlignment":"stretch",
+                        "textBinding":{
+                            "pullFormat":"${This.Context.EditingItem.Get[params].AsJSON[multiline]}",
+                            "pushFormat":["This.Context.EditingItem:Set[params,\"","\"]"]
+                        },
+                        "textBindingUsesFocus":true
                     }
                 }
-            ]
+            ]            
         },
         "isb2.actionEditor.game macro":{
             "jsonTemplate":"isb2.actionEditor.objectview",

@@ -354,19 +354,20 @@ objectdef(global) isb2_profileEditorContext
 
  ;       echo "actionType=${joActionType~}"
 
-        joContainer.Get[children]:AddByRef[joEditor]
-
         if ${joActionType.GetBool[retarget]}
         {
             joContainer.Get[children]:AddByRef["LGUI2.Skin[default].Template[isb2.actionEditor.targetEditor]"]
         }
 
+        joContainer.Get[children]:AddByRef[joEditor]
+
         if ${joActionType.GetBool[timer]}
         {
             ; not yet implemented
-            ; joContainer.Get[children]:AddByRef["LGUI2.Skin[default].Template[isb2.actionEditor.timerEditor]"]            
+            joContainer.Get[children]:AddByRef["LGUI2.Skin[default].Template[isb2.actionEditor.timerEditor]"]            
         }        
 
+        joContainer.Get[children]:AddByRef["LGUI2.Skin[default].Template[isb2.actionEditor.variablePropertiesEditor]"]
 ;        echo "joContainer=${joContainer.AsJSON[multiline]~}"
         return joContainer
     }
@@ -398,6 +399,21 @@ objectdef(global) isb2_profileEditorContext
         ja:ForEach["jo:SetByRef[\"\${ForEach.Value.Get[name]}\",ForEach.Value]"]
 ;        echo "providing dictionary ${jo.Used} ${jo~}"
         return jo
+    }
+
+    method SetObjectEnabled(string name, bool newState)
+    {
+        if ${newState}
+        {
+            ; enable
+            if !${EditingItem.Has[-object,"${name~}"]}
+                EditingItem:Set["${name~}","{}"]
+        }
+        else
+        {
+            ; disable
+            EditingItem:Erase["${name~}"]
+        }
     }
 #endregion
 

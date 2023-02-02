@@ -14,6 +14,60 @@
             "isb2.teamEditor":200,
             "isb2.mappableSheetEditor":200
         },       
+        "propertyview.color":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "children":[           
+                {
+                    "_dock":"right",
+                    "type":"button",
+                    "content":"x",
+                    "eventHandlers":{
+                        "onPress":{
+                            "type":"code",
+                            "code":"This.Locate[\"\",propertyview,ancestor]:SetValue[NULL]"
+                        }
+                    }
+                },  
+                {
+                    "name":"colorpicker.swatch",
+                    "_dock":"right",
+                    "type":"border",
+                    "width":24,
+                    "height":24,
+                    "backgroundBrush":{
+                        "color":"#00000000"
+                    },
+                    "borderThickness":1,
+                    "borderBrush":{
+                        "color":"#7f7f7f"
+                    }
+                },
+                {
+                    "_dock":"left",
+                    "type": "textbox",
+                    "horizontalAlignment":"stretch",
+                    "textBindingUsesFocus":true,
+                    "textBinding": {
+                        "linkBinding": {
+                        "flags": "ancestor",
+                        "elementType": "propertyview",
+                        "member": "ValueBinding"
+                        }
+                    },
+                    "hooks":{
+                        "onTextChanged":{
+                            "event":"onTextChanged",
+                            "flags":"self",
+                            "eventHandler":{
+                                "type":"code",
+                                "code":"This.Locate[colorpicker.swatch,,sibling]:ApplyStyleJSON[\"{\\\"backgroundBrush\\\":{\\\"color\\\":${This.Text.AsJSON~}}}\"]"
+                            }
+                        }
+                    }        
+                }
+            ]
+        },
         "propertyview.cancelabletextbox": {
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
@@ -939,6 +993,9 @@
                 "type":"checkbox",
                 "jsonTemplate":"checkbox",
                 "margin":5,
+                "font":{
+                    "bold":true
+                },
                 "content":"Use Variable Properties (advanced)",
                 "checkedBinding":{
                     "pullFormat":"${This.Context.EditingItem.Has[-object,variableProperties]}",
@@ -965,6 +1022,9 @@
                 "type":"checkbox",
                 "jsonTemplate":"checkbox",
                 "margin":5,
+                "font":{
+                    "bold":true
+                },
                 "content":"Use Action Timer",
                 "checkedBinding":{
                     "pullFormat":"${This.Context.EditingItem.Has[-object,timer]}",
@@ -1009,6 +1069,49 @@
                     }        
                 ]
             }
+        },
+        "isb2.actionEditor.popup text":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Text",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[text]}",
+                        "pushFormat":["This.Object:SetString[text,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[text]"
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                },
+                {
+                    "name":"Color",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[color]}",
+                        "pushFormat":["This.Object:SetString[color,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[color]"
+                    },
+                    "editTemplate":"propertyview.color"
+                },
+                {
+                    "name":"Duration (seconds)",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetNumber[duration]}",
+                        "pullReplaceNull":"0.0",
+                        "pushFormat":["This.Object:SetNumber[duration,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[duration]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox.usesfocus"
+                },
+                {
+                    "name":"Fade Duration (seconds)",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.GetNumber[fadeDuration]}",
+                        "pullReplaceNull":"0.0",
+                        "pushFormat":["This.Object:SetNumber[fadeDuration,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[fadeDuration]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox.usesfocus"
+                }
+            ]
         },
         "isb2.actionEditor.keystroke":{
             "jsonTemplate":"isb2.actionEditor.objectview",
@@ -1094,6 +1197,9 @@
                         "jsonTemplate":"checkbox",
                         "margin":5,
                         "content":"Use Parameters (advanced)",
+                        "font":{
+                            "bold":true
+                        },
                         "checkedBinding":{
                             "pullFormat":"${This.Context.EditingItem.Has[-object,params]}",
                             "pushFormat":["This.Context:SetObjectEnabled[params,\"","\"]"]

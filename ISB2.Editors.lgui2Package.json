@@ -870,18 +870,21 @@
                 }
             ]
         },
-        "isb2.actionEditor.keystroke":{
+        "isb2.actionEditor.container":{
+            "jsonTemplate":"stackpanel",
+            "type":"stackpanel",
+            "children":[],
+            "orientation":"vertical",
+            "uniform":false,
+            "horizontalAlignment":"stretch"           
+        },
+        "isb2.actionEditor.objectview":{
             "jsonTemplate":"isb2.editorContext.objectview",
+            "verticalAlignment":"top"
+        },
+        "isb2.actionEditor.targetEditor":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
             "properties":[               
-                {
-                    "name":"Key Combo",
-                    "dataBinding":{
-                        "pullFormat":"${This.Object.Get[keyCombo]}",
-                        "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"],
-                        "pushNullFormat":"This.Object:Erase[keyCombo]"
-                    },
-                    "editTemplate":"propertyview.inputCombo"
-                },
                 {
                     "name":"Target",
                     "dataBinding":{
@@ -894,8 +897,37 @@
                 }
             ]
         },
+        "isb2.actionEditor.timerEditor":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Timer",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[timer]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[timer,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[timer]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox"
+                }
+            ]
+        },
+        "isb2.actionEditor.keystroke":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Key Combo",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[keyCombo]}",
+                        "pushFormat":["This.Object:SetString[keyCombo,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[keyCombo]"
+                    },
+                    "editTemplate":"propertyview.inputCombo"
+                }
+            ]
+        },
         "isb2.actionEditor.mappable":{
-            "jsonTemplate":"isb2.editorContext.objectview",
+            "jsonTemplate":"isb2.actionEditor.objectview",
             "properties":[
                 {
                     "name":"Sheet",
@@ -942,21 +974,11 @@
                             }
                         }
                     }
-                },
-                {
-                    "name":"Target",
-                    "dataBinding":{
-                        "pullFormat":"${This.Object.Get[target]}",
-                        "pullReplaceNull":"",
-                        "pushFormat":["This.Object:SetString[target,\"","\"]"],
-                        "pushNullFormat":"This.Object:Erase[target]"
-                    },
-                    "editTemplate":"propertyview.cancelabletextbox"
                 }
             ]
         },
         "isb2.actionEditor.game macro":{
-            "jsonTemplate":"isb2.editorContext.objectview",
+            "jsonTemplate":"isb2.actionEditor.objectview",
             "properties":[
                 {
                     "name":"Sheet",
@@ -1003,15 +1025,6 @@
                             }
                         }
                     }
-                },
-                {
-                    "name":"Target",
-                    "dataBinding":{
-                        "pullFormat":"${This.Object.Get[target]}",
-                        "pullReplaceNull":"",
-                        "pushFormat":["This.Object:SetString[target,\"","\"]"]
-                    },
-                    "editTemplate":"propertyview.textbox"
                 }
             ]
         },
@@ -1832,6 +1845,21 @@
                 }
             ]
         },
+        "isb2.missingActionEditor":{
+            "type":"dockpanel",
+            "padding":5,
+            "_dock":"top",
+            "jsonTemplate":"dockpanel",
+            "verticalAlignment":"top",
+            "horizontalAlignment":"stretch",
+            "children":[
+                {
+                    "type":"textblock",
+                    "text":"${This.Context.MissingEditor}",
+                    "_dock":"top"
+                }
+            ]
+        },        
         "isb2.missingContextEditor":{
             "type":"dockpanel",
             "padding":5,

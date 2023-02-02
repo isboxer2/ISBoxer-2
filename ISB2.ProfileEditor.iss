@@ -336,7 +336,7 @@ objectdef(global) isb2_profileEditorContext
 
         if !${joEditor.Reference(exists)} || !${joEditor.Used}
         {
-            joEditor:SetReference["LGUI2.Template[isb2.missingEditor]"]
+            joEditor:SetReference["LGUI2.Template[isb2.missingActionEditor]"]
             echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
             if ${EditingItem.Get[type].NotNULLOrEmpty}
             {
@@ -345,7 +345,30 @@ objectdef(global) isb2_profileEditorContext
             }
         }
 
-        return joEditor
+        ; now check the action definition...
+        variable jsonvalueref joActionType
+        joActionType:SetReference["ISB2.GetActionType[\"${EditingItem.Get[type]~}\"]"]
+
+        variable jsonvalueref joContainer
+        joContainer:SetReference["LGUI2.Skin[default].Template[isb2.actionEditor.container].Duplicate"]
+
+ ;       echo "actionType=${joActionType~}"
+
+        joContainer.Get[children]:AddByRef[joEditor]
+
+        if ${joActionType.GetBool[retarget]}
+        {
+            joContainer.Get[children]:AddByRef["LGUI2.Skin[default].Template[isb2.actionEditor.targetEditor]"]
+        }
+
+        if ${joActionType.GetBool[timer]}
+        {
+            ; not yet implemented
+            ; joContainer.Get[children]:AddByRef["LGUI2.Skin[default].Template[isb2.actionEditor.timerEditor]"]            
+        }        
+
+;        echo "joContainer=${joContainer.AsJSON[multiline]~}"
+        return joContainer
     }
     
     static member:jsonvalueref GetActionAutoComplete(string _type, string name, string subList)

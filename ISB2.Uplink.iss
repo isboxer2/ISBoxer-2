@@ -29,6 +29,8 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
     variable collection:isb2_profileeditorWindow Editors
 
+    variable jsonvalue ActionTypes="{}"
+
     method Initialize()
     {
         isb2.Instance:SetReference[This]
@@ -55,6 +57,7 @@ objectdef(global) isb2 inherits isb2_profilecollection
         LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
         LGUI2:PopSkin["${UseSkin~}"]
 
+        This:InstallDefaultActionTypes
         isb2_achievements.Instance:Init
 
         if ${This.EnableMIDI}
@@ -408,6 +411,36 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
         Profiles:ForEach["ja:AddByRef[ForEach.Value.AsJSON]",joQuery]
         return ja
+    }
+
+    member:jsonvalueref GetActionType(string name)
+    {
+        return "ActionTypes.Get[\"${name.Lower~}\"]"
+    }
+
+    method InstallActionTypes(jsonvalueref ja)
+    {
+        if ${ja.Type.Equal[array]}
+            ja:ForEach["This:InstallActionType[ForEach.Value]"]
+    }
+
+    method InstallActionType(jsonvalueref jo)
+    {
+        if !${jo.Type.Equal[object]}
+            return FALSE
+
+        ; echo InstallActionType: ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo] 
+        ActionTypes:SetByRef["${jo.Get[name].Lower~}",jo]
+
+    }
+
+    method InstallDefaultActionTypes()
+    {
+        variable jsonvalueref ja
+        ja:SetReference["LGUI2.Skin[default].Template[isb2.data].Get[defaultActionTypes]"]
+
+;        echo "InstallDefaultActionTypes ${ja~}"
+        This:InstallActionTypes[ja]
     }
 
 }

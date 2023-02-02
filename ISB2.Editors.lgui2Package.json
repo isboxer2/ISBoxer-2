@@ -1070,6 +1070,20 @@
                 ]
             }
         },
+        "isb2.actionEditor.broadcast target":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Broadcast Target",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[value]}",
+                        "pushFormat":["This.Object:SetString[value,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[value]"
+                    },
+                    "editTemplate":"propertyview.cancelabletextbox"
+                }
+            ]
+        },
         "isb2.actionEditor.popup text":{
             "jsonTemplate":"isb2.actionEditor.objectview",
             "properties":[               
@@ -1080,7 +1094,7 @@
                         "pushFormat":["This.Object:SetString[text,\"","\"]"],
                         "pushNullFormat":"This.Object:Erase[text]"
                     },
-                    "editTemplate":"propertyview.inputCombo"
+                    "editTemplate":"propertyview.cancelabletextbox"
                 },
                 {
                     "name":"Color",
@@ -1325,6 +1339,90 @@
                             "elementName":"actionEditor.General.container",
                             "flags":"ancestor",
                             "event":"onActionTypeChanged"
+                        }
+                    }
+                }
+            ]
+        },
+        "isb2.variableEditor.General":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "name":"variableEditor.General.container",
+            "children":[
+                {
+                    "jsonTemplate":"isb2.editorContext.objectview",
+                    "verticalAlignment":"top",
+                    "_dock":"top",
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[name]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.textbox"                            
+                        }
+                    ]
+                },
+                {
+                    "_dock":"top",
+                    "type":"stackpanel",
+                    "padding":5,
+                    "orientation":"horizontal",
+                    "children":[
+                        {
+                            "type":"textblock",
+                            "text":"Variable Type",
+                            "margin":[0,0,5,0]
+                        },
+                        {
+                            "type":"autocompletebox",
+                            "name":"variableEditor.autocompletebox",
+                            "dictionary":{
+                                "string":{},
+                                "integer":{},
+                                "number":{},
+                                "boolean":{}
+                            },
+                            "-dictionaryBinding":{
+                                "pullFormat":"${ISB2.AutoComplete.Get[Actions]}"
+                            },
+                            "textBinding":{
+                                "pullFormat":"${This.Context.EditingItem.Get[schema,type]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Context.EditingItem.Get[-init,{},schema]:SetString[type,\"","\"]"]
+                            },
+                            "eventHandlers":{
+                                "onTextChanged":{
+                                    "type":"forward",
+                                    "elementName":"variableEditor.General.container",
+                                    "flags":"ancestor",                                    
+                                    "event":"onVariableTypeChanged"
+                                }
+                            }
+                        }        
+                    ]
+                },
+                {
+                    "_dock":"bottom",
+                    "type":"textbox",
+                    "horizontalAlignment":"stretch",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.EditingItem.AsJSON[multiline]}",
+                        "pushFormat":["This.Context:UpdateFromJSON[\"","\"]"]
+                    },
+                    "textBindingUsesFocus":true
+                },
+                {
+                    "_dock":"top",
+                    "type":"dynamic",
+                    "contentBinding":{
+                        "pullFormat":"${This.Context.GetVariableTypeEditor}",
+                        "pullHook":{
+                            "elementName":"variableEditor.General.container",
+                            "flags":"ancestor",
+                            "event":"onVariableTypeChanged"
                         }
                     }
                 }

@@ -251,6 +251,11 @@ objectdef(global) isb2_profileEditorContext
             Element.Locate[editorContext.leftPane.container,listbox,descendant]:SetItemSelected[1,1]
         }
 
+        if ${Data.Has[-string,init]}
+        {
+            execute "This:${Data.Get[init]~}"
+        }        
+
         echo "\aycontextLoaded:${Name~}\ax"
         LGUI2.Element[isb2.events]:FireEventHandler["contextLoaded","{\"type\":\"${Name~}\"}"]
     }
@@ -416,6 +421,32 @@ objectdef(global) isb2_profileEditorContext
         }
     }
 #endregion
+
+    method UpdateImagePreview()
+    {
+        echo "\atcontext:UpdateImagePreview\ax ${Context.Element} ${Context.Element.ID}"
+
+        variable jsonvalueref joImageBrush="{}"
+
+        if ${EditingItem.Has[-string,filename]}
+        {
+            joImageBrush:SetString[imageFile,"${EditingItem.Get[filename]~}"]            
+        }
+
+        if ${EditingItem.Has[colorMask]}
+        {
+            joImageBrush:Set[color,"${EditingItem.Get[colorMask].AsJSON~}"]
+        }
+        else
+            joImageBrush:SetString[color,"#ffffffff"]
+
+        if ${EditingItem.Has[colorKey]}
+        {
+            joImageBrush:Set[imageFileTransparencyKey,"${EditingItem.Get[colorKey].AsJSON~}"]
+        }
+
+        Element.Locate[imageEditor.preview]:SetImageBrush[joImageBrush]
+    }
 
     method OnTreeItemSelected()
     {

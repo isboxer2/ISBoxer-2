@@ -66,7 +66,29 @@
                         }
                     }        
                 }
-            ]
+            ],
+            "hooks":{
+                "onTextChanged":{
+                    "event":"onTextChanged",
+                    "flags":"descendant",
+                    "elementType":"textbox",
+                    "eventHandler":{
+                        "type":"forward",
+                        "flags":"self",
+                        "event":"onTextChanged"
+                    }
+                },
+                "lostKeyboardFocus":{
+                    "event":"lostKeyboardFocus",
+                    "flags":"descendant",
+                    "elementType":"textbox",
+                    "eventHandler":{
+                        "type":"forward",
+                        "flags":"self",
+                        "event":"lostKeyboardFocus"
+                    }
+                }
+            }
         },
         "propertyview.cancelabletextbox": {
             "type":"dockpanel",
@@ -95,7 +117,29 @@
                         }
                     }        
                 }
-            ]
+            ],
+            "hooks":{
+                "onTextChanged":{
+                    "event":"onTextChanged",
+                    "flags":"descendant",
+                    "elementType":"textbox",
+                    "eventHandler":{
+                        "type":"forward",
+                        "flags":"self",
+                        "event":"onTextChanged"
+                    }
+                },
+                "lostKeyboardFocus":{
+                    "event":"lostKeyboardFocus",
+                    "flags":"descendant",
+                    "elementType":"textbox",
+                    "eventHandler":{
+                        "type":"forward",
+                        "flags":"self",
+                        "event":"lostKeyboardFocus"
+                    }
+                }
+            }
           },
           "propertyview.cancelabletextbox.usesfocus": {
             "type":"dockpanel",
@@ -125,7 +169,29 @@
                         }
                     }        
                 }
-            ]
+            ],
+            "hooks":{
+                "onTextChanged":{
+                    "event":"onTextChanged",
+                    "flags":"descendant",
+                    "elementType":"textbox",
+                    "eventHandler":{
+                        "type":"forward",
+                        "flags":"self",
+                        "event":"onTextChanged"
+                    }
+                },
+                "lostKeyboardFocus":{
+                    "event":"lostKeyboardFocus",
+                    "flags":"descendant",
+                    "elementType":"textbox",
+                    "eventHandler":{
+                        "type":"forward",
+                        "flags":"self",
+                        "event":"lostKeyboardFocus"
+                    }
+                }
+            }
           },          
           "isb2.inputMappingEditor.gameKeyBinding":{
             "jsonTemplate":"isb2.inputMappingContext.objectview",
@@ -1425,6 +1491,105 @@
                             "event":"onVariableTypeChanged"
                         }
                     }
+                }
+            ]
+        },
+        "isb2.imageEditor.General":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "horizontalAlignment":"stretch",
+            "verticalAlignment": "stretch",
+            "children":[
+                {
+                    "jsonTemplate":"isb2.editorContext.objectview",
+                    "_dock":"top",
+                    "verticalAlignment":"top",
+                    "properties":[
+                        {
+                            "name":"Name",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[name]}",
+                                "pushFormat":["This.Object:SetString[name,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[name]"
+                            },
+                            "editTemplate":"propertyview.textbox",
+                            "controlData":{
+                                "textBindingUsesFocus":true
+                            }
+                        },
+                        {
+                            "name":"Filename",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[filename]}",
+                                "pushFormat":["This.Object:SetString[filename,\"","\"]"],
+                                "pushNullFormat":"This.Object:Erase[filename]"
+                            },
+                            "editTemplate":"propertyview.cancelabletextbox.usesfocus",
+                            "controlData":{
+                                "eventHandlers":{
+                                    "lostKeyboardFocus":{
+                                        "type":"method",
+                                        "-code":"echo onTextChanged ${This.Context(type)}",
+                                        "object":"This.Context.ObjectView.Context",
+                                        "method":"UpdateImagePreview"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name":"Color Mask",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[colorMask]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:SetString[colorMask,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.color",
+                            "controlData":{
+                                "eventHandlers":{
+                                    "lostKeyboardFocus":{
+                                        "type":"method",
+                                        "object":"This.Context.ObjectView.Context",
+                                        "method":"UpdateImagePreview"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name":"Transparency Key",
+                            "dataBinding":{
+                                "pullFormat":"${This.Object.Get[colorKey]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Object:SetString[colorKey,\"","\"]"]
+                            },
+                            "editTemplate":"propertyview.color",
+                            "controlData":{
+                                "eventHandlers":{
+                                    "lostKeyboardFocus":{
+                                        "type":"method",
+                                        "object":"This.Context.ObjectView.Context",
+                                        "method":"UpdateImagePreview"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type":"imagebox",
+                    "name":"imageEditor.preview",
+                    "_dock":"top",
+                    "margin":5,
+                    "borderThickness":1,
+                    "padding":5,
+                    "borderBrush":{
+                        "color":"#ff7f7f7f"
+                    },
+                    "minSize":[32,32],
+                    "imageBrush":{
+                        "color":"#ffffffff"
+                    },
+                    "verticalAlignment": "center",
+                    "horizontalAlignment":"center"
                 }
             ]
         },

@@ -583,6 +583,11 @@
                     ]                                    
                 },
                 {
+                    "name":"image",
+                    "title":"Image: ${EditingItem.Get[-default,\"\",name]}",
+                    "init":"UpdateImagePreview"
+                },
+                {
                     "name":"vfxSheet",
                     "title":"VFX Sheet: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[

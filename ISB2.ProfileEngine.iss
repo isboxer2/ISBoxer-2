@@ -281,16 +281,44 @@ objectdef isb2_profileengine
 
     }
 
+    method Event_OnHotkeyFocused()
+    {
+        echo "\atisb2_profileengine\ax:\ayEvent_OnHotkeyFocused\ax"
+
+        if ${SlotRef.Assert[switchToEffectType,"\"OnHotkey\""]}
+        {
+            echo "\ayExecuting onSwitchTo"
+            This:ExecuteEventAction[SlotRef,onSwitchTo]
+        }
+    }
+
+    method Event_OnActivate()
+    {
+        echo "\atisb2_profileengine\ax:\ayEvent_OnActivate\ax"
+
+        if ${SlotRef.Assert[switchToEffectType,"\"OnFocus\""]}
+        {
+            echo "\ayExecuting onSwitchTo"
+            This:ExecuteEventAction[SlotRef,onSwitchTo]
+        }
+    }
+    
+
     ; slot activation hotkey
     method OnSwitchTo(bool isGlobal)
     {
+        /*
+                None,
+                OnHotkey,
+                OnFocus,
+        */
         if ${isGlobal}
         {
             WindowVisibility foreground
             Event[OnInternalActivate]:Execute
             ISSession.OnFocused:Execute[1]
-            OnSlotActivate:Execute
-            return
+;            OnSlotActivate:Execute
+;            return
         }
 
         OnSlotActivate:Execute
@@ -1250,6 +1278,8 @@ objectdef isb2_profileengine
 
         script.OnScriptStopped:AttachAtom[This:Event_OnScriptStopped]
         Event[OnFrame]:AttachAtom[This:Event_OnFrame]
+        Event[OnHotkeyFocused]:AttachAtom[This:Event_OnHotkeyFocused]        
+        Event[On Activate]:AttachAtom[This:Event_OnActivate]        
 
         This:ApplyWindowSettings
 

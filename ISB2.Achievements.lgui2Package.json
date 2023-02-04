@@ -489,53 +489,72 @@
             "width":600,
             "height":600,
             "content":{
-                "type":"tabcontrol",                
+                "type":"dockpanel",
                 "horizontalAlignment": "stretch",
                 "verticalAlignment": "stretch",
-                "tabs":[
+                "children":[
                     {
-                        "type":"tab",
-                        "header":"Completed",
-                        "content":{
-                            "type":"listbox",
-                            "borderThickness":0,
-                            "horizontalAlignment": "stretch",
-                            "verticalAlignment": "stretch",
-                            "contentContainer":{
-                                "jsonTemplate":"listbox.contentContainerFitWidth"
-                            },
-                            "itemsBinding":{
-                                "pullFormat": "${isb2_achievements.Instance.CompletedAchievements}"
-                            },
-                            "itemViewGenerators": {
-                                "default":{
-                                    "type":"template",
-                                    "template": "isb2.completedAchievementListView"
-                                }
-                            }
-                        }                            
+                        "_dock":"bottom",
+                        "type":"checkbox",
+                        "horizontalAlignment":"left",
+                        "content":"Disable Achievements",
+                        "margin":5,
+                        "checkedBinding":{
+                            "pullFormat":"${ISB2.Settings.GetBool[disableAchievements]}",
+                            "pushFormat":["ISB2:SetDisableAchievements[\"","\"]"]
+                        }
                     },
                     {
-                        "type":"tab",
-                        "header":"Incomplete",
-                        "content":{
-                            "type":"listbox",
-                            "borderThickness":0,
-                            "horizontalAlignment": "stretch",
-                            "verticalAlignment": "stretch",
-                            "contentContainer":{
-                                "jsonTemplate":"listbox.contentContainerFitWidth"
+                        "_dock":"top",
+                        "type":"tabcontrol",                
+                        "horizontalAlignment": "stretch",
+                        "verticalAlignment": "stretch",
+                        "tabs":[
+                            {
+                                "type":"tab",
+                                "header":"Completed",
+                                "content":{
+                                    "type":"listbox",
+                                    "borderThickness":0,
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "contentContainer":{
+                                        "jsonTemplate":"listbox.contentContainerFitWidth"
+                                    },
+                                    "itemsBinding":{
+                                        "pullFormat": "${isb2_achievements.Instance.CompletedAchievements}"
+                                    },
+                                    "itemViewGenerators": {
+                                        "default":{
+                                            "type":"template",
+                                            "template": "isb2.completedAchievementListView"
+                                        }
+                                    }
+                                }                            
                             },
-                            "itemsBinding":{
-                                "pullFormat": "${isb2_achievements.Instance.IncompleteAchievements}"
-                            },
-                            "itemViewGenerators": {
-                                "default":{
-                                    "type":"template",
-                                    "template": "isb2.achievementListView"
+                            {
+                                "type":"tab",
+                                "header":"Incomplete",
+                                "content":{
+                                    "type":"listbox",
+                                    "borderThickness":0,
+                                    "horizontalAlignment": "stretch",
+                                    "verticalAlignment": "stretch",
+                                    "contentContainer":{
+                                        "jsonTemplate":"listbox.contentContainerFitWidth"
+                                    },
+                                    "itemsBinding":{
+                                        "pullFormat": "${isb2_achievements.Instance.IncompleteAchievements}"
+                                    },
+                                    "itemViewGenerators": {
+                                        "default":{
+                                            "type":"template",
+                                            "template": "isb2.achievementListView"
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        ]        
                     }
                 ]
             }

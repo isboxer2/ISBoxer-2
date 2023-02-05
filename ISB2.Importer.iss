@@ -2496,11 +2496,11 @@ objectdef isb2_importer
 ;       echo "ConvertAction_DoMenuButtonAction ${jo~}"     
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,do menu button]        
+        joNew:SetString[type,do click bar button]        
         
 
         if ${jo.Get[Menu,MenuString]~.NotNULLOrEmpty}
-            joNew:SetString[menu,"${jo.Get[Menu,MenuString]~}"]
+            joNew:SetString[clickBar,"${jo.Get[Menu,MenuString]~}"]
 
         if ${jo.GetInteger[NumButton]}
             jo:SetInteger[numButton,${jo.GetInteger[NumButton]}]
@@ -2528,7 +2528,7 @@ objectdef isb2_importer
             joNew:SetString[menu,"${jo.Get[Menu]~}"]
 
         if ${jo.GetBool[BindSoft]}
-            joNew:SetBool[bindSoft,1]
+            joNew:SetBool[softAttachHotkeys,1]
 
         if ${jo.GetInteger[StartHotkeySetAtNumHotkey]}
             joNew:SetInteger[startAtHotkey,"${jo.GetInteger[StartHotkeySetAtNumHotkey]}"]
@@ -2542,7 +2542,7 @@ objectdef isb2_importer
 ;       echo "ConvertAction_MenuStyleAction ${jo~}"     
         variable jsonvalue joNew="{}"
 
-        joNew:SetString[type,menu style]        
+        joNew:SetString[type,click bar style]        
             
         if ${jo.Get[Menu,MenuString]~.NotNULLOrEmpty}
             joNew:SetString[menu,"${jo.Get[Menu,MenuString]~}"]
@@ -2551,7 +2551,7 @@ objectdef isb2_importer
             joNew:SetString[hotkeySet,"${jo.Get[HotkeySet]~}"]
 
         if ${jo.GetBool[BindSoft]}
-            joNew:SetBool[bindSoft,1]
+            joNew:SetBool[softAttachHotkeys,1]
 
         if ${jo.GetInteger[StartButtonSetAtNumButton]}
             joNew:SetInteger[startAtButton,"${jo.GetInteger[StartButtonSetAtNumButton]}"]
@@ -2640,7 +2640,7 @@ objectdef isb2_importer
 
         switch ${jo.Get[Action]~}
         {
-            case Destroy
+            case Remove
             case Add
             {
                 variable jsonvalue joVFX

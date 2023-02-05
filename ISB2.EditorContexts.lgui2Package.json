@@ -378,6 +378,12 @@
                             "outProperty":"gameMacroSheets",
                             "subItem":"Game Macro Sheets"
                         },
+                        "vfxSheet":{
+                            "type":"add",
+                            "inProperty":"name",
+                            "outProperty":"vfxSheets",
+                            "subItem":"VFX Sheets"
+                        },
                         "windowLayout":{
                             "type":"copy",
                             "inProperty":"name",

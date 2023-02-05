@@ -649,6 +649,10 @@
             "jsonTemplate":"isb2.leftPaneExpander",
             "type":"expander",
             "horizontalAlignment":"stretch",
+            "color":"#ffffff",
+            "font":{
+                "bold":false
+            },
             "contextMenu":{
                 "jsonTemplate":"contextmenu",
                 "eventHandlers": {

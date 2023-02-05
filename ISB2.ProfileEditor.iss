@@ -305,8 +305,8 @@ objectdef(global) isb2_profileEditorContext
 
         if ${element.Context.Get[type].NotNULLOrEmpty}
             joEditor:SetReference["LGUI2.Skin[default].Template[\"${useTemplate~}\"]"]
-        else
-            return NULL
+;        else
+;            return NULL
 ;            joEditor:SetReference["{\"type\":\"panel\"}"]
 
         if !${joEditor.Reference(exists)} || !${joEditor.Used}
@@ -315,7 +315,7 @@ objectdef(global) isb2_profileEditorContext
             echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
             if ${element.Context.Get[type].NotNULLOrEmpty}
             {
-                MissingEditor:Set["Missing template ${useTemplate~}"]
+;                MissingEditor:Set["Missing template ${useTemplate~}"]
                 LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${useTemplate~}\"}"]
             }
         }
@@ -325,34 +325,36 @@ objectdef(global) isb2_profileEditorContext
 #endregion
 
 #region Actions
-    member:jsonvalueref GetActionTypeEditor()
+    static member:jsonvalueref GetActionTypeEditor(lgui2elementref element)
     {        
-        variable string useTemplate="isb2.actionEditor.${EditingItem.Get[type]~}"
+        variable string useTemplate="isb2.actionEditor.${element.Context.Get[type]~}"
         variable jsonvalueref joEditor
 
 
-        if ${EditingItem.Get[type].NotNULLOrEmpty}
+        if ${element.Context.Get[type].NotNULLOrEmpty}
             joEditor:SetReference["LGUI2.Skin[default].Template[\"${useTemplate~}\"]"]
-        else
-            return NULL
+;        else
+;            return NULL
 ;            joEditor:SetReference["{\"type\":\"panel\"}"]
+        echo "\ayGetActionTypeEditor\ax ${element} ${element.ID} ${element.Context~} ${useTemplate~}=${joEditor~}"
 
-        echo "\ayGetActionTypeEditor\ax ${EditingItem~} ${useTemplate~}=${joEditor~}"
 
         if !${joEditor.Reference(exists)} || !${joEditor.Used}
         {
             joEditor:SetReference["LGUI2.Template[isb2.missingActionEditor]"]
             echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
+            joEditor:SetString[_missingEditor,"Missing template ${useTemplate~}"]
             if ${EditingItem.Get[type].NotNULLOrEmpty}
             {
                 LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${useTemplate~}\"}"]
-                MissingEditor:Set["Missing template ${useTemplate~}"]
+
+;                MissingEditor:Set["Missing template ${useTemplate~}"]
             }
         }
 
         ; now check the action definition...
         variable jsonvalueref joActionType
-        joActionType:SetReference["ISB2.GetActionType[\"${EditingItem.Get[type]~}\"]"]
+        joActionType:SetReference["ISB2.GetActionType[\"${element.Context.Get[type]~}\"]"]
 
         variable jsonvalueref joContainer
         joContainer:SetReference["LGUI2.Skin[default].Template[isb2.actionEditor.container].Duplicate"]
@@ -406,18 +408,19 @@ objectdef(global) isb2_profileEditorContext
         return jo
     }
 
-    method SetObjectEnabled(string name, bool newState)
+    static method SetObjectEnabled(jsonvalueref jo, string name, bool newState)
     {
+        echo SetObjectEnabled ${jo~} ${name~} ${newState~}
         if ${newState}
         {
             ; enable
-            if !${EditingItem.Has[-object,"${name~}"]}
-                EditingItem:Set["${name~}","{}"]
+            if !${jo.Has[-object,"${name~}"]}
+                jo:Set["${name~}","{}"]
         }
         else
         {
             ; disable
-            EditingItem:Erase["${name~}"]
+            jo:Erase["${name~}"]
         }
     }
 #endregion

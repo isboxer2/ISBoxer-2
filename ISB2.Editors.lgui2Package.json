@@ -192,7 +192,76 @@
                     }
                 }
             }
-          },          
+          },    
+          "isb2.inputMappingEditor.action":{
+            "type":"dockpanel",
+            "jsonTemplate":"dockpanel",
+            "name":"actionEditor.General.container",
+            "contextBinding":{
+                "pullFormat":"${This.Parent.Context.Get[-init,{},action]}"
+            },
+            "children":[
+                {
+                    "_dock":"top",
+                    "type":"stackpanel",
+                    "padding":5,
+                    "orientation":"horizontal",
+                    "children":[
+                        {
+                            "type":"textblock",
+                            "text":"Action Type",
+                            "margin":[0,0,5,0]
+                        },
+                        {
+                            "type":"autocompletebox",
+                            "name":"actionEditor.autocompletebox",
+                            "dictionaryBinding":{
+                                "pullFormat":"${ISB2.AutoComplete.Get[Actions]}"
+                            },
+                            "textBinding":{
+                                "pullFormat":"${This.Context.Get[type]}",
+                                "pullReplaceNull":"",
+                                "pushFormat":["This.Context:SetString[type,\"","\"]"]
+                            },
+                            "eventHandlers":{
+                                "onTextChanged":{
+                                    "type":"forward",
+                                    "elementName":"actionEditor.General.container",
+                                    "flags":"ancestor",                                    
+                                    "event":"onActionTypeChanged"
+                                }
+                            }
+                        }        
+                    ]
+                },
+                {
+                    "_dock":"bottom",
+                    "type":"textbox",
+                    "horizontalAlignment":"stretch",
+                    "textBinding":{
+                        "pullFormat":"${This.Context.AsJSON[multiline]}",
+                        "pushFormat":["This.Context:Clear:Merge[\"","\"]"]
+                    },
+                    "textBindingUsesFocus":true
+                },
+                {
+                    "_dock":"top",
+                    "type":"dynamic",
+                    "contentContainer":{
+                        "type":"border",
+                        "verticalContentAlignment":"top"
+                    },
+                    "contentBinding":{
+                        "pullFormat":"${isb2_profileEditorContext.GetActionTypeEditor[${This.ID}]}",
+                        "pullHook":{
+                            "elementName":"actionEditor.General.container",
+                            "flags":"ancestor",
+                            "event":"onActionTypeChanged"
+                        }
+                    }
+                }
+            ]
+          },     
           "isb2.inputMappingEditor.gameKeyBinding":{
             "jsonTemplate":"isb2.inputMappingContext.objectview",
             "properties":[                
@@ -1123,12 +1192,15 @@
             "children":[],
             "orientation":"vertical",
             "uniform":false,
-            "horizontalAlignment":"stretch",
-            "verticalAlignment":"stretch"           
+            "horizontalAlignment":"stretch"
         },
         "isb2.actionEditor.objectview":{
             "jsonTemplate":"isb2.editorContext.objectview",
-            "verticalAlignment":"top"
+            "verticalAlignment":"top",
+            "objectBinding":{
+                "pullFormat":"${This.Parent.Context}",
+                "pullOnce":true
+            }
         },
         "isb2.actionEditor.targetEditor":{
             "jsonTemplate":"isb2.actionEditor.objectview",
@@ -1161,16 +1233,16 @@
                 },
                 "content":"Use Variable Properties (advanced)",
                 "checkedBinding":{
-                    "pullFormat":"${This.Context.EditingItem.Has[-object,variableProperties]}",
-                    "pushFormat":["This.Context:SetObjectEnabled[variableProperties,\"","\"]"]
+                    "pullFormat":"${This.Context.Has[-object,variableProperties]}",
+                    "pushFormat":["isb2_profileEditorContext:SetObjectEnabled[_CONTEXT_.Context,variableProperties,\"","\"]"]
                 }
             },
             "content":{
                 "type":"textbox",
                 "horizontalAlignment":"stretch",
                 "textBinding":{
-                    "pullFormat":"${This.Context.EditingItem.Get[variableProperties].AsJSON[multiline]}",
-                    "pushFormat":["This.Context.EditingItem:Set[variableProperties,\"","\"]"]
+                    "pullFormat":"${This.Context.Get[variableProperties].AsJSON[multiline]}",
+                    "pushFormat":["This.Context:Set[variableProperties,\"","\"]"]
                 },
                 "textBindingUsesFocus":true
             }
@@ -1190,8 +1262,8 @@
                 },
                 "content":"Use Action Timer",
                 "checkedBinding":{
-                    "pullFormat":"${This.Context.EditingItem.Has[-object,timer]}",
-                    "pushFormat":["This.Context:SetObjectEnabled[timer,\"","\"]"]
+                    "pullFormat":"${This.Context.Has[-object,timer]}",
+                    "pushFormat":["isb2_profileEditorContext:SetObjectEnabled[_CONTEXT_.Context,timer,\"","\"]"]
                 }
             },
             "content":{
@@ -1351,7 +1423,7 @@
                             "editTemplate":"propertyview.autocompletebox",
                             "controlData":{
                                 "dictionaryBinding":{
-                                    "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",mappables]}",
+                                    "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Object.Get[sheet]~}\",mappables]}",
                                     "pullOnce":true,
                                     "pullHook":{
                                         "elementType":"objectview",
@@ -1378,16 +1450,16 @@
                             "bold":true
                         },
                         "checkedBinding":{
-                            "pullFormat":"${This.Context.EditingItem.Has[-object,params]}",
-                            "pushFormat":["This.Context:SetObjectEnabled[params,\"","\"]"]
+                            "pullFormat":"${This.Context.Has[-object,params]}",
+                            "pushFormat":["isb2_profileEditorContext:SetObjectEnabled[_CONTEXT_.Context,params,\"","\"]"]
                         }
                     },
                     "content":{
                         "type":"textbox",
                         "horizontalAlignment":"stretch",
                         "textBinding":{
-                            "pullFormat":"${This.Context.EditingItem.Get[params].AsJSON[multiline]}",
-                            "pushFormat":["This.Context.EditingItem:Set[params,\"","\"]"]
+                            "pullFormat":"${This.Context.Get[params].AsJSON[multiline]}",
+                            "pushFormat":["This.Context:Set[params,\"","\"]"]
                         },
                         "textBindingUsesFocus":true
                     }
@@ -1433,7 +1505,7 @@
                     "editTemplate":"propertyview.autocompletebox",
                     "controlData":{
                         "dictionaryBinding":{
-                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[GameMacroSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[sheet]~}\",macros]}",
+                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[GameMacroSheets,\"${This.Context.ObjectView.Object.Get[sheet]~}\",macros]}",
                             "pullOnce":true,
                             "pullHook":{
                                 "elementType":"objectview",
@@ -1496,13 +1568,21 @@
                 {
                     "_dock":"top",
                     "type":"dynamic",
+                    "contentContainer":{
+                        "type":"border",
+                        "verticalAlignment":"stretch",
+                        "verticalContentAlignment":"stretch"
+                    },
                     "contentBinding":{
-                        "pullFormat":"${This.Context.GetActionTypeEditor}",
+                        "pullFormat":"${isb2_profileEditorContext.GetActionTypeEditor[${This.ID}]}",
                         "pullHook":{
                             "elementName":"actionEditor.General.container",
                             "flags":"ancestor",
                             "event":"onActionTypeChanged"
                         }
+                    },
+                    "contextBinding":{
+                        "pullFormat":"${This.Parent.Context.EditingItem}"
                     }
                 }
             ]
@@ -2188,6 +2268,15 @@
                         "pushFormat":["This.Object:SetString[broadcastProfile,\"","\"]"]
                         },
                         "editTemplate":"propertyview.textbox"                              
+                },
+                {
+                    "name":"On Switch To",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[-init,{},inputMapping]}",
+                        "-pushFormat":["This.Object:Set[inputMapping,\"","\"]"],
+                        "-pushNullFormat":"This.Object:Erase[inputMapping]"
+                    },
+                    "editTemplate":"propertyview.inputMapping"
                 }
             ]
         },
@@ -2455,7 +2544,7 @@
             "children":[
                 {
                     "type":"textblock",
-                    "text":"${This.Context.MissingEditor}",
+                    "text":"${This.Parent.Metadata.Get[missingEditor]~}",
                     "_dock":"top"
                 }
             ]

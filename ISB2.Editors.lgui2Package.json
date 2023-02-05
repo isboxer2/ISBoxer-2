@@ -772,6 +772,103 @@
                 }
             }
         },
+        "isb2.virtualMappableEditor.General":{
+            "jsonTemplate":"isb2.editorContext.objectview",
+            "properties":[
+                {
+                    "name":"From Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[from,sheet]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object.Get[-init,{},from]:SetString[sheet,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                        },
+                        "hooks":{                           
+                            "textChanged":{
+                                "flags":"self",
+                                "event":"onTextChanged",
+                                "eventHandler":{
+                                    "type":"forward",
+                                    "elementType":"objectview",
+                                    "flags":"ancestor",
+                                    "event":"onFromSheetChanged"
+                                }
+                            }
+                        }
+                    }                            
+                },
+                {
+                    "name":"From Mappable",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[from,name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object.Get[-init,{},from]:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[from,sheet]~}\",mappables]}",
+                            "pullOnce":true,
+                            "pullHook":{
+                                "elementType":"objectview",
+                                "flags":"ancestor",
+                                "event":"onFromSheetChanged"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name":"To Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[to,sheet]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object.Get[-init,{},to]:SetString[sheet,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                        },
+                        "hooks":{                           
+                            "textChanged":{
+                                "flags":"self",
+                                "event":"onTextChanged",
+                                "eventHandler":{
+                                    "type":"forward",
+                                    "elementType":"objectview",
+                                    "flags":"ancestor",
+                                    "event":"onToSheetChanged"
+                                }
+                            }
+                        }
+                    }                            
+                },
+                {
+                    "name":"To Mappable",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[to,name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object.Get[-init,{},to]:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Context.EditingItem.Get[to,sheet]~}\",mappables]}",
+                            "pullOnce":true,
+                            "pullHook":{
+                                "elementType":"objectview",
+                                "flags":"ancestor",
+                                "event":"onToSheetChanged"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
         "isb2.profileEditor.General":{
             "jsonTemplate":"isb2.editorContext.objectview",
             "properties":[

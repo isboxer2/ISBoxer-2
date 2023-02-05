@@ -588,6 +588,10 @@
                     "init":"UpdateImagePreview"
                 },
                 {
+                    "name":"virtualMappable",
+                    "template":"isb2.virtualMappableEditor.General"
+                },
+                {
                     "name":"vfxSheet",
                     "title":"VFX Sheet: ${EditingItem.Get[-default,\"\",name]}",
                     "subItems":[

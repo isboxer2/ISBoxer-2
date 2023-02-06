@@ -671,7 +671,7 @@
             "type":"window",
             "name":"isb2.MainWindow",
             "hideOnClose":true,
-            "title":"ISBoxer 2",
+            "title":"ISBoxer 2 v${ISB2.Version}",
             "width":750,
             "height":400,
             "minSize":[600,300],

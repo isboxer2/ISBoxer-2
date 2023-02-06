@@ -588,6 +588,7 @@ objectdef(global) isb2_profileEditorContext
     method OnContextMenu()
     {
         echo "\apcontext[${Name~}]:OnContextMenu\ax ${Context.Source} ${Context.Source.ID} ${Context.Args~} ${Context.Source.SelectedItem.Data~} ${Context.Source.Context.ItemList.Metadata~} ${Context.Source.Context.Data~}"
+        variable uint idx
         switch ${Context.Source.SelectedItem.Data}
         {
             case Copy
@@ -616,8 +617,16 @@ objectdef(global) isb2_profileEditorContext
                 }
                 break
             case Move Up
+                {
+                    idx:Set[${Context.Source.Context.Index}]
+                    Context.Source.Context.ItemList.ItemsSource:Swap[${idx},${idx.Dec}]
+                }
                 break
             case Move Down
+                {
+                    idx:Set[${Context.Source.Context.Index}]
+                    Context.Source.Context.ItemList.ItemsSource:Swap[${idx},${idx.Inc}]
+                }
                 break
         }
     }

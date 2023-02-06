@@ -181,17 +181,17 @@ objectdef isb2_wowaddon
         variable set ftlmods
         joSlot.Get[ftlModifiers]:ForEach["ftlmods:Add[\"\${ForEach.Value~}\"]"]
 
-        ; ALT
-        if ${ftlmods.Contains[LAlt]} || ${ftlmods.Contains[RAlt]}
-            keyCombo:Prepend["ALT-"]
+        ; SHIFT
+        if ${ftlmods.Contains[LShift]} || ${ftlmods.Contains[RShift]}
+            keyCombo:Prepend["SHIFT-"]
 
         ; CTRL
         if ${ftlmods.Contains[LCtrl]} || ${ftlmods.Contains[RCtrl]}
             keyCombo:Prepend["CTRL-"]
 
-        ; SHIFT
-        if ${ftlmods.Contains[LShift]} || ${ftlmods.Contains[RShift]}
-            keyCombo:Prepend["SHIFT-"]
+        ; ALT
+        if ${ftlmods.Contains[LAlt]} || ${ftlmods.Contains[RAlt]}
+            keyCombo:Prepend["ALT-"]
 
         return "${keyCombo~}"
     }

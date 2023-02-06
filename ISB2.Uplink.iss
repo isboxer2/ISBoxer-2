@@ -42,7 +42,7 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
         if ${InnerSpace.Build} < ${agent.Get[ISBoxer 2].MinimumBuild}
         {
-            echo "ISBoxer 2 inactive; Inner Space build ${agent.Get[ISBoxer 2].MinimumBuild} or later required (currently ${InnerSpace.Build})"
+            This:MinimumBuildNotMet
             return
         }
 
@@ -91,11 +91,43 @@ objectdef(global) isb2 inherits isb2_profilecollection
         LGUI2:UnloadPackageFile[ISB2.Uplink.lgui2Package.json]
     }
 
+    method MinimumBuildNotMet()
+    {
+        echo "ISBoxer 2 inactive; Inner Space build ${agent.Get[ISBoxer 2].MinimumBuild} or later required (currently ${InnerSpace.Build})"
+
+        variable jsonvalueref joContent="$$>
+        {
+            "jsonTemplate":"confirmationWindow.content",
+            "children":[
+                {
+                    "jsonTemplate": "confirmationWindow.dynamic",
+                    "_dock": "top"
+                },
+                {
+                    "jsonTemplate": "confirmationWindow.okButton",
+                    "_dock": "bottom",
+                    "horizontalAlignment":"center"
+                }
+            ]
+        }
+        <$$"
+        variable jsonvalueref joConfirm="{\"jsonTemplate\":\"confirmationWindow\",\"horizontalAlignment\":\"center\",\"verticalAlignment\":\"center\"}"
+        joConfirm:SetString[title,"Inner Space Update Required"]
+        joConfirm:SetByRef[content,joContent]
+        joConfirm:Set[_content,"{\"type\":\"textblock\",\"text\":\"ISBoxer 2 requires Inner Space build ${agent.Get[ISBoxer 2].MinimumBuild} or later (currently ${InnerSpace.Build})\",\"padding\":30,\"font\":{\"bold\":true,\"heightFactor\":1.5}}"]
+
+        LGUI2:LoadJSON[joConfirm]
+    }
+
     method OnScriptError()
     {
         Script:DumpStack
     }
 
+    member:string Version()
+    {
+        return "${agent.Get[ISBoxer 2].Version}"
+    }
 
     method OpenEditor(string profileName)
     {

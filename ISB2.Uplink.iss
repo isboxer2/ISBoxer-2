@@ -5,6 +5,7 @@
 #include "ISB2.QuickSetup.iss"
 #include "ISB2.ProfileEditor.iss"
 #include "ISB2.Achievements.iss"
+#includeoptional "ISB2.Devices.iss"
 
 objectdef(global) isb2 inherits isb2_profilecollection
 {
@@ -58,7 +59,7 @@ objectdef(global) isb2 inherits isb2_profilecollection
         LGUI2:PopSkin["${UseSkin~}"]
 
         This:InstallDefaultActionTypes
-        isb2_achievements.Instance:Init
+        isb2_achievements.Instance:Init    
 
         if ${This.EnableMIDI}
         {
@@ -69,6 +70,8 @@ objectdef(global) isb2 inherits isb2_profilecollection
             }            
             relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
         }
+
+        isb2_devices.Instance:Init
 
         This:LoadGames
         This:LoadNativeProfiles
@@ -287,12 +290,12 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
     member:bool EnableMIDI()
     {
-        return ${Settings.GetBool[enableMidi]}
+        return ${Settings.GetBool[midi,enable]}
     }
 
     method SetEnableMIDI(bool newValue=TRUE)
     {
-        Settings:SetBool[enableMidi,${newValue}]
+        Settings.Get[-init,{},midi]:SetBool[enable,${newValue}]
         This:AutoStoreSettings
 
         if ${newValue}
@@ -308,6 +311,8 @@ objectdef(global) isb2 inherits isb2_profilecollection
             MIDI:CloseAllDevicesIn
         }
 
+        LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnableChanged]
+        
         relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
     }
 
@@ -590,7 +595,7 @@ objectdef isb2_managedSlot
 
         joLaunchInfo:SetBool[isb2,1]
         joLaunchInfo:SetByRef["isb2profiles",This.CollectProfiles]
-        joLaunchInfo:SetBool[enableMidi,${ISB2.Settings.GetBool[enableMidi]}]
+        joLaunchInfo:SetBool[enableMidi,${This.EnableMIDI}]
         joGLI:SetByRef[metadata,joLaunchInfo]
 
         Script:SetLastError        

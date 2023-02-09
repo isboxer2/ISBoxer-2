@@ -826,29 +826,36 @@
                                             "margin":[15,5,0,0]
                                         },
                                         {
-                                            "type":"checkbox",
-                                            "_dock":"top",
-                                            "horizontalAlignment":"right",
-                                            "content":"Enable MIDI devices",
-                                            "margin":[15,5,0,0],
-                                            "checkedBinding":{
-                                                "pullFormat":"${ISB2.EnableMIDI}",
-                                                "pushFormat":["ISB2:SetEnableMIDI[\"","\"]"]
-                                            }
-                                        },
-                                        {
-                                            "type":"button",
+                                            "type":"stackpanel",
                                             "_dock":"bottom",
-                                            "horizontalAlignment":"left",
-                                            "content":"Achievements",
-                                            "margin":5,
-                                            "eventHandlers":{
-                                                "onPress":{
-                                                    "type":"code",
-                                                    "code":"LGUI2.Element[isb2.achievementsWindow]:SetVisibility[visible]"
+                                            "horizontalAlignment":"stretch",
+                                            "orientation":"horizontal",
+                                            "children":[
+                                                {
+                                                    "type":"button",
+                                                    "content":"Achievements",
+                                                    "margin":5,
+                                                    "eventHandlers":{
+                                                        "onPress":{
+                                                            "type":"code",
+                                                            "code":"LGUI2.Element[isb2.achievementsWindow]:SetVisibility[visible]"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "type":"button",
+                                                    "content":"MIDI",
+                                                    "margin":5,
+                                                    "eventHandlers":{
+                                                        "onPress":{
+                                                            "type":"code",
+                                                            "code":"LGUI2.Element[isb2.midiWindow]:SetVisibility[visible]"
+                                                        }
+                                                    }
                                                 }
-                                            }
+                                            ]
                                         }
+                                        
                                     ]         
                                 }                                
                             },

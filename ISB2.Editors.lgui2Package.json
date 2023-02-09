@@ -423,7 +423,7 @@
                             "dataBinding":{
                                 "pullFormat":"${This.Object.Get[game]}",
                                 "pullReplaceNull":"",
-                                "pushFormat":["This.Object:Set[game,\"","\"]"],
+                                "pushFormat":["This.Object:SetString[game,\"","\"]"],
                                 "pushNullFormat":"This.Object:Erase[game]"
                             },
                             "editTemplate":"propertyview.cancelabletextbox"                            
@@ -433,7 +433,7 @@
                             "dataBinding":{
                                 "pullFormat":"${This.Object.Get[gameProfile]}",
                                 "pullReplaceNull":"",
-                                "pushFormat":["This.Object:Set[gameProfile,\"","\"]"],
+                                "pushFormat":["This.Object:SetString[gameProfile,\"","\"]"],
                                 "pushNullFormat":"This.Object:Erase[gameProfile]"
                             },
                             "editTemplate":"propertyview.cancelabletextbox"                            
@@ -443,7 +443,7 @@
                             "dataBinding":{
                                 "pullFormat":"${This.Object.Get[executable]}",
                                 "pullReplaceNull":"",
-                                "pushFormat":["This.Object:Set[executable,\"","\"]"],
+                                "pushFormat":["This.Object:SetString[executable,\"","\"]"],
                                 "pushNullFormat":"This.Object:Erase[executable]"
                             },
                             "editTemplate":"propertyview.cancelabletextbox"                            
@@ -453,7 +453,7 @@
                             "dataBinding":{
                                 "pullFormat":"${This.Object.Get[path]}",
                                 "pullReplaceNull":"",
-                                "pushFormat":["This.Object:Set[executable,\"","\"]"],
+                                "pushFormat":["This.Object:SetString[executable,\"","\"]"],
                                 "pushNullFormat":"This.Object:Erase[executable]"
                             },
                             "editTemplate":"propertyview.cancelabletextbox"                            
@@ -463,7 +463,7 @@
                             "dataBinding":{
                                 "pullFormat":"${This.Object.Get[parameters]}",
                                 "pullReplaceNull":"",
-                                "pushFormat":["This.Object:Set[parameters,\"","\"]"],
+                                "pushFormat":["This.Object:SetString[parameters,\"","\"]"],
                                 "pushNullFormat":"This.Object:Erase[parameters]"
                             },
                             "editTemplate":"propertyview.cancelabletextbox"                            

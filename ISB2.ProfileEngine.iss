@@ -2414,6 +2414,28 @@ objectdef isb2_profileengine
         This:SetRelayGroup["${joAction.Get[name]~}",${joAction.GetBool[enable]}]
     }
 
+    method Action_MIDIOut(jsonvalueref joState, jsonvalueref joAction, bool activate)
+    {
+        echo "\arAction_MIDIOut\ax[${activate}] ${joAction~}"
+        if !${joAction.Type.Equal[object]}
+            return
+
+
+        variable jsonvalue joRelay="{\"object\":\"isb2_devices.Instance\",\"method\":\"RemoteMIDIOut\"}"
+        joRelay:SetString[target,"uplink"]
+        joRelay:SetByRef[action,joAction]
+        InnerSpace:Relay["${joRelay~}"]
+
+        /*
+        variable weakref useDevice
+        useDevice:SetReference["isb2_devices.Instance.Devices[\"${joAction.Get[device]~}\"]"]
+        if !${useDevice.Reference(exists)}
+            return
+
+        useDevice:Output["joAction.Get[output]"]
+        /**/
+    }
+
     method Action_MappableStepState(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\ayAction_MappableStepState\ax[${activate}] ${joAction~}"

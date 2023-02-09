@@ -625,6 +625,13 @@
                     "handler":"Action_Actions",
                     "activationState":true,
                     "retarget":true
+                },
+                {
+                    "name":"midi out",
+                    "handler":"Action_MIDIOut",
+                    "variableProperties":["device"],
+                    "activationState":true,
+                    "retarget":false
                 }
             ]
         }

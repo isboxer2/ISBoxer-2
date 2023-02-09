@@ -90,6 +90,34 @@
                 }
             }
         },
+        "propertyview.onofftoggle":{
+            "jsonTemplate":"propertyview.combobox",
+            "items":[
+                {
+                    "name":"On"
+                },
+                {
+                    "name":"Off"
+                },
+                {
+                    "name":"Toggle"
+                }
+            ],
+            "selectedItemBinding":{
+                "linkBinding": {
+                    "flags": "ancestor",
+                    "elementType": "propertyview",
+                    "member": "ValueBinding"
+                }
+            },
+            "selectedItemBindingProperty":"name",
+            "itemViewGenerators":{
+                "default":{
+                    "type":"template",
+                    "template":"isb2.commonView"
+                }
+            }            
+        },
         "propertyview.cancelabletextbox": {
             "type":"dockpanel",
             "jsonTemplate":"dockpanel",
@@ -1379,7 +1407,170 @@
                     "editTemplate":"propertyview.inputCombo"
                 }
             ]
+        },  
+        "isb2.actionEditor.game key binding":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Game Key Binding",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[name]"
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[GameKeyBindings]}"
+                        }
+                    }                            
+                }
+            ]
+        },         
+        "isb2.actionEditor.mappable sheet state":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Mappable Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[name]"
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                        }
+                    }                            
+                },
+                {
+                    "name":"State",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[value]}",
+                        "pushFormat":["This.Object:SetString[value,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[value]"
+                    },
+                    "editTemplate":"propertyview.onofftoggle"
+                }
+            ]
+        },        
+        "isb2.actionEditor.hotkey sheet state":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Hotkey Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[name]"
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[HotkeySheets]}"
+                        }
+                    }                            
+                },
+                {
+                    "name":"State",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[value]}",
+                        "pushFormat":["This.Object:SetString[value,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[value]"
+                    },
+                    "editTemplate":"propertyview.onofftoggle"
+                }
+            ]
+        },        
+        "isb2.actionEditor.key map state":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Hotkey/Mappable Sheet Name",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[name]"
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                        }
+                    }                            
+                },
+                {
+                    "name":"State",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[value]}",
+                        "pushFormat":["This.Object:SetString[value,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[value]"
+                    },
+                    "editTemplate":"propertyview.onofftoggle"
+                }
+            ]
         },
+        "isb2.actionEditor.mappable state":{
+            "jsonTemplate":"isb2.actionEditor.objectview",
+            "properties":[               
+                {
+                    "name":"Mappable Sheet",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[sheet]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[sheet,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${ISB2.AutoComplete.Get[MappableSheets]}"
+                        },
+                        "hooks":{                           
+                            "textChanged":{
+                                "flags":"self",
+                                "event":"onTextChanged",
+                                "eventHandler":{
+                                    "type":"forward",
+                                    "elementType":"objectview",
+                                    "flags":"ancestor",
+                                    "event":"onMappableSheetChanged"
+                                }
+                            }
+                        }
+                    }                            
+                },
+                {
+                    "name":"Mappable",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[name]}",
+                        "pullReplaceNull":"",
+                        "pushFormat":["This.Object:SetString[name,\"","\"]"]
+                    },
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData":{
+                        "dictionaryBinding":{
+                            "pullFormat":"${isb2_profileEditorContext.GetActionAutoComplete[MappableSheets,\"${This.Context.ObjectView.Object.Get[sheet]~}\",mappables]}",
+                            "pullOnce":true,
+                            "pullHook":{
+                                "elementType":"objectview",
+                                "flags":"ancestor",
+                                "event":"onMappableSheetChanged"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name":"State",
+                    "dataBinding":{
+                        "pullFormat":"${This.Object.Get[value]}",
+                        "pushFormat":["This.Object:SetString[value,\"","\"]"],
+                        "pushNullFormat":"This.Object:Erase[value]"
+                    },
+                    "editTemplate":"propertyview.onofftoggle"
+                }
+            ]
+        },        
         "isb2.actionEditor.mappable":{
             "jsonTemplate":"stackpanel",
             "type":"stackpanel",

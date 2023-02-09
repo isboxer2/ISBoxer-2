@@ -595,7 +595,7 @@ objectdef isb2_managedSlot
 
         joLaunchInfo:SetBool[isb2,1]
         joLaunchInfo:SetByRef["isb2profiles",This.CollectProfiles]
-        joLaunchInfo:SetBool[enableMidi,${This.EnableMIDI}]
+        joLaunchInfo:SetBool[enableMidi,${ISB2.EnableMIDI}]
         joGLI:SetByRef[metadata,joLaunchInfo]
 
         Script:SetLastError        

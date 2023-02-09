@@ -138,6 +138,71 @@
         "isb2.data":{
             "games":[
                 {
+                    "name":"Champions Online",
+                    "shortName":"CO",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/Gameprefs.Pref",
+                            "replacement":"{1}/Gameprefs-{CHARACTER}.Pref"
+                        },
+                        {
+                            "pattern":"Software/Cryptic/Cryptic Launcher/",
+                            "replacement":"Software/Cryptic/Cryptic Launcher-{CHARACTER}/"
+                        }
+                    ]
+                },
+                {
+                    "name":"Dark Age of Camelot",
+                    "shortName":"DAOC",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "":"user.dat, char.bin",
+                            "replacement":"{1}/user-{CHARACTER}.dat",
+                            "pattern":"*/user.dat"
+                        },
+                        {
+                            "replacement":"{1}/char-{CHARACTER}.bin",
+                            "pattern":"*/char.bin"
+                        }
+                    ]
+                },
+                {
+                    "name":"Diablo 2 Resurrected",
+                    "shortName":"D2R",
+                    "genre":"ARPG",
+                    "virtualFiles":[
+                        {
+                            "replacement":"{1}/Battle.net-{CHARACTER}.config",
+                            "pattern":"*/Battle.net.config"
+                        },
+                        {
+                            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/{CHARACTER}/",
+                            "pattern":"Software/Blizzard Entertainment/Battle.net/"
+                        }
+                    ]
+                },
+                {
+                    "name":"Diablo 3",
+                    "shortName":"D3",
+                    "genre":"ARPG",
+                    "virtualFiles":[
+                        {
+                            "replacement":"{1}/Battle.net-{CHARACTER}.config",
+                            "pattern":"*/Battle.net.config"
+                        },
+                        {
+                            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/{CHARACTER}/",
+                            "pattern":"Software/Blizzard Entertainment/Battle.net/"
+                        },
+                        {
+                            "pattern":"*/D3Prefs.txt",
+                            "replacement":"{1}/D3Prefs-{CHARACTER}.txt"
+                        }
+                    ]
+                },
+                {
                     "name":"Diablo Immortal",
                     "shortName":"DI",
                     "genre":"ARPG",
@@ -194,6 +259,28 @@
                     ]
                 },
                 {
+                    "name":"Final Fantasy XIV",
+                    "shortName":"FFXIV",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/ffxiv.cfg",
+                            "replacement":"{1}/ffxiv-{CHARACTER}.cfg"
+                        }
+                    ]
+                },
+                {
+                    "name":"Guild Wars 2",
+                    "shortName":"GW2",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/local.dat",
+                            "replacement":"{1}/local-{CHARACTER}.dat"
+                        }
+                    ]
+                },
+                {
                     "name":"Lord of the Rings Online",
                     "shortName":"LOTRO",
                     "genre":"MMO",
@@ -201,6 +288,55 @@
                         {
                             "pattern":"*/UserPreferences.ini",
                             "replacement":"{1}/UserPreferences-{CHARACTER}.ini"
+                        }
+                    ]
+                },
+                {
+                    "name":"Neverwinter",
+                    "shortName":"NW",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/Gameprefs.Pref",
+                            "replacement":"{1}/Gameprefs-{CHARACTER}.Pref"
+                        },
+                        {
+                            "pattern":"Software/Cryptic/Cryptic Launcher/",
+                            "replacement":"Software/Cryptic/Cryptic Launcher-{CHARACTER}/"
+                        }
+                    ]
+                },
+                {
+                    "name":"RIFT (GlyphClient.cfg, riftpatch.cfg, rift.cfg)",
+                    "shortName":"RIFT",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/GlyphClient.cfg",
+                            "replacement":"{1}/GlyphClient-{CHARACTER}.cfg"
+                        },
+                        {
+                            "pattern":"*/riftpatch.cfg",
+                            "replacement":"{1}/riftpatch-{CHARACTER}.cfg"
+                        },
+                        {
+                            "pattern":"*/rift.cfg",
+                            "replacement":"{1}/rift-{CHARACTER}.cfg"
+                        }
+                    ]
+                },
+                {
+                    "name":"Star Trek Online",
+                    "shortName":"STO",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/Gameprefs.Pref",
+                            "replacement":"{1}/Gameprefs-{CHARACTER}.Pref"
+                        },
+                        {
+                            "pattern":"Software/Cryptic/Cryptic Launcher/",
+                            "replacement":"Software/Cryptic/Cryptic Launcher-{CHARACTER}/"
                         }
                     ]
                 },
@@ -216,6 +352,21 @@
                         {
                             "pattern":"*/launcher.settings",
                             "replacement":"{1}/launcher-{CHARACTER}.settings"
+                        }
+                    ]
+                },
+                {
+                    "name":"Trove (GlyphClient.cfg, Trove.cfg)",
+                    "shortName":"Trove",
+                    "genre":"MMO",
+                    "virtualFiles":[
+                        {
+                            "pattern":"*/GlyphClient.cfg",
+                            "replacement":"{1}/GlyphClient-{CHARACTER}.cfg"
+                        },
+                        {
+                            "pattern":"*/Trove.cfg",
+                            "replacement":"{1}/Trove-{CHARACTER}.cfg"
                         }
                     ]
                 },

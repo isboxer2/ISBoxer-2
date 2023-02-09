@@ -355,7 +355,7 @@
                 },
                 {
                     "id":27,
-                    "name":"MIDI Device Enabled!",
+                    "name":"MIDI Input Device Enabled!",
                     "flavor":"Multiboxing to the beat",
                     "reqs":[
                         {

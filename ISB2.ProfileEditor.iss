@@ -302,9 +302,10 @@ objectdef(global) isb2_profileEditorContext
         variable jsonvalueref joEditor
         echo "\ayGetInputMappingTypeEditor\ax ${element} ${element.ID} ${element.Context~} ${useTemplate~}=${joEditor~}"
 
-
         if ${element.Context.Get[type].NotNULLOrEmpty}
             joEditor:SetReference["LGUI2.Skin[default].Template[\"${useTemplate~}\"]"]
+        else
+            return "{\"type\":\"panel\",\"visibility\":\"collapsed\"}"
 ;        else
 ;            return NULL
 ;            joEditor:SetReference["{\"type\":\"panel\"}"]
@@ -332,25 +333,30 @@ objectdef(global) isb2_profileEditorContext
 
 
         if ${element.Context.Get[type].NotNULLOrEmpty}
+        {
             joEditor:SetReference["LGUI2.Skin[default].Template[\"${useTemplate~}\"]"]
 ;        else
 ;            return NULL
 ;            joEditor:SetReference["{\"type\":\"panel\"}"]
-        echo "\ayGetActionTypeEditor\ax ${element} ${element.ID} ${element.Context~} ${useTemplate~}=${joEditor~}"
+            echo "\ayGetActionTypeEditor\ax ${element} ${element.ID} ${element.Context~} ${useTemplate~}=${joEditor~}"
 
 
-        if !${joEditor.Reference(exists)} || !${joEditor.Used}
-        {
-            joEditor:SetReference["LGUI2.Template[isb2.missingActionEditor]"]
-            echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
-            joEditor:SetString[_missingEditor,"Missing template ${useTemplate~}"]
-            if ${EditingItem.Get[type].NotNULLOrEmpty}
+            if !${joEditor.Reference(exists)} || !${joEditor.Used}
             {
-                LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${useTemplate~}\"}"]
+                joEditor:SetReference["LGUI2.Template[isb2.missingActionEditor]"]
+                echo "\armissing editor\ax \"${useTemplate~}\" = ${joEditor~}"
+                joEditor:SetString[_missingEditor,"Missing template ${useTemplate~}"]
+                if ${EditingItem.Get[type].NotNULLOrEmpty}
+                {
+                    LGUI2.Element[isb2.events]:FireEventHandler[onMissingEditor,"{\"name\":\"${useTemplate~}\"}"]
 
-;                MissingEditor:Set["Missing template ${useTemplate~}"]
+    ;                MissingEditor:Set["Missing template ${useTemplate~}"]
+                }
             }
+        
         }
+        else
+             joEditor:SetReference["{\"type\":\"panel\",\"visibility\":\"collapsed\"}"]
 
         ; now check the action definition...
         variable jsonvalueref joActionType

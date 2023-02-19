@@ -1094,18 +1094,6 @@
                 ]
                 ]
         },
-        "isb2.midi":{
-            "outDevices":[
-                {
-                    "deviceName":"Launchpad MK2",
-                    "deviceType":"isb2_launchpadMK2"
-                },
-                {
-                    "deviceName":"Launchpad Mini",
-                    "deviceType":"isb2_launchpadMiniMK2"
-                }
-            ]
-        },
         "isb2.attachedMidiView":{
             "jsonTemplate":"listboxitem",
             "padding":2,
@@ -1335,39 +1323,6 @@
                                                 "pushNullFormat":"This.Object:Erase[name]"
                                             },
                                             "editTemplate":"propertyview.cancelabletextbox"                            
-                                        },         
-                                        {
-                                            "name":"Device Controller",
-                                            "-dataBinding":{
-                                                "pullFormat":"${This.Object.Get[deviceType]}",
-                                                "pullReplaceNull":"",
-                                                "pushFormat":["This.Object:Set[deviceType,\"","\"]"],
-                                                "pushNullFormat":"This.Object:Erase[deviceType]"
-                                            },
-                                            "editTemplate":"propertyview.combobox",
-                                            "controlData":{
-                                                "items":[
-                                                    {
-                                                        "name":"isb2_launchpadMiniMK2"
-                                                    },
-                                                    {
-                                                        "name":"isb2_launchpadMK2"
-                                                    }
-                                                ],
-                                                "itemViewGenerators":{
-                                                    "default":{
-                                                        "type":"template",
-                                                        "template":"isb2.commonView"
-                                                    }
-                                                },
-                                                "selectedItemBinding":{
-                                                    "pullFormat":"${This.Locate[,objectview,ancestor].Object.Get[deviceType]}",
-                                                    "pullReplaceNull":"",
-                                                    "pushFormat":["This.Locate[,objectview,ancestor].Object:SetString[deviceType,\"","\"]"],
-                                                    "pushNullFormat":"This.Locate[,objectview,ancestor].Object:Erase[deviceType]"                                            
-                                                },
-                                                "selectedItemBindingProperty":"name"
-                                            }                          
                                         }
                                     ]
                                 },   
@@ -1425,6 +1380,40 @@
                                     "text":"Enabled Output Devices"
                                 }
                                 
+                            ]
+                        }
+                    },
+                    {
+                        "type":"tab",
+                        "header":"Output Tester",
+                        "content":{
+                            "type":"dockpanel",
+                            "horizontalAlignment":"stretch",
+                            "verticalAlignment":"stretch",
+                            "children":[
+                                {
+                                    "_dock":"bottom",
+                                    "type":"button",
+                                    "horizontalAlignment":"right",
+                                    "content":"Test",
+                                    "eventHandlers":{
+                                        "onPress":{
+                                            "type":"method",
+                                            "object":"isb2_devices.Instance",
+                                            "method":"OnTestAction"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_dock":"top",
+                                    "type":"textbox",
+                                    "horizontalAlignment":"stretch",
+                                    "textBinding":{
+                                        "pullFormat":"${isb2_devices.TestingAction.AsJSON[multiline]}",
+                                        "pushFormat":["isb2_devices.TestingAction:SetValue[\"","\"]"]
+                                    },
+                                    "textBindingUsesFocus":true
+                                }                                
                             ]
                         }
                     }

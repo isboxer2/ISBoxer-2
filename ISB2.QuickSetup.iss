@@ -395,7 +395,7 @@ objectdef isb2_quicksetup inherits isb2_building
 
     method GenerateGameLaunchInfo(string gameName)
     {
-        GameLaunchInfo:Set["[]"]
+        GameLaunchInfo:Clear
 
         ISUplink.Games:ForEach["This:AddGameLaunchInfo_Game[\"\${ForEach.Key~}\",ForEach.Value]"]
 

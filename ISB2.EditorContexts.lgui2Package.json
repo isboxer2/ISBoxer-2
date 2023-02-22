@@ -7,6 +7,7 @@
                 {
                     "name":"main",
                     "title":"",
+                    "hideEmpties":true,
                     "subItems":[
                         {
                             "name":"Profile",
@@ -237,6 +238,7 @@
                 {
                     "name":"team",
                     "title":"Team: ${EditingItem.Get[-default,\"\",name]}",
+                    "hideEmpties":true,
                     "subItems":[
                         {
                             "name":"General",

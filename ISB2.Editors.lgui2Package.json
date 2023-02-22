@@ -567,6 +567,21 @@
                         "visibility":"collapsed"
                     },
                     {
+                        "_dock":"bottom",
+                        "visibility":"visible",
+                        "type":"button",
+                        "horizontalAlignment":"center",
+                        "content":"Show empty categories",
+                        "margin":[5,2],
+                        "eventHandlers":{
+                            "onPress":{
+                                "type":"method",
+                                "object":"This.Context",
+                                "method":"OnShowEmpties"
+                            }
+                        }
+                    },
+                    {
                         "_dock":"top",
                         "type":"scrollviewer",
                         "horizontalAlignment":"stretch",

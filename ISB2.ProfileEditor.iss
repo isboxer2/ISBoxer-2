@@ -15,6 +15,9 @@ objectdef(global) isb2_profileEditorContext
     variable lgui2elementref Element
     variable lgui2elementref Container
     variable uint SelectedItem=1
+    variable bool HasHiddenItems
+
+    variable jsonvalueref HiddenItems="[]"
 
     method Initialize(weakref _editor, jsonvalueref jo)
     {
@@ -33,9 +36,25 @@ objectdef(global) isb2_profileEditorContext
 
         variable jsonvalueref joList
 
+        variable bool hide
+
         if ${joItem.Has[-object,list]}
         {
             joList:SetReference["joItem.Get[list]"]
+            if ${Data.GetBool[hideEmpties]}
+            {
+                if ${joList.Has[-string,source]}
+                {
+                    variable jsonvalueref joSource
+                    joSource:SetReference["${joList.Get[source]~}"]
+
+                    if !${joSource.Type.Equal[array]} || !${joSource.Used}
+                    {
+                        hide:Set[1]
+                    }
+                }
+            }
+
             joSubItem:Merge["LGUI2.Skin[default].Template[isb2.profileEditor.Context.List]"]
 
             if ${joList.Has[-string,context]}
@@ -114,6 +133,14 @@ objectdef(global) isb2_profileEditorContext
             if ${joItem.Has[-string,init]}
                 joSubItem:SetString[init,"${joItem.Get[init]~}"]
 
+        
+            if ${hide}
+            {
+                HiddenItems:AddByRef[joSubItem]
+                return
+            }
+
+
             if !${joContainer.Has[items]}
                 joContainer:Set[items,"[]"]
             
@@ -190,8 +217,16 @@ objectdef(global) isb2_profileEditorContext
             joLeftPane:SetReference["LGUI2.Template[isb2.editorContext.leftPane]"]
             joLeftPane:SetString["_pane","isb2.subPages"]
 ;            echo "joLeftPane ${joLeftPane~}"
-            joLeftPaneContainer:SetReference["joLeftPane.Get[content,children,2,content]"]
-            Data.Get[subItems]:ForEach["This:AddSubItem[joLeftPaneContainer,ForEach.Value]"]          
+            joLeftPaneContainer:SetReference["joLeftPane.Get[content,children,3,content]"]
+            HiddenItems:Clear
+            Data.Get[subItems]:ForEach["This:AddSubItem[joLeftPaneContainer,ForEach.Value]"]
+
+            if ${HiddenItems.Used}
+            {
+                joLeftPane.Get[content,children,2]:SetString[visibility,visible]
+            }
+            else
+                joLeftPane.Get[content,children,2]:SetString[visibility,collapsed]
         }
 
         if !${useTemplate.NotNULLOrEmpty}
@@ -260,16 +295,18 @@ objectdef(global) isb2_profileEditorContext
         LGUI2.Element[isb2.events]:FireEventHandler["contextLoaded","{\"type\":\"${Name~}\"}"]
     }
 
-    method UpdateFromJSON(string _json)
+    method OnShowEmpties()
     {
-        variable jsonvalue jo
-        jo:SetValue["${_json~}"]
+        echo "OnShowEmpties ${Name~} ${Title~}"
 
-        if ${jo.Type.Equal[object]}
-        {
-            EditingItem:Clear
-            EditingItem:Merge[jo]
-        }
+        variable lgui2elementref ListBox="${Context.Source.Parent.Locate[editorContext.leftPane.container,listbox,descendant].ID}"
+        if !${ListBox.Element(exists)}
+            return
+
+        HiddenItems:ForEach["ListBox:InsertItem[ForEach.Value]"]
+
+        HiddenItems:Clear
+        Context.Source:SetVisibility[collapsed]
     }
 
 #region Configuration Builders

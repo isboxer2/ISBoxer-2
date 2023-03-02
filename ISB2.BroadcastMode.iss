@@ -134,6 +134,16 @@ objectdef isb2_broadcastmode
         Broadcaster.Element:SetBroadcastTarget["${target~}"]
     }
 
+    member:bool BlockLocal()
+    {
+        return "${Broadcaster.BlockLocal}"
+    }
+
+    method SetBlockLocal(bool newValue)
+    {
+        Broadcaster.Element:SetBlockLocal[${newValue}]
+    }
+
     method Event_OnActivate()
     {
         if ${Enabled}

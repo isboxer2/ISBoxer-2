@@ -1566,6 +1566,18 @@ objectdef isb2_profileengine
 #endregion
 
 #region Variable Processors
+    member:string ProcessSlotVariables(string text, jsonvalueref jaSlots)
+    {
+        ; SLOT1 SLOT2 SLOT3 etc
+        variable int i
+        for (i:Set[1] ; ${i}<=${jaSlots.Used} ; i:Inc)
+        {
+            text:Set["${text.ReplaceSubstring["{SLOT${i}}","${jaSlots.Get[${i},character]~}"]}"]
+        }
+
+        return "${text~}"
+    }
+
     member:string ProcessVariables(string text, jsonvalueref joState)
     {
         if !${text.Find["{"]}
@@ -1635,12 +1647,18 @@ objectdef isb2_profileengine
             pos:Set["${text.FindFrom[${pos.Inc},"{P:"]}"]
         }
 
-        if ${Slot}
-            text:Set["${text.ReplaceSubstring["{SLOT}",${Slot}]}"]
-        elseif ${ISBoxerSlot(exists)}        
-            text:Set["${text.ReplaceSubstring["{SLOT}",${ISBoxerSlot}]}"]
-        else
-            text:Set["${text.ReplaceSubstring["{SLOT}",1]}"]
+        if ${text.Find["{SLOT"]}
+        {
+            if ${Slot}
+                text:Set["${text.ReplaceSubstring["{SLOT}",${Slot}]}"]
+            elseif ${ISBoxerSlot(exists)}        
+                text:Set["${text.ReplaceSubstring["{SLOT}",${ISBoxerSlot}]}"]
+            else
+                text:Set["${text.ReplaceSubstring["{SLOT}",1]}"]
+
+            ; SLOT1 SLOT2 SLOT3 etc
+            text:Set["${This.ProcessSlotVariables["${text~}","Team.Get[slots]"]}"]
+        }
 
         if ${Character.Reference(exists)}
             text:Set["${text.ReplaceSubstring["{CHARACTER}","${Character.Get[name]}"]}"]
@@ -2071,7 +2089,15 @@ objectdef isb2_profileengine
     method Action_BroadcastTarget(jsonvalueref joState, jsonvalueref joAction, bool activate)
     {
         echo "\agAction_BroadcasTarget\ax[${activate}] ${joAction~}"
-        ISB2BroadcastMode:SetTarget["${joAction.Get[value]~}"]
+        variable string useTarget="${This.ResolveTarget[joState,joAction,value]~}"
+        ISB2BroadcastMode:SetTarget["${useTarget~}"]        
+
+        if ${useTarget.Equal[self]} || ${useTarget.Equal["${Session~}"]}
+        {
+            ISB2BroadcastMode:SetBlockLocal[FALSE]
+        }
+        else
+            ISB2BroadcastMode:SetBlockLocal["${joAction.GetBool[blockLocal]}"]
     }
 
     method Action_BroadcastList(jsonvalueref joState, jsonvalueref joAction, bool activate)

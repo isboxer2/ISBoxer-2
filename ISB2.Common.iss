@@ -238,6 +238,7 @@ objectdef isb2_profilecollection
         This:BuildAutoComplete[GameKeyBindings]
         This:BuildActionsAutoComplete
         This:BuildGamesAutoComplete
+        This:BuildGameProfilesAutoComplete
     }
 
     method BuildActionsAutoComplete()
@@ -268,6 +269,58 @@ objectdef isb2_profilecollection
         }
 
         AutoComplete.Get[Games]:SetDictionary[jo]
+    }
+
+    method Build_AddProfile(jsonvalueref jo, string name, jsonvalueref joProfile)
+    {
+        if !${name.NotNULLOrEmpty} || ${name.Equal[_set_guid]}
+            return
+
+        echo "\ayBuild_AddProfile\ax ${name~} ${joProfile~}"
+        jo:SetByRef["${name~}",joProfile]
+    }
+
+    method Build_AddGame(jsonvalueref jo, string name, jsonvalueref joGame)
+    {
+        if !${name.NotNULLOrEmpty} || ${name.Equal[_set_guid]}
+            return
+
+        echo "\ayBuild_AddGame\ax ${name~} ${joGame~}"
+        jo:SetByRef["${name~}",joGame]
+
+        variable jsonvalueref joProfiles="{}"
+        joGame.Get[Profiles]:ForEach["This:Build_AddProfile[joProfiles,\"\${ForEach.Key~}\",ForEach.Value]"]
+        
+;        joGame.Get[Profiles]:ForEach["This:AddGameLaunchInfo_Profile[\"${name~}\",\"\${ForEach.Key~}\"]"]
+        
+        if !${AutoComplete.Get["IS-GameProfiles:${name~}"](exists)}
+        {
+            AutoComplete:Set["IS-GameProfiles:${name~}"]
+        }
+
+        AutoComplete.Get["IS-GameProfiles:${name~}"]:SetDictionary[joProfiles]
+    }
+
+    method BuildGameProfilesAutoComplete()
+    {
+        echo BuildGameProfilesAutoComplete
+        ; this is actually a pair, games and game profiles.
+        variable jsonvalueref jaGames="ISUplink.Games"
+        if !${jaGames.Reference(exists)}
+        {
+            echo "ISUplink.Games empty...?"
+            return
+        }
+
+        variable jsonvalueref joGames="{}"
+        jaGames:ForEach["This:Build_AddGame[joGames,\"\${ForEach.Key~}\",ForEach.Value]"]
+
+         if !${AutoComplete.Get["IS-Games"](exists)}
+        {
+            AutoComplete:Set["IS-Games"]
+        }
+
+        AutoComplete.Get["IS-Games"]:SetDictionary[joGames]
     }
 
     method BuildAutoComplete(string name, string fieldName="name")

@@ -454,7 +454,12 @@
                                 "pushFormat":["This.Object:SetString[game,\"","\"]"],
                                 "pushNullFormat":"This.Object:Erase[game]"
                             },
-                            "editTemplate":"propertyview.cancelabletextbox"                            
+                            "editTemplate":"propertyview.autocompletebox",
+                            "controlData":{
+                                "dictionaryBinding":{
+                                    "pullFormat":"${ISB2.AutoComplete.Get[IS-Games]}"
+                                }
+                            }                            
                         },
                         {
                             "name":"Game Profile",
@@ -464,7 +469,12 @@
                                 "pushFormat":["This.Object:SetString[gameProfile,\"","\"]"],
                                 "pushNullFormat":"This.Object:Erase[gameProfile]"
                             },
-                            "editTemplate":"propertyview.cancelabletextbox"                            
+                            "editTemplate":"propertyview.autocompletebox",
+                            "controlData":{
+                                "dictionaryBinding":{
+                                    "pullFormat":"${ISB2.AutoComplete.Get[\"IS-GameProfiles:${This.Locate[,objectview,ancestor].Object.Get[game]~}\"]}"
+                                }
+                            }                                               
                         },
                         {
                             "name":"Executable",
@@ -2183,7 +2193,12 @@
                         "pullReplaceNull":"",
                         "pushFormat":["This.Object:SetString[game,\"","\"]"]
                     },
-                    "editTemplate":"propertyview.textbox"                            
+                    "editTemplate":"propertyview.autocompletebox",
+                    "controlData": {
+                        "dictionaryBinding": {
+                            "pullFormat": "${ISB2.AutoComplete.Get[Games]}"
+                        }
+                    }
                 },
                 {
                     "name":"Clip cursor to window",

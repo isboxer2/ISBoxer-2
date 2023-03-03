@@ -222,6 +222,21 @@
                     ]
                 },
                 {
+                    "name":"Restore Broadcast Target",
+                    "steps": [
+                        {
+                            "actions":[
+                                {
+                                    "type":"broadcast target",
+                                    "blockLocal": false,
+                                    "value": "{U:Core.broadcast target}",
+                                    "target":"{U:Core.broadcast toggle target}"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "name": "Toggle Broadcasting",
                     "steps": [
                         {
@@ -386,6 +401,13 @@
             "schema":{
                 "type":"string",
                 "enum": ["all","self"]
+            }
+        },
+        {
+            "name":"Core.broadcast target",
+            "value":"all other",
+            "schema":{
+                "type":"string"
             }
         }
     ],

@@ -1960,18 +1960,7 @@
             "content":{
                 "type":"dockpanel",
                 "horizontalAlignment":"stretch",
-                "verticalAlignment": "stretch",
-                "eventHandlers":{
-                    "xyz":{
-                        "type":"forward",
-                        "event": "boobs"
-                    }
-                },
-                "children":[
-                    {
-                        "jsonTemplate":"xyz"
-                    }
-                ]
+                "verticalAlignment": "stretch"
             }
         }
     ]

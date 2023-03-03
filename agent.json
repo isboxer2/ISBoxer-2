@@ -1,8 +1,8 @@
 {
     "$schema": "http://www.lavishsoft.com/schema/agent.json",
     "name": "ISBoxer 2",
-    "version": "20230222.1",
-    "minimumBuild": 7102,
+    "version": "20230303.1",
+    "minimumBuild": 7106,
     "platforms": {
         "inner space uplink": {
             "eventHandlers": {
@@ -20,7 +20,7 @@
         },
         "inner space session": {
             "eventHandlers": {
-                "onAgentStartup": {
+                "onAgentStartup": { 
                     "code": [
                         "run ISB2.Session.iss"
                     ]

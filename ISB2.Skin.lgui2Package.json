@@ -782,6 +782,7 @@
                     "handler":"Action_MIDIOut",
                     "variableProperties":["device"],
                     "activationState":true,
+                    "timer":true,
                     "retarget":false
                 }
             ]

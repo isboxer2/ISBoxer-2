@@ -1341,6 +1341,8 @@ objectdef isb2_profileengine
             jaGames:SetReference["LGUI2.Skin[default].Template[isb2.data].Get[games]"]
 
             ActiveGame:SetReference["ISB2.FindInArray[jaGames,\"${Character.Get[game]~}\"]"]
+            if !${ActiveGame.Reference(exists)}
+                ActiveGame:SetReference["ISB2.FindInArray[jaGames,\"${Character.Get[game]~}\",shortName]"]
         }
         else
         {
@@ -1350,6 +1352,7 @@ objectdef isb2_profileengine
         if ${Character.GetBool[useGameVirtualFiles]}
         {
             ; get the game
+;            echo "\ayInstalling Game-specific Virtual Files\ax from ${ActiveGame~}"
             This:InstallVirtualFiles["ActiveGame.Get[virtualFiles]"]    
         }
 

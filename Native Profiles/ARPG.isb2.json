@@ -6,69 +6,519 @@
             "name": "ARPG - Standard",
             "genre":"ARPG",
             "team": {
-                "hotkeySheets": ["ARPG - Base Hotkeys"],
-                "mappableSheets": ["ARPG - Base Hotkeys"]
-            }
+                "hotkeySheets": ["ARPG - Hold to Control"],
+                "mappableSheets": ["ARPG - Hold to Control"]
+            },
+            "hotkeys": [
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 1",
+                    "keyCombo":"F1",
+                    "category": "Hold to Control"
+                },
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 2",
+                    "keyCombo":"F2",
+                    "category": "Hold to Control"
+                },
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 3",
+                    "keyCombo":"F3",
+                    "category": "Hold to Control"
+                },
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 4",
+                    "keyCombo":"F4",
+                    "category": "Hold to Control"
+                },
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 5",
+                    "keyCombo":"F5",
+                    "category": "Hold to Control"
+                },
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 6",
+                    "keyCombo":"F6",
+                    "category": "Hold to Control"
+                },
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 7",
+                    "keyCombo":"F7",
+                    "category": "Hold to Control"
+                },
+                {
+                    "sheet": "ARPG - Hold to Control",
+                    "name": "Slot 8",
+                    "keyCombo":"F8",
+                    "category": "Hold to Control"
+                }
+            ]
         }
     ],
     "hotkeySheets": [
         {
-            "name":"ARPG - Base Hotkeys",
+            "name":"ARPG - Hold to Control",
             "hotkeys": [
                 {
-                    "name":"Hold to Control Slot 1"
+                    "name":"Slot 1",
+                    "keyCombo":"F1",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 1"
+                    }
                 },
                 {
-                    "name":"Hold to Control Slot 2"
+                    "name":"Slot 2",
+                    "keyCombo":"F2",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 2"
+                    }
                 },
                 {
-                    "name":"Hold to Control Slot 3"
+                    "name":"Slot 3",
+                    "keyCombo":"F3",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 3"
+                    }
                 },
                 {
-                    "name":"Hold to Control Slot 4"
+                    "name":"Slot 4",
+                    "keyCombo":"F4",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 4"
+                    }
                 },
                 {
-                    "name":"Hold to Control Slot 5"
+                    "name":"Slot 5",
+                    "keyCombo":"F5",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 5"
+                    }
                 },
                 {
-                    "name":"Hold to Control Slot 6"
+                    "name":"Slot 6",
+                    "keyCombo":"F6",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 6"
+                    }
                 },
                 {
-                    "name":"Hold to Control Slot 7"
+                    "name":"Slot 7",
+                    "keyCombo":"F7",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 7"
+                    }
                 },
                 {
-                    "name":"Hold to Control Slot 8"
+                    "name":"Slot 8",
+                    "keyCombo":"F8",
+                    "inputMapping": {
+                        "type": "mappable",
+                        "sheet": "ARPG - Hold to Control",
+                        "name": "Slot 8"
+                    }
                 }
             ]
         }
     ],
     "mappableSheets":[
         {
-         "name": "ARPG - Base Hotkeys",
+         "name": "ARPG - Hold to Control",
          "mappables": [
             {
-                "name":"Hold to Control Slot 1"
+                "name":"Slot 1",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "1",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT1}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             },
             {
-                "name":"Hold to Control Slot 2"
+                "name":"Slot 2",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "2",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT2}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             },
             {
-                "name":"Hold to Control Slot 3"
+                "name":"Slot 3",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "3",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT3}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             },
             {
-                "name":"Hold to Control Slot 4"
+                "name":"Slot 4",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "4",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT4}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             },
             {
-                "name":"Hold to Control Slot 5"
+                "name":"Slot 5",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "5",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT5}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             },
             {
-                "name":"Hold to Control Slot 6"
+                "name":"Slot 6",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "6",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT6}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             },
             {
-                "name":"Hold to Control Slot 7"
+                "name":"Slot 7",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "7",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT7}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             },
             {
-                "name":"Hold to Control Slot 8"
+                "name":"Slot 8",
+                "onRelease": true,
+                "onPress": true,
+                "steps": [
+                    {
+                        "actions": [
+                            {
+                                "type": "broadcast target",
+                                "value": "8",
+                                "blockLocal": true
+                            },
+                            {
+                                "type": "broadcast state",
+                                "mouseState": "On",
+                                "keyboardState": "On",
+                                "target": "self"
+                            },
+                            {
+                                "type": "popup text",
+                                "text": "Control {SLOT8}",
+                                "duration": 1.0,
+                                "color": "#00ff00"
+                            }
+                        ]
+                    },
+                    {
+                        "actions": [
+                            {
+                                "type":"mappable",
+                                "name":"Restore Broadcast Target",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            },
+                            {
+                                "type": "mappable",
+                                "name": "Toggle Broadcasting",
+                                "sheet": "Core Toggles"
+                            }
+                        ]
+                    }
+                ]
             }
          ]   
         }

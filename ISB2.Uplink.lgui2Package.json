@@ -513,7 +513,7 @@
         {
             "type": "panel",
             "visibility": "hidden",
-            "name": "isb2.events"
+            "name": "isb2.events"            
         },
         {
             "type":"window",
@@ -1243,7 +1243,12 @@
                                                             "pullReplaceNull":"",
                                                             "pushFormat":["This.ObjectView.Object:SetString[game,\"","\"]"]
                                                           },
-                                                          "editTemplate":"propertyview.textbox"                              
+                                                          "editTemplate":"propertyview.autocompletebox",
+                                                          "controlData":{
+                                                            "dictionaryBinding":{
+                                                                "pullFormat":"${ISB2.AutoComplete.Get[Games]}"
+                                                            }
+                                                          }                              
                                                     },
                                                     {
                                                         "name":"Actual Name",
@@ -1933,11 +1938,38 @@
                                                 "flags": "global",
                                                 "event": "onSelectionChanged"
                                             }                                        
-                                        }    
+                                        }
                                     }
                                 }
                             ]
                         }
+                    }
+                ]
+            }
+        },
+        {
+            "name":"isb2.tutorialWindow",
+            "type":"window",
+            "visibility": "hidden",
+            "hideOnClose": true,
+            "title":"ISBoxer 2: Tutorial",
+            "horizontalAlignment": "center",
+            "verticalAlignment": "center",
+            "width":800,
+            "height":600,
+            "content":{
+                "type":"dockpanel",
+                "horizontalAlignment":"stretch",
+                "verticalAlignment": "stretch",
+                "eventHandlers":{
+                    "xyz":{
+                        "type":"forward",
+                        "event": "boobs"
+                    }
+                },
+                "children":[
+                    {
+                        "jsonTemplate":"xyz"
                     }
                 ]
             }

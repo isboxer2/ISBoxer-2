@@ -1058,7 +1058,7 @@ objectdef isb2_profileeditorWindow
         Window:Set["${LGUI2.LoadReference["LGUI2.Template[isb2.profileEditor]",This].ID}"]
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
 
-        This:BuildAutoComplete
+        ISB2:BuildStandardAutoComplete
         
         TopEditor:Init[Editing,"${Window.Locate["editor.container"].ID}"]
         BottomEditor:Init[Editing,"${Window.Locate["editor.bottomContainer"].ID}"]
@@ -1087,15 +1087,6 @@ objectdef isb2_profileeditorWindow
             Window.Locate["editor.bottompane"]:SetVisibility[Collapsed]
 
         LGUI2.Element[isb2.events]:FireEventHandler[onSplitEditorChanged,"{\"value\":${newValue.AsJSON~}}"]
-    }
-
-    method BuildAutoComplete()
-    {
-        ISB2:BuildAutoComplete[Characters]
-        ISB2:BuildAutoComplete[MappableSheets]
-        ISB2:BuildAutoComplete[GameKeyBindings]
-        ISB2:BuildActionsAutoComplete
-        
     }
 
     method OnWindowClosed()

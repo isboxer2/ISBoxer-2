@@ -60,6 +60,8 @@ objectdef isb2_quicksetup inherits isb2_building
         This:DetectMonitors
         This:GenerateGameLaunchInfo
         This:RefreshBuilderPresets
+
+        ISB2:BuildStandardAutoComplete
         
         if !${LGUI2.Element[isb2.QuickSetupWindow].Visibility~.Equal[visible]}
         {
@@ -144,6 +146,11 @@ objectdef isb2_quicksetup inherits isb2_building
                 break
             case Character Selection
                 This:DetectCharacters
+
+                ; refresh game name if the user emptied it and went back, etc.
+                if !${EditingCharacter.Get[game]~.NotNULLOrEmpty}
+                    EditingCharacter:SetString[game,"${GameName~}"]
+
                 LGUI2.Element[isb2.QuickSetup.EditingCharacter.name]:KeyboardFocus
                 break
             case Window Layout
@@ -293,6 +300,9 @@ objectdef isb2_quicksetup inherits isb2_building
                     Error:Set["Please select a Game (or 'Other')"]                    
                     Context.Args:SetBool[pageValid,0]
                 }
+
+                ; we're advancing to Character page, change the game field to match
+                EditingCharacter:SetString[game,"${GameName~}"]
             }            
                 break
             case Characters

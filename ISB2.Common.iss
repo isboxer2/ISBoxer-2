@@ -231,6 +231,15 @@ objectdef isb2_profilecollection
     }
     /**/
 
+    method BuildStandardAutoComplete()
+    {
+        This:BuildAutoComplete[Characters]
+        This:BuildAutoComplete[MappableSheets]
+        This:BuildAutoComplete[GameKeyBindings]
+        This:BuildActionsAutoComplete
+        This:BuildGamesAutoComplete
+    }
+
     method BuildActionsAutoComplete()
     {
         variable jsonvalueref ja="LGUI2.Skin[default].Template[isb2.data].Get[defaultActionTypes]"
@@ -244,6 +253,21 @@ objectdef isb2_profilecollection
         }
 
         AutoComplete.Get[Actions]:SetDictionary[jo]
+    }
+
+    method BuildGamesAutoComplete()
+    {
+        variable jsonvalueref ja="LGUI2.Skin[default].Template[isb2.data].Get[games]"
+
+        variable jsonvalueref jo="{}"
+        ja:ForEach["jo:SetByRef[\"\${ForEach.Value.Get[name]}\",ForEach.Value]"]
+
+        if !${AutoComplete.Get[Games](exists)}
+        {
+            AutoComplete:Set[Games]
+        }
+
+        AutoComplete.Get[Games]:SetDictionary[jo]
     }
 
     method BuildAutoComplete(string name, string fieldName="name")

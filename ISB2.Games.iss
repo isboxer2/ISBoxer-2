@@ -169,3 +169,142 @@ objectdef isb2_games
         return "${Games.AsJSON~}"
     }
 }
+
+; EverQuest, code contributed by ElfinRoosters
+objectdef isb2_game_EQ1 inherits isb2_game
+{
+    method Initialize(jsonvalueref data)
+    {
+        This[parent]:Initialize[data]
+    }
+
+    method AddEQ1Character(jsonvalueref jo, string accountName, string serverName, string characterName)
+    {
+		;echo "\arAddEQ1Character\ax: ${accountName~} ${serverName~} ${characterName~}"
+        if ${characterName.Equal[SavedVariables]}
+            return FALSE
+
+        echo "\agDetected Everquest Character\ax: ${characterName~}-${serverName} (${accountName})"
+
+        if !${jo.Has[-array,characters]}
+            jo:Set[characters,"[]"]
+
+        variable jsonvalue joCharacter="{}"
+
+        joCharacter:SetString[name,"${characterName~}-${serverName~}"]
+        joCharacter:SetString[actualName,"${characterName~}"]
+        joCharacter:SetString[gameServer,"${serverName~}"]
+        joCharacter:SetString[accountName,"${accountName~}"]
+        joCharacter:SetString[game,"EverQuest"]
+        joCharacter:SetString[foundPath,""]
+		
+		echo "joCharacter: ${joCharacter~}"
+
+        jo.Get[characters]:AddByRef[joCharacter]
+    }
+	
+	method IniCharacterEntry(jsonvalueref jo, string accountName, string charInfo)
+	{
+        /*
+         * Character Info string should match the pattern character,server
+         */
+		echo "\arIniCharacterEntry\ax: ${accountName~} charInfo:${charInfo~}"
+        if !${charInfo.Find[","]}
+            return FALSE
+
+		variable string characterName
+		variable string serverName
+
+        characterName:Set["${charInfo.Token[1,","]~}"]
+        serverName:Set["${charInfo.Token[2,","]~}"]
+    
+		if !${characterName~.NotNULLOrEmpty}
+			return FALSE
+		if !${serverName~.NotNULLOrEmpty}
+			return FALSE
+
+        ;echo "characterName: ${characterName~}"
+        ;echo "serverName: ${serverName~}"
+	
+        This:AddEQ1Character[jo,"${accountName}","${serverName}","${characterName}"]
+	}
+
+	method IniCharacterEntries(jsonvalueref jo, string accountName, jsonvalueref eqIni)
+	{
+        /*
+         * Everquest ini file format:
+         * [Characters]
+         * Character0=character,server
+         * Character1=character,server
+         *
+         * Ensure we have a [Characters] object, and handle the values from it.
+         */
+		echo "\arIniCharacterEntries\ax: ${accountName~} eqIni:${eqIni~}"
+
+		if !${eqIni.Has["Characters"]}
+			return FALSE
+
+		eqIni.Get[Characters]:ForEach["This:IniCharacterEntry[jo,\"${accountName~}\",\"\${ForEach.Value}\"]"]
+	}
+
+    method ScanAccountCharIni(jsonvalueref jo, file accountIniFile)
+    {
+        /*
+         * Parse the account ini file, and handle the characters section
+         * from it.
+         */
+        variable string charFileName="${accountIniFile.Filename~}"
+        if ${charFileName.Equal[SavedVariables]}
+            return FALSE
+
+        echo "\ayisb2_game_EQ1:ScanAccountCharIni\ax: accountIniFile:${accountIniFile~}"
+		if !${charFileName.Find["_"]}
+			return FALSE
+
+        echo "\ayisb2_game_EQ1:ScanAccountCharIni\ax: charFileName:${charFileName~}"
+
+		variable string accountName="${charFileName.Token[1,"_"]~}"
+		if !${accountName~.NotNULLOrEmpty}
+			return FALSE
+			
+		echo "accountName: ${accountName~}"
+		
+		variable jsonvalue eqIni="{}"
+		if !${eqIni:ParseINIFile["${accountIniFile~}"](exists)} || !${eqIni.Type.Equal[object]}
+			return FALSE
+		
+        This:IniCharacterEntries[jo,${accountName~},eqIni]
+    }
+
+    method ScanAccountCharIniInto(jsonvalueref jo, filepath gameFolder)
+    {
+        /*
+         * Everquest stores the character and server names inside an {accountName}_characters.ini.
+         */
+        echo "\ayisb2_game_EQ1:ScanAccountCharIniInto\ax ${gameFolder~}"
+        variable jsonvalueref jaInis="gameFolder.GetFiles[\"\*_characters.ini\"]"
+
+        echo "inifiles=${jaInis~}"
+        jaInis:ForEach["This:ScanAccountCharIni[jo,\"${gameFolder~}/\${ForEach.Value.Get[filename]~}\"]"]
+    }
+
+    member:bool CanDetectCharacters()
+    {
+        echo "\ayisb2_game_EQ1:CanDetectCharacters: TRUE\ax"
+        return TRUE
+    }
+
+    member:jsonvalueref DetectCharacters(filepath gameFolder)
+    {
+        if !${gameFolder~.NotNULLOrEmpty}
+            return NULL
+
+        echo "\arisb2_game_EQ1:DetectCharacters\ax: GameFolder\=${gameFolder~}"
+
+        variable jsonvalue jo="{}"
+        This:ScanAccountCharIniInto[jo,"${gameFolder~}"]
+		
+        return jo
+    }
+
+}

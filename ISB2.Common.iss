@@ -2078,6 +2078,8 @@ objectdef isb2_vfxOutput
         w:Inc["${joAdjust.GetInteger[width]}"]
         h:Inc["${joAdjust.GetInteger[height]}"]
 
+        variable bool defaultPermanent=${ISB2.Character.GetBool[vfxViewersPermanent]}
+
         variable jsonvalue joVideofeed
         joVideofeed:SetValue["$$>
         {
@@ -2089,7 +2091,7 @@ objectdef isb2_vfxOutput
             "sendMouse":${Data.GetBool[-default,false,sendMouse]},
             "sendKeyboard":${Data.GetBool[-default,false,sendKeyboard]},
             "useLocalBindings":${Data.GetBool[-default,true,useLocalBindings]},
-            "permanent":${Data.GetBool[-default,false,permanent]}
+            "permanent":${Data.GetBool[-default,${defaultPermanent},permanent]}
             "opacity":${Data.GetNumber[-default,1.0,opacity]}
         }
         <$$"]
@@ -2189,6 +2191,9 @@ objectdef isb2_vfxSource
     method Enable()
     {
 ;        echo "\agisb2_vfxSource:Enable\ax ${Data~}"
+        if ${ISB2.Character.GetBool[vfxViewersPermanent]}
+            return
+
         if ${Window.Element(exists)}
             return
 

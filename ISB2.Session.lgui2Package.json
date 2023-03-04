@@ -618,6 +618,119 @@
             "name": "isb2.events"
         },
         {
+            "type":"dragger",
+            "name":"isb2.button",
+            "content":{
+                "type":"imagebox",
+                "imageBrush":"isb2.logo-48"    
+            },
+            "x":10,
+            "y":10,
+            "contextMenu":{
+                "type":"contextmenu",
+                "eventHandlers": {
+                    "onItemSelected": [ "method", "ISB2", "OnISBoxer2ButtonContextMenu" ]
+                  },          
+                "items": [
+                    {
+                        "type": "checkbox",
+                        "content": "GUI Mode",
+                        "checkedBinding": {
+                          "pullFormat": "${ISB2.GUIMode}",
+                          "pushFormat": [ "ISB2:SetGUIMode[\"", "\"]" ]
+                        }
+                    },
+                    "Reload ISBoxer 2",
+                    " ",
+                    "Hide ISBoxer 2 Button",
+                    " ",
+                    "Close Window",
+                    "Exit Process"
+                ]
+            },
+            "animations": [
+                {
+                    "name":"fly-in",
+                    "type":"chain",
+                    "autoStart":true,
+                    "animations":[
+                        {"destination":[6000,6000],"instant":true,"name":"instantOut","type":"slide"},
+                        {"destination":[10,10],"duration":1.0,"name":"slideIn","type":"slide"},
+                        {"name":"blink","type":"chain","animations":
+                            [
+                                {
+                                    "type": "value",
+                                    "name": "fadeIn",
+                                    "valueName": "opacity",
+                                    "duration": 0.3,
+                                    "finalValue": 1.0,
+                                    "originalValue": 1.0
+                                },
+                                {
+                                    "type": "delay",
+                                    "name": "delayIn",
+                                    "duration": 0.2
+                                },
+                                {
+                                    "type": "value",
+                                    "name": "fadeOut",
+                                    "duration": 0.3,
+                                    "finalValue": 0.5,
+                                    "originalValue": 1.0,
+                                    "valueName": "opacity"
+                                },
+                                {
+                                    "type": "repeat",
+                                    "name": "repeatFade",
+                                    "maxIterations": 5,
+                                    "animation": {
+                                        "type": "chain",
+                                        "name": "chainFade",
+                                        "animations": [
+                                            {
+                                                "type": "value",
+                                                "name": "fadeIn",
+                                                "duration": 0.3,
+                                                "finalValue": 1.0,
+                                                "originalValue": 0.5,
+                                                "valueName": "opacity"
+                                            },
+                                            {
+                                                "type": "delay",
+                                                "name": "delayIn",
+                                                "duration": 0.2
+                                            },
+                                            {
+                                                "type": "value",
+                                                "name": "fadeOut",
+                                                "duration": 0.3,
+                                                "finalValue": 0.5,
+                                                "originalValue": 1.0,
+                                                "valueName": "opacity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "delay",
+                                    "name": "delayIn",
+                                    "duration": 0.2
+                                },
+                                {
+                                    "type": "value",
+                                    "name": "fadeIn",
+                                    "duration": 0.3,
+                                    "finalValue": 1.0,
+                                    "originalValue": 1.0,
+                                    "valueName": "opacity"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "type":"border",
             "visibility":"visible",
             "name":"isb2.popupTextPanel",
@@ -683,7 +796,7 @@
                         "children":[
                             {
                                 "type":"button",
-                                "content":"Restart Script",
+                                "content":"Reload ISBoxer 2",
                                 "_dock": "right",
                                 "eventHandlers": {
                                     "onPress":{

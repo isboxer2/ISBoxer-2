@@ -4689,6 +4689,35 @@ objectdef isb2_profileengine
         return "${ja.SelectKey[joQuery]}"
     }
 
+    method OnISBoxer2ButtonContextMenu()
+    {
+;        echo "\ayOnISBoxer2ButtonContextMenu\ax ${Context.Source} ${Context.Element} ${Context.Args}"
+
+        variable int idx=${Context.Args[index]}
+        if ${Context.Source.Item[${idx}].Data(type)~.Equal[unistring]}
+        {
+            switch ${Context.Source.Item[${idx}].Data}
+            {
+                case Reload ISBoxer 2
+                    This:Restart
+                    break
+                case Hide ISBoxer 2 Button
+                    LGUI2.Element[isb2.button]:SetVisibility[hidden]
+                    break
+                case Close Window
+                    Display.Window:PostMessage[16]                    
+                    break
+                case Exit Process
+                    exit
+                    break
+            }
+        }
+        else
+        {
+            echo "${Context.Source.Item[${idx}].Data(type)}: ${Context.Source.Item[${idx}].Data~}"
+        }
+    }
+
 }
 
 

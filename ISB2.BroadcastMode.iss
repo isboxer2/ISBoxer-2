@@ -186,11 +186,28 @@ objectdef isb2_broadcastmode
         LGUI2.Element[isb2.events]:FireEventHandler[onBroadcastingStateChanged]
     }
 
-    method Suppress()
+    method Suppress(bool newValue=TRUE)
     {
-        Suppressed:Set[1]
-        echo "\ayisb2_broadcastmode\ax: \arBroadcasting Mode Suppressed\ax"     
-        This:Disable  
-        lgui2remotecontrol:SetRemoteControlAllowed[0]
+        if ${newValue} == ${Suppressed}
+            return
+            
+        if ${newValue}
+        {
+            Suppressed:Set[1]
+            echo "\ayisb2_broadcastmode\ax: \arBroadcasting Mode Suppressed\ax"     
+            This:Disable  
+            lgui2remotecontrol:SetRemoteControlAllowed[0]
+        }
+        else
+        {
+            Suppressed:Set[0]
+            echo "\ayisb2_broadcastmode\ax: \arBroadcasting Mode Suppression removed\ax"     
+            lgui2remotecontrol:SetRemoteControlAllowed[1]
+        }
+    }
+
+    method ToggleSuppress()
+    {
+        This:Suppress[${Suppressed.Not}]
     }
 }

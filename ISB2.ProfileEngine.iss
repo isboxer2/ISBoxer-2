@@ -1305,6 +1305,9 @@ objectdef isb2_profileengine
 
         This:DeactivateCharacter
         Character:SetReference[jo]
+
+        ISB2BroadcastMode:Suppress[${Character.GetBool[muteBroadcasts]}]
+
         This:ActivateSlot["${This.GetCharacterSlot["${Character.Get[name]~}"]}"]
         This:ActivateProfilesByName["Character.Get[profiles]"]
 

@@ -307,7 +307,7 @@
                     ]
                 },
                 {
-                    "name":"RIFT (GlyphClient.cfg, riftpatch.cfg, rift.cfg)",
+                    "name":"RIFT",
                     "shortName":"RIFT",
                     "genre":"MMO",
                     "virtualFiles":[
@@ -356,7 +356,7 @@
                     ]
                 },
                 {
-                    "name":"Trove (GlyphClient.cfg, Trove.cfg)",
+                    "name":"Trove",
                     "shortName":"Trove",
                     "genre":"MMO",
                     "virtualFiles":[

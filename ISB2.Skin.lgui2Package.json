@@ -203,6 +203,25 @@
                     ]
                 },
                 {
+                    "name":"Diablo 4",
+                    "shortName":"D4",
+                    "genre":"ARPG",
+                    "virtualFiles":[
+                        {
+                            "replacement":"{1}/Battle.net-{CHARACTER}.config",
+                            "pattern":"*/Battle.net.config"
+                        },
+                        {
+                            "replacement":"Software/Blizzard Entertainment/Battle.net-ISBoxer/{CHARACTER}/",
+                            "pattern":"Software/Blizzard Entertainment/Battle.net/"
+                        },
+                        {
+                            "pattern":"*/LocalPrefs.txt",
+                            "replacement":"{1}/LocalPrefs-{CHARACTER}.txt"
+                        }
+                    ]
+                },
+                {
                     "name":"Diablo Immortal",
                     "shortName":"DI",
                     "genre":"ARPG",

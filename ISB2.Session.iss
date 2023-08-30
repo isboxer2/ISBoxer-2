@@ -57,6 +57,7 @@ objectdef isb2session inherits isb2_profileengine
             This:InstallDefaultVirtualFiles
             WoWAddon:Generate
 
+            This:ApplyVRAMLimiting
             ISSession.OnStartupCompleted:AttachAtom[This:Event_OnStartupCompleted]
             echo "\agISBoxer 2 activated.\ax"
         }
@@ -67,9 +68,25 @@ objectdef isb2session inherits isb2_profileengine
         LGUI2:UnloadPackageFile[ISB2.Session.lgui2Package.json]
     }
 
+    method ApplyVRAMLimiting()
+	{
+		if !${direct3d11.Method[SetGPUMemoryReservation](exists)}
+			return
+
+		if ${Direct3D11.MemoryInfo.GetNumber[gpu,reserve]}==0
+			Direct3D11:SetGPUMemoryReservation[128]
+		if ${Direct3D11.MemoryInfo.GetNumber[shared,reserve]}==0
+			Direct3D11:SetSharedMemoryReservation[128]
+		if ${Direct3D11.MemoryInfo.GetNumber[gpu,budgetOverride]}==0
+			Direct3D11:SetGPUMemoryBudgetOverride[2500]
+		if ${Direct3D11.MemoryInfo.GetNumber[shared,budgetOverride]}==0
+			Direct3D11:SetSharedMemoryBudgetOverride[2500]
+	}
+
     method Event_OnStartupCompleted()
     {
         This:StripInnerSpaceDefaults
+        This:ApplyVRAMLimiting
     }
 
     method StripInnerSpaceDefaults()

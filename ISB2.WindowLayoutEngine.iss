@@ -93,6 +93,8 @@ objectdef isb2_windowlayoutengine
         This:RefreshActiveStatus[Startup]
 
 ;        uplink "ISB2WindowLayout:Event_OnSessionStartup[\"${Session~}\"]"
+
+        
     }
 
     method Shutdown()
@@ -788,7 +790,9 @@ objectdef isb2_windowlayoutengine
         else
         {
             NumActiveRegion:Set[1]
-            NumResetRegion:Set[1]
+            if !${Settings.Has[resetRegion]}
+                NumResetRegion:Set[1]
+
             RoamingSlot:Set[0]
             Roaming:Set[0]
         }
@@ -857,6 +861,47 @@ objectdef isb2_windowlayoutengine
         echo active=${NumActiveRegion} inactive=${NumInactiveRegion} reset=${NumResetRegion}
         This:SelectRegions[${NumActiveRegion},${NumInactiveRegion}]
         This:SelectResetRegion[${NumResetRegion}]
+
+
+
+
+		noop ${Direct3D8:SetForceWindowed[1]} ${Direct3D9:SetForceWindowed[1]} ${Direct3D10:SetForceWindowed[1]} ${Direct3D11:SetForceWindowed[1]}
+
+		variable bool EmulateSet
+		if ${ResetRegion.Reference(exists)}
+		{
+			videomode -add ${ResetRegion.GetInteger[bounds,3]}x${ResetRegion.GetInteger[bounds,4]}
+			if !${EmulateSet}
+			{
+				echo "\atWindow Layout selecting Reset Region resolution: ${ResetRegion.GetInteger[bounds,3]}x${ResetRegion.GetInteger[bounds,4]}"
+				videomode -emulate ${ResetRegion.GetInteger[bounds,3]}x${ResetRegion.GetInteger[bounds,4]}
+    			EmulateSet:Set[TRUE]
+			}
+		}
+
+		if ${ActiveRegion.Reference(exists)}
+		{
+			videomode -add ${ActiveRegion.GetInteger[bounds,3]}x${ActiveRegion.GetInteger[bounds,4]}
+			if !${EmulateSet}
+			{
+                echo "\atWindow Layout selecting Active Region resolution: ${ActiveRegion.GetInteger[bounds,3]}x${ActiveRegion.GetInteger[bounds,4]}"
+				videomode -emulate ${ActiveRegion.GetInteger[bounds,3]}x${ActiveRegion.GetInteger[bounds,4]}
+    			EmulateSet:Set[TRUE]
+			}
+		}
+
+		if ${InactiveRegion.Reference(exists)}
+		{
+			videomode -add ${InactiveRegion.GetInteger[bounds,3]}x${InactiveRegion.GetInteger[bounds,4]}
+			if !${EmulateSet}
+			{
+                echo "\atWindow Layout selecting Home Region resolution: ${InactiveRegion.GetInteger[bounds,3]}x${InactiveRegion.GetInteger[bounds,4]}"
+			    videomode -emulate ${InactiveRegion.GetInteger[bounds,3]}x${InactiveRegion.GetInteger[bounds,4]}
+    			EmulateSet:Set[TRUE]
+			}
+		}
+
+
 
         WindowCharacteristics -lock
         This:Apply

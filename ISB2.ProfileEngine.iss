@@ -1346,6 +1346,15 @@ objectdef isb2_profileengine
             ActiveGame:SetReference["ISB2.FindInArray[jaGames,\"${Character.Get[game]~}\"]"]
             if !${ActiveGame.Reference(exists)}
                 ActiveGame:SetReference["ISB2.FindInArray[jaGames,\"${Character.Get[game]~}\",shortName]"]
+
+            if ${ActiveGame.Reference(exists)} && !${Team.Has[lockForeground]}
+            {
+                if ${ActiveGame.GetBool[-default,true,lockForeground]}
+                    lockforeground on
+                else
+                    lockforeground off
+            }
+
         }
         else
         {
@@ -1476,13 +1485,6 @@ objectdef isb2_profileengine
         if ${jo.Has[lockForeground]}
         {
             if ${jo.GetBool[lockForeground]}
-                lockforeground on
-            else
-                lockforeground off
-        }
-        else
-        {
-            if ${ActiveGame.GetBool[-default,true,lockForeground]}
                 lockforeground on
             else
                 lockforeground off

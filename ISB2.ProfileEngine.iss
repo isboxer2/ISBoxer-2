@@ -1473,6 +1473,21 @@ objectdef isb2_profileengine
         Team.Get[clickBars]:ForEach["ClickBars.Get[\"\${ForEach.Value~}\"]:Enable"]
         Team.Get[vfxSheets]:ForEach["VFXSheets.Get[\"\${ForEach.Value~}\"]:Enable"]
 
+        if ${jo.Has[lockForeground]}
+        {
+            if ${jo.GetBool[lockForeground]}
+                lockforeground on
+            else
+                lockforeground off
+        }
+        else
+        {
+            if ${ActiveGame.GetBool[-default,true,lockForeground]}
+                lockforeground on
+            else
+                lockforeground off
+        }
+
         LGUI2.Element[isb2.events]:FireEventHandler[onTeamChanged]
 
         This:ExecuteEventAction[Team,onLoad]

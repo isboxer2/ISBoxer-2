@@ -413,8 +413,14 @@
                     ]
                 },
                 {
-                    "name":"Other",
-                    "shortName":"Other"
+                    "name":"Other ARPG",
+                    "shortName":"ARPG",
+                    "genre":"ARPG"
+                },
+                {
+                    "name":"Other MMO",
+                    "shortName":"MMO",
+                    "genre":"MMO"
                 }
             ],
             "defaultActionTypes":[

@@ -21,8 +21,16 @@ objectdef isb2_wowaddon
 
     member:uint GetInterfaceVersion()
     {
-        ; _classic_
-        return 20501
+        ; _classic_era_ 11503
+        if ${GameFolder.Find[_classic_era_]}>0
+            return 11503
+
+        ; _classic_     40400
+        if ${GameFolder.Find[_classic_]}>0
+            return 40400
+
+        ; _retail_      110002
+        return 110002
     }
 
     method WriteTOC()
@@ -42,6 +50,7 @@ objectdef isb2_wowaddon
         out_file:Write["## URL: https://isboxer.com\n"]
         out_file:Write["## DefaultState: Enabled\n"]
         out_file:Write["## LoadOnDemand: 0\n"]
+        out_file:Write["## IconTexture: Interface\\Addons\\ISBoxer_2\\ISBoxer 2-32.png\n"]
         out_file:Write["ISBoxer_2.lua\n"]
         out_file:Write["ISBoxer_2_Team.lua\n"]
         out_file:Write["ISBoxer_2_Character.lua\n"]
@@ -321,6 +330,13 @@ objectdef isb2_wowaddon
         return TRUE
     }
 
+    method WriteIconFile()
+    {
+;        out_file:Write["## IconTexture: Interface\\Addons\\ISBoxer 2\\ISBoxer 2-32.png\n"]
+
+        cp -keep "Images/ISBoxer 2-32.png" "${AddonFolder~}/ISBoxer 2-32.png"
+    }
+
     method Generate()
     {
         ; make sure we have Interface/Addons
@@ -336,6 +352,7 @@ objectdef isb2_wowaddon
         {
             ; these only need to be made once, and we dont want the different instances fighting over them ayway
             This:WriteTOC
+            This:WriteIconFile
             This:WriteMainLuaFile
             This:WriteGenericTeamFile        
             This:WriteGenericCharacterFile

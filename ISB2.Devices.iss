@@ -14,52 +14,26 @@ objectdef(global) isb2_devices
 
     method Shutdown()
     {
-        midi:CloseAllDevicesOut
-        LGUI2:UnloadPackageFile[ISB2.Devices.lgui2Package.json]
+        LGUI2:UnloadPackageFile[LGUI2/ISB2.Devices.lgui2Package.json]
     }
 
+/*
     static method SetUseSynth(bool newValue)
     {
         ISB2.Settings.Get[-init,{},midi]:SetBool[useSynth,${newValue}]
         ; echo ${ISB2.Settings}
         ISB2:AutoStoreSettings
     }
+*/
 
     method Init()
     {
+        ; not currently implemented.
+        return
+
         LGUI2:PushSkin["${ISB2.UseSkin~}"]
-        LGUI2:LoadPackageFile[ISB2.Devices.lgui2Package.json]
+        LGUI2:LoadPackageFile[LGUI2/ISB2.Devices.lgui2Package.json]
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
-
-        /*
-        jo:SetValue["$$>{
-            "name":"synth",
-            "deviceName":"Microsoft GS Wavetable Synth",
-            "deviceType":"isb2_synthGS",
-            "deviceIndex":1
-            }
-            <$$"]
-        This:AddDevice[jo]
-
-
-        joTest:SetValue["$$>{
-            "name":"launchpad mini",
-            "deviceName":"Launchpad Mini",
-            "deviceType":"isb2_launchpadMiniMK2",
-            "deviceIndex":1
-            }
-            <$$"]
-        This:AddDevice[joTest]
-
-        joTest:SetValue["$$>{
-            "name":"launchpad mk2",
-            "deviceName":"Launchpad MK2",
-            "deviceType":"isb2_launchpadMK2",
-            "deviceIndex":1
-            }
-            <$$"]
-        This:AddDevice[joTest]       
-        /**/
 
         This:RefreshOutDevices
 
@@ -132,13 +106,15 @@ objectdef(global) isb2_devices
         return TRUE
     }
 
-    method ExecuteMIDIOutAction(jsonvalueref joAction)
+    method ExecuteLDIOAction(jsonvalueref joAction)
     {
+        echo "\arNOT CURRENTLY IMPLEMENTED \ax\ayExecuteLDIOAction\ax: ${JoAction~}"
+        /*
         variable weakref useDevice
         useDevice:SetReference["Devices.Get[\"${joAction.Get[device]~}\"]"]
         if !${useDevice.Reference(exists)}
         {
-            useDevice:SetReference["midipatch.Get[\"${joAction.Get[patch]~}\"]"]
+            useDevice:SetReference["ldiopatch.Get[\"${joAction.Get[patch]~}\"]"]
             if ${useDevice.Reference(exists)}
             {
                 switch ${joAction.GetType[output]}
@@ -156,6 +132,7 @@ objectdef(global) isb2_devices
         }
 
         return ${useDevice:ExecuteMIDIOutAction[joAction](exists)}
+        */
     }
 
     method RemoteMIDIOut()
@@ -175,70 +152,18 @@ objectdef(global) isb2_devices
 objectdef isb2_device
 {
     variable weakref OutDevice
-
-    ; name of the device, e.g. "My Launchpad"
-    variable string Name
-    ; index of the device, e.g. 1 being the first "Launchpad Mini" instance
-    variable uint Index
-    ; device-specified name
-    variable string DeviceName
+    variable jsonvalueref joDevice
 
     method Initialize(jsonvalueref joDevice)
     {
-        Name:Set["${joDevice.Get[name]~}"]
-        Index:Set["${joDevice.GetInteger[-default,1,deviceIndex]}"]
-        DeviceName:Set["${joDevice.Get[-default,"",deviceName]~}"]
-
-        This:DetectDevice
+        
     }
 
     method Shutdown()
     {
-        echo "isb2_device:Shutdown ${OutDevice.Name}"
-        OutDevice:Close
     }
 
-    method DetectDevice()
-    {
-        if ${OutDevice.Reference(exists)}
-            return
-        
-;        echo "isb2_device:DetectDevice"
-        variable jsonvalueref joQuery
-        joQuery:SetReference["{\"op\":\"==\",\"value\":true}"]
-        joQuery:SetString[eval,"Select.Get[deviceName].StartsWith[\"${DeviceName~}\"]"]        
-;        joQuery:SetReference["$$>{"eval":"Select.Get[deviceName\].StartsWith[\"${DeviceName~}\"\]","op":"==","value":true}<$$"]
-
-;        echo "query=${joQuery~}"
-        variable jsonvalueref joDevice
-
-;        echo "selected values=${midi.OutDevices.SelectValues[joQuery]~}"
-
-;        echo "index = ${Index}"
-        joDevice:SetReference["midi.OutDevices.SelectValues[joQuery].Get[${Index}]"]
-;        echo "device=${joDevice~}"
-
-        if !${joDevice.Reference(exists)}
-        {
-            ; check attached devices
-            variable int idx
-;            echo "${midi.AttachedOutDevices.SelectKeys[joQuery]~}"
-            idx:Set[${midi.AttachedOutDevices.SelectKeys[joQuery].Get[${Index}]}]
-;            echo idx = ${idx}
-
-            if ${idx}
-            {
-;                echo "isb2_devices: OpenDeviceOut ${idx} for ${Name~}"
-                midi:OpenDeviceOut[${idx}]
-            }
-
-            joDevice:SetReference["midi.OutDevices.SelectValues[joQuery].Get[${Index}]"]
-        }
-
-        OutDevice:SetReference["midi.OutDevice[\"${joDevice.Get[name]~}\"]"]
-    }    
-
-    method ExecuteMIDIOutAction(jsonvalueref joAction)
+    method ExecuteLDIOAction(jsonvalueref joAction)
     {
         switch ${joAction.GetType[output]}
         {

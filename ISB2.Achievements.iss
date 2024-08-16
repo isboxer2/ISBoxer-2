@@ -24,7 +24,7 @@ objectdef(global) isb2_achievements
     method Init()
     {
         LGUI2:PushSkin["${ISB2.UseSkin~}"]
-        LGUI2:LoadPackageFile[ISB2.Achievements.lgui2Package.json]
+        LGUI2:LoadPackageFile[LGUI2/ISB2.Achievements.lgui2Package.json]
         LGUI2:PopSkin["${ISB2.UseSkin~}"]
 
         This:LoadSettings
@@ -105,7 +105,7 @@ objectdef(global) isb2_achievements
 
     method Shutdown()
     {
-        LGUI2:UnloadPackageFile[ISB2.Achievements.lgui2Package.json]
+        LGUI2:UnloadPackageFile[LGUI2/ISB2.Achievements.lgui2Package.json]
     }
 
     member:jsonvalueref GetAchievementsFromHook(string eventName)

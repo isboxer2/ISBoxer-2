@@ -1185,9 +1185,9 @@
     },
     "elements": [
         {
-            "name":"isb2.midiWindow",
+            "name":"isb2.inputDevicesWindow",
             "type":"window",
-            "title":"ISBoxer 2 MIDI Control",
+            "title":"ISBoxer 2 Input Device Manager",
             "hideOnClose": true,
             "visibility": "hidden",
             "width":600,
@@ -1205,45 +1205,6 @@
                             "horizontalAlignment": "stretch",
                             "verticalAlignment": "stretch",
                             "children":[
-                                {
-                                    "_dock":"top",
-                                    "type":"checkbox",
-                                    "horizontalAlignment":"left",
-                                    "content":"Enable MIDI Input Devices",
-                                    "margin":[5,5,5,25],
-                                    "checkedBinding":{
-                                        "pullFormat":"${ISB2.EnableMIDI}",
-                                        "pushFormat":["ISB2:SetEnableMIDI[\"","\"]"]
-                                    }
-                                },
-                                {
-                                    "_dock":"bottom",
-                                    "type":"listbox",
-                                    "horizontalAlignment":"stretch",
-                                    "contentContainer":{
-                                        "jsonTemplate":"listbox.contentContainerFitWidth"
-                                    },
-                                    "itemsBinding":{
-                                        "pullFormat":"${midi.InDevices}",
-                                        "pullHook":{
-                                            "elementName":"isb2.events",
-                                            "flags":"global",
-                                            "event":"onMidiEnableChanged"                            
-                                        }
-                                    },
-                                    "itemViewGenerators":{
-                                        "default":{
-                                            "type":"template",
-                                            "template":"isb2.midiInDeviceView"
-                                        }
-                                    },
-                                    "height":100
-                                },
-                                {
-                                    "_dock":"bottom",
-                                    "type":"textblock",
-                                    "text":"Enabled Input Devices"
-                                }
                             ]
                         }
                     },
@@ -1256,164 +1217,6 @@
                             "horizontalAlignment": "stretch",
                             "verticalAlignment": "stretch",
                             "children":[
-                                {
-                                    "_dock":"top",
-                                    "type":"textblock",
-                                    "text":"Attached Output Devices"
-                                },                                        
-                                {
-                                    "_dock":"top",
-                                    "type":"combobox",
-                                    "horizontalAlignment":"stretch",
-                                    "margin":5,
-                                    "itemsBinding":{
-                                        "pullFormat":"${midi.AttachedOutDevices}",
-                                        "pullOnce":true
-                                    },
-                                    "itemViewGenerators":{
-                                        "default":{
-                                            "type":"template",
-                                            "template":"isb2.attachedMidiView"
-                                        }
-                                    },
-                                    "eventHandlers":{
-                                        "onSelectionChanged":{
-                                            "type":"code",
-                                            "code":"isb2_devices.AddingItem:SetString[deviceName,\"${This.SelectedItem.Data.Get[deviceName]~}\"]"
-                                        }
-                                    }
-                                },                 
-                                {
-                                    "_dock":"top",
-                                    "type":"objectview",
-                                    "horizontalAlignment":"stretch",
-                                    "objectBinding":{
-                                        "pullFormat":"${isb2_devices.AddingItem}",
-                                        "pullOnce":true
-                                    },
-                                    "properties":[
-                                        {
-                                            "name":"Device Name",
-                                            "dataBinding":{
-                                                "pullFormat":"${This.Object.Get[deviceName]}",
-                                                "pullReplaceNull":"",
-                                                "pushFormat":["This.Object:SetString[deviceName,\"","\"]"],
-                                                "pushNullFormat":"This.Object:Erase[deviceName]"
-                                            },
-                                            "editTemplate":"propertyview.cancelabletextbox"                            
-                                        },
-                                        {
-                                            "name":"Device Index",
-                                            "dataBinding":{
-                                                "pullFormat":"${This.Object.Get[deviceIndex]}",
-                                                "pullReplaceNull":"",
-                                                "pushFormat":["This.Object:SetInteger[deviceIndex,\"","\"]"]
-                                            },
-                                            "editTemplate":"propertyview.textbox",
-                                            "controlData":{
-                                                "textBindingUsesFocus":true
-                                            }                            
-                                        },         
-                                        {
-                                            "name":"Usage Name",
-                                            "dataBinding":{
-                                                "pullFormat":"${This.Object.Get[name]}",
-                                                "pullReplaceNull":"",
-                                                "pushFormat":["This.Object:SetString[name,\"","\"]"],
-                                                "pushNullFormat":"This.Object:Erase[name]"
-                                            },
-                                            "editTemplate":"propertyview.cancelabletextbox"                            
-                                        }
-                                    ]
-                                },   
-                                {
-                                    "_dock":"top",
-                                    "type":"button",
-                                    "horizontalAlignment":"right",
-                                    "content":"Add",
-                                    "margin":5,
-                                    "eventHandlers":{
-                                        "onPress":{
-                                            "type":"method",
-                                            "object":"isb2_devices.Instance",
-                                            "method":"OnAddOutputDevice"
-                                        }
-                                    }
-                                },           
-                                {
-                                    "_dock":"bottom",
-                                    "type":"checkbox",
-                                    "horizontalAlignment":"left",
-                                    "content":"Use Microsoft GS Wavetable Synth (Sound output) as \"synth\"",
-                                    "margin":5,
-                                    "checkedBinding":{
-                                        "pullFormat":"${ISB2.Settings.GetBool[midi,useSynth]}",
-                                        "pushFormat":["isb2_devices:SetUseSynth[\"","\"]"]
-                                    }
-                                },
-                                {
-                                    "_dock":"bottom",
-                                    "type":"listbox",
-                                    "horizontalAlignment":"stretch",
-                                    "contentContainer":{
-                                        "jsonTemplate":"listbox.contentContainerFitWidth"
-                                    },
-                                    "itemsBinding":{
-                                        "pullFormat":"${ISB2.Settings.Get[midi,outDevices]}",
-                                        "pullHook":{
-                                            "elementName":"isb2.events",
-                                            "flags":"global",
-                                            "event":"onMidiOutDevicesChanged"                            
-                                        }
-                                    },
-                                    "itemViewGenerators":{
-                                        "default":{
-                                            "type":"template",
-                                            "template":"isb2.midiOutDeviceView"
-                                        }
-                                    },
-                                    "height":100
-                                },
-                                {
-                                    "_dock":"bottom",
-                                    "type":"textblock",
-                                    "text":"Enabled Output Devices"
-                                }
-                                
-                            ]
-                        }
-                    },
-                    {
-                        "type":"tab",
-                        "header":"Output Tester",
-                        "content":{
-                            "type":"dockpanel",
-                            "horizontalAlignment":"stretch",
-                            "verticalAlignment":"stretch",
-                            "children":[
-                                {
-                                    "_dock":"bottom",
-                                    "type":"button",
-                                    "horizontalAlignment":"right",
-                                    "content":"Test",
-                                    "eventHandlers":{
-                                        "onPress":{
-                                            "type":"method",
-                                            "object":"isb2_devices.Instance",
-                                            "method":"OnTestAction"
-                                        }
-                                    }
-                                },
-                                {
-                                    "_dock":"top",
-                                    "type":"textbox",
-                                    "horizontalAlignment":"stretch",
-                                    "textBinding":{
-                                        "pullFormat":"${isb2_devices.TestingAction.AsJSON[multiline]}",
-                                        "pushFormat":["isb2_devices.TestingAction:SetValue[\"","\"]"]
-                                    },
-                                    "textBindingUsesFocus":true
-                                }                                
                             ]
                         }
                     }

@@ -145,7 +145,7 @@ objectdef isb2_importer
     {
         variable jsonvalueref jo
         jo:SetReference["This.TransformLGUIXML[\"${filename~}\"]"]
-        jo:WriteFile["${LavishScript.ProfilesFolder~}/${filename.FilenameOnly~}.lgui2Package.json",multiline]
+        jo:WriteFile["${LavishScript.ProfilesFolder~}/LGUI2/${filename.FilenameOnly~}.lgui2Package.json",multiline]
     }
 
     member:jsonvalueref TransformLGUIXML(string filename)

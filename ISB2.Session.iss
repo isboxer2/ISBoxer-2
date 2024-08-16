@@ -42,9 +42,9 @@ objectdef isb2session inherits isb2_profileengine
             ISSession:SetFlashWindow[0]
         
             This:StripInnerSpaceDefaults
-            LGUI2:LoadPackageFile[ISB2.Skin.lgui2Package.json]
+            LGUI2:LoadPackageFile[LGUI2/ISB2.Skin.lgui2Package.json]
             LGUI2:PushSkin["${UseSkin~}"]
-            LGUI2:LoadPackageFile[ISB2.Session.lgui2Package.json]
+            LGUI2:LoadPackageFile[LGUI2/ISB2.Session.lgui2Package.json]
             LGUI2:PopSkin["${UseSkin~}"]
 
             isb2_achievements.Instance:Init
@@ -59,13 +59,16 @@ objectdef isb2session inherits isb2_profileengine
 
             This:ApplyVRAMLimiting
             ISSession.OnStartupCompleted:AttachAtom[This:Event_OnStartupCompleted]
+
+            ldio:LoadPackageFile[LDIO/ISB2.General.ldioPackage.json]
             echo "\agISBoxer 2 activated.\ax"
         }
     }
 
     method Shutdown()
     {        
-        LGUI2:UnloadPackageFile[ISB2.Session.lgui2Package.json]
+        LGUI2:UnloadPackageFile[LGUI2/ISB2.Session.lgui2Package.json]
+        ldio:UnloadPackageFile[LDIO/ISB2.General.ldioPackage.json]
     }
 
     method ApplyVRAMLimiting()
@@ -127,9 +130,6 @@ objectdef isb2session inherits isb2_profileengine
         if ${joMetadata.Has[character]}
             This:ActivateCharacterByName["${joMetadata.Get[character,name]~}"]
 
-        if ${joMetadata.GetBool[enableMidi]}
-            This:SetEnableMIDI[1]
-
         echo "\ayInstallFromSessionMetadata complete\ax"
     }
 
@@ -172,25 +172,6 @@ objectdef isb2session inherits isb2_profileengine
         return jo
     }
 
-    method SetEnableMIDI(bool newValue=TRUE)
-    {
-        Settings:SetBool[enableMidi,${newValue}]
-        This:AutoStoreSettings
-
-        if ${newValue}
-        {
-            MIDI:OpenAllDevicesIn
-            if ${MIDI.InDevices.Used}
-            {
-                LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnabled]
-            }
-        }
-        else
-        {
-            MIDI:CloseAllDevicesIn
-        }
-    }
-
     method Unicast(string relay_target, string command)
     {
         variable string wrappedCommand
@@ -230,6 +211,13 @@ objectdef isb2session inherits isb2_profileengine
 			timedcommand 2 relay "is${Slot.Inc}" "ISB2:ResetTaskbarTab[1]"
 		}
 	}
+
+    method OnLDIOMessage()
+    {
+        ; todo: implement LDIO message handling for messages direct to ISB2 session
+        echo "isb2session:OnLDIOMessage \ay${Context.Command~}\ax ${Context.Args~}"
+
+    }
 
 }
 

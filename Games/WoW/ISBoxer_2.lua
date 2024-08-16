@@ -101,7 +101,14 @@ function isboxer2.SetMacro(usename,key,macro)
 	end
 	isboxer2.NextButton = isboxer2.NextButton + 1;
 	local button = CreateFrame("Button",name,nil,"SecureActionButtonTemplate");
-	button:RegisterForClicks("LeftButtonDown")
+
+	if (C_CVar.GetCVar("ActionButtonUseKeyDown") == "1") then
+		button:RegisterForClicks("LeftButtonDown");
+	else
+		button:RegisterForClicks("LeftButtonUp");
+	end
+
+--	button:RegisterForClicks("LeftButtonDown")
 	button:SetAttribute("type1","macro");
 	button:SetAttribute("macrotext1",macro);
 	button:Hide();

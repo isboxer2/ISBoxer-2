@@ -1,0 +1,11 @@
+{
+    "$schema":"http://www.lavishsoft.com/schema/ldioPackage.json",
+    "patches": [
+        {
+            "type":"lavishscript",
+            "method": "OnLDIOMessage",
+            "object":"ISB2",
+            "name":"isb2"
+        }
+    ]
+}

@@ -53,29 +53,21 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
         echo "ISBoxer 2: Using Profiles Folder ${ProfilesFolder~}"
 
-        LGUI2:LoadPackageFile[ISB2.Skin.lgui2Package.json]
+        LGUI2:LoadPackageFile[LGUI2/ISB2.Skin.lgui2Package.json]
         LGUI2:PushSkin["${UseSkin~}"]
-        LGUI2:LoadPackageFile[ISB2.Uplink.lgui2Package.json]
+        LGUI2:LoadPackageFile[LGUI2/ISB2.Uplink.lgui2Package.json]
         LGUI2:PopSkin["${UseSkin~}"]
 
         This:InstallDefaultActionTypes
         isb2_achievements.Instance:Init    
-
-        if ${This.EnableMIDI}
-        {
-            MIDI:OpenAllDevicesIn
-            if ${MIDI.InDevices.Used}
-            {
-                LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnabled]
-            }            
-            relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
-        }
 
         isb2_devices.Instance:Init
 
         This:LoadGames
         This:LoadNativeProfiles
         This:LoadPreviousProfiles
+
+        ldio:LoadPackageFile[LDIO/ISB2.General.ldioPackage.json]
 
         if ${Settings.Has[lastSelectedTeam]}
             This:SelectTeam["${Settings.Get[lastSelectedTeam]~}"]
@@ -91,7 +83,8 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
     method Shutdown()
     {
-        LGUI2:UnloadPackageFile[ISB2.Uplink.lgui2Package.json]
+        LGUI2:UnloadPackageFile[LGUI2/ISB2.Uplink.lgui2Package.json]
+        ldio:UnloadPackageFile[LDIO/ISB2.General.ldioPackage.json]
     }
 
     method MinimumBuildNotMet()
@@ -157,8 +150,8 @@ objectdef(global) isb2 inherits isb2_profilecollection
 
     method LoadGames()
     {
-        variable jsonvalue ja
-        ja:SetValue["${LGUI2.Skin[default].Template[isb2.data].Get[games]~}"]
+        variable jsonvalueref ja="LGUI2.Skin[default].Template[isb2.data].Get[games]"
+;        ja:SetValue["${LGUI2.Skin[default].Template[isb2.data].Get[games]~}"]
 
         Games:FromJSON[ja]
     }
@@ -286,34 +279,6 @@ objectdef(global) isb2 inherits isb2_profilecollection
         Settings:SetBool[showHiddenProfiles,${newValue}]
         This:AutoStoreSettings
         LGUI2.Element[isb2.events]:FireEventHandler[onProfilesUpdated]
-    }
-
-    member:bool EnableMIDI()
-    {
-        return ${Settings.GetBool[midi,enable]}
-    }
-
-    method SetEnableMIDI(bool newValue=TRUE)
-    {
-        Settings.Get[-init,{},midi]:SetBool[enable,${newValue}]
-        This:AutoStoreSettings
-
-        if ${newValue}
-        {
-            MIDI:OpenAllDevicesIn
-            if ${MIDI.InDevices.Used}
-            {
-                LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnabled]
-            }            
-        }
-        else
-        {
-            MIDI:CloseAllDevicesIn
-        }
-
-        LGUI2.Element[isb2.events]:FireEventHandler[onMidiEnableChanged]
-        
-        relay "local isboxer" "ISB2:SetEnableMIDI[${newValue}]"
     }
 
     member:bool QuickLaunch()
@@ -480,6 +445,11 @@ objectdef(global) isb2 inherits isb2_profilecollection
         This:InstallActionTypes[ja]
     }
 
+    method OnLDIOMessage()
+    {
+        ; todo: implement LDIO message handling for messages direct to ISB2 uplink
+        echo "isb2:OnLDIOMessage \ay${Context.Command~}\ax ${Context.Args~}"
+    }
 }
 
 objectdef isb2_managedSlot
@@ -595,7 +565,6 @@ objectdef isb2_managedSlot
 
         joLaunchInfo:SetBool[isb2,1]
         joLaunchInfo:SetByRef["isb2profiles",This.CollectProfiles]
-        joLaunchInfo:SetBool[enableMidi,${ISB2.EnableMIDI}]
         joGLI:SetByRef[metadata,joLaunchInfo]
 
         Script:SetLastError        

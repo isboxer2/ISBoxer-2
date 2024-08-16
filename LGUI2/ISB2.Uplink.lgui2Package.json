@@ -841,17 +841,6 @@
                                                             "code":"LGUI2.Element[isb2.achievementsWindow]:SetVisibility[visible]"
                                                         }
                                                     }
-                                                },
-                                                {
-                                                    "type":"button",
-                                                    "content":"MIDI",
-                                                    "margin":5,
-                                                    "eventHandlers":{
-                                                        "onPress":{
-                                                            "type":"code",
-                                                            "code":"LGUI2.Element[isb2.midiWindow]:SetVisibility[visible]"
-                                                        }
-                                                    }
                                                 }
                                             ]
                                         }
